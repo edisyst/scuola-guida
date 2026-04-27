@@ -6,7 +6,9 @@ cd scuola-guida
 composer install
 cp .env.example .env
 php artisan key:generate
+php artisan storage:link
 php artisan migrate:fresh --seed
+COPIARE IMMAGINI IN STORAGE
 
 # RUN
 npm install

@@ -10,27 +10,20 @@ use App\Services\QuestionService;
 use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\UpdateQuestionRequest;
 use Illuminate\Support\Facades\Cache;
+use App\Filters\QuestionFilter;
 
 class QuestionController extends Controller
 {
     public function __construct(private QuestionService $service) {}
 
-    public function index(Request $request)
+    public function index(Request $request, QuestionFilter $filter)
     {
-        $query = Question::select('id', 'category_id', 'question', 'is_true', 'image')
-            ->with('category:id,name'); // 🔥 solo colonne utili
+        $questions = Question::query()
+            ->with('category:id,name');
 
-        // filtro categoria
-        if ($request->filled('category_id')) { // evita null/empty
-            $query->where('category_id', $request->category_id);
-        }
-
-        // ricerca testo
-        if ($request->filled('search')) {
-            $query->where('question', 'like', '%' . $request->search . '%');
-        }
-
-        $questions = $query->latest()->get();
+        $questions = $filter->apply($questions)
+            ->latest()
+            ->get();
 
         $categories = Cache::remember('categories_list', 3600, function () {
             return Category::select('id', 'name')->get();

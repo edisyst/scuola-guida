@@ -16,7 +16,7 @@ class QuestionFactory extends Factory
             'category_id' => Category::factory(), // 🔥 IMPORTANTISSIMO
             'question' => $this->faker->sentence(10),
             'is_true' => $this->faker->boolean(),
-            'image' => null,
+            'image' => 'questions/images/test/' . $this->faker->numberBetween(1, 10) . '.png',
         ];
     }
 }
