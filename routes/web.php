@@ -24,6 +24,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::resource('questions', QuestionController::class);
     Route::get('/admin/questions/data', [QuestionController::class, 'data'])
         ->name('questions.data');
+    Route::get('/admin/questions/export', [QuestionController::class, 'export'])
+        ->name('questions.export');
+    Route::post('/admin/questions/import', [QuestionController::class, 'import'])
+        ->name('questions.import');
+    Route::get('/admin/questions/template', [QuestionController::class, 'template'])
+        ->name('questions.template');
+    Route::post('/admin/questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
+        ->name('questions.bulkDelete');
 });
 
 // quiz

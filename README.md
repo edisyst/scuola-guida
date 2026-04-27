@@ -82,3 +82,14 @@ php artisan make:request StoreQuestionRequest
 @stop
 
 composer require barryvdh/laravel-debugbar --dev
+
+ATTIVA NEL PHP.INI extension=zip
+composer require maatwebsite/excel:^3.1 
+php artisan make:export QuestionsExport --model=Question
+php artisan make:import QuestionsImport --model=Question
+
+// questo non l'ho fatto, mi sa che è inutile al momento
+php artisan queue:table
+php artisan migrate
+php artisan make:job ImportQuestionsJob
+

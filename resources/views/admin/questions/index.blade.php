@@ -7,6 +7,20 @@
     <a href="{{ route('questions.create') }}" class="btn btn-primary mb-3">
         Nuova Domanda
     </a>
+    <a href="{{ route('questions.export') }}" class="btn btn-success mb-3">
+        Export Excel
+    </a>
+    <a href="{{ route('questions.template') }}" class="btn btn-info mb-3">
+        Scarica Template
+    </a>
+
+    <form action="{{ route('questions.import') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+        @csrf
+        <input type="file" name="file" required>
+        <button class="btn btn-primary">Import Excel</button>
+    </form>
+
+    <button id="bulk-delete" class="btn btn-danger mb-3">Elimina selezionati</button>
 
     <div class="row mb-3">
         <div class="col-md-3">
@@ -43,6 +57,7 @@
             <th>Risposta</th>
             <th>Img</th>
             <th>Azioni</th>
+            <th><input type="checkbox" id="select-all"></th>
         </tr>
         </thead>
     </table>
@@ -53,6 +68,38 @@
     @parent
 
     <script>
+        $('#select-all').on('click', function() {
+            $('.row-checkbox').prop('checked', this.checked);
+        });
+
+        $('#bulk-delete').click(function() {
+            let ids = [];
+
+            $('.row-checkbox:checked').each(function() {
+                ids.push($(this).val());
+            });
+
+            if (!ids.length) {
+                toastr.warning('Seleziona almeno un elemento');
+                return;
+            }
+
+            if (!confirm('Sei sicuro?')) return;
+
+            $.ajax({
+                url: "{{ route('questions.bulkDelete') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    ids: ids
+                },
+                success: function() {
+                    toastr.success('Eliminati');
+                    $('#questions-table').DataTable().ajax.reload();
+                }
+            });
+        });
+
         $(function() {
             let table = $('#questions-table').DataTable({
                 processing: true,
@@ -73,6 +120,7 @@
                     { data: 'is_true', orderable: false },
                     { data: 'image', orderable: false },
                     { data: 'actions', orderable: false },
+                    { data: 'checkbox', orderable: false, searchable: false },
                 ],
             });
 

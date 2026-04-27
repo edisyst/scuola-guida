@@ -11,10 +11,50 @@ use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\UpdateQuestionRequest;
 use Illuminate\Support\Facades\Cache;
 use App\Filters\QuestionFilter;
+use App\Exports\QuestionsExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\QuestionsImport;
 
 class QuestionController extends Controller
 {
     public function __construct(private QuestionService $service) {}
+
+    public function export()
+    {
+        return Excel::download(new QuestionsExport, 'questions.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,csv'
+        ]);
+
+        Excel::import(new QuestionsImport, $request->file('file'));
+
+        return back()->with('success', 'Import completato');
+    }
+
+    public function template()
+    {
+        $data = [
+            ['ID', 'Categoria', 'Domanda', 'Risposta', 'Immagine'],
+            ['', 'Segnaletica', 'Esempio domanda', 'VERO', ''],
+        ];
+
+        return Excel::download(new class($data) implements \Maatwebsite\Excel\Concerns\FromArray {
+            private $data;
+            public function __construct($data) { $this->data = $data; }
+            public function array(): array { return $this->data; }
+        }, 'template_questions.xlsx');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        Question::whereIn('id', $request->ids)->delete();
+
+        return response()->json(['success' => true]);
+    }
 
     public function data(Request $request)
     {
@@ -74,6 +114,8 @@ class QuestionController extends Controller
                         : '',
 
                     'actions' => view('admin.questions.partials.actions', compact('q'))->render(),
+
+                    'checkbox' => '<input type="checkbox" class="row-checkbox" value="'.$q->id.'">',
                 ];
             }),
         ]);
