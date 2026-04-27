@@ -8,6 +8,32 @@
         Nuova Domanda
     </a>
 
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <select id="filter-category" class="form-control">
+                <option value="">Tutte categorie</option>
+                @foreach($categories as $c)
+                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <select id="filter-is-true" class="form-control">
+                <option value="">Tutte</option>
+                <option value="1">Vero</option>
+                <option value="0">Falso</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <select id="filter-image" class="form-control">
+                <option value="">Tutte</option>
+                <option value="1">Con immagine</option>
+            </select>
+        </div>
+    </div>
+
     <table id="questions-table" class="table table-bordered table-striped">
         <thead>
         <tr>
@@ -28,25 +54,31 @@
 
     <script>
         $(function() {
-            $('#questions-table').DataTable({
+            let table = $('#questions-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('questions.data') }}",
+                ajax: {
+                    url: "{{ route('questions.data') }}",
+                    data: function (d) {
+                        d.category_id = $('#filter-category').val();
+                        d.is_true = $('#filter-is-true').val();
+                        d.has_image = $('#filter-image').val();
+                    }
+                },
 
                 columns: [
                     { data: 'id' },
                     { data: 'category' },
                     { data: 'question' },
-                    { data: 'is_true', orderable: false, searchable: false },
-                    { data: 'image', orderable: false, searchable: false },
-                    { data: 'actions', orderable: false, searchable: false },
+                    { data: 'is_true', orderable: false },
+                    { data: 'image', orderable: false },
+                    { data: 'actions', orderable: false },
                 ],
+            });
 
-                pageLength: 10,
-                order: [[0, 'desc']],
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/it-IT.json'
-                }
+            // 🔥 trigger reload al cambio filtro
+            $('#filter-category, #filter-is-true, #filter-image').change(function() {
+                table.draw();
             });
         });
     </script>
