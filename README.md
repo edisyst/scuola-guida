@@ -1,7 +1,16 @@
 composer create-project --prefer-dist laravel/laravel:^11.0 scuola-guida
 composer create-project laravel/laravel scuola-guida
 
+# INSTALL
 cd scuola-guida
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate:fresh --seed
+
+# RUN
+npm install
+npm run dev
 php artisan serve
 http://127.0.0.1:8000
 
