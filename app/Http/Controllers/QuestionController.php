@@ -16,6 +16,51 @@ class QuestionController extends Controller
 {
     public function __construct(private QuestionService $service) {}
 
+    public function data(Request $request)
+    {
+        $query = Question::with('category:id,name');
+
+        // ricerca globale DataTables
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('question', 'like', "%{$search}%")
+                  ->orWhereHas('category', function ($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $total = Question::count();
+
+        $filtered = $query->count();
+
+        $data = $query
+            ->skip($request->start)
+            ->take($request->length)
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(function ($q) {
+                return [
+                    'id' => $q->id,
+                    'category' => $q->category->name,
+                    'question' => \Str::limit($q->question, 50),
+                    'is_true' => $q->is_true
+                        ? '<span class="badge badge-success">Vero</span>'
+                        : '<span class="badge badge-danger">Falso</span>',
+                    'image' => $q->image
+                        ? '<img src="'.asset('storage/'.$q->image).'" width="50">'
+                        : '',
+                    'actions' => view('admin.questions.partials.actions', compact('q'))->render(),
+                ];
+            }),
+        ]);
+    }
+
     public function index(Request $request, QuestionFilter $filter)
     {
         $questions = Question::query()
