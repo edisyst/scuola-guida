@@ -22,6 +22,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 // questions
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::resource('questions', QuestionController::class);
+    Route::get('/admin/questions/data', [QuestionController::class, 'data'])
+        ->name('questions.data');
 });
 
 // quiz

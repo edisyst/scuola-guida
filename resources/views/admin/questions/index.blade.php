@@ -16,41 +16,9 @@
             <th>Domanda</th>
             <th>Risposta</th>
             <th>Img</th>
-            <th width="150">Azioni</th>
+            <th>Azioni</th>
         </tr>
         </thead>
-        <tbody>
-        @foreach($questions as $q)
-            <tr>
-                <td>{{ $q->id }}</td>
-                <td>{{ $q->category->name }}</td>
-                <td>{{ \Illuminate\Support\Str::limit($q->question, 50) }}</td>
-                <td>
-                    @if($q->is_true)
-                        <span class="badge badge-success">Vero</span>
-                    @else
-                        <span class="badge badge-danger">Falso</span>
-                    @endif
-                </td>
-                <td>
-                    @if($q->image)
-                        <img src="{{ asset('storage/'.$q->image) }}" width="50">
-                    @endif
-                </td>
-                <td>
-                    <a href="{{ route('questions.edit', $q) }}" class="btn btn-sm btn-warning">Modifica</a>
-
-                    <form action="{{ route('questions.destroy', $q) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-sm btn-danger" onclick="return confirm('Sei sicuro?')">
-                            Elimina
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-        </tbody>
     </table>
 
 @endsection
@@ -61,11 +29,21 @@
     <script>
         $(function() {
             $('#questions-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('questions.data') }}",
+
+                columns: [
+                    { data: 'id' },
+                    { data: 'category' },
+                    { data: 'question' },
+                    { data: 'is_true', orderable: false, searchable: false },
+                    { data: 'image', orderable: false, searchable: false },
+                    { data: 'actions', orderable: false, searchable: false },
+                ],
+
                 pageLength: 10,
                 order: [[0, 'desc']],
-                columnDefs: [
-                    { orderable: false, targets: [4,5] } // img + azioni non ordinabili
-                ],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/it-IT.json'
                 }
