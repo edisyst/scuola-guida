@@ -30,7 +30,7 @@ class CategoryController extends Controller
         Category::create($data);
         Cache::forget('categories_list');
 
-        return redirect()->route('categories.index')
+        return redirect()->route('admin.categories.index')
             ->with('success', 'Categoria creata');
     }
 
@@ -49,7 +49,7 @@ class CategoryController extends Controller
         $category->update($data);
         Cache::forget('categories_list');
 
-        return redirect()->route('categories.index')
+        return redirect()->route('admin.categories.index')
             ->with('success', 'Categoria aggiornata');
     }
 

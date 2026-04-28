@@ -3,7 +3,7 @@
 @section('header', 'Nuova Categoria')
 
 @section('content')
-    <form action="{{ route('categories.store') }}" method="POST">
+    <form action="{{ route('admin.categories.store') }}" method="POST">
         @csrf
 
         @include('admin.categories.partials.form')

@@ -16,10 +16,8 @@ Route::middleware(['auth', 'admin'])
     ->group(function () {
 
         // categories
-        Route::resource('categories', CategoryController::class);
-
-        // questions
-        Route::resource('questions', QuestionController::class);
+        Route::resource('categories', CategoryController::class)
+            ->except(['show']);
 
         // DataTables server-side
         Route::get('questions/data', [QuestionController::class, 'data'])
@@ -36,6 +34,10 @@ Route::middleware(['auth', 'admin'])
 
         Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
             ->name('questions.bulkDelete');
+
+        // questions
+        Route::resource('questions', QuestionController::class)
+            ->except(['show']);
 
         // audit logs
         Route::get('audit-logs', function () {

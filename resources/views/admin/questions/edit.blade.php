@@ -3,7 +3,7 @@
 @section('header', 'Modifica Domanda')
 
 @section('content')
-    <form action="{{ route('questions.update', $question) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.questions.update', $question) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 

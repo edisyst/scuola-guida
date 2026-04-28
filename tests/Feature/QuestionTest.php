@@ -16,7 +16,7 @@ class QuestionTest extends TestCase
         $admin = User::factory()->create(['is_admin' => true]);
         $category = Category::factory()->create();
 
-        $response = $this->actingAs($admin)->post(route('questions.store'), [
+        $response = $this->actingAs($admin)->post(route('admin.questions.store'), [
             'category_id' => $category->id,
             'question' => 'Test domanda',
             'is_true' => 1
@@ -33,7 +33,7 @@ class QuestionTest extends TestCase
     {
         $category = Category::factory()->create();
 
-        $response = $this->post(route('questions.store'), [
+        $response = $this->post(route('admin.questions.store'), [
             'category_id' => $category->id,
             'question' => 'Test',
             'is_true' => 1

@@ -163,7 +163,7 @@ class QuestionController extends Controller
 
         Question::create($data);
 
-        return redirect()->route('questions.index')
+        return redirect()->route('admin.questions.index')
             ->with('success', 'Domanda creata');
     }
 
@@ -192,7 +192,7 @@ class QuestionController extends Controller
 
         $question->update($data);
 
-        return redirect()->route('questions.index')
+        return redirect()->route('admin.questions.index')
             ->with('success', 'Domanda aggiornata');
     }
 

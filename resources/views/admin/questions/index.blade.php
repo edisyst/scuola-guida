@@ -4,17 +4,17 @@
 
 @section('content')
 
-    <a href="{{ route('questions.create') }}" class="btn btn-primary mb-3">
+    <a href="{{ route('admin.questions.create') }}" class="btn btn-primary mb-3">
         Nuova Domanda
     </a>
-    <a href="{{ route('questions.export') }}" class="btn btn-success mb-3">
+    <a href="{{ route('admin.questions.export') }}" class="btn btn-success mb-3">
         Export Excel
     </a>
-    <a href="{{ route('questions.template') }}" class="btn btn-info mb-3">
+    <a href="{{ route('admin.questions.template') }}" class="btn btn-info mb-3">
         Scarica Template
     </a>
 
-    <form action="{{ route('questions.import') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+    <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="mb-3">
         @csrf
         <input type="file" name="file" required>
         <button class="btn btn-primary">Import Excel</button>
@@ -87,7 +87,7 @@
             if (!confirm('Sei sicuro?')) return;
 
             $.ajax({
-                url: "{{ route('questions.bulkDelete') }}",
+                url: "{{ route('admin.questions.bulkDelete') }}",
                 method: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
@@ -105,7 +105,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('questions.data') }}",
+                    url: "{{ route('admin.questions.data') }}",
                     data: function (d) {
                         d.category_id = $('#filter-category').val();
                         d.is_true = $('#filter-is-true').val();

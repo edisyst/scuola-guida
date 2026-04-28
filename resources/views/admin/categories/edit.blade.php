@@ -3,7 +3,7 @@
 @section('header', 'Modifica Categoria')
 
 @section('content')
-    <form action="{{ route('categories.update', $category) }}" method="POST">
+    <form action="{{ route('admin.categories.update', $category) }}" method="POST">
         @csrf
         @method('PUT')
 

@@ -3,7 +3,7 @@
 @section('header', 'Nuova Domanda')
 
 @section('content')
-    <form action="{{ route('questions.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.questions.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         @include('admin.questions.partials.form')
