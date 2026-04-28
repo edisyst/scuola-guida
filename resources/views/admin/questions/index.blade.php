@@ -4,15 +4,12 @@
 
 @section('content')
 
-    <a href="{{ route('admin.questions.create') }}" class="btn btn-primary mb-3">
-        Nuova Domanda
-    </a>
-    <a href="{{ route('admin.questions.export') }}" class="btn btn-success mb-3">
-        Export Excel
-    </a>
-    <a href="{{ route('admin.questions.template') }}" class="btn btn-info mb-3">
-        Scarica Template
-    </a>
+    @if(auth()->user()->canCreateQuestion())
+        <a href="{{ route('admin.questions.create') }}" class="btn btn-primary mb-3">Nuova Domanda</a>
+    @endif
+
+    <a href="{{ route('admin.questions.export') }}" class="btn btn-success mb-3">Export Excel</a>
+    <a href="{{ route('admin.questions.template') }}" class="btn btn-info mb-3">Scarica Template</a>
 
     <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="mb-3">
         @csrf

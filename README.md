@@ -95,3 +95,5 @@ php artisan make:migration create_audit_logs_table
 📁 app/Models/AuditLog.php
 📁 app/Traits/Auditable.php
 php artisan make:test AuditLogTest
+
+php artisan make:migration add_permissions_to_users_table
