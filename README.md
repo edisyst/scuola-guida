@@ -34,8 +34,6 @@ php artisan migrate
 php artisan make:seeder AdminUserSeeder
 php artisan db:seed
 
-php artisan make:middleware IsAdmin
-
 composer require jeroennoten/laravel-adminlte
 php artisan adminlte:install
 // testare su /login con user=admin@test.com password=password poi andare su /admin

@@ -10,43 +10,48 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth', 'admin'])
+Route::middleware(['auth'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        // categories
-        Route::resource('categories', CategoryController::class)
-            ->except(['show']);
+        // accesso base admin area
+        Route::middleware('role:admin,editor,viewer')->group(function () {
 
-        // DataTables server-side
-        Route::get('questions/data', [QuestionController::class, 'data'])
-            ->name('questions.data');
+            // categories
+            Route::resource('categories', CategoryController::class)
+                ->except(['show']);
 
-        Route::get('questions/export', [QuestionController::class, 'export'])
-            ->name('questions.export');
+            // questions
+            Route::get('questions/data', [QuestionController::class, 'data'])
+                ->name('questions.data');
 
-        Route::post('questions/import', [QuestionController::class, 'import'])
-            ->name('questions.import');
+            Route::resource('questions', QuestionController::class)
+                ->except(['show']);
 
-        Route::get('questions/template', [QuestionController::class, 'template'])
-            ->name('questions.template');
+            Route::get('questions/export', [QuestionController::class, 'export'])
+                ->name('questions.export');
 
-        Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
-            ->name('questions.bulkDelete');
+            Route::post('questions/import', [QuestionController::class, 'import'])
+                ->name('questions.import');
 
-        // questions
-        Route::resource('questions', QuestionController::class)
-            ->except(['show']);
+            Route::get('questions/template', [QuestionController::class, 'template'])
+                ->name('questions.template');
 
-        // audit logs
-        Route::get('audit-logs', function () {
-            $logs = \App\Models\AuditLog::with('user')
-                ->latest()
-                ->paginate(20);
+            Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
+                ->name('questions.bulkDelete');
+        });
 
-            return view('admin.audit.index', compact('logs'));
-        })->name('audit.index');
+        // 🔥 SOLO ADMIN
+        Route::middleware('role:admin')->group(function () {
+            Route::get('audit-logs', function () {
+                $logs = \App\Models\AuditLog::with('user')
+                    ->latest()
+                    ->paginate(20);
+
+                return view('admin.audit.index', compact('logs'));
+            })->name('audit.index');
+        });
     });
 
 // quiz
