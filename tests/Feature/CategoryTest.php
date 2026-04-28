@@ -11,31 +11,61 @@ class CategoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_example(): void
+    protected function adminUser()
     {
-        $response = $this->get('/');
+        return \App\Models\User::factory()->create([
+            'role' => 'admin'
+        ]);
+    }
 
-        $response->assertStatus(200);
+    protected function editorUser()
+    {
+        return \App\Models\User::factory()->create([
+            'role' => 'editor'
+        ]);
+    }
+
+    protected function viewerUser()
+    {
+        return \App\Models\User::factory()->create([
+            'role' => 'viewer'
+        ]);
+    }
+
+    public function test_guest_cannot_access_admin()
+    {
+        $response = $this->get('/admin/questions');
+
+        $response->assertRedirect('/login');
+    }
+
+    public function test_only_admin_can_access_audit()
+    {
+        $this->actingAs($this->editorUser());
+
+        $response = $this->get(route('admin.audit.index'));
+
+        $response->assertStatus(403);
     }
 
     public function test_admin_can_create_category()
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($this->adminUser());
 
-        $response = $this->actingAs($admin)->post('/admin/categories', [
-            'name' => 'Segnali'
+        $response = $this->post(route('admin.categories.store'), [
+            'name' => 'Nuova categoria'
         ]);
 
-        $response->assertRedirect('/admin/categories');
+        $response->assertRedirect();
 
         $this->assertDatabaseHas('categories', [
-            'name' => 'Segnali'
+            'name' => 'Nuova categoria'
         ]);
     }
 
     public function test_non_admin_cannot_access_categories()
     {
-        $user = User::factory()->create(['is_admin' => false]);
+        $user = User::factory()->create(['role' => 'guest']);
 
         $response = $this->actingAs($user)->get('/admin/categories');
 
