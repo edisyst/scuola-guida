@@ -342,6 +342,11 @@ return [
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question',
         ],
+        [
+            'text' => 'Audit Log',
+            'url'  => 'admin/audit-logs',
+            'icon' => 'fas fa-file',
+        ],
         ['header' => 'account_settings'],
         [
             'text' => 'profile',
