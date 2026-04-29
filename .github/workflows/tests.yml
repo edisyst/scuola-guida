@@ -38,15 +38,11 @@ jobs:
           cp .env.example .env
           php artisan key:generate --env=testing
 
-      - name: Configure DB
-        run: |
-          sed -i 's/DB_HOST=.*/DB_HOST=mysql/' .env
-          sed -i 's/DB_DATABASE=.*/DB_DATABASE=laravel_test/' .env
-          sed -i 's/DB_USERNAME=.*/DB_USERNAME=root/' .env
-          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+      - name: Create SQLite database
+        run: touch database/testing.sqlite
 
       - name: Run migrations
-        run: php artisan migrate
+        run: php artisan migrate --env=testing --database=sqlite_testing
 
       - name: Run tests
         run: php artisan test
