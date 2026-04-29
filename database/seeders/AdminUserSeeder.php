@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -11,14 +10,16 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Admin
         User::create([
             'name' => 'Admin',
             'email' => 'admin@test.com',
             'password' => Hash::make('password'),
             'role' => User::ROLE_ADMIN,
-            'permissions' => [], // admin bypassa tutto
+//             'permissions' => [], // ROLE_ADMIN bypassa tutto
         ]);
 
+        // Editor
         User::create([
             'name' => 'Editor',
             'email' => 'editor@test.com',
@@ -30,6 +31,7 @@ class AdminUserSeeder extends Seeder
             ],
         ]);
 
+        // Viewer
         User::create([
             'name' => 'Viewer',
             'email' => 'viewer@test.com',

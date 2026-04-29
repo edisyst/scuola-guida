@@ -35,6 +35,12 @@ class Category extends Model
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
+
     public function questions()
     {
         return $this->hasMany(Question::class);

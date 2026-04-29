@@ -33,6 +33,12 @@ class Question extends Model
         }
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
+
     public function category()
     {
         return $this->belongsTo(Category::class);
