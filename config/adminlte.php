@@ -331,26 +331,39 @@ return [
             'text' => 'Prova Quiz',
             'url'  => 'quiz/play',
             'icon' => 'fas fa-check',
+            // pubblico → nessun can
+        ],
+        [
+            'text' => 'Dashboard',
+            'url'  => 'admin/dashboard',
+            'icon' => 'fas fa-home',
+            'can'  => 'view-admin',
         ],
         [
             'text' => 'Categorie',
             'url'  => 'admin/categories',
             'icon' => 'fas fa-tags',
+            'can'  => 'manage-questions',
         ],
         [
             'text' => 'Domande',
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question',
+//             'label' => 6, // lo calcola AppServiceProvider
+//             'label_color' => 'success',
+            'can'  => 'manage-questions',
         ],
         [
             'text' => 'Audit Log',
             'url'  => 'admin/audit-logs',
             'icon' => 'fas fa-file',
+            'can'  => 'admin-only',
         ],
         [
             'text' => 'Users',
             'url'  => 'admin/users',
             'icon' => 'fas fa-user',
+            'can'  => 'admin-only',
         ],
         ['header' => 'account_settings'],
         [

@@ -19,6 +19,12 @@ class Question extends Model
 
     protected $with = ['category']; // carica sempre category automaticamente (usare solo se serve sempre)
 
+    /*
+    |--------------------------------------------------------------------------
+    | SCOPES
+    |--------------------------------------------------------------------------
+    */
+
     public function scopeCategory($query, $categoryId)
     {
         if ($categoryId) {
