@@ -67,9 +67,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/quiz/results', [QuizController::class, 'results'])->name('quiz.results');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// KPI - DA METTERE SOTTO AUTENTICAZIONE
+Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
+    ->name('dashboard');
+
+//VWECCHIA DASHBOARD DI BREEZE
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
