@@ -4,6 +4,14 @@
 
 @section('content')
 
+    @if(auth()->user()->isAdmin())
+        <li class="nav-item">
+            <a href="{{ route('admin.users.index') }}" class="nav-link">
+                <p>Utenti</p>
+            </a>
+        </li>
+    @endif
+
     @if(auth()->user()->canCreateQuestion())
         <a href="{{ route('admin.questions.create') }}" class="btn btn-primary mb-3">Nuova Domanda</a>
     @endif

@@ -42,15 +42,21 @@ Route::middleware(['auth'])
                 ->name('questions.bulkDelete');
         });
 
-        // 🔥 SOLO ADMIN
+        // SOLO ADMIN: audit-logs
         Route::middleware('role:admin')->group(function () {
             Route::get('audit-logs', function () {
                 $logs = \App\Models\AuditLog::with('user')
                     ->latest()
                     ->paginate(20);
-
                 return view('admin.audit.index', compact('logs'));
             })->name('audit.index');
+        });
+
+        // SOLO ADMIN: users
+        Route::middleware('role:admin')->group(function () {
+            Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+                ->except(['show']);
+
         });
     });
 

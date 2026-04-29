@@ -97,3 +97,5 @@ php artisan make:migration create_audit_logs_table
 php artisan make:test AuditLogTest
 
 php artisan make:migration add_permissions_to_users_table
+
+php artisan make:controller Admin/UserController --resource
