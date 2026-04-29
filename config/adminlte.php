@@ -347,6 +347,11 @@ return [
             'url'  => 'admin/audit-logs',
             'icon' => 'fas fa-file',
         ],
+        [
+            'text' => 'Users',
+            'url'  => 'admin/users',
+            'icon' => 'fas fa-user',
+        ],
         ['header' => 'account_settings'],
         [
             'text' => 'profile',

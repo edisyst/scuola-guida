@@ -15,7 +15,8 @@ class AdminUserSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@test.com',
             'password' => Hash::make('password'),
-            'role' => User::ROLE_ADMIN, // 🔥 FIX
+            'role' => User::ROLE_ADMIN,
+            'permissions' => [], // admin bypassa tutto
         ]);
 
         User::create([
@@ -23,6 +24,10 @@ class AdminUserSeeder extends Seeder
             'email' => 'editor@test.com',
             'password' => Hash::make('password'),
             'role' => User::ROLE_EDITOR,
+            'permissions' => [
+                'create_question',
+                'edit_question',
+            ],
         ]);
 
         User::create([
@@ -30,6 +35,7 @@ class AdminUserSeeder extends Seeder
             'email' => 'viewer@test.com',
             'password' => Hash::make('password'),
             'role' => User::ROLE_VIEWER,
+            'permissions' => [],
         ]);
     }
 }

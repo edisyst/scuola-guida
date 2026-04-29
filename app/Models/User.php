@@ -26,6 +26,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'permissions' => 'array',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -55,5 +59,37 @@ class User extends Authenticatable
             self::ROLE_ADMIN,
             self::ROLE_EDITOR
         ]);
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        // 🔥 admin bypass totale
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $permissions = $this->permissions ?? [];
+
+        // 🔥 gestione permesso globale
+        if (in_array('manage_question', $permissions)) {
+            return true;
+        }
+
+        return in_array($permission, $permissions);
+    }
+
+    public function canCreateQuestion(): bool
+    {
+        return $this->hasPermission('create_question');
+    }
+
+    public function canEditQuestion(): bool
+    {
+        return $this->hasPermission('edit_question');
+    }
+
+    public function canDeleteQuestion(): bool
+    {
+        return $this->hasPermission('delete_question');
     }
 }

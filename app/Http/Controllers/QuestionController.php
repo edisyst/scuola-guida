@@ -146,6 +146,10 @@ class QuestionController extends Controller
 
     public function store(Request $request)
     {
+        if (!auth()->user()->canCreateQuestion()) {
+            abort(403);
+        }
+
         $data = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'question'    => 'required|string',
@@ -176,6 +180,10 @@ class QuestionController extends Controller
 
     public function update(Request $request, Question $question)
     {
+        if (!auth()->user()->canEditQuestion()) {
+            abort(403);
+        }
+
         $data = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'question'    => 'required|string',
@@ -198,6 +206,10 @@ class QuestionController extends Controller
 
     public function destroy(Question $question)
     {
+        if (!auth()->user()->canDeleteQuestion()) {
+            abort(403);
+        }
+
         $this->service->delete($question);
 
         return back()->with('success', 'Domanda eliminata');
