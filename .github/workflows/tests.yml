@@ -14,13 +14,13 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: laravel_test
-        ports:
-          - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
+        ports:
+          - 3306:3306
 
     steps:
       - uses: actions/checkout@v3
@@ -35,14 +35,37 @@ jobs:
 
       - name: Setup environment
         run: |
-          cp .env.example .env
+          cp .env.example .env.testing
           php artisan key:generate --env=testing
 
-      - name: Create SQLite database
-        run: touch database/testing.sqlite
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if mysqladmin ping -h 127.0.0.1 -u root -proot --silent; then
+              echo "MySQL is ready!"
+              exit 0
+            fi
+            echo "Waiting for MySQL... ($i/30)"
+            sleep 1
+          done
+          exit 1
 
       - name: Run migrations
-        run: php artisan migrate --env=testing --database=sqlite_testing
+        run: php artisan migrate --env=testing
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: laravel_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
 
       - name: Run tests
-        run: php artisan test
+        run: php artisan test --env=testing
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: laravel_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
