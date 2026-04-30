@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     'main_navigation' => 'MENU PRINCIPALE',
     'blog' => 'Blog',
     'pages' => 'Pagine',
@@ -16,4 +15,6 @@ return [
     'important' => 'Importante',
     'warning' => 'Avvertimento',
     'information' => 'Informazione',
+    'admin_area' => 'AMMINISTRAZIONE',
+    'homepage' => 'HOME',
 ];

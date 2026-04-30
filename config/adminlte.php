@@ -320,13 +320,7 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
-        [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
-        ],
+        ['header' => 'homepage'],
         [
             'text' => 'Prova Quiz',
             'url'  => 'quiz/play',
@@ -339,6 +333,7 @@ return [
             'icon' => 'fas fa-home',
             'can'  => 'view-admin',
         ],
+        ['header' => 'admin_area'],
         [
             'text' => 'Categorie',
             'url'  => 'admin/categories',
@@ -415,6 +410,13 @@ return [
             ],
         ],
         ['header' => 'labels'],
+        [
+            'text' => 'pages',
+            'url' => 'admin/pages',
+            'icon' => 'far fa-fw fa-file',
+            'label' => 4,
+            'label_color' => 'success',
+        ],
         [
             'text' => 'important',
             'icon_color' => 'red',
