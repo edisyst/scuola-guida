@@ -347,6 +347,7 @@ return [
 //             'label' => 6, // lo calcola AppServiceProvider
 //             'label_color' => 'success',
             'can'  => 'manage-questions',
+    'key'  => 'questions_menu',
         ],
         [
             'text' => 'Audit Log',

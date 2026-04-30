@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Question;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Cache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -56,8 +57,10 @@ class AppServiceProvider extends ServiceProvider
             config([
                 'adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) {
 
-                    if (($item['text'] ?? '') === 'Domande') {
-                        $item['label'] = Question::count();
+                    if (($item['key'] ?? '') === 'questions_menu') {
+                        $item['label'] = Cache::remember('questions_count', 60, function () {
+                            return Question::count();
+                        });
                         $item['label_color'] = 'success';
                     }
 
