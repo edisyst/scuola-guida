@@ -9,11 +9,10 @@ class Quiz extends Model
 {
     use HasFactory;
 
-    /*
-    |--------------------------------------------------------------------------
-    | HELPERS
-    |--------------------------------------------------------------------------
-    */
+    protected $fillable = [
+        'title',
+        'is_active',
+    ];
 
     public static function generateRandom($limit = 10)
     {
@@ -21,12 +20,6 @@ class Quiz extends Model
             ->limit($limit)
             ->get();
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONS
-    |--------------------------------------------------------------------------
-    */
 
     public function questions()
     {

@@ -121,6 +121,12 @@ class QuestionController extends Controller
         ]);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD
+    |--------------------------------------------------------------------------
+    */
+
     public function index(Request $request, QuestionFilter $filter)
     {
         $questions = Question::query()
@@ -217,6 +223,12 @@ class QuestionController extends Controller
 
         return back()->with('success', 'Domanda eliminata');
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALTRI METODI
+    |--------------------------------------------------------------------------
+    */
 
     private function handleImageUpload($request, $question = null)
     {

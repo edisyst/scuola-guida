@@ -363,6 +363,12 @@ return [
             'can'  => 'admin-only',
             'key'  => 'users',
         ],
+        [
+            'text' => 'Quizzes',
+            'url'  => 'admin/quizzes',
+            'icon' => 'fas fa-check',
+            'key'  => 'quizzes',
+        ],
         ['header' => 'account_settings'],
         [
             'text' => 'profile',

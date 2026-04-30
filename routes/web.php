@@ -69,6 +69,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
     Route::get('/quiz/results', [QuizController::class, 'results'])->name('quiz.results');
 });
+// ADMIN CRUD
+Route::resource('admin/quizzes', \App\Http\Controllers\QuizController::class)
+    ->names('admin.quizzes'); // probabilmente devo togliere show
+// PLAY
+Route::get('quiz/random-play', [QuizController::class, 'randomPlay'])
+    ->name('quiz.random');
+Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])
+    ->name('quiz.play');
 
 
 //VWECCHIA DASHBOARD DI BREEZE

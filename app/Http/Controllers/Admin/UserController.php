@@ -16,6 +16,12 @@ class UserController extends Controller
         'manage_question',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD
+    |--------------------------------------------------------------------------
+    */
+
     public function index()
     {
         $users = User::latest()->paginate(10);

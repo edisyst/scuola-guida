@@ -11,6 +11,7 @@ use App\Models\Quiz;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use App\Observers\QuizObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /*
+        |--------------------------------------------------------------------------
+        | OBSERVERS
+        |--------------------------------------------------------------------------
+        */
+
+        Quiz::observe(QuizObserver::class);
+
         /*
         |--------------------------------------------------------------------------
         | GATES MENU ADMINLTE

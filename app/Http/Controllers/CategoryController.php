@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD
+    |--------------------------------------------------------------------------
+    */
+
     public function index()
     {
         $categories = Category::withCount('questions')->get();
