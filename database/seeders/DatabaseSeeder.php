@@ -18,26 +18,19 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
 
-
-//         User::factory(10)->create();
-
-//         User::factory()->create([
-//             'name' => 'Test User',
-//             'email' => 'test@example.com',
-//         ]);
-
         // Crea 10 categorie
         $categories = Category::factory()
             ->count(10)
             ->create();
 
         // Crea 100 domande usando le categorie esistenti
-        $questions = Question::factory()
-            ->count(100)
+        $questions = Question::factory(100)
             ->recycle($categories)
             ->create();
 
-        Quiz::factory(10)->recycle($questions)->create();
+        Quiz::factory(10)
+            ->recycle($questions)
+            ->create();
 
         $this->call(QuizAttemptSeeder::class);
     }
