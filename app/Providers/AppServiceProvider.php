@@ -6,6 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Question;
+use App\Models\Category;
+use App\Models\Quiz;
+use App\Models\AuditLog;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 
@@ -52,20 +55,57 @@ class AppServiceProvider extends ServiceProvider
             return $user->canDeleteQuestion();
         });
 
-        View::composer('*', function ($view) {
+        /*
+        |--------------------------------------------------------------------------
+        | VIEW COMPOSER ADMINLTE
+        |--------------------------------------------------------------------------
+        */
 
-            config([
-                'adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) {
+        View::composer('*', function () {
+            // 🔥 cache unica per tutti i badge (più efficiente)
+            $counts = Cache::remember('admin_badges', 60, function () {
+                return [
+                    'users' => User::count(),
+                    'questions' => Question::count(),
+                    'categories' => Category::count(),
+                    'quizzes' => Quiz::count(),
+                    'audit' => AuditLog::count(),
+                ];
+            });
 
-                    if (($item['key'] ?? '') === 'questions_menu') {
-                        $item['label'] = Cache::remember('questions_count', 60, function () {
-                            return Question::count();
-                        });
-                        $item['label_color'] = 'success';
-                    }
+            config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($counts) {
 
+                if (!isset($item['key']))
                     return $item;
 
+                switch ($item['key']) {
+                    case 'questions':
+                        $item['label'] = $counts['questions'];
+                        $item['label_color'] = 'success';
+                        break;
+
+                    case 'categories':
+                        $item['label'] = $counts['categories'];
+                        $item['label_color'] = 'info';
+                        break;
+
+                    case 'users':
+                        $item['label'] = $counts['users'];
+                        $item['label_color'] = 'primary';
+                        break;
+
+                    case 'quizzes':
+                        $item['label'] = $counts['quizzes'];
+                        $item['label_color'] = 'warning';
+                        break;
+
+                    case 'audit':
+                        $item['label'] = $counts['audit'];
+                        $item['label_color'] = 'danger';
+                        break;
+                }
+
+                    return $item;
                 })->toArray()
             ]);
         });

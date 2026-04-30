@@ -326,6 +326,7 @@ return [
             'url'  => 'quiz/play',
             'icon' => 'fas fa-check',
             // pubblico → nessun can
+            'key'  => 'quizzes',
         ],
         [
             'text' => 'Dashboard',
@@ -339,27 +340,28 @@ return [
             'url'  => 'admin/categories',
             'icon' => 'fas fa-tags',
             'can'  => 'manage-questions',
+            'key'  => 'categories',
         ],
         [
             'text' => 'Domande',
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question',
-//             'label' => 6, // lo calcola AppServiceProvider
-//             'label_color' => 'success',
             'can'  => 'manage-questions',
-    'key'  => 'questions_menu',
+            'key'  => 'questions',
         ],
         [
             'text' => 'Audit Log',
             'url'  => 'admin/audit-logs',
             'icon' => 'fas fa-file',
             'can'  => 'admin-only',
+            'key'  => 'audit',
         ],
         [
             'text' => 'Users',
             'url'  => 'admin/users',
             'icon' => 'fas fa-user',
             'can'  => 'admin-only',
+            'key'  => 'users',
         ],
         ['header' => 'account_settings'],
         [

@@ -11,7 +11,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::latest()->paginate(10); // paginazione reale
+        $categories = Category::withCount('questions')->get();
 
         return view('admin.categories.index', compact('categories'));
     }
@@ -28,7 +28,8 @@ class CategoryController extends Controller
         ]);
 
         Category::create($data);
-        Cache::forget('categories_list');
+        Cache::forget('categories_list'); // sarebbe da creare l'helper anche di questo
+        clearAdminBadgesCache();
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoria creata');
@@ -47,7 +48,8 @@ class CategoryController extends Controller
         ]);
 
         $category->update($data);
-        Cache::forget('categories_list');
+        Cache::forget('categories_list'); // sarebbe da creare l'helper anche di questo
+        clearAdminBadgesCache();
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoria aggiornata');
@@ -56,7 +58,8 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        Cache::forget('categories_list');
+        Cache::forget('categories_list'); // sarebbe da creare l'helper anche di questo
+        clearAdminBadgesCache();
 
         return back()->with('success', 'Categoria eliminata');
     }

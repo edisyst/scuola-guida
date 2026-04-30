@@ -43,6 +43,7 @@ class UserController extends Controller
         $data['password'] = Hash::make($data['password']);
 
         User::create($data);
+        clearAdminBadgesCache();
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Utente creato');
@@ -73,6 +74,7 @@ class UserController extends Controller
         }
 
         $user->update($data);
+        clearAdminBadgesCache();
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Utente aggiornato');
@@ -85,6 +87,7 @@ class UserController extends Controller
         }
 
         $user->delete();
+        clearAdminBadgesCache();
 
         return back()->with('success', 'Utente eliminato');
     }

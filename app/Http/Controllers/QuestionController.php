@@ -166,6 +166,7 @@ class QuestionController extends Controller
         }
 
         Question::create($data);
+        clearAdminBadgesCache();
 
         return redirect()->route('admin.questions.index')
             ->with('success', 'Domanda creata');
@@ -199,6 +200,7 @@ class QuestionController extends Controller
         }
 
         $question->update($data);
+        clearAdminBadgesCache();
 
         return redirect()->route('admin.questions.index')
             ->with('success', 'Domanda aggiornata');
@@ -211,6 +213,7 @@ class QuestionController extends Controller
         }
 
         $this->service->delete($question);
+        clearAdminBadgesCache();
 
         return back()->with('success', 'Domanda eliminata');
     }

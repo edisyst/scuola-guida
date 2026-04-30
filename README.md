@@ -105,3 +105,5 @@ php artisan make:controller Admin/DashboardController
 php artisan make:model QuizAttempt -m
 php artisan make:factory QuizAttemptFactory --model=QuizAttempt
 php artisan make:seeder QuizAttemptSeeder
+
+composer dump-autoload
