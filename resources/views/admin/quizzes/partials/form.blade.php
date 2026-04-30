@@ -12,3 +12,21 @@
         Attivo
     </label>
 </div>
+
+<div class="form-group">
+    <label>Domande</label>
+
+    <select name="questions[]" class="form-control" multiple size="10">
+
+        @foreach($questions as $q)
+            <option value="{{ $q->id }}"
+                    @if(isset($quiz) && $quiz->questions->contains($q->id)) selected @endif
+            >
+                {{ Str::limit($q->question, 60) }}
+            </option>
+        @endforeach
+
+    </select>
+
+    <small class="text-muted">Tieni premuto CTRL per selezione multipla</small>
+</div>

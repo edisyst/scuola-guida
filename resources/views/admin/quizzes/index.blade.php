@@ -14,6 +14,7 @@
             <th>ID</th>
             <th>Titolo</th>
             <th>Attivo</th>
+            <th>Domande</th>
             <th>Azioni</th>
         </tr>
     </thead>
@@ -31,6 +32,7 @@
                         <span class="badge badge-secondary">Disattivo</span>
                     @endif
                 </td>
+                <td><span class="badge badge-info">{{ $quiz->questions_count }}</span></td>
 
                 <td>
                     <a href="{{ route('quiz.play', $quiz) }}" class="btn btn-sm btn-info">Play</a>

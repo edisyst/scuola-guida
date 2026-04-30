@@ -19,25 +19,35 @@ class QuizController extends Controller
 
     public function index()
     {
-        $quizzes = Quiz::latest()->get();
+        $quizzes = Quiz::withCount('questions')->latest()->get();
 
         return view('admin.quizzes.index', compact('quizzes'));
     }
 
     public function create()
     {
-        return view('admin.quizzes.create');
+        $questions = Question::limit(200)->get(); // evita carichi enormi
+
+        return view('admin.quizzes.create', compact('questions'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title'     => 'nullable', //|string forse??? o forse si può togliere?
+            'title'         => 'nullable', //|string forse??? o forse si può togliere?
+            'questions'     => 'nullable|array',
+            'questions.*'   => 'exists:questions,id',
         ]);
 
         $data['is_active'] = $request->has('is_active');
 
         $quiz = Quiz::create($data);
+
+        // 🔥 collega domande
+        if (!empty($data['questions'])) {
+            $quiz->questions()->sync($data['questions']);
+        }
+
         clearAdminBadgesCache();
 
         return redirect()->route('admin.quizzes.index')
@@ -46,18 +56,27 @@ class QuizController extends Controller
 
     public function edit(Quiz $quiz)
     {
-        return view('admin.quizzes.edit', compact('quiz'));
+        $questions = Question::limit(200)->get();
+//        $quiz->load('questions');
+
+        return view('admin.quizzes.edit', compact('quiz', 'questions'));
     }
 
     public function update(Request $request, Quiz $quiz)
     {
         $data = $request->validate([
             'title' => 'nullable|string', // forse si può togliere?
+            'questions' => 'nullable|array',
+            'questions.*' => 'exists:questions,id',
         ]);
 
         $data['is_active'] = $request->has('is_active');
 
         $quiz->update($data);
+
+        // 🔥 aggiorna pivot
+        $quiz->questions()->sync($data['questions'] ?? []);
+
         clearAdminBadgesCache();
 
         return redirect()->route('admin.quizzes.index')
