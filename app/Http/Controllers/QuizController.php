@@ -38,6 +38,7 @@ class QuizController extends Controller
             'title'         => 'nullable', //|string forse??? o forse si può togliere?
             'questions'     => 'nullable|array',
             'questions.*'   => 'exists:questions,id',
+            'max_questions' => 'required|integer|min:1|max:100',
         ]);
 
         $data['is_active'] = $request->has('is_active');
@@ -69,6 +70,7 @@ class QuizController extends Controller
             'title' => 'nullable|string', // forse si può togliere?
             'questions' => 'nullable|array',
             'questions.*' => 'exists:questions,id',
+            'max_questions' => 'required|integer|min:1|max:100',
         ]);
 
         $data['is_active'] = $request->has('is_active');
@@ -164,9 +166,15 @@ class QuizController extends Controller
 
     public function addQuestion(Request $request, Quiz $quiz)
     {
-        $request->validate([
-            'question_id' => 'required|exists:questions,id'
-        ]);
+        if ($quiz->hasReachedLimit()) {
+            return response()->json([
+                'error' => 'Limite massimo raggiunto'
+            ], 422);
+        }
+
+//        $request->validate([
+//            'question_id' => 'required|exists:questions,id'
+//        ]);
 
         $quiz->questions()->syncWithoutDetaching([
             $request->question_id
@@ -188,21 +196,22 @@ class QuizController extends Controller
 
     public function createRandom()
     {
+        $max = $quiz->max_questions;
+
         $quiz = Quiz::create([
             'title' => 'QUIZ NR.',
-            'is_active' => true
+            'max_questions' => 30
         ]);
 
-        $quiz->update([
-            'title' => 'QUIZ NR. ' . $quiz->id
-        ]);
+        $ids = Question::inRandomOrder()
+            ->limit($max)
+            ->pluck('id');
 
-        $questions = Question::inRandomOrder()->limit(30)->pluck('id');
+        $quiz->questions()->attach($ids);
 
-        $quiz->questions()->sync($questions);
-
-        return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Quiz random creato');
+        return redirect()
+            ->route('admin.quizzes.index')
+            ->with('success', 'Quiz creato con '.$ids->count().' domande');
     }
 
     public function randomPlay()
@@ -262,6 +271,9 @@ class QuizController extends Controller
 
     public function bulkAdd(Request $request, Quiz $quiz)
     {
+        $max = $quiz->max_questions;
+        $current = $quiz->questions()->count();
+
         if ($request->mode === 'all') {
 
             $query = Question::query();
@@ -273,12 +285,27 @@ class QuizController extends Controller
             $ids = $query->pluck('id');
 
         } else {
-            $ids = $request->ids ?? [];
+            $ids = collect($request->ids ?? []);
         }
+
+        // 🔥 calcolo quanti posso aggiungere
+        $available = $max - $current;
+
+        if ($available <= 0) {
+            return response()->json([
+                'error' => 'Limite massimo raggiunto'
+            ], 422);
+        }
+
+        // 🔥 limito gli ID
+        $ids = collect($ids)->take($available);
 
         $quiz->questions()->syncWithoutDetaching($ids);
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'added' => $ids->count()
+        ]);
     }
 
     public function bulkRemove(Request $request, Quiz $quiz)

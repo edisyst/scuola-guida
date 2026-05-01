@@ -1,4 +1,11 @@
 <div class="form-group">
+    <label>Max Domande</label>
+    <input type="number" name="max_questions"
+           class="form-control"
+           value="{{ old('max_questions', $quiz->max_questions ?? 30) }}">
+</div>
+
+<div class="form-group">
     <label>Titolo</label>
     <input name="title"
            class="form-control"

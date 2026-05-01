@@ -12,6 +12,11 @@ class Quiz extends Model
     protected $fillable = [
         'title',
         'is_active',
+        'max_questions',
+    ];
+
+    protected $casts = [
+        'max_questions' => 'integer',
     ];
 
     public static function generateRandom($limit = 10)
@@ -21,10 +26,37 @@ class Quiz extends Model
             ->get();
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | HELPERS
+    |--------------------------------------------------------------------------
+    */
+
     public function hasQuestion($questionId)
     {
         return $this->questions()->where('question_id', $questionId)->exists();
     }
+
+    public function hasReachedLimit(): bool
+    {
+        return $this->questions()->count() >= $this->max_questions;
+    }
+
+    public function remainingSlots(): int
+    {
+        return $this->max_questions - $this->questions()->count();
+    }
+
+//    public function getMaxQuestionsAttribute($value)
+//    {
+//        return $value ?? 30;
+//    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
 
     public function questions()
     {

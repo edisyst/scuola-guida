@@ -49,6 +49,13 @@
             </div>
 
             {{-- TABELLA --}}
+            <div class="mb-3">
+                <strong>
+                    Domande:
+                    {{ $quiz->questions()->count() }}
+                    / {{ $quiz->max_questions }}
+                </strong>
+            </div>
             <table id="questions-table" class="table table-bordered">
 
                 <thead>
@@ -142,6 +149,8 @@
             }, function () {
                 toastr.success('Aggiunta');
                 table.ajax.reload();
+            }).fail(function (xhr) {
+                toastr.error(xhr.responseJSON.error);
             });
         });
 
@@ -245,6 +254,10 @@
                 selectionMode = 'manual';
 
                 table.ajax.reload(null, false);
+            }).fail(function (xhr) {
+
+                toastr.error(xhr.responseJSON.error);
+
             });
         });
 
@@ -275,6 +288,13 @@
                 table.ajax.reload(null, false);
             });
         });
+
+        // DISABILITA BOTTONI (UX PRO)
+        function checkLimit(current, max) {
+            if (current >= max) {
+                $('.btn-add, #bulk-add').prop('disabled', true);
+            }
+        }
 
     </script>
 
