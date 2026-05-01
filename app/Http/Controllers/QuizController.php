@@ -253,4 +253,52 @@ class QuizController extends Controller
 
         return view('quiz.results', compact('results'));
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | BULK ACTIONS METHODS
+    |--------------------------------------------------------------------------
+    */
+
+    public function bulkAdd(Request $request, Quiz $quiz)
+    {
+        if ($request->mode === 'all') {
+
+            $query = Question::query();
+
+            if ($request->category_id) {
+                $query->where('category_id', $request->category_id);
+            }
+
+            $ids = $query->pluck('id');
+
+        } else {
+            $ids = $request->ids ?? [];
+        }
+
+        $quiz->questions()->syncWithoutDetaching($ids);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function bulkRemove(Request $request, Quiz $quiz)
+    {
+        if ($request->mode === 'all') {
+
+            $query = Question::query();
+
+            if ($request->category_id) {
+                $query->where('category_id', $request->category_id);
+            }
+
+            $ids = $query->pluck('id');
+
+        } else {
+            $ids = $request->ids ?? [];
+        }
+
+        $quiz->questions()->detach($ids);
+
+        return response()->json(['success' => true]);
+    }
 }

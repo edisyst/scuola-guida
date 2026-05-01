@@ -69,15 +69,18 @@ Route::post('admin/quizzes/random', [QuizController::class, 'createRandom'])
 
 Route::get('admin/quizzes/{quiz}/questions/data', [QuizController::class, 'questionsData'])
     ->name('admin.quizzes.questions.data');
-
 Route::get('admin/quizzes/{quiz}/questions', [QuizController::class, 'manageQuestions'])
     ->name('admin.quizzes.questions');
 
 Route::post('admin/quizzes/{quiz}/questions/add', [QuizController::class, 'addQuestion'])
     ->name('admin.quizzes.questions.add');
-
 Route::post('admin/quizzes/{quiz}/questions/remove', [QuizController::class, 'removeQuestion'])
     ->name('admin.quizzes.questions.remove');
+
+Route::post('admin/quizzes/{quiz}/bulk-add', [QuizController::class, 'bulkAdd'])
+    ->name('admin.quizzes.bulkAdd');
+Route::post('admin/quizzes/{quiz}/bulk-remove', [QuizController::class, 'bulkRemove'])
+    ->name('admin.quizzes.bulkRemove');
 
 Route::resource('admin/quizzes', \App\Http\Controllers\QuizController::class)
     ->names('admin.quizzes'); // probabilmente devo togliere show
