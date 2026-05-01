@@ -19,7 +19,7 @@ class QuizController extends Controller
 
     public function index()
     {
-        $quizzes = Quiz::withCount('questions')->latest()->get();
+        $quizzes = Quiz::withCount('questions')->get();
 
         return view('admin.quizzes.index', compact('quizzes'));
     }
@@ -97,6 +97,58 @@ class QuizController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    public function manageQuestions(Quiz $quiz)
+    {
+        $quiz->load('questions');
+
+        $questions = Question::with('category')->get();
+
+        return view('admin.quizzes.questions', compact('quiz', 'questions'));
+    }
+
+    public function addQuestion(Request $request, Quiz $quiz)
+    {
+        $request->validate([
+            'question_id' => 'required|exists:questions,id'
+        ]);
+
+        $quiz->questions()->syncWithoutDetaching([
+            $request->question_id
+        ]);
+
+        return back()->with('success', 'Domanda aggiunta');
+    }
+
+    public function removeQuestion(Request $request, Quiz $quiz)
+    {
+        $request->validate([
+            'question_id' => 'required|exists:questions,id'
+        ]);
+
+        $quiz->questions()->detach($request->question_id);
+
+        return back()->with('success', 'Domanda rimossa');
+    }
+
+    public function createRandom()
+    {
+        $quiz = Quiz::create([
+            'title' => 'QUIZ NR.',
+            'is_active' => true
+        ]);
+
+        $quiz->update([
+            'title' => 'QUIZ NR. ' . $quiz->id
+        ]);
+
+        $questions = Question::inRandomOrder()->limit(30)->pluck('id');
+
+        $quiz->questions()->sync($questions);
+
+        return redirect()->route('admin.quizzes.index')
+            ->with('success', 'Quiz random creato');
+    }
+
     public function randomPlay()
     {
         $ids = Question::inRandomOrder()->limit(10)->pluck('id');
@@ -107,10 +159,19 @@ class QuizController extends Controller
 
     public function play(Quiz $quiz)
     {
-        // per ora stesso comportamento (poi colleghiamo domande al quiz)
-        $questions = Question::inRandomOrder()->limit(10)->get();
+        $questions = $quiz->questions()->get();
 
-        return view('quiz.play', compact('questions', 'quiz'));
+        return view('quiz.play', [
+            'quiz' => $quiz,
+            'questionsJson' => $questions->map(function ($q) {
+                return [
+                    'id' => $q->id,
+                    'text' => $q->question,
+                    'image' => $q->image ? asset('storage/'.$q->image) : null,
+                    'correct' => $q->is_true,
+                ];
+            })
+        ]);
     }
 
     public function submit(Request $request, QuizService $service)

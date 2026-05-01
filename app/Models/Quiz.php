@@ -21,6 +21,11 @@ class Quiz extends Model
             ->get();
     }
 
+    public function hasQuestion($questionId)
+    {
+        return $this->questions()->where('question_id', $questionId)->exists();
+    }
+
     public function questions()
     {
         return $this->belongsToMany(Question::class);

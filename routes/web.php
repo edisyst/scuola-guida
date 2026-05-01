@@ -63,16 +63,30 @@ Route::middleware(['auth'])
             });
     });
 
+// QUIZZES
+Route::post('admin/quizzes/random', [QuizController::class, 'createRandom'])
+    ->name('admin.quizzes.random');
+
+Route::get('admin/quizzes/{quiz}/questions', [QuizController::class, 'manageQuestions'])
+    ->name('admin.quizzes.questions');
+
+Route::post('admin/quizzes/{quiz}/questions/add', [QuizController::class, 'addQuestion'])
+    ->name('admin.quizzes.questions.add');
+
+Route::post('admin/quizzes/{quiz}/questions/remove', [QuizController::class, 'removeQuestion'])
+    ->name('admin.quizzes.questions.remove');
+
+Route::resource('admin/quizzes', \App\Http\Controllers\QuizController::class)
+    ->names('admin.quizzes'); // probabilmente devo togliere show
+
+
 // quiz
 Route::middleware(['auth'])->group(function () {
     Route::get('/quiz/play', [QuizController::class, 'play'])->name('quiz.play');
     Route::post('/quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
     Route::get('/quiz/results', [QuizController::class, 'results'])->name('quiz.results');
 });
-// ADMIN CRUD
-Route::resource('admin/quizzes', \App\Http\Controllers\QuizController::class)
-    ->names('admin.quizzes'); // probabilmente devo togliere show
-// PLAY
+// quiz PLAY
 Route::get('quiz/random-play', [QuizController::class, 'randomPlay'])
     ->name('quiz.random');
 Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])
