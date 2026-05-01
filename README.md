@@ -107,3 +107,6 @@ php artisan make:factory QuizAttemptFactory --model=QuizAttempt
 php artisan make:seeder QuizAttemptSeeder
 
 composer dump-autoload
+
+composer require yajra/laravel-datatables:"^11.0"
+

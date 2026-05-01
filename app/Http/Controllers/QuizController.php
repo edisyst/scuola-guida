@@ -8,6 +8,7 @@ use App\Models\Quiz;
 use App\Models\QuizResult;
 use App\Models\Question;
 use App\Services\QuizService;
+use Yajra\DataTables\Facades\DataTables;
 
 class QuizController extends Controller
 {
@@ -96,6 +97,61 @@ class QuizController extends Controller
     | ALTRI METODI
     |--------------------------------------------------------------------------
     */
+
+    public function questionsData(Request $request, Quiz $quiz)
+    {
+//        dd(99);
+        $query = Question::with('category')
+            ->select('questions.*');
+
+        // filtro categoria
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        return DataTables::of($query)
+
+            ->addColumn('category', function ($q) {
+                return $q->category->name ?? '-';
+            })
+
+            ->addColumn('status', function ($q) use ($quiz) {
+
+                $exists = $quiz->questions()
+                    ->where('question_id', $q->id)
+                    ->exists();
+
+                return $exists
+                    ? '<span class="badge badge-success">✔ Nel quiz</span>'
+                    : '<span class="badge badge-secondary">Non presente</span>';
+            })
+
+            ->addColumn('action', function ($q) use ($quiz) {
+
+                $exists = $quiz->questions()
+                    ->where('question_id', $q->id)
+                    ->exists();
+
+                if ($exists) {
+                    return '
+                    <button class="btn btn-sm btn-danger btn-remove"
+                        data-id="'.$q->id.'">
+                        Rimuovi
+                    </button>
+                ';
+                }
+
+                return '
+                <button class="btn btn-sm btn-success btn-add"
+                    data-id="'.$q->id.'">
+                    Aggiungi
+                </button>
+            ';
+            })
+
+            ->rawColumns(['status', 'action'])
+            ->make(true);
+    }
 
     public function manageQuestions(Quiz $quiz)
     {

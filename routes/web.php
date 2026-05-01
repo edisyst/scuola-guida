@@ -67,6 +67,9 @@ Route::middleware(['auth'])
 Route::post('admin/quizzes/random', [QuizController::class, 'createRandom'])
     ->name('admin.quizzes.random');
 
+Route::get('admin/quizzes/{quiz}/questions/data', [QuizController::class, 'questionsData'])
+    ->name('admin.quizzes.questions.data');
+
 Route::get('admin/quizzes/{quiz}/questions', [QuizController::class, 'manageQuestions'])
     ->name('admin.quizzes.questions');
 
