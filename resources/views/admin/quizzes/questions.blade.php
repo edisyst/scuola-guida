@@ -56,6 +56,27 @@
                     / {{ $quiz->max_questions }}
                 </strong>
             </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <strong>
+                        <span id="current-count">{{ $currentCount }}</span>
+                        /
+                        <span id="max-count">{{ $max }}</span>
+                        domande
+                    </strong>
+                    <span id="percentage"></span>
+                </div>
+
+                <div class="progress">
+                    <div id="quiz-progress-bar"
+                         class="progress-bar bg-success"
+                         role="progressbar"
+                         style="width: 0%">
+                    </div>
+                </div>
+            </div>
+
             <table id="questions-table" class="table table-bordered">
 
                 <thead>
@@ -84,6 +105,8 @@
         let table = null;
 
         $(document).ready(function () {
+            updateProgress({{ $currentCount }}, {{ $max }});
+
             table = $('#questions-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -147,6 +170,9 @@
                 _token: "{{ csrf_token() }}",
                 question_id: id
             }, function () {
+                let current = parseInt($('#current-count').text()) + 1;
+                let max = parseInt($('#max-count').text());
+                updateProgress(current, max);
                 toastr.success('Aggiunta');
                 table.ajax.reload();
             }).fail(function (xhr) {
@@ -167,6 +193,9 @@
                 _token: "{{ csrf_token() }}",
                 question_id: id
             }, function () {
+                let current = parseInt($('#current-count').text()) - 1;
+                let max = parseInt($('#max-count').text());
+                updateProgress(current, max);
                 toastr.warning('Rimossa');
                 table.ajax.reload();
             });
@@ -246,7 +275,11 @@
                 ids: Array.from(selectedIds),
                 mode: selectionMode,
                 category_id: $('#filter-category').val()
-            }, function () {
+            }, function (res) {
+                let current = parseInt($('#current-count').text()) + res.added;
+                let max = parseInt($('#max-count').text());
+
+                updateProgress(current, max);
 
                 toastr.success('Domande aggiunte');
 
@@ -279,6 +312,12 @@
                 mode: selectionMode,
                 category_id: $('#filter-category').val()
             }, function () {
+                table.ajax.reload(function () {
+
+                    // fallback: ricalcolo da server (più preciso)
+                    location.reload();
+
+                });
 
                 toastr.warning('Domande rimosse');
 
@@ -293,6 +332,37 @@
         function checkLimit(current, max) {
             if (current >= max) {
                 $('.btn-add, #bulk-add').prop('disabled', true);
+            }
+        }
+
+        function updateProgress(current, max) {
+
+            const percent = Math.round((current / max) * 100);
+
+            $('#quiz-progress-bar')
+                .css('width', percent + '%')
+                .text(percent + '%');
+
+            $('#current-count').text(current);
+            $('#percentage').text(percent + '%');
+
+            // 🔥 colori dinamici (UX TOP)
+            let bar = $('#quiz-progress-bar');
+
+            bar.removeClass('bg-success bg-warning bg-danger');
+
+            if (percent < 60) {
+                bar.addClass('bg-success');
+            } else if (percent < 90) {
+                bar.addClass('bg-warning');
+            } else {
+                bar.addClass('bg-danger');
+            }
+
+            if (current >= max) {
+                $('.btn-add, #bulk-add').prop('disabled', true);
+            } else {
+                $('.btn-add, #bulk-add').prop('disabled', false);
             }
         }
 

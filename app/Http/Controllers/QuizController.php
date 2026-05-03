@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateQuizRequest;
+use App\Http\Requests\StoreQuizRequest;
 use Illuminate\Http\Request;
 use App\Models\Quiz;
 use App\Models\QuizResult;
@@ -32,21 +34,21 @@ class QuizController extends Controller
         return view('admin.quizzes.create', compact('questions'));
     }
 
-    public function store(Request $request)
+    public function store(StoreQuizRequest $request)
     {
-        $data = $request->validate([
-            'title'         => 'nullable', //|string forse??? o forse si può togliere?
-            'questions'     => 'nullable|array',
-            'questions.*'   => 'exists:questions,id',
-            'max_questions' => 'required|integer|min:1|max:100',
-        ]);
-
+        $data = $request->validated();
         $data['is_active'] = $request->has('is_active');
 
         $quiz = Quiz::create($data);
 
         // 🔥 collega domande
         if (!empty($data['questions'])) {
+            if (count($data['questions']) > $quiz->max_questions) {
+                return back()->withErrors([
+                    'questions' => 'Superato limite massimo domande'
+                ]);
+            }
+
             $quiz->questions()->sync($data['questions']);
         }
 
@@ -58,21 +60,24 @@ class QuizController extends Controller
 
     public function edit(Quiz $quiz)
     {
+        $questionsCount = $quiz->questions()->count();
+        $currentCount = $quiz->questions()->count(); // refactoring: sono la stessa cosa
+        $max = $quiz->max_questions;
+
         $questions = Question::limit(200)->get();
 //        $quiz->load('questions');
 
-        return view('admin.quizzes.edit', compact('quiz', 'questions'));
+        return view('admin.quizzes.edit', compact('quiz', 'questions', 'questionsCount', 'currentCount', 'max'));
     }
 
-    public function update(Request $request, Quiz $quiz)
+    public function update(UpdateQuizRequest $request, Quiz $quiz)
     {
+        $quiz->update($request->validated());
+
         $data = $request->validate([
-            'title' => 'nullable|string', // forse si può togliere?
             'questions' => 'nullable|array',
             'questions.*' => 'exists:questions,id',
-            'max_questions' => 'required|integer|min:1|max:100',
         ]);
-
         $data['is_active'] = $request->has('is_active');
 
         $quiz->update($data);
@@ -161,7 +166,10 @@ class QuizController extends Controller
 
         $questions = Question::with('category')->get();
 
-        return view('admin.quizzes.questions', compact('quiz', 'questions'));
+        $currentCount = $quiz->questions()->count();
+        $max = $quiz->max_questions;
+
+        return view('admin.quizzes.questions', compact('quiz', 'questions', 'currentCount', 'max'));
     }
 
     public function addQuestion(Request $request, Quiz $quiz)
@@ -196,11 +204,14 @@ class QuizController extends Controller
 
     public function createRandom()
     {
-        $max = $quiz->max_questions;
+        $max = 30;
 
         $quiz = Quiz::create([
-            'title' => 'QUIZ NR.',
-            'max_questions' => 30
+            'title' => 'QUIZ RANDOM NR.',
+            'max_questions' => $max,
+        ]);
+        $quiz->update([
+            'title' => 'QUIZ RANDOM NR. ' . $quiz->id,
         ]);
 
         $ids = Question::inRandomOrder()

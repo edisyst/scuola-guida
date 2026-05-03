@@ -43,7 +43,7 @@
                             <span class="badge badge-secondary">Disattivo</span>
                         @endif
                     </td>
-                    <td><span class="badge badge-info">{{ $quiz->questions_count  ?? 0}}</span></td>
+                    <td><span class="badge badge-info">{{ $quiz->questions_count  ?? 0}}/{{ $quiz->max_questions  ?? 0}}</span></td>
 
                     <td>
 

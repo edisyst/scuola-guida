@@ -16,12 +16,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             UserSeeder::class,
+            CategorySeeder::class
         ]);
 
-        // Crea 10 categorie
-        $categories = Category::factory()
-            ->count(10)
-            ->create();
+        $categories = Category::all();
 
         // Crea 100 domande usando le categorie esistenti
         $questions = Question::factory(100)

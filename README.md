@@ -110,3 +110,4 @@ composer dump-autoload
 
 composer require yajra/laravel-datatables:"^11.0"
 
+php artisan lang:publish
