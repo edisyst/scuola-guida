@@ -94,11 +94,11 @@
                 <ul id="sortable-questions" class="list-group">
 
                     @foreach($quiz->questions as $i => $q)
-                    <li class="list-group-item" data-id="{{ $q->id }}" data-text="{{ $q->question }}">
-
-                        {{ Str::limit($q->question, 50) }}
-
-                    </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center"
+                        data-id="{{ $q->id }}" data-text="{{ $q->question }}">
+                            <span>{{ Str::limit($q->question, 50) }}</span>
+                            <button class="btn btn-sm btn-danger btn-remove-from-list">✕</button>
+                        </li>
                     @endforeach
 
                 </ul>
@@ -468,13 +468,9 @@
 
         $('#sortable-questions').append(`
             <li class="list-group-item d-flex justify-content-between align-items-center"
-                data-id="${id}" data-text="${text}" >
-
+            data-id="${id}" data-text="${text}" >
                 <span>${text}</span>
-
-                <button class="btn btn-sm btn-danger btn-remove-from-list">
-                    ✕
-                </button>
+                <button class="btn btn-sm btn-danger btn-remove-from-list">✕</button>
             </li>
         `);
     }
