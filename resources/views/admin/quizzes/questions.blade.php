@@ -151,42 +151,47 @@
 
         // ADD
         $(document).on('click', '.btn-add', function () {
-            let id = $(this).data('id');
 
-            console.log({
-                mode: selectionMode,
-                selected: Array.from(selectedIds)
-            });
+            let id = $(this).data('id');
 
             $.post("{{ route('admin.quizzes.questions.add', $quiz) }}", {
                 _token: "{{ csrf_token() }}",
                 question_id: id
             }, function (res) {
-                updateProgress(res.current, parseInt($('#max-count').text()));
+
+                let max = parseInt($('#max-count').text());
+
+                updateProgress(res.current, max); // 🔥 USA backend
+
                 toastr.success('Aggiunta');
+
                 table.ajax.reload(null, false);
+
             }).fail(function (xhr) {
-                console.log(xhr.responseText);
-                toastr.error(xhr.responseJSON.error);
+                toastr.error(xhr.responseJSON?.error ?? 'Errore');
             });
         });
 
         // REMOVE
         $(document).on('click', '.btn-remove', function () {
-            let id = $(this).data('id');
 
-            console.log({
-                mode: selectionMode,
-                selected: Array.from(selectedIds)
-            });
+            let id = $(this).data('id');
 
             $.post("{{ route('admin.quizzes.questions.remove', $quiz) }}", {
                 _token: "{{ csrf_token() }}",
                 question_id: id
             }, function (res) {
-                updateProgress(res.current, parseInt($('#max-count').text()));
+
+                let max = parseInt($('#max-count').text());
+
+                updateProgress(res.current, max); // 🔥 USA backend
+
                 toastr.warning('Rimossa');
+
                 table.ajax.reload(null, false);
+
+            }).fail(function (xhr) {
+                toastr.error(xhr.responseJSON?.error ?? 'Errore');
             });
         });
 
@@ -323,6 +328,9 @@
 
         function updateProgress(current, max) {
 
+            current = parseInt(current) || 0;
+            max = parseInt(max) || 1;
+
             const percent = Math.round((current / max) * 100);
 
             $('#quiz-progress-bar')
@@ -332,7 +340,6 @@
             $('#current-count').text(current);
             $('#percentage').text(percent + '%');
 
-            // 🔥 colori dinamici (UX TOP)
             let bar = $('#quiz-progress-bar');
 
             bar.removeClass('bg-success bg-warning bg-danger');

@@ -188,18 +188,24 @@ class QuizController extends Controller
             $request->question_id
         ]);
 
-        return back()->with('success', 'Domanda aggiunta');
+//         return back()->with('success', 'Domanda aggiunta');
+        return response()->json([
+                'current' => $quiz->questions()->count() // 🔥 QUESTO SERVE
+            ]);
     }
 
     public function removeQuestion(Request $request, Quiz $quiz)
     {
-        $request->validate([
-            'question_id' => 'required|exists:questions,id'
-        ]);
+//         $request->validate([
+//             'question_id' => 'required|exists:questions,id'
+//         ]);
 
         $quiz->questions()->detach($request->question_id);
 
-        return back()->with('success', 'Domanda rimossa');
+//         return back()->with('success', 'Domanda rimossa');
+        return response()->json([
+            'current' => $quiz->questions()->count() // 🔥 QUESTO SERVE
+        ]);
     }
 
     public function createRandom()
@@ -283,11 +289,14 @@ class QuizController extends Controller
     public function bulkAdd(Request $request, Quiz $quiz)
     {
         $max = $quiz->max_questions;
+
+        // 🔥 count attuale
         $current = $quiz->questions()->count();
 
+        // 🔥 recupero IDs da aggiungere
         if ($request->mode === 'all') {
 
-            $query = Question::query();
+            $query = \App\Models\Question::query();
 
             if ($request->category_id) {
                 $query->where('category_id', $request->category_id);
@@ -299,6 +308,25 @@ class QuizController extends Controller
             $ids = collect($request->ids ?? []);
         }
 
+        // 🔥 niente selezione
+        if ($ids->isEmpty()) {
+            return response()->json([
+                'error' => 'Nessuna selezione'
+            ], 422);
+        }
+
+        // 🔥 IDs già presenti nel quiz
+        $existingIds = $quiz->questions()->pluck('questions.id');
+
+        // 🔥 filtro duplicati
+        $idsToInsert = $ids->diff($existingIds);
+
+        if ($idsToInsert->isEmpty()) {
+            return response()->json([
+                'error' => 'Tutte le domande selezionate sono già presenti nel quiz'
+            ], 422);
+        }
+
         // 🔥 spazio disponibile
         $available = $max - $current;
 
@@ -308,20 +336,21 @@ class QuizController extends Controller
             ], 422);
         }
 
-        // 🔥 limito
-        $ids = $ids->take($available);
+        // 🔥 limito al massimo consentito
+        $idsToInsert = $idsToInsert->take($available);
 
-        // 🔥 PRIMA count
+        // 🔥 count prima
         $before = $quiz->questions()->count();
 
-        $quiz->questions()->syncWithoutDetaching($ids);
+        // 🔥 insert reale
+        $quiz->questions()->attach($idsToInsert);
 
-        // 🔥 DOPO count
+        // 🔥 count dopo
         $after = $quiz->questions()->count();
 
         return response()->json([
             'current' => $after,
-            'added' => $after - $before, // 🔥 FIX
+            'added' => $after - $before,
         ]);
     }
 

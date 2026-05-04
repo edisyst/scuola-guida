@@ -60,7 +60,8 @@ class Quiz extends Model
 
     public function questions()
     {
-        return $this->belongsToMany(Question::class);
+        return $this->belongsToMany(Question::class)
+            ->withTimestamps();
     }
 
     public function attempts()
