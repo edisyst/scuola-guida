@@ -109,18 +109,18 @@
                     }
                 },
                 columns: [
+                    { data: 'id' },
+                    { data: 'question' },
+                    { data: 'category' },
+                    { data: 'status', orderable: false },
+                    { data: 'action', orderable: false },
                     {
                         data: 'id',
                         orderable: false,
                         render: function (data) {
                             return `<input type="checkbox" class="row-checkbox" value="${data}">`;
                         }
-                    },
-                    { data: 'id' },
-                    { data: 'question' },
-                    { data: 'category' },
-                    { data: 'status', orderable: false },
-                    { data: 'action', orderable: false }
+                    }
                 ]
             });
 
