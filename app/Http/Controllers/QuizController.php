@@ -105,13 +105,31 @@ class QuizController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    public function questionsList(Quiz $quiz)
+    {
+        return $quiz->questions()
+            ->orderBy('pivot_order')
+            ->get(['id', 'question']);
+    }
+
+    public function reorder(Request $request, Quiz $quiz)
+    {
+        $ids = $request->input('ids'); // array ordinato
+
+        foreach ($ids as $index => $id) {
+            $quiz->questions()->updateExistingPivot($id, [
+                'order' => $index
+            ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function questionsData(Request $request, Quiz $quiz)
     {
-//        dd(99);
         $query = Question::with('category')
             ->select('questions.*');
 
-        // filtro categoria
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
         }
@@ -122,8 +140,15 @@ class QuizController extends Controller
                 return $q->category->name ?? '-';
             })
 
-            ->addColumn('status', function ($q) use ($quiz) {
+            // 🔥 AGGIUNGI QUESTA COLONNA NASCOSTA
+            ->addColumn('is_in_quiz', function ($q) use ($quiz) {
+                $exists = $quiz->questions()
+                    ->where('question_id', $q->id)
+                    ->exists();
+                return $exists ? 'added' : 'pending'; // ritorna stringa, non HTML
+            })
 
+            ->addColumn('status', function ($q) use ($quiz) {
                 $exists = $quiz->questions()
                     ->where('question_id', $q->id)
                     ->exists();
@@ -134,26 +159,25 @@ class QuizController extends Controller
             })
 
             ->addColumn('action', function ($q) use ($quiz) {
-
                 $exists = $quiz->questions()
                     ->where('question_id', $q->id)
                     ->exists();
 
+                $questionText = htmlspecialchars($q->question, ENT_QUOTES, 'UTF-8');
+
                 if ($exists) {
-                    return '
-                    <button class="btn btn-sm btn-danger btn-remove"
-                        data-id="'.$q->id.'">
-                        Rimuovi
-                    </button>
-                ';
+                    return '<button class="btn btn-sm btn-danger btn-remove"
+                                data-id="'.$q->id.'"
+                                data-text="'.$questionText.'">
+                                Rimuovi
+                            </button>';
                 }
 
-                return '
-                <button class="btn btn-sm btn-success btn-add"
-                    data-id="'.$q->id.'">
-                    Aggiungi
-                </button>
-            ';
+                return '<button class="btn btn-sm btn-success btn-add"
+                            data-id="'.$q->id.'"
+                            data-text="'.$questionText.'">
+                            Aggiungi
+                        </button>';
             })
 
             ->rawColumns(['status', 'action'])

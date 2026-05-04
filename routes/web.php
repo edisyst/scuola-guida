@@ -72,6 +72,11 @@ Route::get('admin/quizzes/{quiz}/questions/data', [QuizController::class, 'quest
 Route::get('admin/quizzes/{quiz}/questions', [QuizController::class, 'manageQuestions'])
     ->name('admin.quizzes.questions');
 
+
+Route::post('admin/quizzes/{quiz}/questions-list', [QuizController::class, 'questionsList'])
+    ->name('admin.quizzes.questions.list');
+Route::post('admin/quizzes/{quiz}/reorder', [QuizController::class, 'reorder'])
+    ->name('admin.quizzes.reorder');
 Route::post('admin/quizzes/{quiz}/questions/add', [QuizController::class, 'addQuestion'])
     ->name('admin.quizzes.questions.add');
 Route::post('admin/quizzes/{quiz}/questions/remove', [QuizController::class, 'removeQuestion'])
