@@ -50,14 +50,6 @@
 
             {{-- TABELLA --}}
             <div class="mb-3">
-                <strong>
-                    Domande:
-                    {{ $quiz->questions()->count() }}
-                    / {{ $quiz->max_questions }}
-                </strong>
-            </div>
-
-            <div class="mb-3">
                 <div class="d-flex justify-content-between">
                     <strong>
                         <span id="current-count">{{ $currentCount }}</span>
@@ -169,13 +161,12 @@
             $.post("{{ route('admin.quizzes.questions.add', $quiz) }}", {
                 _token: "{{ csrf_token() }}",
                 question_id: id
-            }, function () {
-                let current = parseInt($('#current-count').text()) + 1;
-                let max = parseInt($('#max-count').text());
-                updateProgress(current, max);
+            }, function (res) {
+                updateProgress(res.current, parseInt($('#max-count').text()));
                 toastr.success('Aggiunta');
-                table.ajax.reload();
+                table.ajax.reload(null, false);
             }).fail(function (xhr) {
+                console.log(xhr.responseText);
                 toastr.error(xhr.responseJSON.error);
             });
         });
@@ -192,12 +183,10 @@
             $.post("{{ route('admin.quizzes.questions.remove', $quiz) }}", {
                 _token: "{{ csrf_token() }}",
                 question_id: id
-            }, function () {
-                let current = parseInt($('#current-count').text()) - 1;
-                let max = parseInt($('#max-count').text());
-                updateProgress(current, max);
+            }, function (res) {
+                updateProgress(res.current, parseInt($('#max-count').text()));
                 toastr.warning('Rimossa');
-                table.ajax.reload();
+                table.ajax.reload(null, false);
             });
         });
 
@@ -265,33 +254,34 @@
                 return;
             }
 
-            console.log({
-                mode: selectionMode,
-                selected: Array.from(selectedIds)
-            });
-
             $.post("{{ route('admin.quizzes.bulkAdd', $quiz) }}", {
                 _token: "{{ csrf_token() }}",
                 ids: Array.from(selectedIds),
                 mode: selectionMode,
                 category_id: $('#filter-category').val()
+
             }, function (res) {
-                let current = parseInt($('#current-count').text()) + res.added;
+                let current = res.current; // 🔥 arriva dal backend
                 let max = parseInt($('#max-count').text());
 
                 updateProgress(current, max);
 
-                toastr.success('Domande aggiunte');
+                toastr.success(`Domande aggiunte (${res.added ?? ''})`);
 
                 selectedIds.clear();
                 selectionMode = 'manual';
 
                 table.ajax.reload(null, false);
+
             }).fail(function (xhr) {
+                console.log(xhr.responseText);
+               let msg = 'Errore generico';
 
-                toastr.error(xhr.responseJSON.error);
-
-            });
+               if (xhr.responseJSON && xhr.responseJSON.error) {
+                   msg = xhr.responseJSON.error;
+               }
+               toastr.error(msg);
+           });
         });
 
         // 🔥 BULK REMOVE
@@ -301,29 +291,25 @@
                 return;
             }
 
-            console.log({
-                mode: selectionMode,
-                selected: Array.from(selectedIds)
-            });
-
             $.post("{{ route('admin.quizzes.bulkRemove', $quiz) }}", {
                 _token: "{{ csrf_token() }}",
                 ids: Array.from(selectedIds),
                 mode: selectionMode,
                 category_id: $('#filter-category').val()
-            }, function () {
-                table.ajax.reload(function () {
 
-                    // fallback: ricalcolo da server (più preciso)
-                    location.reload();
+            }, function (res) {
+                // 🔥 aggiorno progress con valore reale backend
+                let current = res.current;
+                let max = parseInt($('#max-count').text());
 
-                });
+                updateProgress(current, max);
 
                 toastr.warning('Domande rimosse');
 
                 selectedIds.clear();
                 selectionMode = 'manual';
 
+                // 🔥 NON resetta pagina
                 table.ajax.reload(null, false);
             });
         });

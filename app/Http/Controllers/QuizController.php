@@ -299,7 +299,7 @@ class QuizController extends Controller
             $ids = collect($request->ids ?? []);
         }
 
-        // 🔥 calcolo quanti posso aggiungere
+        // 🔥 spazio disponibile
         $available = $max - $current;
 
         if ($available <= 0) {
@@ -308,14 +308,20 @@ class QuizController extends Controller
             ], 422);
         }
 
-        // 🔥 limito gli ID
-        $ids = collect($ids)->take($available);
+        // 🔥 limito
+        $ids = $ids->take($available);
+
+        // 🔥 PRIMA count
+        $before = $quiz->questions()->count();
 
         $quiz->questions()->syncWithoutDetaching($ids);
 
+        // 🔥 DOPO count
+        $after = $quiz->questions()->count();
+
         return response()->json([
-            'success' => true,
-            'added' => $ids->count()
+            'current' => $after,
+            'added' => $after - $before, // 🔥 FIX
         ]);
     }
 
@@ -337,6 +343,9 @@ class QuizController extends Controller
 
         $quiz->questions()->detach($ids);
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'current' => $quiz->questions()->count(),
+//             'success' => true,
+        ]);
     }
 }
