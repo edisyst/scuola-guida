@@ -8,6 +8,17 @@
             {{ $quiz->title ?? 'Quiz Random' }}
         </h3>
 
+    <div class="d-flex justify-content-between mb-3">
+        <strong>
+            Domanda <span id="current-num">1</span> / <span id="total-num"></span>
+        </strong>
+        <span id="progress-percent"></span>
+    </div>
+
+    <div class="progress mb-3">
+        <div id="progress-bar" class="progress-bar" style="width:0%"></div>
+    </div>
+
         <div class="row">
 
             {{-- SINISTRA: DOMANDA --}}
@@ -65,13 +76,17 @@
 
         const answers = {}; // {questionId: true/false}
 
+        // RENDER DOMANDA
         function renderQuestion(index) {
-            const q = questions[index];
+            updateProgress();
 
+            const q = questions[index];
             $('#question-text').text((index+1) + '. ' + q.text);
 
             if (q.image) {
-                $('#question-image').html(`<img src="${q.image}" width="200">`);
+                $('#question-image').html(`
+                    <img src="${q.image}" class="img-fluid rounded shadow-sm" style="max-height:200px; cursor:pointer;">
+                `);
             } else {
                 $('#question-image').html('');
             }
@@ -79,24 +94,29 @@
             $('#feedback').text('');
         }
 
+        // RENDER NAVIGAZIONE
         function renderNavigator() {
             let html = '';
-
             questions.forEach((q, i) => {
 
                 let className = 'btn-outline-secondary';
 
+                // 👉 stato risposta (PRIORITARIO)
                 if (answers[q.id] !== undefined) {
                     className = answers[q.id] === q.correct
                         ? 'btn-success'
                         : 'btn-danger';
                 }
 
+                // 👉 stato corrente (NON sovrascrive colore)
+                let activeClass = (i === currentIndex) ? 'border border-dark' : '';
+
                 html += `
-                <button class="btn btn-sm ${className} m-1 nav-btn" data-index="${i}">
-                    ${i+1}
-                </button>
-            `;
+                    <button class="btn btn-sm ${className} ${activeClass} m-1 nav-btn"
+                        data-index="${i}">
+                        ${i+1}
+                    </button>
+                `;
             });
 
             $('#navigator').html(html);
@@ -104,7 +124,6 @@
 
         // CLICK RISPOSTA
         $(document).on('click', '.btn-answer', function () {
-
             const value = parseInt($(this).data('value'));
             const q = questions[currentIndex];
 
@@ -122,7 +141,7 @@
                 if (!isCorrect) errors++;
             }
 
-            answers[q.id] = value;
+            answers[q.id] = value; // 🔥 salva 0/1 invece di true/false
 
             $('#errors').text(errors);
 
@@ -133,7 +152,27 @@
             );
 
             renderNavigator();
+
+            setTimeout(() => {
+                if (currentIndex < questions.length - 1) {
+                    currentIndex++;
+                    renderQuestion(currentIndex);
+                }
+            }, 400);
         });
+
+        //UPDATE BARRA
+        function updateProgress() {
+            let current = currentIndex + 1;
+            let total = questions.length;
+            let percent = Math.round((current / total) * 100);
+
+            $('#current-num').text(current);
+            $('#total-num').text(total);
+            $('#progress-percent').text(percent + '%');
+
+            $('#progress-bar').css('width', percent + '%');
+        }
 
         // NAVIGAZIONE
         $(document).on('click', '.nav-btn', function () {
@@ -141,10 +180,26 @@
             renderQuestion(currentIndex);
         });
 
+        // ZOOM
+        $(document).on('click', '#question-image img', function () {
+            window.open($(this).attr('src'), '_blank');
+        });
+
         // INIT
         $(document).ready(function () {
             renderQuestion(0);
             renderNavigator();
+
+            $('.btn-answer').removeClass('active');
+
+            $(this).addClass('active');
+
+            // disabilita temporaneamente
+            $('.btn-answer').prop('disabled', true);
+
+            setTimeout(() => {
+                $('.btn-answer').prop('disabled', false);
+            }, 400);
         });
 
     </script>
