@@ -42,16 +42,6 @@ class Quiz extends Model
         return $this->questions()->count() >= $this->max_questions;
     }
 
-    public function remainingSlots(): int
-    {
-        return $this->max_questions - $this->questions()->count();
-    }
-
-//    public function getMaxQuestionsAttribute($value)
-//    {
-//        return $value ?? 30;
-//    }
-
     /*
     |--------------------------------------------------------------------------
     | RELATIONS

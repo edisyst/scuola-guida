@@ -25,9 +25,7 @@
             <div class="card-header d-flex justify-content-between">
                 <h5>{{ $quiz->title }}</h5>
 
-                <a href="{{ route('admin.quizzes.index') }}" class="btn btn-secondary btn-sm">
-                    Indietro
-                </a>
+                <a href="{{ route('admin.quizzes.index') }}" class="btn btn-secondary btn-sm">Indietro</a>
             </div>
 
             <div class="card-body">
@@ -37,9 +35,9 @@
                         <select id="filter-category" class="form-control">
                             <option value="">-- Tutte le categorie --</option>
                             @foreach(\App\Models\Category::all() as $cat)
-                            <option value="{{ $cat->id }}">
-                                {{ $cat->name }}
-                            </option>
+                                <option value="{{ $cat->id }}">
+                                    {{ $cat->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -47,17 +45,11 @@
 
                 {{-- BULK ACTIONS --}}
                 <div class="mb-3 d-flex gap-2">
-                    <button id="bulk-add" class="btn btn-success btn-sm">
-                        Aggiungi selezionate
-                    </button>
+                    <button id="bulk-add" class="btn btn-success btn-sm">Aggiungi selezionate</button>
 
-                    <button id="bulk-remove" class="btn btn-danger btn-sm">
-                        Rimuovi selezionate
-                    </button>
+                    <button id="bulk-remove" class="btn btn-danger btn-sm">Rimuovi selezionate</button>
 
-                    <button id="select-all-filtered" class="btn btn-secondary btn-sm">
-                        Seleziona TUTTI (filtrati)
-                    </button>
+                    <button id="select-all-filtered" class="btn btn-secondary btn-sm">Seleziona TUTTI (filtrati)</button>
                 </div>
 
                 {{-- TABELLA --}}
@@ -69,7 +61,6 @@
                             <span id="max-count">{{ $max }}</span>
                             domande
                         </strong>
-                        <span id="percentage"></span>
                     </div>
 
                     <div class="progress">
@@ -102,9 +93,7 @@
             <div class="card-header d-flex justify-content-between">
                 <h5>Ordine del Quiz</h5>
 
-                <button id="shuffle-questions" class="btn btn-sm btn-warning">
-                    🔀 Shuffle
-                </button>
+                <button id="shuffle-questions" class="btn btn-sm btn-warning">🔀 Shuffle</button>
             </div>
 
             <div class="card-body" style="max-height: 800px; overflow-y: auto;">
@@ -116,33 +105,15 @@
                             data-id="{{ $q->id }}"
                             data-text="{{ $q->question }}">
 
-                            {{-- LEFT --}}
                             <div class="d-flex align-items-center gap-2">
+                                <span class="badge badge-secondary index-badge">{{ $i + 1 }}</span>
 
-                                {{-- indice --}}
-                                <span class="badge badge-secondary index-badge">
-                                    {{ $i + 1 }}
-                                </span>
+                                <span class="small text-muted">{{ Str::limit($q->question, 60) }}</span>
 
-                                {{-- testo --}}
-                                <span class="small text-muted">
-                                    {{ Str::limit($q->question, 60) }}
-                                </span>
-
-                                {{-- categoria --}}
-                                @if($q->category)
-                                    <span class="badge badge-info ml-2">
-                                        {{ $q->category->name }}
-                                    </span>
-                                @endif
-
+                                <span class="badge badge-info ml-2">{{ $q->category->name }}</span>
                             </div>
 
-                            {{-- RIGHT --}}
-                            <button class="btn btn-sm btn-outline-danger btn-remove-from-list">
-                                ✕
-                            </button>
-
+                            <button class="btn btn-sm btn-outline-danger btn-remove-from-list">✕</button>
                         </li>
                     @endforeach
 
@@ -493,10 +464,8 @@
             .text(percent + '%');
 
         $('#current-count').text(current);
-        $('#percentage').text(percent + '%');
 
         let bar = $('#quiz-progress-bar');
-
         bar.removeClass('bg-success bg-warning bg-danger');
 
         if (percent < 60) {
@@ -518,7 +487,7 @@
     function addToQuizList(id, text, category) {
         // evita duplicati
         if ($('#sortable-questions li[data-id="' + id + '"]').length) return;
-
+        // aggiungi elemento <li> nell'elenco domande
         $('#sortable-questions').append(`
             <li class="list-group-item d-flex align-items-center justify-content-between"
             data-id="${id}" data-text="${text}" >
@@ -595,7 +564,7 @@
         saveOrder(); // 🔥 riuso tua funzione esistente
     });
 
-    // Funzione saveOrder() (se non ce l’hai già)
+    // HELPER saveOrder() (se non ce l’hai già)
     function saveOrder() {
 
         let ids = [];
@@ -612,13 +581,14 @@
         });
     }
 
-    // AGGIORNARE INDICE dopo drag/shuffle
+    // HELPER: AGGIORNARE INDICE dopo drag/shuffle
     function updateIndexes() {
         $('#sortable-questions li').each(function (index) {
             $(this).find('.index-badge').text(index + 1);
         });
     }
 
+    // HELPER truncate
     function truncate(text, max) {
         return text.length > max ? text.substring(0, max) + '...' : text;
     }
