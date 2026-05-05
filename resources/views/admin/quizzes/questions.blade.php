@@ -10,8 +10,7 @@
             <div class="card-header d-flex justify-content-between">
                 <h5>{{ $quiz->title }}</h5>
 
-                <a href="{{ route('admin.quizzes.index') }}"
-                    class="btn btn-secondary btn-sm">
+                <a href="{{ route('admin.quizzes.index') }}" class="btn btn-secondary btn-sm">
                     Indietro
                 </a>
             </div>
@@ -85,8 +84,12 @@
 
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between">
                 <h5>Ordine del Quiz</h5>
+
+                <button id="shuffle-questions" class="btn btn-sm btn-warning">
+                    🔀 Shuffle
+                </button>
             </div>
 
             <div class="card-body" style="max-height: 800px; overflow-y: auto;">
@@ -160,7 +163,6 @@
                     data: 'action',
                     orderable: false,
                     render: function(data, type, row) {
-                            console.log('is_in_quiz:', row.is_in_quiz); // 👈 verifica
 
                         const questionText = row.question;
                         // 🔥 USA is_in_quiz, non status!
@@ -233,8 +235,6 @@
 
         let id = $(this).data('id');
         let text = $(this).data('text'); // 🔥ò importantissimo
-
-        console.log("ID:", id, "TEXT:", text); // 👈 verifica che text non sia undefined
 
         $.post("{{ route('admin.quizzes.questions.add', $quiz) }}", {
             _token: "{{ csrf_token() }}",
@@ -470,9 +470,6 @@
 
     // ADD ALLA LISTA
     function addToQuizList(id, text) {
-
-        console.log(text)
-
         // evita duplicati
         if ($('#sortable-questions li[data-id="' + id + '"]').length) return;
 
@@ -513,7 +510,6 @@
 
     // RELOAD LISTA DA SERVER (fallback safe)
     function reloadQuizList() {
-
         $.get("{{ route('admin.quizzes.questions.list', $quiz) }}", function(data) {
 
             $('#quiz-list').html('');
@@ -522,6 +518,43 @@
                 addToQuizList(q.id, q.question);
             });
 
+        });
+    }
+
+    // JS → shuffle lista (frontend)
+    $('#shuffle-questions').click(function () {
+
+        let list = $('#sortable-questions');
+        let items = list.children('li').get();
+
+        // 🔥 shuffle array (Fisher-Yates)
+        for (let i = items.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [items[i], items[j]] = [items[j], items[i]];
+        }
+
+        // 🔥 reinserisco nel DOM
+        $.each(items, function (_, li) {
+            list.append(li);
+        });
+
+        saveOrder(); // 🔥 riuso tua funzione esistente
+    });
+
+    // Funzione saveOrder() (se non ce l’hai già)
+    function saveOrder() {
+
+        let ids = [];
+
+        $('#sortable-questions li').each(function () {
+            ids.push($(this).data('id'));
+        });
+
+        $.post("{{ route('admin.quizzes.reorder', $quiz) }}", {
+            _token: "{{ csrf_token() }}",
+            ids: ids
+        }, function () {
+            toastr.success('Ordine aggiornato');
         });
     }
 </script>
