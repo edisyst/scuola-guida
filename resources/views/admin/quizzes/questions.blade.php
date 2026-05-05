@@ -1,5 +1,20 @@
 @extends('layouts.admin')
 
+@section('css')
+@parent
+
+<style>
+    #sortable-questions li {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+    .index-badge {
+        min-width: 28px;
+        text-align: center;
+    }
+</style>
+@stop
+
 @section('header', 'Gestione Domande Quiz')
 
 @section('content')
@@ -97,10 +112,37 @@
                 <ul id="sortable-questions" class="list-group">
 
                     @foreach($quiz->questions as $i => $q)
-                        <li class="list-group-item d-flex justify-content-between align-items-center"
-                        data-id="{{ $q->id }}" data-text="{{ $q->question }}">
-                            <span>{{ Str::limit($q->question, 50) }}</span>
-                            <button class="btn btn-sm btn-danger btn-remove-from-list">✕</button>
+                        <li class="list-group-item d-flex align-items-center justify-content-between"
+                            data-id="{{ $q->id }}"
+                            data-text="{{ $q->question }}">
+
+                            {{-- LEFT --}}
+                            <div class="d-flex align-items-center gap-2">
+
+                                {{-- indice --}}
+                                <span class="badge badge-secondary index-badge">
+                                    {{ $i + 1 }}
+                                </span>
+
+                                {{-- testo --}}
+                                <span class="small text-muted">
+                                    {{ Str::limit($q->question, 60) }}
+                                </span>
+
+                                {{-- categoria --}}
+                                @if($q->category)
+                                    <span class="badge badge-info ml-2">
+                                        {{ $q->category->name }}
+                                    </span>
+                                @endif
+
+                            </div>
+
+                            {{-- RIGHT --}}
+                            <button class="btn btn-sm btn-outline-danger btn-remove-from-list">
+                                ✕
+                            </button>
+
                         </li>
                     @endforeach
 
@@ -123,6 +165,8 @@
         animation: 150,
 
         onEnd: function() {
+
+            updateIndexes(); // 🔥 aggiungi questo
 
             let ids = [];
 
@@ -174,7 +218,8 @@
                         } else {
                             return `<button class="btn btn-success btn-sm btn-add"
                                         data-id="${row.id}"
-                                        data-text="${questionText}">
+                                        data-text="${questionText}"
+                                        data-category="${row.category}">
                                         Aggiungi
                                     </button>`;
                         }
@@ -234,14 +279,15 @@
     $(document).on('click', '.btn-add', function() {
 
         let id = $(this).data('id');
-        let text = $(this).data('text'); // 🔥ò importantissimo
+        let text = $(this).data('text');
+        let category = $(this).data('category');
 
         $.post("{{ route('admin.quizzes.questions.add', $quiz) }}", {
             _token: "{{ csrf_token() }}",
             question_id: id
         }, function(res) {
 
-            addToQuizList(id, text); // 🔥 sync UI
+            addToQuizList(id, text, category); // 🔥 sync UI
 
             let max = parseInt($('#max-count').text());
             updateProgress(res.current, max); // 🔥 USA backend
@@ -469,21 +515,28 @@
     }
 
     // ADD ALLA LISTA
-    function addToQuizList(id, text) {
+    function addToQuizList(id, text, category) {
         // evita duplicati
         if ($('#sortable-questions li[data-id="' + id + '"]').length) return;
 
         $('#sortable-questions').append(`
-            <li class="list-group-item d-flex justify-content-between align-items-center"
+            <li class="list-group-item d-flex align-items-center justify-content-between"
             data-id="${id}" data-text="${text}" >
-                <span>${text}</span>
-                <button class="btn btn-sm btn-danger btn-remove-from-list">✕</button>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge badge-secondary index-badge"></span>
+                    <span class="small text-muted">${truncate(text, 60)}</span>
+                    <span class="badge badge-info ml-2">${category}</span>
+                </div>
+                <button class="btn btn-sm btn-outline-danger btn-remove-from-list">✕</button>
             </li>
         `);
+        // aggiorna indici
+        updateIndexes();
     }
     // REMOVE DALLA LISTA
     function removeFromQuizList(id) {
         $('#sortable-questions li[data-id="' + id + '"]').remove();
+        updateIndexes();
     }
 
     // REMOVE DALLA LISTA DAL PULSANTINO SULLA LISTA
@@ -498,7 +551,7 @@
         }, function(res) {
 
             li.remove();
-
+            updateIndexes();
             updateProgress(res.current, {{ $max }});
 
             toastr.warning('Rimossa');
@@ -538,6 +591,7 @@
             list.append(li);
         });
 
+        updateIndexes(); // 🔥 qui
         saveOrder(); // 🔥 riuso tua funzione esistente
     });
 
@@ -557,6 +611,18 @@
             toastr.success('Ordine aggiornato');
         });
     }
+
+    // AGGIORNARE INDICE dopo drag/shuffle
+    function updateIndexes() {
+        $('#sortable-questions li').each(function (index) {
+            $(this).find('.index-badge').text(index + 1);
+        });
+    }
+
+    function truncate(text, max) {
+        return text.length > max ? text.substring(0, max) + '...' : text;
+    }
+
 </script>
 
 @stop
