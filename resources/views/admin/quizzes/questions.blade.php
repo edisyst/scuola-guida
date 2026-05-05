@@ -376,8 +376,9 @@
                 selectedIds.forEach(id => {
                     let row = $(`.btn-add[data-id="${id}"]`);
                     let text = row.data('text');
+                    let category = row.data('category');
 
-                    addToQuizList(id, text);
+                    addToQuizList(id, text, category);
                 });
 
             } else {
