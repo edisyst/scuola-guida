@@ -11,27 +11,17 @@ return new class extends Migration
         Schema::create('quiz_attempts', function (Blueprint $table) {
             $table->id();
 
-            // 🔗 relazioni
-            $table->foreignId('user_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('quiz_id')->constrained()->cascadeOnDelete();
 
-            $table->foreignId('quiz_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->unsignedInteger('score');
+            $table->unsignedInteger('total_questions');
 
-            // 📊 dati tentativo
-            $table->unsignedTinyInteger('score'); // risposte corrette
-            $table->unsignedTinyInteger('total_questions');
-
-            // opzionale ma utile
             $table->unsignedInteger('duration')->nullable(); // secondi
 
-            $table->timestamps();
+            $table->json('answers')->nullable(); // 🔥 {question_id: 0/1}
 
-            // 🔥 index performance
-            $table->index(['user_id', 'quiz_id']);
-            $table->index('created_at');
+            $table->timestamps();
         });
     }
 

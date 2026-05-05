@@ -44,6 +44,10 @@
                         <span id="feedback"></span>
                     </div>
 
+                    <button id="finish-quiz" class="btn btn-primary mt-3">
+                        Termina Quiz
+                    </button>
+
                 </div>
 
             </div>
@@ -68,6 +72,8 @@
 @endsection
 
 @section('js')
+    @parent
+
     <script>
         const questions = @json($questionsJson);
 
@@ -183,6 +189,33 @@
         // ZOOM
         $(document).on('click', '#question-image img', function () {
             window.open($(this).attr('src'), '_blank');
+        });
+
+        $('#finish-quiz').click(function () {
+
+            if (Object.keys(answers).length === 0) {
+                toastr.warning('Nessuna risposta');
+                return;
+            }
+
+            $.post("{{ route('quiz.attempts.store') }}", {
+                _token: "{{ csrf_token() }}",
+                quiz_id: {{ $quiz->id }},
+                answers: answers,
+                duration: 0 // 🔥 poi colleghiamo il timer
+            }, function (res) {
+
+                toastr.success(`Risultato: ${res.score}/${res.total}`);
+
+                window.location.href = `/quiz/attempts/${res.attempt_id}`;
+
+            }).fail(function (xhr) {
+
+                toastr.error('Errore salvataggio');
+
+                console.error(xhr.responseJSON);
+
+            });
         });
 
         // INIT
