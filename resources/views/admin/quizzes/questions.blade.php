@@ -190,7 +190,17 @@
                     data: 'is_in_quiz',
                     visible: false
                 }
-            ]
+            ],
+            // 🔥 QUI
+                rowCallback: function (row, data) {
+
+                    if (data.in_quiz) {
+                        $(row).addClass('table-success'); // verde bootstrap
+                    } else {
+                        $(row).removeClass('table-success');
+                    }
+
+                }
         });
 
         // selezione multipla

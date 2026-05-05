@@ -134,6 +134,8 @@ class QuizController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
+        $quizQuestionIds = $quiz->questions()->pluck('questions.id')->toArray();
+
         return DataTables::of($query)
 
             ->addColumn('category', function ($q) {
@@ -178,6 +180,10 @@ class QuizController extends Controller
                             data-text="'.$questionText.'">
                             Aggiungi
                         </button>';
+            })
+
+            ->addColumn('in_quiz', function ($q) use ($quizQuestionIds) {
+                return in_array($q->id, $quizQuestionIds);
             })
 
             ->rawColumns(['status', 'action'])
