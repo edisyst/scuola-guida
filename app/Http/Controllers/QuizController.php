@@ -60,30 +60,26 @@ class QuizController extends Controller
 
     public function edit(Quiz $quiz)
     {
-        $questionsCount = $quiz->questions()->count();
-        $currentCount = $quiz->questions()->count(); // refactoring: sono la stessa cosa
+        $questionsCount = $currentCount = $quiz->questions()->count();
         $max = $quiz->max_questions;
 
         $questions = Question::limit(200)->get();
-//        $quiz->load('questions');
 
         return view('admin.quizzes.edit', compact('quiz', 'questions', 'questionsCount', 'currentCount', 'max'));
     }
 
     public function update(UpdateQuizRequest $request, Quiz $quiz)
     {
-        $quiz->update($request->validated());
+        $validated = $request->validated();
+        $validated['is_active'] = $request->has('is_active');
 
-        $data = $request->validate([
-            'questions' => 'nullable|array',
+        $questions = $request->validate([
+            'questions'   => 'nullable|array',
             'questions.*' => 'exists:questions,id',
-        ]);
-        $data['is_active'] = $request->has('is_active');
+        ])['questions'] ?? [];
 
-        $quiz->update($data);
-
-        // 🔥 aggiorna pivot
-        $quiz->questions()->sync($data['questions'] ?? []);
+        $quiz->update($validated);
+        $quiz->questions()->sync($questions);
 
         clearAdminBadgesCache();
 
@@ -142,44 +138,23 @@ class QuizController extends Controller
                 return $q->category->name ?? '-';
             })
 
-            // 🔥 AGGIUNGI QUESTA COLONNA NASCOSTA
-            ->addColumn('is_in_quiz', function ($q) use ($quiz) {
-                $exists = $quiz->questions()
-                    ->where('question_id', $q->id)
-                    ->exists();
-                return $exists ? 'added' : 'pending'; // ritorna stringa, non HTML
+            ->addColumn('is_in_quiz', function ($q) use ($quizQuestionIds) {
+                return in_array($q->id, $quizQuestionIds) ? 'added' : 'pending';
             })
 
-            ->addColumn('status', function ($q) use ($quiz) {
-                $exists = $quiz->questions()
-                    ->where('question_id', $q->id)
-                    ->exists();
-
-                return $exists
+            ->addColumn('status', function ($q) use ($quizQuestionIds) {
+                return in_array($q->id, $quizQuestionIds)
                     ? '<span class="badge badge-success">✔ Nel quiz</span>'
                     : '<span class="badge badge-secondary">Non presente</span>';
             })
 
-            ->addColumn('action', function ($q) use ($quiz) {
-                $exists = $quiz->questions()
-                    ->where('question_id', $q->id)
-                    ->exists();
-
+            ->addColumn('action', function ($q) use ($quizQuestionIds) {
+                $exists = in_array($q->id, $quizQuestionIds);
                 $questionText = htmlspecialchars($q->question, ENT_QUOTES, 'UTF-8');
 
-                if ($exists) {
-                    return '<button class="btn btn-sm btn-danger btn-remove"
-                                data-id="'.$q->id.'"
-                                data-text="'.$questionText.'">
-                                Rimuovi
-                            </button>';
-                }
-
-                return '<button class="btn btn-sm btn-success btn-add"
-                            data-id="'.$q->id.'"
-                            data-text="'.$questionText.'">
-                            Aggiungi
-                        </button>';
+                return $exists
+                    ? '<button class="btn btn-sm btn-danger btn-remove" data-id="'.$q->id.'" data-text="'.$questionText.'">Rimuovi</button>'
+                    : '<button class="btn btn-sm btn-success btn-add" data-id="'.$q->id.'" data-text="'.$questionText.'">Aggiungi</button>';
             })
 
             ->addColumn('in_quiz', function ($q) use ($quizQuestionIds) {
@@ -204,67 +179,54 @@ class QuizController extends Controller
 
     public function addQuestion(Request $request, Quiz $quiz)
     {
-        if ($quiz->hasReachedLimit()) {
-            return response()->json([
-                'error' => 'Limite massimo raggiunto'
-            ], 422);
-        }
-
-//        $request->validate([
-//            'question_id' => 'required|exists:questions,id'
-//        ]);
-
-        $quiz->questions()->syncWithoutDetaching([
-            $request->question_id
+        $request->validate([
+            'question_id' => 'required|exists:questions,id',
         ]);
 
-//         return back()->with('success', 'Domanda aggiunta');
-        return response()->json([
-                'current' => $quiz->questions()->count() // 🔥 QUESTO SERVE
-            ]);
+        if ($quiz->hasReachedLimit()) {
+            return response()->json(['error' => 'Limite massimo raggiunto'], 422);
+        }
+
+        $quiz->questions()->syncWithoutDetaching([$request->question_id]);
+
+        return response()->json(['current' => $quiz->questions()->count()]);
     }
 
     public function removeQuestion(Request $request, Quiz $quiz)
     {
-//         $request->validate([
-//             'question_id' => 'required|exists:questions,id'
-//         ]);
+        $request->validate([
+            'question_id' => 'required|exists:questions,id',
+        ]);
 
         $quiz->questions()->detach($request->question_id);
 
-//         return back()->with('success', 'Domanda rimossa');
-        return response()->json([
-            'current' => $quiz->questions()->count() // 🔥 QUESTO SERVE
-        ]);
+        return response()->json(['current' => $quiz->questions()->count()]);
     }
 
     public function createRandom()
     {
         $max = 30;
 
+        $ids = Question::inRandomOrder()->limit($max)->pluck('id');
+
         $quiz = Quiz::create([
-            'title' => 'QUIZ RANDOM NR.',
+            'title'         => 'QUIZ RANDOM NR.',
             'max_questions' => $max,
         ]);
-        $quiz->update([
-            'title' => 'QUIZ RANDOM NR. ' . $quiz->id,
-        ]);
 
-        $ids = Question::inRandomOrder()
-            ->limit($max)
-            ->pluck('id');
+        $quiz->title = 'QUIZ RANDOM NR. ' . $quiz->id;
+        $quiz->save();
 
         $quiz->questions()->attach($ids);
 
         return redirect()
             ->route('admin.quizzes.index')
-            ->with('success', 'Quiz creato con '.$ids->count().' domande');
+            ->with('success', 'Quiz creato con ' . $ids->count() . ' domande');
     }
 
     public function randomPlay()
     {
-        $ids = Question::inRandomOrder()->limit(10)->pluck('id');
-        $questions = Question::whereIn('id', $ids)->get();
+        $questions = Question::inRandomOrder()->limit(10)->get();
 
         return view('quiz.play', compact('questions'));
     }
@@ -369,18 +331,11 @@ class QuizController extends Controller
         // 🔥 limito al massimo consentito
         $idsToInsert = $idsToInsert->take($available);
 
-        // 🔥 count prima
-        $before = $quiz->questions()->count();
-
-        // 🔥 insert reale
         $quiz->questions()->attach($idsToInsert);
 
-        // 🔥 count dopo
-        $after = $quiz->questions()->count();
-
         return response()->json([
-            'current' => $after,
-            'added' => $after - $before,
+            'current' => $quiz->questions()->count(),
+            'added'   => $idsToInsert->count(),
         ]);
     }
 

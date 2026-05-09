@@ -48,24 +48,12 @@ class QuestionController extends Controller
         return view('admin.questions.create', compact('categories'));
     }
 
-    public function store(Request $request)
+    public function store(StoreQuestionRequest $request)
     {
-        if (!auth()->user()->canCreateQuestion()) {
-            abort(403);
-        }
-
-        $data = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'question'    => 'required|string',
-            'image'       => 'nullable|image|max:2048',
-        ]);
-
+        $data = $request->validated();
         $data['is_true'] = $request->has('is_true');
 
-        // upload immagine
-        $image = $this->handleImageUpload($request);
-
-        if ($image) {
+        if ($image = $this->handleImageUpload($request)) {
             $data['image'] = $image;
         }
 
@@ -83,23 +71,12 @@ class QuestionController extends Controller
         return view('admin.questions.edit', compact('question', 'categories'));
     }
 
-    public function update(Request $request, Question $question)
+    public function update(UpdateQuestionRequest $request, Question $question)
     {
-        if (!auth()->user()->canEditQuestion()) {
-            abort(403);
-        }
-
-        $data = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'question'    => 'required|string',
-            'image'       => 'nullable|image|max:2048',
-        ]);
-
+        $data = $request->validated();
         $data['is_true'] = $request->has('is_true');
 
-        $image = $this->handleImageUpload($request, $question);
-
-        if ($image) {
+        if ($image = $this->handleImageUpload($request, $question)) {
             $data['image'] = $image;
         }
 
@@ -209,7 +186,13 @@ class QuestionController extends Controller
 
     public function bulkDelete(Request $request)
     {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'integer|exists:questions,id',
+        ]);
+
         Question::whereIn('id', $request->ids)->delete();
+        clearAdminBadgesCache();
 
         return response()->json(['success' => true]);
     }

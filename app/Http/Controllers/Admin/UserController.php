@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -67,7 +68,7 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => 'required',
-            'email' => "required|email|unique:users,email,$user->id",
+            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|min:6',
             'role' => 'required|in:admin,editor,viewer',
             'permissions' => 'nullable|array',
