@@ -3,9 +3,11 @@
 @section('header', 'Categorie')
 
 @section('content')
+    @if(auth()->user()->isAdmin())
     <a href="{{ route('admin.categories.create') }}" class="btn btn-primary mb-3">
         Nuova Categoria
     </a>
+    @endif
 
     <table id="categories-table" class="table table-bordered">
         <thead>
@@ -30,13 +32,15 @@
                 </td>
 
                 <td>
-                    <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-warning">Modifica</a>
+                    @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-warning">Modifica</a>
 
-                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-sm btn-danger" onclick="return confirm('Sei sicuro?')">Elimina</button>
-                    </form>
+                        <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-danger" onclick="return confirm('Sei sicuro?')">Elimina</button>
+                        </form>
+                    @endif
                 </td>
             </tr>
         @endforeach

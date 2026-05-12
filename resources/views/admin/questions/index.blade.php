@@ -4,28 +4,23 @@
 
 @section('content')
 
-    @if(auth()->user()->isAdmin())
-        <li class="nav-item">
-            <a href="{{ route('admin.users.index') }}" class="nav-link">
-                <p>Utenti</p>
-            </a>
-        </li>
-    @endif
-
-    @if(auth()->user()->canCreateQuestion())
+    @if(auth()->user()->canEdit())
         <a href="{{ route('admin.questions.create') }}" class="btn btn-primary mb-3">Nuova Domanda</a>
+        <a href="{{ route('admin.questions.export') }}" class="btn btn-success mb-3">Export Excel</a>
+        <a href="{{ route('admin.questions.template') }}" class="btn btn-info mb-3">Scarica Template</a>
     @endif
 
-    <a href="{{ route('admin.questions.export') }}" class="btn btn-success mb-3">Export Excel</a>
-    <a href="{{ route('admin.questions.template') }}" class="btn btn-info mb-3">Scarica Template</a>
-
-    <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+    @if(auth()->user()->canEdit())
+    <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="mb-3 d-inline">
         @csrf
         <input type="file" name="file" required>
         <button class="btn btn-primary">Import Excel</button>
     </form>
+    @endif
 
+    @if(auth()->user()->isAdmin())
     <button id="bulk-delete" class="btn btn-danger mb-3">Elimina selezionati</button>
+    @endif
 
     <div class="row mb-3">
         <div class="col-md-3">
@@ -62,7 +57,9 @@
             <th>Risposta</th>
             <th>Img</th>
             <th>Azioni</th>
+            @if(auth()->user()->isAdmin())
             <th><input type="checkbox" id="select-all"></th>
+            @endif
         </tr>
         </thead>
     </table>
@@ -125,7 +122,9 @@
                     { data: 'is_true', orderable: false },
                     { data: 'image', orderable: false },
                     { data: 'actions', orderable: false },
+                    @if(auth()->user()->isAdmin())
                     { data: 'checkbox', orderable: false, searchable: false },
+                    @endif
                 ],
             });
 

@@ -51,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-questions', function (User $user) {
-            return $user->canEditQuestion() || $user->canDeleteQuestion();
+            return in_array($user->role, ['admin', 'editor', 'viewer']);
         });
 
 //      Gate::define('create-question', fn($user) => $user->canCreateQuestion()); // provare a vedere se è lo stesso

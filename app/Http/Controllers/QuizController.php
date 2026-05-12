@@ -94,6 +94,8 @@ class QuizController extends Controller
 
     public function destroy(Quiz $quiz)
     {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
         $quiz->delete();
         clearAdminBadgesCache();
 

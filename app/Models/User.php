@@ -97,16 +97,16 @@ class User extends Authenticatable
 
     public function canCreateQuestion(): bool
     {
-        return $this->hasPermission('create_question');
+        return $this->isAdmin() || $this->isEditor() || $this->hasPermission('create_question');
     }
 
     public function canEditQuestion(): bool
     {
-        return $this->hasPermission('edit_question');
+        return $this->isAdmin() || $this->isEditor() || $this->hasPermission('edit_question');
     }
 
     public function canDeleteQuestion(): bool
     {
-        return $this->hasPermission('delete_question');
+        return $this->isAdmin() || $this->hasPermission('delete_question');
     }
 }
