@@ -306,6 +306,10 @@ return [
             'topnav_right' => true,
         ],
         [
+            'type' => 'darkmode-widget',
+            'topnav_right' => true,
+        ],
+        [
             'type' => 'fullscreen-widget',
             'topnav_right' => true,
         ],
@@ -332,14 +336,14 @@ return [
             'text' => 'Categorie',
             'url'  => 'admin/categories',
             'icon' => 'fas fa-tags',
-            'can'  => 'manage-questions',
+            'can'  => 'view-admin',
             'key'  => 'categories',
         ],
         [
             'text' => 'Domande',
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question',
-            'can'  => 'manage-questions',
+            'can'  => 'view-admin',
             'key'  => 'questions',
         ],
         [
