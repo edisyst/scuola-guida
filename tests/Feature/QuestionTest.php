@@ -52,22 +52,21 @@ class QuestionTest extends TestCase
         ]);
     }
 
-// ANCORA NON IMPLEMENTATO IL BLOCCO
-//     public function test_viewer_cannot_create_question()
-//     {
-//         $user = $this->viewerUser();
-//         $this->actingAs($user);
-//
-//         $category = \App\Models\Category::factory()->create();
-//
-//         $response = $this->post(route('admin.questions.store'), [
-//             'category_id' => $category->id,
-//             'question' => 'Test domanda',
-//             'is_true' => true,
-//         ]);
-//
-//         $response->assertStatus(403);
-//     }
+    public function test_viewer_cannot_create_question()
+    {
+        $user = $this->viewerUser();
+        $this->actingAs($user);
+
+        $category = \App\Models\Category::factory()->create();
+
+        $response = $this->post(route('admin.questions.store'), [
+            'category_id' => $category->id,
+            'question' => 'Test domanda',
+            'is_true' => true,
+        ]);
+
+        $response->assertStatus(403);
+    }
 
     public function test_admin_can_delete_question()
     {
@@ -86,17 +85,16 @@ class QuestionTest extends TestCase
         ]);
     }
 
-// ANCORA NON IMPLEMENTATO IL BLOCCO
-//     public function test_editor_cannot_delete_question()
-//     {
-//         $user = $this->editorUser();
-//
-//         $this->actingAs($user);
-//
-//         $question = \App\Models\Question::factory()->create();
-//
-//         $response = $this->delete(route('admin.questions.destroy', $question));
-//
-//         $response->assertStatus(403);
-//     }
+    public function test_viewer_cannot_delete_question()
+    {
+        $user = $this->viewerUser();
+
+        $this->actingAs($user);
+
+        $question = \App\Models\Question::factory()->create();
+
+        $response = $this->delete(route('admin.questions.destroy', $question));
+
+        $response->assertStatus(403);
+    }
 }

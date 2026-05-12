@@ -65,7 +65,7 @@ class CategoryTest extends TestCase
 
     public function test_non_admin_cannot_access_categories()
     {
-        $user = User::factory()->create(['role' => 'guest']);
+        $user = User::factory()->create(['role' => \App\Models\User::ROLE_VIEWER]);
 
         $response = $this->actingAs($user)->get('/admin/categories');
 
