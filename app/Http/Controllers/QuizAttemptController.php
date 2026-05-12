@@ -62,4 +62,44 @@ class QuizAttemptController extends Controller
     {
         return view('quiz.attempt', compact('attempt'));
     }
+
+    public function update(Request $request, QuizAttempt $attempt)
+    {
+        $data = $request->validate([
+            'answers' => 'required|array',
+            'answers.*' => 'in:0,1',
+            'duration' => 'nullable|integer|min:0',
+        ]);
+
+        // sicurezza: solo owner
+        if ($attempt->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $quiz = $attempt->quiz()->with('questions:id,is_true')->first();
+
+        $correctMap = $quiz->questions->pluck('is_true', 'id');
+
+        $score = 0;
+
+        foreach ($data['answers'] as $questionId => $answer) {
+            if (!isset($correctMap[$questionId])) continue;
+
+            if ((int)$answer === (int)$correctMap[$questionId]) {
+                $score++;
+            }
+        }
+
+        $attempt->update([
+            'answers' => $data['answers'],
+            'score' => $score,
+            'total_questions' => count($correctMap),
+            'duration' => $data['duration'] ?? $attempt->duration,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'score' => $score,
+        ]);
+    }
 }

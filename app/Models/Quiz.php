@@ -13,6 +13,8 @@ class Quiz extends Model
         'title',
         'is_active',
         'max_questions',
+        'time_limit',
+        'max_errors',
     ];
 
     protected $casts = [

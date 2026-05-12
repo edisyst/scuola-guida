@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateQuizRequest;
 use App\Http\Requests\StoreQuizRequest;
 use Illuminate\Http\Request;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Models\QuizResult;
 use App\Models\Question;
 use App\Services\QuizService;
@@ -273,8 +274,19 @@ class QuizController extends Controller
     {
         $questions = $quiz->questions()->get();
 
+        $attempt = QuizAttempt::create([
+            'user_id' => auth()->id(),
+            'quiz_id' => $quiz->id,
+            'score' => 0,
+            'total_questions' => $quiz->questions()->count(),
+            'answers' => [],
+        ]);
+
         return view('quiz.play', [
             'quiz' => $quiz,
+            'timeLimit' => $quiz->time_limit,
+            'maxErrors' => $quiz->max_errors,
+            'attemptId' => $attempt->id, // 🔥 aggiungi questo
             'questionsJson' => $questions->map(function ($q) {
                 return [
                     'id' => $q->id,
