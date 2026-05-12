@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(vendor/bin/phpunit *)",
+      "Bash(Get-ChildItem \"C:\\\\laragon\\\\www\\\\scuola-guida\" -Filter \".env*\" -Force)",
+      "Bash(Select-Object Name)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'Quiz: fix logica play, storico tentativi e restyling UI' --body ' *)",
+      "Bash(php artisan *)",
+      "Bash(git rm *)",
+      "Bash(gh pr *)",
+      "Bash(gh auth *)",
+      "Bash(git commit *)",
+      "Bash(git restore *)",
+      "Bash(Test-Path \".env.testing\")",
+      "Bash(Test-Path \".env.testing.locale\")"
+    ]
+  }
+}

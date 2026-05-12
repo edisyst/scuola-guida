@@ -292,7 +292,7 @@ class QuizController extends Controller
                     'id' => $q->id,
                     'text' => $q->question,
                     'image' => $q->image ? asset('storage/'.$q->image) : null,
-                    'correct' => $q->is_true,
+                    'correct' => (int) $q->is_true,
                 ];
             })
         ]);

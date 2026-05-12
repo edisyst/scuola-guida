@@ -13,6 +13,16 @@ use Yajra\DataTables\Facades\DataTables;
 
 class QuizAttemptController extends Controller
 {
+    public function index()
+    {
+        $attempts = QuizAttempt::with('quiz')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->paginate(15);
+
+        return view('quiz.attempts', compact('attempts'));
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -56,6 +66,15 @@ class QuizAttemptController extends Controller
             'percentage' => $attempt->percentage,
             'passed' => $attempt->is_passed,
         ]);
+    }
+
+    public function adminIndex()
+    {
+        $attempts = QuizAttempt::with(['quiz', 'user'])
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.quiz-attempts.index', compact('attempts'));
     }
 
     public function show(QuizAttempt $attempt)
