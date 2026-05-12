@@ -325,8 +325,13 @@ return [
             'text' => 'Prova Quiz',
             'url'  => 'quiz/play',
             'icon' => 'fas fa-check',
-            // pubblico → nessun can
             'key'  => 'quizzes',
+        ],
+        [
+            'text'  => 'I miei tentativi',
+            'url'   => 'quiz/attempts',
+            'icon'  => 'fas fa-history',
+            'key'   => 'quiz-attempts',
         ],
         [
             'text' => 'Dashboard',

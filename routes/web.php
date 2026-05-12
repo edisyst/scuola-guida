@@ -104,6 +104,8 @@ Route::get('quiz/random-play', [QuizController::class, 'randomPlay'])
 Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])
     ->name('quiz.play');
 // quiz attempts
+Route::get('/quiz/attempts', [QuizAttemptController::class, 'index'])
+    ->name('quiz.attempts.index')->middleware('auth');
 Route::put('/quiz/attempts/{attempt}', [QuizAttemptController::class, 'update'])
     ->name('quiz.attempts.update');
 Route::post('/quiz/attempts', [QuizAttemptController::class, 'store'])

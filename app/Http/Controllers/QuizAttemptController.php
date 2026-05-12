@@ -13,6 +13,16 @@ use Yajra\DataTables\Facades\DataTables;
 
 class QuizAttemptController extends Controller
 {
+    public function index()
+    {
+        $attempts = QuizAttempt::with('quiz')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->paginate(15);
+
+        return view('quiz.attempts', compact('attempts'));
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([

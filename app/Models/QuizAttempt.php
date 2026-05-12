@@ -12,6 +12,7 @@ class QuizAttempt extends Model
         'score',
         'total_questions',
         'duration',
+        'answers',
     ];
 
     protected $casts = [
