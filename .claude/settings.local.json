@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(vendor/bin/phpunit *)",
+      "Bash(Get-ChildItem \"C:\\\\laragon\\\\www\\\\scuola-guida\" -Filter \".env*\" -Force)",
+      "Bash(Select-Object Name)"
+    ]
+  }
+}
