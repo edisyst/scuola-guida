@@ -68,6 +68,15 @@ class QuizAttemptController extends Controller
         ]);
     }
 
+    public function adminIndex()
+    {
+        $attempts = QuizAttempt::with(['quiz', 'user'])
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.quiz-attempts.index', compact('attempts'));
+    }
+
     public function show(QuizAttempt $attempt)
     {
         return view('quiz.attempt', compact('attempt'));
