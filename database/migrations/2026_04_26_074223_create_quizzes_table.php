@@ -6,22 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('quizzes', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable(); //da sistemare questo nullable
+            $table->string('title')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->unsignedInteger('max_questions')->default(30);
+            $table->unsignedInteger('time_limit')->default(1800);
+            $table->unsignedInteger('max_errors')->default(3);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('quizzes');
