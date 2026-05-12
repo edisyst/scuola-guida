@@ -332,7 +332,7 @@ return [
             'text' => 'Dashboard',
             'url'  => 'admin/dashboard',
             'icon' => 'fas fa-home',
-            'can'  => 'view-admin',
+            'can'  => 'admin-only',
         ],
         ['header' => 'admin_area'],
         [
