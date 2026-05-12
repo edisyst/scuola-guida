@@ -44,6 +44,10 @@
                         <span id="feedback"></span>
                     </div>
 
+                    <button id="finish-quiz" class="btn btn-primary mt-3">
+                        Termina Quiz
+                    </button>
+
                 </div>
 
             </div>
@@ -52,6 +56,12 @@
             <div class="col-md-4">
 
                 <div class="card p-3">
+                    <div class="mb-3">
+                        <h5>
+                            Tempo Rimasto:
+                            <span id="timer" class="text-primary"></span>
+                        </h5>
+                    </div>
 
                     <h5>Errori: <span id="errors">0</span></h5>
 
@@ -68,13 +78,48 @@
 @endsection
 
 @section('js')
+    @parent
+
     <script>
         const questions = @json($questionsJson);
+        const answers = {}; // {questionId: true/false}
+        const attemptId = {{ $attemptId }};
+        const timeLimit = {{ $timeLimit }};
+        const maxErrors = {{ $maxErrors }};
 
         let currentIndex = 0;
         let errors = 0;
+        let autosaveTimeout = null;
+        let remainingSeconds = timeLimit;
+        let quizFinished = false;
 
-        const answers = {}; // {questionId: true/false}
+        window.addEventListener('beforeunload', function () {
+            autosave();
+        });
+
+        function autosave() {
+            // debounce per evitare spam richieste
+            clearTimeout(autosaveTimeout);
+
+            autosaveTimeout = setTimeout(() => {
+
+                $.ajax({
+                    url: `/quiz/attempts/${attemptId}`,
+                    method: 'PUT',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        answers: answers,
+                        duration: timeLimit - remainingSeconds
+                    },
+                    success: function () {
+                        console.log('autosave ok');
+                    },
+                    error: function () {
+                        console.error('autosave error');
+                    }
+                });
+            }, 300); // 🔥 debounce 300ms
+        }
 
         // RENDER DOMANDA
         function renderQuestion(index) {
@@ -142,8 +187,14 @@
             }
 
             answers[q.id] = value; // 🔥 salva 0/1 invece di true/false
+            autosave(); // 🔥 salvataggio automatico
 
             $('#errors').text(errors);
+
+            if (errors >= maxErrors) {
+                finishQuiz('Limite errori raggiunto');
+                return;
+            }
 
             $('#feedback').html(
                 isCorrect
@@ -185,10 +236,102 @@
             window.open($(this).attr('src'), '_blank');
         });
 
+        $('#finish-quiz').click(function () {
+
+            if (Object.keys(answers).length === 0) {
+                toastr.warning('Nessuna risposta');
+                return;
+            }
+
+            finishQuiz();
+
+            $.post("{{ route('quiz.attempts.store') }}", {
+                _token: "{{ csrf_token() }}",
+                quiz_id: {{ $quiz->id }},
+                answers: answers,
+                duration: 0 // 🔥 poi colleghiamo il timer
+            }, function (res) {
+
+                toastr.success(`Risultato: ${res.score}/${res.total}`);
+
+                window.location.href = `/quiz/attempts/${res.attempt_id}`;
+
+            }).fail(function (xhr) {
+
+                toastr.error('Errore salvataggio');
+
+                console.error(xhr.responseJSON);
+
+            });
+        });
+
+        function startTimer() {
+            updateTimerUI();
+
+            const interval = setInterval(function () {
+                if (quizFinished) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                remainingSeconds--;
+
+                updateTimerUI();
+                // autosave tempo
+                autosave();
+
+                // tempo finito
+                if (remainingSeconds <= 0) {
+                    clearInterval(interval);
+                    finishQuiz('Tempo scaduto');
+                }
+            }, 1000);
+        }
+
+    function updateTimerUI() {
+        let minutes = Math.floor(remainingSeconds / 60);
+        let seconds = remainingSeconds % 60;
+
+        minutes = String(minutes).padStart(2, '0');
+        seconds = String(seconds).padStart(2, '0');
+
+        $('#timer').text(`${minutes}:${seconds}`);
+
+        // warning colori
+        if (remainingSeconds < 300) {
+            $('#timer').removeClass('text-primary')
+                .addClass('text-danger');
+        }
+    }
+
+    function finishQuiz(reason = '') {
+        if (quizFinished) return;
+
+        quizFinished = true;
+        $('.btn-answer').prop('disabled', true);
+
+        $.post("{{ route('quiz.attempts.store') }}", {
+            _token: "{{ csrf_token() }}",
+            quiz_id: {{ $quiz->id }},
+            answers: answers,
+            duration: timeLimit - remainingSeconds
+
+        }, function (res) {
+            if (reason) {
+                toastr.warning(reason);
+            }
+            window.location.href = `/quiz/attempts/${res.attempt_id}`;
+
+        }).fail(function () {
+            toastr.error('Errore submit finale');
+        });
+    }
+
         // INIT
         $(document).ready(function () {
             renderQuestion(0);
             renderNavigator();
+            startTimer();
 
             $('.btn-answer').removeClass('active');
 

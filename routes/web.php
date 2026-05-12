@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\QuizAttemptController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -102,7 +103,13 @@ Route::get('quiz/random-play', [QuizController::class, 'randomPlay'])
     ->name('quiz.random');
 Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])
     ->name('quiz.play');
-
+// quiz attempts
+Route::put('/quiz/attempts/{attempt}', [QuizAttemptController::class, 'update'])
+    ->name('quiz.attempts.update');
+Route::post('/quiz/attempts', [QuizAttemptController::class, 'store'])
+    ->name('quiz.attempts.store');
+Route::get('/quiz/attempts/{attempt}', [QuizAttemptController::class, 'show'])
+    ->name('quiz.attempts.show');
 
 //VWECCHIA DASHBOARD DI BREEZE
 Route::get('/dashboard', function () {

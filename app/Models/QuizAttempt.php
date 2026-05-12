@@ -14,6 +14,10 @@ class QuizAttempt extends Model
         'duration',
     ];
 
+    protected $casts = [
+        'answers' => 'array',
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
