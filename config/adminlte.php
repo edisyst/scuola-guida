@@ -301,9 +301,12 @@ return [
     'menu' => [
         // Navbar items:
         [
-            'type' => 'navbar-search',
-            'text' => 'search',
+            'type'        => 'navbar-search',
+            'text'        => 'Cerca domande e categorie...',
             'topnav_right' => true,
+            'href'        => '/search',
+            'input_name'  => 'q',
+            'method'      => 'get',
         ],
         [
             'type' => 'darkmode-widget',

@@ -63,11 +63,13 @@ class CategoryTest extends TestCase
         ]);
     }
 
-    public function test_non_admin_cannot_access_categories()
+    public function test_viewer_cannot_create_category()
     {
         $user = User::factory()->create(['role' => \App\Models\User::ROLE_VIEWER]);
 
-        $response = $this->actingAs($user)->get('/admin/categories');
+        $response = $this->actingAs($user)->post('/admin/categories', [
+            'name' => 'Categoria test',
+        ]);
 
         $response->assertStatus(403);
     }

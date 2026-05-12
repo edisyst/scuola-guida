@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizAttemptController;
+use App\Http\Controllers\SearchController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,6 +18,8 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -46,25 +49,35 @@ Route::middleware(['auth'])
     ->group(function () {
 
         /*
-        | ADMIN + EDITOR — gestione categorie, domande, quiz
+        | VIEWER + EDITOR + ADMIN — sola lettura (indici)
+        */
+        Route::middleware('role:admin,editor,viewer')->group(function () {
+
+            Route::get('categories', [CategoryController::class, 'index'])
+                ->name('categories.index');
+
+            Route::get('questions', [QuestionController::class, 'index'])
+                ->name('questions.index');
+            Route::get('questions/data', [QuestionController::class, 'data'])
+                ->name('questions.data');
+
+            Route::get('quizzes', [QuizController::class, 'index'])
+                ->name('quizzes.index');
+        });
+
+        /*
+        | EDITOR + ADMIN — scrittura (nessuna eliminazione)
         */
         Route::middleware('role:admin,editor')->group(function () {
 
-            Route::resource('categories', CategoryController::class)
-                ->except(['show']);
-
-            Route::get('questions/data', [QuestionController::class, 'data'])
-                ->name('questions.data');
             Route::get('questions/export', [QuestionController::class, 'export'])
                 ->name('questions.export');
             Route::post('questions/import', [QuestionController::class, 'import'])
                 ->name('questions.import');
             Route::get('questions/template', [QuestionController::class, 'template'])
                 ->name('questions.template');
-            Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
-                ->name('questions.bulkDelete');
             Route::resource('questions', QuestionController::class)
-                ->except(['show']);
+                ->only(['create', 'store', 'edit', 'update']);
 
             Route::post('quizzes/random', [QuizController::class, 'createRandom'])
                 ->name('quizzes.random');
@@ -85,13 +98,24 @@ Route::middleware(['auth'])
             Route::post('quizzes/{quiz}/bulk-remove', [QuizController::class, 'bulkRemove'])
                 ->name('quizzes.bulkRemove');
             Route::resource('quizzes', QuizController::class)
-                ->except(['show']);
+                ->only(['create', 'store', 'edit', 'update']);
         });
 
         /*
-        | SOLO ADMIN — utenti, dashboard, audit, tutti i risultati
+        | SOLO ADMIN — eliminazioni, utenti, dashboard, audit
         */
         Route::middleware('role:admin')->group(function () {
+
+            Route::resource('categories', CategoryController::class)
+                ->except(['show', 'index']);
+
+            Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
+                ->name('questions.bulkDelete');
+            Route::delete('questions/{question}', [QuestionController::class, 'destroy'])
+                ->name('questions.destroy');
+
+            Route::delete('quizzes/{quiz}', [QuizController::class, 'destroy'])
+                ->name('quizzes.destroy');
 
             Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
                 ->except(['show']);
@@ -104,7 +128,6 @@ Route::middleware(['auth'])
                 return view('admin.audit.index', compact('logs'));
             })->name('audit.index');
 
-            // Tutti i tentativi di tutti gli utenti
             Route::get('quiz-attempts', [QuizAttemptController::class, 'adminIndex'])
                 ->name('quiz.attempts.all');
         });
