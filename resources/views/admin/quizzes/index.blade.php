@@ -4,7 +4,7 @@
 
 @section('content')
 
-    @if(auth()->user()->canEdit())
+    @if(auth()->user()->canCreateQuiz())
     <div class="mb-3 d-flex">
 
         <a href="{{ route('admin.quizzes.create') }}" class="btn btn-primary mr-2">
@@ -57,7 +57,7 @@
                                 Play
                             </a>
 
-                            @if(auth()->user()->canEdit())
+                            @if(auth()->user()->canEditQuiz())
                             {{-- GESTIONE DOMANDE --}}
                             <a href="{{ route('admin.quizzes.questions', $quiz) }}"
                                class="btn btn-sm btn-secondary mb-1">
@@ -71,7 +71,7 @@
                             </a>
                             @endif
 
-                            @if(auth()->user()->isAdmin())
+                            @if(auth()->user()->canDeleteQuiz())
                             {{-- DELETE --}}
                             <form method="POST"
                                   action="{{ route('admin.quizzes.destroy', $quiz) }}"

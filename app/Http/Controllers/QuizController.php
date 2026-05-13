@@ -30,6 +30,8 @@ class QuizController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->canCreateQuiz(), 403);
+
         $questions = Question::limit(200)->get(); // evita carichi enormi
 
         return view('admin.quizzes.create', compact('questions'));
@@ -37,6 +39,8 @@ class QuizController extends Controller
 
     public function store(StoreQuizRequest $request)
     {
+        abort_unless(auth()->user()->canCreateQuiz(), 403);
+
         $data = $request->validated();
         $data['is_active'] = $request->has('is_active');
 
@@ -61,6 +65,8 @@ class QuizController extends Controller
 
     public function edit(Quiz $quiz)
     {
+        abort_unless(auth()->user()->canEditQuiz(), 403);
+
         $questionsCount = $quiz->questions()->count();
         $currentCount = $quiz->questions()->count(); // refactoring: sono la stessa cosa
         $max = $quiz->max_questions;
@@ -73,6 +79,8 @@ class QuizController extends Controller
 
     public function update(UpdateQuizRequest $request, Quiz $quiz)
     {
+        abort_unless(auth()->user()->canEditQuiz(), 403);
+
         $quiz->update($request->validated());
 
         $data = $request->validate([
@@ -94,7 +102,7 @@ class QuizController extends Controller
 
     public function destroy(Quiz $quiz)
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless(auth()->user()->canDeleteQuiz(), 403);
 
         $quiz->delete();
         clearAdminBadgesCache();
@@ -243,6 +251,8 @@ class QuizController extends Controller
 
     public function createRandom()
     {
+        abort_unless(auth()->user()->canCreateQuiz(), 403);
+
         $max = 30;
 
         $quiz = Quiz::create([

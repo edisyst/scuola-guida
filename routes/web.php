@@ -7,6 +7,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Admin\RolePermissionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,6 +43,8 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 | ADMIN AREA
 |--------------------------------------------------------------------------
+| Tutti i ruoli (admin/editor/viewer) possono accedere al pannello.
+| Le singole azioni sono protette nei controller tramite hasPermission().
 */
 Route::middleware(['auth'])
     ->prefix('admin')
@@ -49,36 +52,29 @@ Route::middleware(['auth'])
     ->group(function () {
 
         /*
-        | VIEWER + EDITOR + ADMIN — sola lettura (indici)
+        | INDICI + AZIONI (controller-level permission check)
         */
         Route::middleware('role:admin,editor,viewer')->group(function () {
 
-            Route::get('categories', [CategoryController::class, 'index'])
-                ->name('categories.index');
+            // CATEGORIES
+            Route::resource('categories', CategoryController::class)
+                ->except(['show']);
 
-            Route::get('questions', [QuestionController::class, 'index'])
-                ->name('questions.index');
+            // QUESTIONS
             Route::get('questions/data', [QuestionController::class, 'data'])
                 ->name('questions.data');
-
-            Route::get('quizzes', [QuizController::class, 'index'])
-                ->name('quizzes.index');
-        });
-
-        /*
-        | EDITOR + ADMIN — scrittura (nessuna eliminazione)
-        */
-        Route::middleware('role:admin,editor')->group(function () {
-
             Route::get('questions/export', [QuestionController::class, 'export'])
                 ->name('questions.export');
             Route::post('questions/import', [QuestionController::class, 'import'])
                 ->name('questions.import');
             Route::get('questions/template', [QuestionController::class, 'template'])
                 ->name('questions.template');
+            Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
+                ->name('questions.bulkDelete');
             Route::resource('questions', QuestionController::class)
-                ->only(['create', 'store', 'edit', 'update']);
+                ->except(['show']);
 
+            // QUIZZES
             Route::post('quizzes/random', [QuizController::class, 'createRandom'])
                 ->name('quizzes.random');
             Route::get('quizzes/{quiz}/questions/data', [QuizController::class, 'questionsData'])
@@ -98,27 +94,17 @@ Route::middleware(['auth'])
             Route::post('quizzes/{quiz}/bulk-remove', [QuizController::class, 'bulkRemove'])
                 ->name('quizzes.bulkRemove');
             Route::resource('quizzes', QuizController::class)
-                ->only(['create', 'store', 'edit', 'update']);
+                ->except(['show']);
+
+            // USERS
+            Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+                ->except(['show']);
         });
 
         /*
-        | SOLO ADMIN — eliminazioni, utenti, dashboard, audit
+        | SOLO ADMIN — gestione sistema (dashboard, audit, role-permissions)
         */
         Route::middleware('role:admin')->group(function () {
-
-            Route::resource('categories', CategoryController::class)
-                ->except(['show', 'index']);
-
-            Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
-                ->name('questions.bulkDelete');
-            Route::delete('questions/{question}', [QuestionController::class, 'destroy'])
-                ->name('questions.destroy');
-
-            Route::delete('quizzes/{quiz}', [QuizController::class, 'destroy'])
-                ->name('quizzes.destroy');
-
-            Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
-                ->except(['show']);
 
             Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
                 ->name('dashboard');
@@ -130,6 +116,12 @@ Route::middleware(['auth'])
 
             Route::get('quiz-attempts', [QuizAttemptController::class, 'adminIndex'])
                 ->name('quiz.attempts.all');
+
+            // Ruoli & Permessi
+            Route::get('roles', [RolePermissionController::class, 'index'])
+                ->name('roles.index');
+            Route::put('roles', [RolePermissionController::class, 'update'])
+                ->name('roles.update');
         });
     });
 

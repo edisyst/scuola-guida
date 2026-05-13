@@ -15,7 +15,12 @@
       "Bash(git commit *)",
       "Bash(git restore *)",
       "Bash(Test-Path \".env.testing\")",
-      "Bash(Test-Path \".env.testing.locale\")"
+      "Bash(Test-Path \".env.testing.locale\")",
+      "Bash(php -l app/Models/User.php)",
+      "Bash(php -l app/Http/Controllers/Admin/UserController.php)",
+      "Bash(php -l app/Http/Controllers/Admin/RolePermissionController.php)",
+      "Bash(php -l app/Http/Controllers/QuizController.php)",
+      "Bash(php -l app/Http/Controllers/CategoryController.php)"
     ]
   }
 }

@@ -4,13 +4,13 @@
 
 @section('content')
 
-    @if(auth()->user()->canEdit())
+    @if(auth()->user()->canCreateQuestion())
         <a href="{{ route('admin.questions.create') }}" class="btn btn-primary mb-3">Nuova Domanda</a>
         <a href="{{ route('admin.questions.export') }}" class="btn btn-success mb-3">Export Excel</a>
         <a href="{{ route('admin.questions.template') }}" class="btn btn-info mb-3">Scarica Template</a>
     @endif
 
-    @if(auth()->user()->canEdit())
+    @if(auth()->user()->canCreateQuestion())
     <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="mb-3 d-inline">
         @csrf
         <input type="file" name="file" required>
@@ -18,7 +18,7 @@
     </form>
     @endif
 
-    @if(auth()->user()->isAdmin())
+    @if(auth()->user()->canDeleteQuestion())
     <button id="bulk-delete" class="btn btn-danger mb-3">Elimina selezionati</button>
     @endif
 
@@ -57,7 +57,7 @@
             <th>Risposta</th>
             <th>Img</th>
             <th>Azioni</th>
-            @if(auth()->user()->isAdmin())
+            @if(auth()->user()->canDeleteQuestion())
             <th><input type="checkbox" id="select-all"></th>
             @endif
         </tr>
@@ -122,7 +122,7 @@
                     { data: 'is_true', orderable: false },
                     { data: 'image', orderable: false },
                     { data: 'actions', orderable: false },
-                    @if(auth()->user()->isAdmin())
+                    @if(auth()->user()->canDeleteQuestion())
                     { data: 'checkbox', orderable: false, searchable: false },
                     @endif
                 ],

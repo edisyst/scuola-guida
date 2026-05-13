@@ -360,8 +360,14 @@ return [
             'text' => 'Users',
             'url'  => 'admin/users',
             'icon' => 'fas fa-user',
-            'can'  => 'admin-only',
+            'can'  => 'manage-users-menu',
             'key'  => 'users',
+        ],
+        [
+            'text' => 'Ruoli & Permessi',
+            'url'  => 'admin/roles',
+            'icon' => 'fas fa-user-shield',
+            'can'  => 'admin-only',
         ],
         [
             'text' => 'Quizzes',

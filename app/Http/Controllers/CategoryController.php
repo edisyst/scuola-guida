@@ -24,14 +24,14 @@ class CategoryController extends Controller
 
     public function create()
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless(auth()->user()->canCreateCategory(), 403);
 
         return view('admin.categories.create');
     }
 
     public function store(Request $request)
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless(auth()->user()->canCreateCategory(), 403);
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -47,14 +47,14 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless(auth()->user()->canEditCategory(), 403);
 
         return view('admin.categories.edit', compact('category'));
     }
 
     public function update(Request $request, Category $category)
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless(auth()->user()->canEditCategory(), 403);
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -70,7 +70,7 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless(auth()->user()->canDeleteCategory(), 403);
 
         $category->delete();
         Cache::forget('categories_list');

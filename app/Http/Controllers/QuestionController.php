@@ -209,7 +209,7 @@ class QuestionController extends Controller
 
     public function bulkDelete(Request $request)
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless(auth()->user()->canDeleteQuestion(), 403);
 
         Question::whereIn('id', $request->ids)->delete();
 

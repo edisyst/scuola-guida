@@ -3,7 +3,7 @@
 @section('header', 'Categorie')
 
 @section('content')
-    @if(auth()->user()->isAdmin())
+    @if(auth()->user()->canCreateCategory())
     <a href="{{ route('admin.categories.create') }}" class="btn btn-primary mb-3">
         Nuova Categoria
     </a>
@@ -32,9 +32,11 @@
                 </td>
 
                 <td>
-                    @if(auth()->user()->isAdmin())
+                    @if(auth()->user()->canEditCategory())
                         <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-warning">Modifica</a>
+                    @endif
 
+                    @if(auth()->user()->canDeleteCategory())
                         <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
