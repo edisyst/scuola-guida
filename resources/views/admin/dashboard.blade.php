@@ -1,77 +1,90 @@
 @extends('layouts.admin')
 
-@section('header', 'Dashboard')
+@section('title', 'Dashboard Admin')
+
+@section('content_header')@endsection
 
 @section('content')
+<div class="sg-wrapper">
 
-{{-- KPI BOX --}}
-<div class="row">
-
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3>{{ $stats['users'] }}</h3>
-                <p>Utenti</p>
-            </div>
-        </div>
+    <div class="sg-header">
+        <p class="sg-header-subtitle">Panoramica</p>
+        <h1 class="sg-header-title">Dashboard Admin</h1>
     </div>
 
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h3>{{ $stats['questions'] }}</h3>
-                <p>Domande</p>
+    {{-- KPI BOX --}}
+    <div class="row" style="margin:0 -8px;">
+
+        <div class="col-lg-3 col-6" style="padding:0 8px;margin-bottom:16px;">
+            <div class="sg-stat-card">
+                <div class="sg-stat-icon grad-blue"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="sg-stat-value">{{ $stats['users'] }}</div>
+                    <div class="sg-stat-label">Utenti</div>
+                </div>
             </div>
         </div>
+
+        <div class="col-lg-3 col-6" style="padding:0 8px;margin-bottom:16px;">
+            <div class="sg-stat-card">
+                <div class="sg-stat-icon grad-green"><i class="fas fa-question-circle"></i></div>
+                <div>
+                    <div class="sg-stat-value">{{ $stats['questions'] }}</div>
+                    <div class="sg-stat-label">Domande</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6" style="padding:0 8px;margin-bottom:16px;">
+            <div class="sg-stat-card">
+                <div class="sg-stat-icon grad-orange"><i class="fas fa-folder-open"></i></div>
+                <div>
+                    <div class="sg-stat-value">{{ $stats['categories'] }}</div>
+                    <div class="sg-stat-label">Categorie</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6" style="padding:0 8px;margin-bottom:16px;">
+            <div class="sg-stat-card">
+                <div class="sg-stat-icon grad-red"><i class="fas fa-clipboard-list"></i></div>
+                <div>
+                    <div class="sg-stat-value">{{ $stats['quizzes'] }}</div>
+                    <div class="sg-stat-label">Quiz</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3>{{ $stats['categories'] }}</h3>
-                <p>Categorie</p>
-            </div>
-        </div>
-    </div>
+    {{-- GRAFICI --}}
+    <div class="row" style="margin:0 -8px;">
 
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h3>{{ $stats['quizzes'] }}</h3>
-                <p>Quiz</p>
+        <div class="col-md-6" style="padding:0 8px;margin-bottom:16px;">
+            <div class="sg-card">
+                <div class="sg-card-header">
+                    <h2 class="sg-card-header-title">Domande ultimi 30 giorni</h2>
+                </div>
+                <div class="sg-card-body">
+                    <canvas id="questionsChart"></canvas>
+                </div>
             </div>
         </div>
+
+        <div class="col-md-6" style="padding:0 8px;margin-bottom:16px;">
+            <div class="sg-card">
+                <div class="sg-card-header">
+                    <h2 class="sg-card-header-title">Utenti ultimi 30 giorni</h2>
+                </div>
+                <div class="sg-card-body">
+                    <canvas id="usersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>
-
-{{-- GRAFICI --}}
-<div class="row mt-4">
-
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Domande ultimi 30 giorni</h3>
-            </div>
-            <div class="card-body">
-                <canvas id="questionsChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Utenti ultimi 30 giorni</h3>
-            </div>
-            <div class="card-body">
-                <canvas id="usersChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-</div>
-
 @endsection
 
 @section('js')
@@ -84,8 +97,7 @@
     const questionsData = @json($questionsChart);
     const usersData = @json($usersChart);
 
-    function buildChart(canvasId, data, label) {
-
+    function buildChart(canvasId, data, label, color) {
         new Chart(document.getElementById(canvasId), {
             type: 'line',
             data: {
@@ -93,28 +105,30 @@
                 datasets: [{
                     label: label,
                     data: data.map(i => i.total),
-                    tension: 0.3
+                    tension: 0.35,
+                    borderColor: color,
+                    backgroundColor: color + '22',
+                    fill: true,
+                    pointRadius: 3,
+                    pointBackgroundColor: color,
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: {
-                        display: true
-                    }
+                    legend: { display: true, position: 'bottom' }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    y: { beginAtZero: true, grid: { color: '#f1f3f5' } },
+                    x: { grid: { display: false } }
                 }
             }
         });
     }
 
-    buildChart('questionsChart', questionsData, 'Domande');
-    buildChart('usersChart', usersData, 'Utenti');
-
+    buildChart('questionsChart', questionsData, 'Domande', '#28a745');
+    buildChart('usersChart', usersData, 'Utenti', '#4361ee');
 </script>
 
 @endsection

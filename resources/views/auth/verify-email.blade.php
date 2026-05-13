@@ -1,30 +1,27 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-    </div>
+    <h1 class="sg-auth-title">Verifica email</h1>
+    <p class="sg-auth-subtitle">
+        {{ __('Grazie per esserti registrato! Prima di iniziare, verifica il tuo indirizzo email cliccando sul link che ti abbiamo inviato. Se non hai ricevuto l\'email, possiamo inviarne un\'altra.') }}
+    </p>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+        <div class="sg-text-success sg-mb-2" style="font-size:.88rem;font-weight:600;">
+            {{ __('Un nuovo link di verifica è stato inviato al tuo indirizzo email.') }}
         </div>
     @endif
 
-    <div class="mt-4 flex items-center justify-between">
+    <div class="sg-flex-between sg-mt-3" style="flex-wrap:wrap;gap:12px;">
         <form method="POST" action="{{ route('verification.send') }}">
             @csrf
-
-            <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
-            </div>
+            <x-primary-button>
+                {{ __('Reinvia email di verifica') }}
+            </x-primary-button>
         </form>
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('Log Out') }}
+            <button type="submit" class="sg-link sg-link-muted" style="font-size:.85rem;background:none;border:none;cursor:pointer;">
+                {{ __('Esci') }}
             </button>
         </form>
     </div>

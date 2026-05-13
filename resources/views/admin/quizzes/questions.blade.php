@@ -6,124 +6,150 @@
 <style>
     #sortable-questions li {
         font-size: 13px;
-        padding: 8px 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--sg-border-light);
+        border-radius: var(--sg-radius-sm);
+        margin-bottom: 6px;
+        background: #fff;
+        transition: background .15s, box-shadow .15s;
+    }
+    #sortable-questions li:hover {
+        background: var(--sg-bg-soft);
+        box-shadow: var(--sg-shadow-card);
     }
     .index-badge {
         min-width: 28px;
         text-align: center;
+        font-size: .7rem;
+        padding: 4px 8px;
+        background: var(--sg-gradient-dark) !important;
+        color: #fff;
+        border-radius: var(--sg-radius-pill);
+        font-weight: 700;
     }
+    .quiz-q-progress {
+        height: 10px;
+        border-radius: 5px;
+        background: var(--sg-border);
+        overflow: hidden;
+    }
+    .quiz-q-progress .bar {
+        height: 100%;
+        border-radius: 5px;
+        transition: width .35s ease, background .15s;
+        background: var(--sg-gradient-success);
+    }
+    .quiz-q-progress .bar.warn   { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+    .quiz-q-progress .bar.danger { background: linear-gradient(90deg, #dc3545, #e83e8c); }
 </style>
 @stop
 
-@section('header', 'Gestione Domande Quiz')
+@section('content_header')@endsection
 
 @section('content')
+<div class="sg-wrapper">
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h5>{{ $quiz->title }}</h5>
-
-                <a href="{{ route('admin.quizzes.index') }}" class="btn btn-secondary btn-sm">Indietro</a>
-            </div>
-
-            <div class="card-body">
-                {{-- FILTRI --}}
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <select id="filter-category" class="form-control">
-                            <option value="">-- Tutte le categorie --</option>
-                            @foreach(\App\Models\Category::all() as $cat)
-                                <option value="{{ $cat->id }}">
-                                    {{ $cat->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                {{-- BULK ACTIONS --}}
-                <div class="mb-3 d-flex gap-2">
-                    <button id="bulk-add" class="btn btn-success btn-sm">Aggiungi selezionate</button>
-
-                    <button id="bulk-remove" class="btn btn-danger btn-sm">Rimuovi selezionate</button>
-
-                    <button id="select-all-filtered" class="btn btn-secondary btn-sm">Seleziona TUTTI (filtrati)</button>
-                </div>
-
-                {{-- TABELLA --}}
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between">
-                        <strong>
-                            <span id="current-count">{{ $currentCount }}</span>
-                            /
-                            <span id="max-count">{{ $max }}</span>
-                            domande
-                        </strong>
-                    </div>
-
-                    <div class="progress">
-                        <div id="quiz-progress-bar"
-                            class="progress-bar bg-success"
-                            role="progressbar"
-                            style="width: 0%">
-                        </div>
-                    </div>
-                </div>
-
-                <table id="questions-table" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Domanda</th>
-                            <th>Categoria</th>
-                            <th>Stato</th>
-                            <th>Azione</th>
-                            <th><input type="checkbox" id="select-all"></th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
+    <div class="sg-header sg-flex-between">
+        <div>
+            <p class="sg-header-subtitle">Quiz / {{ $quiz->title }}</p>
+            <h1 class="sg-header-title"><i class="fas fa-list-check mr-2"></i> Gestione domande</h1>
         </div>
+        <a href="{{ route('admin.quizzes.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
+            <i class="fas fa-arrow-left"></i> Indietro
+        </a>
     </div>
 
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h5>Ordine del Quiz</h5>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="sg-card">
+                <div class="sg-card-body">
+                    {{-- PROGRESS --}}
+                    <div class="sg-mb-3">
+                        <div class="sg-flex-between sg-mb-1">
+                            <span class="sg-label sg-mb-0">Domande inserite</span>
+                            <strong>
+                                <span id="current-count">{{ $currentCount }}</span>
+                                / <span id="max-count">{{ $max }}</span>
+                            </strong>
+                        </div>
+                        <div class="quiz-q-progress">
+                            <div id="quiz-progress-bar" class="bar" style="width:0%"></div>
+                        </div>
+                    </div>
 
-                <button id="shuffle-questions" class="btn btn-sm btn-warning">🔀 Shuffle</button>
+                    {{-- FILTRI --}}
+                    <div class="row sg-mb-2">
+                        <div class="col-md-6">
+                            <select id="filter-category" class="sg-form-control">
+                                <option value="">— Tutte le categorie —</option>
+                                @foreach(\App\Models\Category::all() as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- BULK ACTIONS --}}
+                    <div class="sg-mb-3 sg-d-flex sg-gap-2" style="flex-wrap:wrap;">
+                        <button id="bulk-add" class="sg-btn sg-btn-success sg-btn-sm">
+                            <i class="fas fa-plus"></i> Aggiungi selezionate
+                        </button>
+                        <button id="bulk-remove" class="sg-btn sg-btn-danger sg-btn-sm">
+                            <i class="fas fa-minus"></i> Rimuovi selezionate
+                        </button>
+                        <button id="select-all-filtered" class="sg-btn sg-btn-light sg-btn-sm">
+                            <i class="fas fa-check-double"></i> Seleziona tutti (filtrati)
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="questions-table" class="sg-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Domanda</th>
+                                    <th>Categoria</th>
+                                    <th>Stato</th>
+                                    <th>Azione</th>
+                                    <th><input type="checkbox" id="select-all"></th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <div class="card-body" style="max-height: 800px; overflow-y: auto;">
-
-                <ul id="sortable-questions" class="list-group">
-
-                    @foreach($quiz->questions as $i => $q)
-                        <li class="list-group-item d-flex align-items-center justify-content-between"
-                            data-id="{{ $q->id }}"
-                            data-text="{{ $q->question }}">
-
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge badge-secondary index-badge">{{ $i + 1 }}</span>
-
-                                <span class="small text-muted">{{ Str::limit($q->question, 60) }}</span>
-
-                                <span class="badge badge-info ml-2">{{ $q->category->name }}</span>
-                            </div>
-
-                            <button class="btn btn-sm btn-outline-danger btn-remove-from-list">✕</button>
-                        </li>
-                    @endforeach
-
-                </ul>
-
+        <div class="col-md-4">
+            <div class="sg-card">
+                <div class="sg-card-header">
+                    <h2 class="sg-card-header-title">Ordine del quiz</h2>
+                    <button id="shuffle-questions" class="sg-btn sg-btn-light sg-btn-sm">
+                        <i class="fas fa-shuffle"></i> Shuffle
+                    </button>
+                </div>
+                <div style="max-height:800px;overflow-y:auto;padding:14px;">
+                    <ul id="sortable-questions" class="list-unstyled" style="margin:0;">
+                        @foreach($quiz->questions as $i => $q)
+                            <li data-id="{{ $q->id }}" data-text="{{ $q->question }}"
+                                class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center" style="gap:8px;flex:1;min-width:0;">
+                                    <span class="index-badge">{{ $i + 1 }}</span>
+                                    <span class="sg-text-muted" style="font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                        {{ Str::limit($q->question, 60) }}
+                                    </span>
+                                </div>
+                                <button class="sg-btn-icon delete btn-remove-from-list" title="Rimuovi">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('js')
@@ -460,21 +486,17 @@
 
         const percent = Math.round((current / max) * 100);
 
-        $('#quiz-progress-bar')
-            .css('width', percent + '%')
-            .text(percent + '%');
+        let bar = $('#quiz-progress-bar');
+        bar.css('width', percent + '%');
 
         $('#current-count').text(current);
 
-        let bar = $('#quiz-progress-bar');
-        bar.removeClass('bg-success bg-warning bg-danger');
+        bar.removeClass('warn danger');
 
-        if (percent < 60) {
-            bar.addClass('bg-success');
-        } else if (percent < 90) {
-            bar.addClass('bg-warning');
-        } else {
-            bar.addClass('bg-danger');
+        if (percent >= 90) {
+            bar.addClass('danger');
+        } else if (percent >= 60) {
+            bar.addClass('warn');
         }
 
         if (current >= max) {
@@ -490,14 +512,15 @@
         if ($('#sortable-questions li[data-id="' + id + '"]').length) return;
         // aggiungi elemento <li> nell'elenco domande
         $('#sortable-questions').append(`
-            <li class="list-group-item d-flex align-items-center justify-content-between"
-            data-id="${id}" data-text="${text}" >
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge badge-secondary index-badge"></span>
-                    <span class="small text-muted">${truncate(text, 60)}</span>
-                    <span class="badge badge-info ml-2">${category}</span>
+            <li data-id="${id}" data-text="${text}"
+                class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center" style="gap:8px;flex:1;min-width:0;">
+                    <span class="index-badge"></span>
+                    <span class="sg-text-muted" style="font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${truncate(text, 60)}</span>
                 </div>
-                <button class="btn btn-sm btn-outline-danger btn-remove-from-list">✕</button>
+                <button class="sg-btn-icon delete btn-remove-from-list" title="Rimuovi">
+                    <i class="fas fa-times"></i>
+                </button>
             </li>
         `);
         // aggiorna indici

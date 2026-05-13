@@ -2,35 +2,37 @@
     @csrf
     @method('put')
 
-    <div class="form-group">
-        <label for="update_password_current_password">{{ __('Current Password') }}</label>
+    <div class="sg-form-group">
+        <label for="update_password_current_password" class="sg-form-label">{{ __('Password attuale') }}</label>
         <input id="update_password_current_password" name="current_password" type="password"
-               class="form-control @if($errors->updatePassword->has('current_password')) is-invalid @endif"
+               class="sg-form-control @if($errors->updatePassword->has('current_password')) is-invalid @endif"
                autocomplete="current-password">
         @if ($errors->updatePassword->has('current_password'))
-            <div class="invalid-feedback">{{ $errors->updatePassword->first('current_password') }}</div>
+            <div class="sg-form-error">{{ $errors->updatePassword->first('current_password') }}</div>
         @endif
     </div>
 
-    <div class="form-group">
-        <label for="update_password_password">{{ __('New Password') }}</label>
+    <div class="sg-form-group">
+        <label for="update_password_password" class="sg-form-label">{{ __('Nuova password') }}</label>
         <input id="update_password_password" name="password" type="password"
-               class="form-control @if($errors->updatePassword->has('password')) is-invalid @endif"
+               class="sg-form-control @if($errors->updatePassword->has('password')) is-invalid @endif"
                autocomplete="new-password">
         @if ($errors->updatePassword->has('password'))
-            <div class="invalid-feedback">{{ $errors->updatePassword->first('password') }}</div>
+            <div class="sg-form-error">{{ $errors->updatePassword->first('password') }}</div>
         @endif
     </div>
 
-    <div class="form-group">
-        <label for="update_password_password_confirmation">{{ __('Confirm Password') }}</label>
+    <div class="sg-form-group">
+        <label for="update_password_password_confirmation" class="sg-form-label">{{ __('Conferma password') }}</label>
         <input id="update_password_password_confirmation" name="password_confirmation" type="password"
-               class="form-control @if($errors->updatePassword->has('password_confirmation')) is-invalid @endif"
+               class="sg-form-control @if($errors->updatePassword->has('password_confirmation')) is-invalid @endif"
                autocomplete="new-password">
         @if ($errors->updatePassword->has('password_confirmation'))
-            <div class="invalid-feedback">{{ $errors->updatePassword->first('password_confirmation') }}</div>
+            <div class="sg-form-error">{{ $errors->updatePassword->first('password_confirmation') }}</div>
         @endif
     </div>
 
-    <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+    <button type="submit" class="sg-btn sg-btn-primary sg-mt-2">
+        <i class="fas fa-key"></i> {{ __('Aggiorna password') }}
+    </button>
 </form>
