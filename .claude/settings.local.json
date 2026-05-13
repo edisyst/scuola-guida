@@ -29,7 +29,8 @@
       "Bash(php -l resources/views/admin/categories/index.blade.php resources/views/admin/categories/create.blade.php resources/views/admin/categories/edit.blade.php resources/views/admin/categories/partials/form.blade.php)",
       "Bash(php -l resources/views/admin/questions/index.blade.php resources/views/admin/questions/create.blade.php resources/views/admin/questions/edit.blade.php resources/views/admin/questions/partials/form.blade.php resources/views/admin/questions/partials/actions.blade.php)",
       "Bash(php -l resources/views/admin/quizzes/index.blade.php resources/views/admin/quizzes/create.blade.php resources/views/admin/quizzes/edit.blade.php resources/views/admin/quizzes/partials/form.blade.php resources/views/admin/quizzes/partials/actions.blade.php resources/views/admin/quizzes/questions.blade.php)",
-      "Bash(php -l resources/views/admin/users/index.blade.php resources/views/admin/users/create.blade.php resources/views/admin/users/edit.blade.php resources/views/admin/users/form.blade.php resources/views/admin/roles/index.blade.php resources/views/admin/quiz-attempts/index.blade.php resources/views/admin/audit/index.blade.php resources/views/search/results.blade.php)"
+      "Bash(php -l resources/views/admin/users/index.blade.php resources/views/admin/users/create.blade.php resources/views/admin/users/edit.blade.php resources/views/admin/users/form.blade.php resources/views/admin/roles/index.blade.php resources/views/admin/quiz-attempts/index.blade.php resources/views/admin/audit/index.blade.php resources/views/search/results.blade.php)",
+      "PowerShell(Start-Process \"https://github.com/edisyst/scuola-guida/compare/master...quiz_attempts?expand=1\")"
     ]
   }
 }
