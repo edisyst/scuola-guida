@@ -20,7 +20,16 @@
       "Bash(php -l app/Http/Controllers/Admin/UserController.php)",
       "Bash(php -l app/Http/Controllers/Admin/RolePermissionController.php)",
       "Bash(php -l app/Http/Controllers/QuizController.php)",
-      "Bash(php -l app/Http/Controllers/CategoryController.php)"
+      "Bash(php -l app/Http/Controllers/CategoryController.php)",
+      "Bash(php -l resources/views/quiz/attempts.blade.php resources/views/quiz/attempt.blade.php resources/views/quiz/results.blade.php resources/views/profile/edit.blade.php)",
+      "Bash(php -l resources/views/welcome.blade.php resources/views/dashboard.blade.php resources/views/admin/dashboard.blade.php resources/views/auth/login.blade.php resources/views/auth/register.blade.php)",
+      "Bash(gh run *)",
+      "Bash(start *)",
+      "Bash(php -l resources/views/auth/forgot-password.blade.php resources/views/auth/reset-password.blade.php resources/views/auth/verify-email.blade.php resources/views/auth/confirm-password.blade.php resources/views/layouts/guest.blade.php resources/views/layouts/app.blade.php resources/views/quiz/play.blade.php)",
+      "Bash(php -l resources/views/admin/categories/index.blade.php resources/views/admin/categories/create.blade.php resources/views/admin/categories/edit.blade.php resources/views/admin/categories/partials/form.blade.php)",
+      "Bash(php -l resources/views/admin/questions/index.blade.php resources/views/admin/questions/create.blade.php resources/views/admin/questions/edit.blade.php resources/views/admin/questions/partials/form.blade.php resources/views/admin/questions/partials/actions.blade.php)",
+      "Bash(php -l resources/views/admin/quizzes/index.blade.php resources/views/admin/quizzes/create.blade.php resources/views/admin/quizzes/edit.blade.php resources/views/admin/quizzes/partials/form.blade.php resources/views/admin/quizzes/partials/actions.blade.php resources/views/admin/quizzes/questions.blade.php)",
+      "Bash(php -l resources/views/admin/users/index.blade.php resources/views/admin/users/create.blade.php resources/views/admin/users/edit.blade.php resources/views/admin/users/form.blade.php resources/views/admin/roles/index.blade.php resources/views/admin/quiz-attempts/index.blade.php resources/views/admin/audit/index.blade.php resources/views/search/results.blade.php)"
     ]
   }
 }
