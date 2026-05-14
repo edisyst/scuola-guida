@@ -25,7 +25,7 @@ class User extends Authenticatable
     */
 
     public const ENTITIES = ['question', 'quiz', 'category', 'user'];
-    public const ACTIONS  = ['create', 'edit', 'delete', 'manage'];
+    public const ACTIONS  = ['read', 'create', 'edit', 'delete', 'bulk', 'manage'];
 
     public const LABELS = [
         'question' => 'Domande',
@@ -35,9 +35,11 @@ class User extends Authenticatable
     ];
 
     public const ACTION_LABELS = [
+        'read'   => 'Leggi',
         'create' => 'Crea',
         'edit'   => 'Modifica',
         'delete' => 'Elimina',
+        'bulk'   => 'Operazioni bulk',
         'manage' => 'Gestisci (tutto)',
     ];
 
@@ -178,13 +180,15 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
-    | HELPERS — QUESTION (retrocompatibilità)
+    | HELPERS — QUESTION
     |--------------------------------------------------------------------------
     */
 
+    public function canReadQuestion(): bool   { return $this->hasPermission('read_question'); }
     public function canCreateQuestion(): bool { return $this->hasPermission('create_question'); }
     public function canEditQuestion(): bool   { return $this->hasPermission('edit_question'); }
     public function canDeleteQuestion(): bool { return $this->hasPermission('delete_question'); }
+    public function canBulkQuestion(): bool   { return $this->hasPermission('bulk_question'); }
     public function canManageQuestion(): bool { return $this->hasPermission('manage_question'); }
 
     /*
@@ -193,9 +197,11 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
+    public function canReadQuiz(): bool   { return $this->hasPermission('read_quiz'); }
     public function canCreateQuiz(): bool { return $this->hasPermission('create_quiz'); }
     public function canEditQuiz(): bool   { return $this->hasPermission('edit_quiz'); }
     public function canDeleteQuiz(): bool { return $this->hasPermission('delete_quiz'); }
+    public function canBulkQuiz(): bool   { return $this->hasPermission('bulk_quiz'); }
     public function canManageQuiz(): bool { return $this->hasPermission('manage_quiz'); }
 
     /*
@@ -204,9 +210,11 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
+    public function canReadCategory(): bool   { return $this->hasPermission('read_category'); }
     public function canCreateCategory(): bool { return $this->hasPermission('create_category'); }
     public function canEditCategory(): bool   { return $this->hasPermission('edit_category'); }
     public function canDeleteCategory(): bool { return $this->hasPermission('delete_category'); }
+    public function canBulkCategory(): bool   { return $this->hasPermission('bulk_category'); }
     public function canManageCategory(): bool { return $this->hasPermission('manage_category'); }
 
     /*
@@ -215,8 +223,10 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
+    public function canReadUser(): bool   { return $this->hasPermission('read_user'); }
     public function canCreateUser(): bool { return $this->hasPermission('create_user'); }
     public function canEditUser(): bool   { return $this->hasPermission('edit_user'); }
     public function canDeleteUser(): bool { return $this->hasPermission('delete_user'); }
+    public function canBulkUser(): bool   { return $this->hasPermission('bulk_user'); }
     public function canManageUser(): bool { return $this->hasPermission('manage_user'); }
 }
