@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | CRUD
-    |--------------------------------------------------------------------------
-    */
-
     public function index()
     {
         $categories = Category::withCount('questions')->get();
@@ -29,17 +22,9 @@ class CategoryController extends Controller
         return view('admin.categories.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request)
     {
-        abort_unless(auth()->user()->canCreateCategory(), 403);
-
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        Category::create($data);
-        Cache::forget('categories_list');
-        clearAdminBadgesCache();
+        Category::create($request->validated());
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoria creata');
@@ -52,17 +37,9 @@ class CategoryController extends Controller
         return view('admin.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category)
     {
-        abort_unless(auth()->user()->canEditCategory(), 403);
-
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $category->update($data);
-        Cache::forget('categories_list');
-        clearAdminBadgesCache();
+        $category->update($request->validated());
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoria aggiornata');
@@ -73,8 +50,6 @@ class CategoryController extends Controller
         abort_unless(auth()->user()->canDeleteCategory(), 403);
 
         $category->delete();
-        Cache::forget('categories_list');
-        clearAdminBadgesCache();
 
         return back()->with('success', 'Categoria eliminata');
     }

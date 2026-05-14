@@ -20,12 +20,25 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     | CATALOGO PERMESSI
     |--------------------------------------------------------------------------
-    | Pattern: {action}_{entity} dove action ∈ {create, edit, delete, manage}
-    | manage_{entity} = bypass totale sull'entità
+    | Pattern: {action}_{entity}
+    |
+    | HARDCODED (non configurabili per ruolo):
+    |   read_*  → true per tutti gli utenti autenticati (viewer+)
+    |   bulk_*  → true solo per admin
+    |
+    | MANAGED (configurabili dalla UI ruoli):
+    |   create, edit, delete, manage
+    |   manage_{entity} = bypass totale sull'entità
     */
 
     public const ENTITIES = ['question', 'quiz', 'category', 'user'];
     public const ACTIONS  = ['read', 'create', 'edit', 'delete', 'bulk', 'manage'];
+
+    /** Actions gestite dal DB e configurabili dalla UI dei ruoli */
+    public const MANAGED_ACTIONS = ['create', 'edit', 'delete', 'manage'];
+
+    /** Actions con regole hardcoded: non configurabili per ruolo */
+    public const HARDCODED_ACTIONS = ['read', 'bulk'];
 
     public const LABELS = [
         'question' => 'Domande',
@@ -40,6 +53,14 @@ class User extends Authenticatable
         'edit'   => 'Modifica',
         'delete' => 'Elimina',
         'bulk'   => 'Operazioni bulk',
+        'manage' => 'Gestisci (tutto)',
+    ];
+
+    /** Etichette solo per le actions gestite dalla UI */
+    public const MANAGED_ACTION_LABELS = [
+        'create' => 'Crea',
+        'edit'   => 'Modifica',
+        'delete' => 'Elimina',
         'manage' => 'Gestisci (tutto)',
     ];
 
@@ -129,6 +150,20 @@ class User extends Authenticatable
     }
 
     /**
+     * Solo i permessi configurabili dal pannello ruoli (esclude read e bulk).
+     */
+    public static function managedPermissions(): array
+    {
+        $perms = [];
+        foreach (self::ENTITIES as $entity) {
+            foreach (self::MANAGED_ACTIONS as $action) {
+                $perms[] = "{$action}_{$entity}";
+            }
+        }
+        return $perms;
+    }
+
+    /**
      * Permessi associati al ruolo (cache 60s)
      */
     public static function rolePermissions(string $role): array
@@ -161,13 +196,23 @@ class User extends Authenticatable
 
     public function hasPermission(string $permission): bool
     {
+        // Controllato prima di effectivePermissions() così manage_{entity} non bypassa bulk.
+        if (str_starts_with($permission, 'bulk_')) {
+            return $this->isAdmin();
+        }
+
         if ($this->isAdmin()) {
+            return true;
+        }
+
+        // read_* è garantito a tutti gli utenti autenticati senza passare dal DB.
+        if (str_starts_with($permission, 'read_')) {
             return true;
         }
 
         $effective = $this->effectivePermissions();
 
-        // manage_{entity} fa da bypass per la stessa entità
+        // manage_{entity} fa da bypass per tutte le action sulla stessa entità.
         if (str_contains($permission, '_')) {
             [, $entity] = explode('_', $permission, 2);
             if (in_array("manage_{$entity}", $effective, true)) {

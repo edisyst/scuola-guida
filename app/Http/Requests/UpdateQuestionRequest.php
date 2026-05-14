@@ -6,26 +6,26 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateQuestionRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()?->canEditQuestion() ?? false;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
             'category_id' => 'required|exists:categories,id',
             'question'    => 'required|string',
-//            'is_true'     => 'nullable|boolean',
+            'is_true'     => 'boolean',
             'image'       => 'nullable|image|max:2048',
         ];
+    }
+
+    public function prepareForValidation(): void
+    {
+        // Un checkbox non spuntato non è presente nel payload; boolean() lo normalizza a false.
+        $this->merge([
+            'is_true' => $this->boolean('is_true'),
+        ]);
     }
 }
