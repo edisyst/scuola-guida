@@ -7,6 +7,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\RolePermissionController;
 
 Route::get('/', function () {
@@ -31,6 +32,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])->name('quiz.play');
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
     Route::get('quiz/results', [QuizController::class, 'results'])->name('quiz.results');
+
+    // Dashboard personale stats utente
+    Route::get('stats', [UserStatsController::class, 'me'])->name('stats.me');
+    Route::post('stats/{user}/refresh', [UserStatsController::class, 'refresh'])
+        ->name('stats.refresh');
 
     // Storico tentativi — solo i propri
     Route::get('quiz/attempts', [QuizAttemptController::class, 'index'])->name('quiz.attempts.index');
@@ -97,6 +103,8 @@ Route::middleware(['auth'])
                 ->except(['show']);
 
             // USERS
+            Route::get('users/{user}/stats', [UserStatsController::class, 'show'])
+                ->name('users.stats');
             Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
                 ->except(['show']);
         });

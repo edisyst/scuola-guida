@@ -54,6 +54,10 @@
                                 @endif
                             </td>
                             <td class="sg-actions-cell">
+                                <a href="{{ route('admin.users.stats', $u) }}" class="sg-btn-icon" title="Statistiche">
+                                    <i class="fas fa-chart-line"></i>
+                                </a>
+
                                 @if(auth()->user()->canEditUser())
                                     <a href="{{ route('admin.users.edit', $u) }}" class="sg-btn-icon edit" title="Modifica">
                                         <i class="fas fa-edit"></i>

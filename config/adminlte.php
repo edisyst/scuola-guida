@@ -323,6 +323,12 @@ return [
             'text' => 'search',
         ],
         [
+            'text'  => 'Le mie statistiche',
+            'url'   => 'stats',
+            'icon'  => 'fas fa-chart-line',
+            'key'   => 'stats-me',
+        ],
+        [
             'text'  => 'I miei tentativi',
             'url'   => 'quiz/attempts',
             'icon'  => 'fas fa-history',

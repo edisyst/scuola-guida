@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Services\UserStatsService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class QuizAttempt extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'quiz_id',
@@ -18,6 +22,22 @@ class QuizAttempt extends Model
     protected $casts = [
         'answers' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        $invalidate = function (QuizAttempt $attempt) {
+            if ($attempt->user_id) {
+                UserStatsService::forget($attempt->user_id);
+            }
+
+            if ($attempt->isDirty('user_id') && $attempt->getOriginal('user_id')) {
+                UserStatsService::forget($attempt->getOriginal('user_id'));
+            }
+        };
+
+        static::saved($invalidate);
+        static::deleted($invalidate);
+    }
 
     /*
     |--------------------------------------------------------------------------
