@@ -1,113 +1,224 @@
-composer create-project --prefer-dist laravel/laravel:^11.0 scuola-guida
-composer create-project laravel/laravel scuola-guida
+# Scuola Guida — Quiz App
 
-# INSTALL
+Applicazione web per la gestione di quiz della patente di guida. Permette agli admin di creare domande, raggrupparle in quiz e assegnarli agli utenti; gli utenti possono svolgere i quiz e consultare le proprie statistiche.
+
+**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · MySQL
+
+---
+
+## Installazione da zero
+
+### Prerequisiti
+
+| Tool | Versione minima |
+|---|---|
+| PHP | 8.2 |
+| Composer | 2.x |
+| Node.js | 18.x |
+| MySQL | 8.x (o MariaDB 10.6+) |
+
+> Con [Laragon](https://laragon.org/) su Windows tutti i prerequisiti sono già inclusi.
+
+### 1. Clona il repository
+
+```bash
+git clone <url-repo> scuola-guida
 cd scuola-guida
+```
+
+### 2. Dipendenze PHP e Node
+
+```bash
 composer install
+npm install
+```
+
+### 3. Configurazione ambiente
+
+```bash
 cp .env.example .env
 php artisan key:generate
-php artisan storage:link
-php artisan migrate:fresh --seed
-COPIARE IMMAGINI IN STORAGE
+```
 
-# RUN
-npm install
-npm run dev
-php artisan serve
-http://127.0.0.1:8000
+Apri `.env` e imposta le credenziali del database:
 
+```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=scuola_guida
 DB_USERNAME=root
 DB_PASSWORD=
+```
 
-composer require laravel/breeze --dev
-php artisan breeze:install blade
-npm install
-npm run dev
-php artisan migrate
+### 4. Database e dati iniziali
 
-php artisan make:migration add_is_admin_to_users_table
-php artisan migrate
-php artisan make:seeder AdminUserSeeder
-php artisan db:seed
-
-composer require jeroennoten/laravel-adminlte
-php artisan adminlte:install
-// testare su /login con user=admin@test.com password=password poi andare su /admin
-
-php artisan make:model Category -mcr
-php artisan make:model Question -mcr
-php artisan migrate
-
-php artisan storage:link
-
-php artisan make:factory QuestionFactory
-php artisan make:factory CategoryFactory
+```bash
 php artisan migrate:fresh --seed
+```
 
+Il seeder crea:
+- Un utente **admin** (`admin@test.com` / `password`)
+- Categorie di esempio
+- Domande campione
 
-php artisan make:model Quiz -m
-php artisan make:migration create_quiz_question_table
-php artisan migrate
+### 5. Storage pubblico
 
-php artisan make:controller QuizController
+```bash
+php artisan storage:link
+```
 
+Crea il symlink `public/storage → storage/app/public` necessario per le immagini delle domande.
 
-php artisan make:request StoreQuestionRequest
-php artisan make:request UpdateQuestionRequest
+### 6. Avvia il server di sviluppo
 
+In due terminali separati (oppure con un process manager come [Herd](https://herd.laravel.com/)):
 
-php artisan make:model QuizResult -m
-php artisan migrate
+```bash
+# Terminale 1 — asset Vite
+npm run dev
 
-php artisan test
-php artisan make:test CategoryTest
-php artisan make:test QuestionTest
+# Terminale 2 — server PHP
+php artisan serve
+```
 
-php artisan make:test QuizServiceTest
+Apri [http://127.0.0.1:8000](http://127.0.0.1:8000) e accedi con `admin@test.com` / `password`, poi vai su `/admin`.
 
-php artisan make:request StoreQuestionRequest
+### Comandi utili
 
-// DATATABLES
-@section('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-@stop
-@section('js')
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-@stop
+```bash
+php artisan test                    # esegui la test suite
+php artisan migrate:fresh --seed    # reset completo del DB
+php artisan route:list              # elenco di tutte le route
+```
 
-composer require barryvdh/laravel-debugbar --dev
+---
 
-ATTIVA NEL PHP.INI extension=zip
-composer require maatwebsite/excel:^3.1 
-php artisan make:export QuestionsExport --model=Question
-php artisan make:import QuestionsImport --model=Question
+## Business logic — flusso di una chiamata
 
-// questo non l'ho fatto, mi sa che è inutile al momento
-php artisan queue:table
-php artisan migrate
-php artisan make:job ImportQuestionsJob
+Esempio: **aggiornamento di una domanda** (`PUT /admin/questions/{id}`).
 
-php artisan make:migration create_audit_logs_table
-📁 app/Models/AuditLog.php
-📁 app/Traits/Auditable.php
-php artisan make:test AuditLogTest
+Il flusso attraversa cinque strati in sequenza: **Route → Middleware → FormRequest → Controller → Service → Model/Observer**.
 
-php artisan make:migration add_permissions_to_users_table
+```
+Browser
+  │
+  │  PUT /admin/questions/42
+  ▼
+┌─────────────────────────────────────────────────────┐
+│  routes/web.php                                     │
+│                                                     │
+│  Route::middleware(['auth', 'role:admin,editor,     │
+│    viewer'])->resource('questions', ...)            │
+│                                                     │
+│  → QuestionController@update                        │
+└───────────────────────┬─────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────┐
+│  UpdateQuestionRequest (FormRequest)                │
+│                                                     │
+│  1. authorize()  → $user->canEditQuestion()         │
+│     └ verifica il permesso 'edit_questions'         │
+│        nel campo JSON permissions dell'utente       │
+│     └ abort 403 se non autorizzato                  │
+│                                                     │
+│  2. prepareForValidation()                          │
+│     └ normalizza is_true a boolean                  │
+│                                                     │
+│  3. rules() — valida:                               │
+│     · category_id  required|exists:categories,id   │
+│     · question     required|string                  │
+│     · is_true      boolean                          │
+│     · image        nullable|image|max:2048          │
+└───────────────────────┬─────────────────────────────┘
+                        │ $request->validated()
+                        ▼
+┌─────────────────────────────────────────────────────┐
+│  QuestionController@update                          │
+│                                                     │
+│  public function update(                            │
+│    UpdateQuestionRequest $request,                  │
+│    Question $question        ← route model binding  │
+│  ) {                                                │
+│    $this->service->update(                          │
+│      $question,                                     │
+│      $request->validated(),                         │
+│      $request->file('image')   ← separato: non     │
+│    );                            passa da validated │
+│    return redirect()->route('admin.questions.index')│
+│      ->with('success', 'Domanda aggiornata');       │
+│  }                                                  │
+└───────────────────────┬─────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────┐
+│  QuestionService@update                             │
+│                                                     │
+│  1. Rimuove 'image' dall'array dati                 │
+│     (il file viene gestito a parte)                 │
+│                                                     │
+│  2. Se arriva un nuovo file immagine:               │
+│     a. deleteImage($question)                       │
+│        └ cancella il vecchio file da               │
+│          storage/app/public/questions/              │
+│          (se non è un URL esterno)                  │
+│     b. storeImage($file)                            │
+│        └ salva il nuovo file e aggiunge             │
+│          il path all'array dati                     │
+│                                                     │
+│  3. $question->update($data)                        │
+│     └ Eloquent scrive sul DB                        │
+└───────────────────────┬─────────────────────────────┘
+                        │  evento 'updated' di Eloquent
+                        ▼
+┌─────────────────────────────────────────────────────┐
+│  Trait Auditable (bootAuditable)                    │
+│                                                     │
+│  Intercetta l'evento updated e scrive su            │
+│  audit_logs:                                        │
+│  · user_id   → chi ha fatto la modifica             │
+│  · event     → 'updated'                            │
+│  · model_type→ 'App\Models\Question'                │
+│  · model_id  → 42                                   │
+│  · old_values→ campi prima della modifica           │
+│  · new_values→ campi dopo la modifica               │
+└───────────────────────┬─────────────────────────────┘
+                        │  evento 'saved' di Eloquent
+                        ▼
+┌─────────────────────────────────────────────────────┐
+│  QuestionObserver@saved                             │
+│                                                     │
+│  clearAdminBadgesCache()                            │
+│  └ invalida la cache 'admin_badges' (TTL 60 s)     │
+│    così i contatori in sidebar si aggiornano        │
+│    alla prossima request                            │
+└───────────────────────┬─────────────────────────────┘
+                        │
+                        ▼
+                   redirect 302
+               → admin.questions.index
+               + flash 'success'
+```
 
-php artisan make:controller Admin/UserController --resource
+### Punti chiave dell'architettura
 
-php artisan make:controller Admin/DashboardController
+| Strato | Responsabilità |
+|---|---|
+| **FormRequest** | Autorizzazione + validazione. Il controller non vede mai dati non validati. |
+| **Controller** | Orchestrazione pura: chiama il service, ritorna la risposta. Nessuna logica. |
+| **Service** | Tutta la business logic: gestione file, aggiornamento del modello. |
+| **Trait Auditable** | Logging automatico di ogni create/update/delete su tutti i modelli che lo usano. |
+| **Observer** | Effetti collaterali post-salvataggio (invalidazione cache, notifiche, ecc.) tenuti fuori dal service. |
 
-php artisan make:model QuizAttempt -m
-php artisan make:factory QuizAttemptFactory --model=QuizAttempt
-php artisan make:seeder QuizAttemptSeeder
+---
 
-composer dump-autoload
+## Ruoli e permessi
 
-composer require yajra/laravel-datatables:"^11.0"
+| Ruolo | Accesso |
+|---|---|
+| `admin` | Tutto, inclusa dashboard, audit log, gestione ruoli |
+| `editor` | CRUD su domande, categorie, quiz |
+| `viewer` | Solo lettura |
 
-php artisan lang:publish
+I permessi granulari (`edit_questions`, `delete_questions`, …) sono configurabili per ruolo dalla pagina **Admin → Ruoli & Permessi** e sono salvati come JSON nel campo `permissions` della tabella `users`.
