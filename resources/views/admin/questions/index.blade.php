@@ -1,72 +1,99 @@
 @extends('layouts.admin')
 
-@section('header', 'Domande')
+@section('title', 'Domande')
+@section('content_header')@endsection
 
 @section('content')
+<div class="sg-wrapper">
 
-    @if(auth()->user()->isAdmin())
-        <li class="nav-item">
-            <a href="{{ route('admin.users.index') }}" class="nav-link">
-                <p>Utenti</p>
-            </a>
-        </li>
-    @endif
-
-    @if(auth()->user()->canCreateQuestion())
-        <a href="{{ route('admin.questions.create') }}" class="btn btn-primary mb-3">Nuova Domanda</a>
-    @endif
-
-    <a href="{{ route('admin.questions.export') }}" class="btn btn-success mb-3">Export Excel</a>
-    <a href="{{ route('admin.questions.template') }}" class="btn btn-info mb-3">Scarica Template</a>
-
-    <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="mb-3">
-        @csrf
-        <input type="file" name="file" required>
-        <button class="btn btn-primary">Import Excel</button>
-    </form>
-
-    <button id="bulk-delete" class="btn btn-danger mb-3">Elimina selezionati</button>
-
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <select id="filter-category" class="form-control">
-                <option value="">Tutte categorie</option>
-                @foreach($categories as $c)
-                    <option value="{{ $c->id }}">{{ $c->name }}</option>
-                @endforeach
-            </select>
+    <div class="sg-header sg-flex-between">
+        <div>
+            <p class="sg-header-subtitle">Catalogo</p>
+            <h1 class="sg-header-title"><i class="fas fa-question-circle mr-2"></i> Domande</h1>
         </div>
-
-        <div class="col-md-3">
-            <select id="filter-is-true" class="form-control">
-                <option value="">Tutte</option>
-                <option value="1">Vero</option>
-                <option value="0">Falso</option>
-            </select>
-        </div>
-
-        <div class="col-md-3">
-            <select id="filter-image" class="form-control">
-                <option value="">Tutte</option>
-                <option value="1">Con immagine</option>
-            </select>
-        </div>
+        @if(auth()->user()->canCreateQuestion())
+            <div class="sg-header-actions" style="flex-wrap:wrap;">
+                <a href="{{ route('admin.questions.create') }}" class="sg-btn sg-btn-light sg-btn-sm">
+                    <i class="fas fa-plus"></i> Nuova
+                </a>
+                <a href="{{ route('admin.questions.export') }}" class="sg-btn sg-btn-light sg-btn-sm">
+                    <i class="fas fa-file-excel"></i> Export
+                </a>
+                <a href="{{ route('admin.questions.template') }}" class="sg-btn sg-btn-light sg-btn-sm">
+                    <i class="fas fa-download"></i> Template
+                </a>
+            </div>
+        @endif
     </div>
 
-    <table id="questions-table" class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Categoria</th>
-            <th>Domanda</th>
-            <th>Risposta</th>
-            <th>Img</th>
-            <th>Azioni</th>
-            <th><input type="checkbox" id="select-all"></th>
-        </tr>
-        </thead>
-    </table>
+    @if(auth()->user()->canCreateQuestion())
+        <div class="sg-card sg-mb-3">
+            <div class="sg-card-body" style="padding:1rem 1.25rem;">
+                <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="sg-d-flex sg-gap-2" style="align-items:center;flex-wrap:wrap;">
+                    @csrf
+                    <span class="sg-label sg-mb-0" style="margin-right:6px;"><i class="fas fa-file-import"></i> Import Excel</span>
+                    <input type="file" name="file" required class="sg-form-control" style="max-width:340px;">
+                    <button class="sg-btn sg-btn-primary sg-btn-sm">
+                        <i class="fas fa-upload"></i> Carica
+                    </button>
+                </form>
+            </div>
+        </div>
+    @endif
 
+    <div class="sg-card">
+        <div class="sg-card-body" style="padding:1.25rem;">
+            <div class="row sg-mb-2">
+                <div class="col-md-3 sg-mb-1">
+                    <select id="filter-category" class="sg-form-control">
+                        <option value="">Tutte le categorie</option>
+                        @foreach($categories as $c)
+                            <option value="{{ $c->id }}">{{ $c->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3 sg-mb-1">
+                    <select id="filter-is-true" class="sg-form-control">
+                        <option value="">Vero / Falso</option>
+                        <option value="1">Vero</option>
+                        <option value="0">Falso</option>
+                    </select>
+                </div>
+                <div class="col-md-3 sg-mb-1">
+                    <select id="filter-image" class="sg-form-control">
+                        <option value="">Tutte</option>
+                        <option value="1">Con immagine</option>
+                    </select>
+                </div>
+                @if(auth()->user()->canDeleteQuestion())
+                <div class="col-md-3 sg-mb-1 sg-text-center">
+                    <button id="bulk-delete" class="sg-btn sg-btn-danger sg-btn-sm">
+                        <i class="fas fa-trash"></i> Elimina selezionati
+                    </button>
+                </div>
+                @endif
+            </div>
+
+            <div class="table-responsive">
+                <table id="questions-table" class="sg-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Categoria</th>
+                            <th>Domanda</th>
+                            <th>Risposta</th>
+                            <th>Img</th>
+                            <th>Azioni</th>
+                            @if(auth()->user()->canDeleteQuestion())
+                                <th><input type="checkbox" id="select-all"></th>
+                            @endif
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
@@ -125,11 +152,12 @@
                     { data: 'is_true', orderable: false },
                     { data: 'image', orderable: false },
                     { data: 'actions', orderable: false },
+                    @if(auth()->user()->canDeleteQuestion())
                     { data: 'checkbox', orderable: false, searchable: false },
+                    @endif
                 ],
             });
 
-            // 🔥 trigger reload al cambio filtro
             $('#filter-category, #filter-is-true, #filter-image').change(function() {
                 table.draw();
             });

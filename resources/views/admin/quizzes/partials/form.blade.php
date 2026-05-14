@@ -1,5 +1,5 @@
 @if ($errors->any())
-    <div class="alert alert-danger">
+    <div class="alert alert-danger" style="border-radius:var(--sg-radius-sm);border:none;">
         <strong>Ci sono errori nel form:</strong>
         <ul class="mb-0 mt-2">
             @foreach ($errors->all() as $error)
@@ -9,67 +9,63 @@
     </div>
 @endif
 
-<div class="form-group">
-    <label>Titolo</label>
+<div class="sg-form-group">
+    <label class="sg-form-label">Titolo</label>
     <input name="title"
-           class="form-control @error('title') is-invalid @enderror"
+           class="sg-form-control @error('title') is-invalid @enderror"
            value="{{ old('title', $quiz->title ?? '') }}">
-
     @error('title')
-        <div class="text-danger">{{ $message }}</div>
+        <div class="sg-form-error">{{ $message }}</div>
     @enderror
 </div>
 
-<div class="form-group">
-    <label>
+<div class="sg-form-group">
+    <label class="sg-form-check">
         <input type="checkbox" name="is_active"
             {{ old('is_active', $quiz->is_active ?? true) ? 'checked' : '' }}>
-        Attivo
+        <span>Quiz attivo</span>
     </label>
 </div>
 
-<div class="form-group">
-    <label>Domande</label>
+<div class="sg-form-group">
+    <label class="sg-form-label">Domande</label>
 
     <select name="questions[]"
-            class="form-control @error('questions') is-invalid @enderror"
+            class="sg-form-control @error('questions') is-invalid @enderror"
             multiple size="20">
-
         @foreach($questions as $q)
             <option value="{{ $q->id }}"
-                    @if(isset($quiz) && $quiz->questions->contains($q->id)) selected @endif
-            >
+                    @if(isset($quiz) && $quiz->questions->contains($q->id)) selected @endif>
                 {{ Str::limit($q->question, 60) }}
             </option>
         @endforeach
-
     </select>
 
     @error('questions')
-        <div class="text-danger mt-1">{{ $message }}</div>
+        <div class="sg-form-error">{{ $message }}</div>
     @enderror
 
-    <small class="text-muted">Tieni premuto CTRL per selezione multipla</small>
+    <small class="sg-form-hint">Tieni premuto CTRL per selezione multipla</small>
 </div>
 
-<div class="form-group">
-    <label>Max Domande</label>
+<div class="sg-form-group">
+    <label class="sg-form-label">Max domande</label>
 
     <input type="number"
            id="max_questions"
            name="max_questions"
-           class="form-control @error('max_questions') is-invalid @enderror"
+           class="sg-form-control @error('max_questions') is-invalid @enderror"
            value="{{ old('max_questions', $quiz->max_questions ?? 30) }}">
 
     @error('max_questions')
-        <div class="text-danger">{{ $message }}</div>
+        <div class="sg-form-error">{{ $message }}</div>
     @enderror
 
-    <small class="text-muted">
+    <small class="sg-form-hint">
         Domande attuali: {{ $questionsCount ?? 0 }}
     </small>
 
-    <div id="max-warning" class="text-danger mt-1" style="display:none;"></div>
+    <div id="max-warning" class="sg-form-error" style="display:none;"></div>
 </div>
 
 
@@ -97,9 +93,7 @@
                 }
             }
 
-            // 🔥 live mentre scrivi
             input.on('input', validateMax);
-            // 🔥 al load (se old())
             validateMax();
 
             $('form').on('submit', function (e) {

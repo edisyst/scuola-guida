@@ -51,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('manage-questions', function (User $user) {
-            return $user->canEditQuestion() || $user->canDeleteQuestion();
+            return in_array($user->role, ['admin', 'editor', 'viewer']);
         });
 
 //      Gate::define('create-question', fn($user) => $user->canCreateQuestion()); // provare a vedere se è lo stesso
@@ -62,6 +62,23 @@ class AppServiceProvider extends ServiceProvider
 //      Gate::define('delete-question', fn($user) => $user->canDeleteQuestion());
         Gate::define('delete-question', function (User $user) {
             return $user->canDeleteQuestion();
+        });
+
+        // 🔥 Gates dinamiche generate per ogni combinazione action_entity
+        foreach (User::ACTIONS as $action) {
+            foreach (User::ENTITIES as $entity) {
+                $perm = "{$action}_{$entity}";
+                Gate::define($perm, fn(User $user) => $user->hasPermission($perm));
+            }
+        }
+
+        // 🔥 Menu Users: visibile se l'utente può fare qualcosa sugli utenti
+        Gate::define('manage-users-menu', function (User $user) {
+            return $user->isAdmin()
+                || $user->canCreateUser()
+                || $user->canEditUser()
+                || $user->canDeleteUser()
+                || $user->canManageUser();
         });
 
         /*

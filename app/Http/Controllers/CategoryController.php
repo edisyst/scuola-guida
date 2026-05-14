@@ -24,17 +24,21 @@ class CategoryController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->canCreateCategory(), 403);
+
         return view('admin.categories.create');
     }
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->canCreateCategory(), 403);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
         Category::create($data);
-        Cache::forget('categories_list'); // sarebbe da creare l'helper anche di questo
+        Cache::forget('categories_list');
         clearAdminBadgesCache();
 
         return redirect()->route('admin.categories.index')
@@ -43,18 +47,21 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
+        abort_unless(auth()->user()->canEditCategory(), 403);
+
         return view('admin.categories.edit', compact('category'));
     }
 
     public function update(Request $request, Category $category)
     {
+        abort_unless(auth()->user()->canEditCategory(), 403);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
-//            'slug' => 'required|string|unique:categories,slug,' . $category->id,
         ]);
 
         $category->update($data);
-        Cache::forget('categories_list'); // sarebbe da creare l'helper anche di questo
+        Cache::forget('categories_list');
         clearAdminBadgesCache();
 
         return redirect()->route('admin.categories.index')
@@ -63,8 +70,10 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        abort_unless(auth()->user()->canDeleteCategory(), 403);
+
         $category->delete();
-        Cache::forget('categories_list'); // sarebbe da creare l'helper anche di questo
+        Cache::forget('categories_list');
         clearAdminBadgesCache();
 
         return back()->with('success', 'Categoria eliminata');

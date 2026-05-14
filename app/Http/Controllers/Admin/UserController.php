@@ -9,13 +9,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    private array $permissions = [
-        'create_question',
-        'edit_question',
-        'delete_question',
-        'manage_question',
-    ];
-
     /*
     |--------------------------------------------------------------------------
     | CRUD
@@ -31,19 +24,22 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('admin.users.create', [
-            'permissions' => $this->permissions
-        ]);
+        abort_unless(auth()->user()->canCreateUser(), 403);
+
+        return view('admin.users.create', $this->permissionViewData());
     }
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->canCreateUser(), 403);
+
         $data = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-            'role' => 'required|in:admin,editor,viewer',
-            'permissions' => 'nullable|array',
+            'name'          => 'required',
+            'email'         => 'required|email|unique:users',
+            'password'      => 'required|min:6',
+            'role'          => 'required|in:' . implode(',', array_keys(User::ROLES)),
+            'permissions'   => 'nullable|array',
+            'permissions.*' => 'in:' . implode(',', User::allPermissions()),
         ]);
 
         $data['password'] = Hash::make($data['password']);
@@ -57,20 +53,25 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('admin.users.edit', [
-            'user' => $user,
-            'permissions' => $this->permissions
-        ]);
+        abort_unless(auth()->user()->canEditUser(), 403);
+
+        return view('admin.users.edit', array_merge(
+            ['user' => $user],
+            $this->permissionViewData()
+        ));
     }
 
     public function update(Request $request, User $user)
     {
+        abort_unless(auth()->user()->canEditUser(), 403);
+
         $data = $request->validate([
-            'name' => 'required',
-            'email' => "required|email|unique:users,email,$user->id",
-            'password' => 'nullable|min:6',
-            'role' => 'required|in:admin,editor,viewer',
-            'permissions' => 'nullable|array',
+            'name'          => 'required',
+            'email'         => "required|email|unique:users,email,$user->id",
+            'password'      => 'nullable|min:6',
+            'role'          => 'required|in:' . implode(',', array_keys(User::ROLES)),
+            'permissions'   => 'nullable|array',
+            'permissions.*' => 'in:' . implode(',', User::allPermissions()),
         ]);
 
         if (!empty($data['password'])) {
@@ -78,6 +79,9 @@ class UserController extends Controller
         } else {
             unset($data['password']);
         }
+
+        // se nessun permesso → salva array vuoto, non null
+        $data['permissions'] = $data['permissions'] ?? [];
 
         $user->update($data);
         clearAdminBadgesCache();
@@ -88,6 +92,8 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        abort_unless(auth()->user()->canDeleteUser(), 403);
+
         if ($user->id === auth()->id()) {
             return back()->with('error', 'Non puoi eliminarti');
         }
@@ -96,5 +102,22 @@ class UserController extends Controller
         clearAdminBadgesCache();
 
         return back()->with('success', 'Utente eliminato');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | HELPERS
+    |--------------------------------------------------------------------------
+    */
+
+    private function permissionViewData(): array
+    {
+        return [
+            'entities'     => User::ENTITIES,
+            'actions'      => User::ACTIONS,
+            'entityLabels' => User::LABELS,
+            'actionLabels' => User::ACTION_LABELS,
+            'roles'        => User::ROLES,
+        ];
     }
 }

@@ -301,8 +301,15 @@ return [
     'menu' => [
         // Navbar items:
         [
-            'type' => 'navbar-search',
-            'text' => 'search',
+            'type'        => 'navbar-search',
+            'text'        => 'Cerca domande e categorie...',
+            'topnav_right' => true,
+            'href'        => '/search',
+            'input_name'  => 'q',
+            'method'      => 'get',
+        ],
+        [
+            'type' => 'darkmode-widget',
             'topnav_right' => true,
         ],
         [
@@ -316,6 +323,12 @@ return [
             'text' => 'search',
         ],
         [
+            'text'  => 'Le mie statistiche',
+            'url'   => 'stats',
+            'icon'  => 'fas fa-chart-line',
+            'key'   => 'stats-me',
+        ],
+        [
             'text'  => 'I miei tentativi',
             'url'   => 'quiz/attempts',
             'icon'  => 'fas fa-history',
@@ -325,21 +338,21 @@ return [
             'text' => 'Dashboard',
             'url'  => 'admin/dashboard',
             'icon' => 'fas fa-home',
-            'can'  => 'view-admin',
+            'can'  => 'admin-only',
         ],
         ['header' => 'admin_area'],
         [
             'text' => 'Categorie',
             'url'  => 'admin/categories',
             'icon' => 'fas fa-tags',
-            'can'  => 'manage-questions',
+            'can'  => 'view-admin',
             'key'  => 'categories',
         ],
         [
             'text' => 'Domande',
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question',
-            'can'  => 'manage-questions',
+            'can'  => 'view-admin',
             'key'  => 'questions',
         ],
         [
@@ -353,8 +366,14 @@ return [
             'text' => 'Users',
             'url'  => 'admin/users',
             'icon' => 'fas fa-user',
-            'can'  => 'admin-only',
+            'can'  => 'manage-users-menu',
             'key'  => 'users',
+        ],
+        [
+            'text' => 'Ruoli & Permessi',
+            'url'  => 'admin/roles',
+            'icon' => 'fas fa-user-shield',
+            'can'  => 'admin-only',
         ],
         [
             'text' => 'Quizzes',

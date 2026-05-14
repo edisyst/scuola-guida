@@ -6,6 +6,9 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizAttemptController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\UserStatsController;
+use App\Http\Controllers\Admin\RolePermissionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,6 +21,8 @@ Route::get('/', function () {
 */
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -27,6 +32,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])->name('quiz.play');
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
     Route::get('quiz/results', [QuizController::class, 'results'])->name('quiz.results');
+
+    // Dashboard personale stats utente
+    Route::get('stats', [UserStatsController::class, 'me'])->name('stats.me');
+    Route::post('stats/{user}/refresh', [UserStatsController::class, 'refresh'])
+        ->name('stats.refresh');
 
     // Storico tentativi — solo i propri
     Route::get('quiz/attempts', [QuizAttemptController::class, 'index'])->name('quiz.attempts.index');
@@ -39,6 +49,8 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 | ADMIN AREA
 |--------------------------------------------------------------------------
+| Tutti i ruoli (admin/editor/viewer) possono accedere al pannello.
+| Le singole azioni sono protette nei controller tramite hasPermission().
 */
 Route::middleware(['auth'])
     ->prefix('admin')
@@ -46,13 +58,15 @@ Route::middleware(['auth'])
     ->group(function () {
 
         /*
-        | ADMIN + EDITOR — gestione categorie, domande, quiz
+        | INDICI + AZIONI (controller-level permission check)
         */
-        Route::middleware('role:admin,editor')->group(function () {
+        Route::middleware('role:admin,editor,viewer')->group(function () {
 
+            // CATEGORIES
             Route::resource('categories', CategoryController::class)
                 ->except(['show']);
 
+            // QUESTIONS
             Route::get('questions/data', [QuestionController::class, 'data'])
                 ->name('questions.data');
             Route::get('questions/export', [QuestionController::class, 'export'])
@@ -66,6 +80,7 @@ Route::middleware(['auth'])
             Route::resource('questions', QuestionController::class)
                 ->except(['show']);
 
+            // QUIZZES
             Route::post('quizzes/random', [QuizController::class, 'createRandom'])
                 ->name('quizzes.random');
             Route::get('quizzes/{quiz}/questions/data', [QuizController::class, 'questionsData'])
@@ -86,15 +101,18 @@ Route::middleware(['auth'])
                 ->name('quizzes.bulkRemove');
             Route::resource('quizzes', QuizController::class)
                 ->except(['show']);
+
+            // USERS
+            Route::get('users/{user}/stats', [UserStatsController::class, 'show'])
+                ->name('users.stats');
+            Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+                ->except(['show']);
         });
 
         /*
-        | SOLO ADMIN — utenti, dashboard, audit, tutti i risultati
+        | SOLO ADMIN — gestione sistema (dashboard, audit, role-permissions)
         */
         Route::middleware('role:admin')->group(function () {
-
-            Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
-                ->except(['show']);
 
             Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
                 ->name('dashboard');
@@ -104,9 +122,14 @@ Route::middleware(['auth'])
                 return view('admin.audit.index', compact('logs'));
             })->name('audit.index');
 
-            // Tutti i tentativi di tutti gli utenti
             Route::get('quiz-attempts', [QuizAttemptController::class, 'adminIndex'])
                 ->name('quiz.attempts.all');
+
+            // Ruoli & Permessi
+            Route::get('roles', [RolePermissionController::class, 'index'])
+                ->name('roles.index');
+            Route::put('roles', [RolePermissionController::class, 'update'])
+                ->name('roles.update');
         });
     });
 
