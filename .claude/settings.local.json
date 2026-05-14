@@ -30,7 +30,13 @@
       "Bash(php -l resources/views/admin/questions/index.blade.php resources/views/admin/questions/create.blade.php resources/views/admin/questions/edit.blade.php resources/views/admin/questions/partials/form.blade.php resources/views/admin/questions/partials/actions.blade.php)",
       "Bash(php -l resources/views/admin/quizzes/index.blade.php resources/views/admin/quizzes/create.blade.php resources/views/admin/quizzes/edit.blade.php resources/views/admin/quizzes/partials/form.blade.php resources/views/admin/quizzes/partials/actions.blade.php resources/views/admin/quizzes/questions.blade.php)",
       "Bash(php -l resources/views/admin/users/index.blade.php resources/views/admin/users/create.blade.php resources/views/admin/users/edit.blade.php resources/views/admin/users/form.blade.php resources/views/admin/roles/index.blade.php resources/views/admin/quiz-attempts/index.blade.php resources/views/admin/audit/index.blade.php resources/views/search/results.blade.php)",
-      "PowerShell(Start-Process \"https://github.com/edisyst/scuola-guida/compare/master...quiz_attempts?expand=1\")"
+      "PowerShell(Start-Process \"https://github.com/edisyst/scuola-guida/compare/master...quiz_attempts?expand=1\")",
+      "PowerShell(php artisan route:list)",
+      "PowerShell(php artisan route:list --name=stats 2>&1)",
+      "PowerShell(php -l app/Services/UserStatsService.php; php -l app/Http/Controllers/UserStatsController.php; php -l app/Models/QuizAttempt.php)",
+      "PowerShell(php artisan view:clear; php artisan config:clear)",
+      "PowerShell(php artisan test --filter=UserStatsTest 2>&1)",
+      "PowerShell(php artisan test 2>&1)"
     ]
   }
 }
