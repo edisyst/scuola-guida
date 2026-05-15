@@ -6,6 +6,7 @@ use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use Illuminate\Support\Collection;
+use RuntimeException;
 
 class QuizService
 {
@@ -13,6 +14,8 @@ class QuizService
     {
         $questionIds = $data['questions'] ?? [];
         unset($data['questions']);
+
+        $data['status'] = $data['status'] ?? Quiz::STATUS_DRAFT;
 
         $quiz = Quiz::create($data);
 
@@ -27,6 +30,7 @@ class QuizService
     {
         $quiz = Quiz::create([
             'title'         => 'QUIZ RANDOM NR.',
+            'status'        => Quiz::STATUS_DRAFT,
             'max_questions' => $max,
         ]);
 
@@ -40,21 +44,69 @@ class QuizService
         return $quiz->refresh();
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | STATE TRANSITIONS
+    |--------------------------------------------------------------------------
+    */
+
+    public function publish(Quiz $quiz): Quiz
+    {
+        $this->assertNotLocked($quiz);
+
+        $quiz->update(['status' => Quiz::STATUS_PUBLISHED]);
+
+        return $quiz->refresh();
+    }
+
+    public function unpublish(Quiz $quiz): Quiz
+    {
+        $this->assertNotLocked($quiz);
+
+        $quiz->update(['status' => Quiz::STATUS_DRAFT]);
+
+        return $quiz->refresh();
+    }
+
+    public function confirm(Quiz $quiz, int $adminId): Quiz
+    {
+        if ($quiz->isConfirmed()) {
+            return $quiz;
+        }
+
+        if ($quiz->questions()->count() === 0) {
+            throw new RuntimeException('Impossibile confermare un quiz senza domande.');
+        }
+
+        $quiz->update([
+            'status'       => Quiz::STATUS_CONFIRMED,
+            'confirmed_at' => now(),
+            'confirmed_by' => $adminId,
+        ]);
+
+        return $quiz->refresh();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | GAMEPLAY
+    |--------------------------------------------------------------------------
+    */
+
     /**
      * Avvia una sessione di gioco creando un nuovo QuizAttempt.
      */
-    public function startPlay(Quiz $quiz, int $userId): array
+    public function startPlay(Quiz $quiz, int $userId, ?int $enrollmentId = null): array
     {
         $questions = $quiz->questions()->get();
 
-        // Placeholder: serve l'attemptId prima che il quiz venga giocato.
-        // Score e answers vengono popolati da QuizAttemptController::store() al submit.
         $attempt = QuizAttempt::create([
-            'user_id'         => $userId,
-            'quiz_id'         => $quiz->id,
-            'score'           => 0,
-            'total_questions' => $questions->count(),
-            'answers'         => [],
+            'user_id'            => $userId,
+            'quiz_id'            => $quiz->id,
+            'quiz_enrollment_id' => $enrollmentId,
+            'score'              => 0,
+            'total_questions'    => $questions->count(),
+            'answers'            => [],
         ]);
 
         return [
@@ -68,13 +120,19 @@ class QuizService
         ];
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | MUTATIONS (bloccate se quiz confermato)
+    |--------------------------------------------------------------------------
+    */
+
     /**
-     * Aggiunge una singola domanda al quiz rispettando il limite.
-     *
      * @return array{ok: bool, error?: string, current: int}
      */
     public function addQuestion(Quiz $quiz, int $questionId): array
     {
+        $this->assertNotLocked($quiz);
+
         if ($quiz->hasReachedLimit()) {
             return ['ok' => false, 'error' => 'Limite massimo raggiunto', 'current' => $quiz->questions()->count()];
         }
@@ -86,18 +144,20 @@ class QuizService
 
     public function removeQuestion(Quiz $quiz, int $questionId): int
     {
+        $this->assertNotLocked($quiz);
+
         $quiz->questions()->detach($questionId);
 
         return $quiz->questions()->count();
     }
 
     /**
-     * Bulk add: aggiunge più domande, filtrando duplicati e rispettando il limite.
-     *
      * @return array{ok: bool, error?: string, current: int, added: int}
      */
     public function bulkAddQuestions(Quiz $quiz, string $mode, array $ids, ?int $categoryId): array
     {
+        $this->assertNotLocked($quiz);
+
         $candidateIds = $this->resolveIds($mode, $ids, $categoryId);
 
         if ($candidateIds->isEmpty()) {
@@ -122,7 +182,6 @@ class QuizService
             return ['ok' => false, 'error' => 'Limite massimo raggiunto', 'current' => $quiz->questions()->count(), 'added' => 0];
         }
 
-        // Tronca silenziosamente: inserisce solo fino al limite, senza errore.
         $idsToInsert = $idsToInsert->take($available);
 
         $before = $quiz->questions()->count();
@@ -134,6 +193,8 @@ class QuizService
 
     public function bulkRemoveQuestions(Quiz $quiz, string $mode, array $ids, ?int $categoryId): int
     {
+        $this->assertNotLocked($quiz);
+
         $idsToRemove = $this->resolveIds($mode, $ids, $categoryId);
 
         $quiz->questions()->detach($idsToRemove);
@@ -143,6 +204,8 @@ class QuizService
 
     public function fillWithRandom(Quiz $quiz): array
     {
+        $this->assertNotLocked($quiz);
+
         $available = $quiz->max_questions - $quiz->questions()->count();
 
         if ($available <= 0) {
@@ -168,6 +231,8 @@ class QuizService
 
     public function reorderQuestions(Quiz $quiz, array $orderedIds): void
     {
+        $this->assertNotLocked($quiz);
+
         foreach ($orderedIds as $index => $id) {
             $quiz->questions()->updateExistingPivot($id, ['order' => $index]);
         }
@@ -201,5 +266,12 @@ class QuizService
         }
 
         return collect($ids);
+    }
+
+    private function assertNotLocked(Quiz $quiz): void
+    {
+        if ($quiz->isLocked()) {
+            throw new RuntimeException('Il quiz è confermato e non può essere modificato.');
+        }
     }
 }

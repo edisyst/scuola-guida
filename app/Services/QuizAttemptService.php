@@ -7,8 +7,11 @@ use App\Models\QuizAttempt;
 
 class QuizAttemptService
 {
+    public function __construct(private QuizEnrollmentService $enrollmentService) {}
+
     /**
      * Crea un nuovo tentativo calcolando lo score.
+     * Se il quiz è confermato, consuma l'iscrizione approvata del viewer.
      */
     public function record(int $userId, int $quizId, array $answers, ?int $duration): QuizAttempt
     {
@@ -16,14 +19,34 @@ class QuizAttemptService
 
         $correctMap = $quiz->questions->pluck('is_true', 'id');
 
-        return QuizAttempt::create([
-            'user_id'         => $userId,
-            'quiz_id'         => $quiz->id,
-            'score'           => $this->scoreAnswers($answers, $correctMap),
-            'total_questions' => $correctMap->count(),
-            'duration'        => $duration,
-            'answers'         => $answers,
+        $enrollmentId = null;
+
+        if ($quiz->isConfirmed()) {
+            $user       = \App\Models\User::findOrFail($userId);
+            $enrollment = $this->enrollmentService->activeFor($quiz, $user);
+
+            if (!$enrollment || !$enrollment->isApproved()) {
+                abort(403, 'Iscrizione approvata richiesta per svolgere questo quiz.');
+            }
+
+            $enrollmentId = $enrollment->id;
+        }
+
+        $attempt = QuizAttempt::create([
+            'user_id'            => $userId,
+            'quiz_id'            => $quiz->id,
+            'quiz_enrollment_id' => $enrollmentId,
+            'score'              => $this->scoreAnswers($answers, $correctMap),
+            'total_questions'    => $correctMap->count(),
+            'duration'           => $duration,
+            'answers'            => $answers,
         ]);
+
+        if ($enrollmentId) {
+            $this->enrollmentService->markCompleted($attempt->enrollment, $attempt);
+        }
+
+        return $attempt;
     }
 
     /**

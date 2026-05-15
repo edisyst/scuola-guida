@@ -35,7 +35,7 @@
                         <th>Titolo</th>
                         <th>Stato</th>
                         <th>Domande</th>
-                        <th style="width:320px;text-align:right;">Azioni</th>
+                        <th style="width:360px;text-align:right;">Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,10 +44,12 @@
                             <td class="sg-text-muted">{{ $quiz->id }}</td>
                             <td><strong>{{ $quiz->title }}</strong></td>
                             <td>
-                                @if($quiz->is_active)
-                                    <span class="sg-badge sg-badge-success">Attivo</span>
+                                @if($quiz->isConfirmed())
+                                    <span class="sg-badge sg-badge-info"><i class="fas fa-lock"></i> Confermato</span>
+                                @elseif($quiz->isPublished())
+                                    <span class="sg-badge sg-badge-success">Pubblicato</span>
                                 @else
-                                    <span class="sg-badge">Disattivo</span>
+                                    <span class="sg-badge">Bozza</span>
                                 @endif
                             </td>
                             <td>
@@ -63,12 +65,18 @@
                                         <i class="fas fa-play"></i>
                                     </span>
                                 @endif
-                                @if(auth()->user()->canEditQuiz())
+
+                                @if(auth()->user()->canEditQuiz() && !$quiz->isLocked())
                                     <a href="{{ route('admin.quizzes.questions', $quiz) }}" class="sg-btn-icon info" title="Gestisci domande">
                                         <i class="fas fa-tasks"></i>
                                     </a>
+                                @else
+                                    <span class="sg-btn-icon info" title="Quiz confermato: domande bloccate" style="opacity:.4;cursor:not-allowed;">
+                                        <i class="fas fa-tasks"></i>
+                                    </span>
                                 @endif
-                                @if(auth()->user()->canBulkQuiz())
+
+                                @if(auth()->user()->canBulkQuiz() && !$quiz->isLocked())
                                     <form method="POST" action="{{ route('admin.quizzes.fillRandom', $quiz) }}" style="display:inline;">
                                         @csrf
                                         @if(($quiz->questions_count ?? 0) === 0)
@@ -82,7 +90,38 @@
                                         @endif
                                     </form>
                                 @endif
-                                @if(auth()->user()->canDeleteQuiz())
+
+                                @if(auth()->user()->isAdmin() && !$quiz->isConfirmed())
+                                    @if($quiz->isPublished())
+                                        <form method="POST" action="{{ route('admin.quizzes.unpublish', $quiz) }}" style="display:inline;">
+                                            @csrf
+                                            <button class="sg-btn-icon" title="Riporta in bozza">
+                                                <i class="fas fa-eye-slash"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form method="POST" action="{{ route('admin.quizzes.publish', $quiz) }}" style="display:inline;">
+                                            @csrf
+                                            <button class="sg-btn-icon success" title="Pubblica">
+                                                <i class="fas fa-globe"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    @if(($quiz->questions_count ?? 0) > 0)
+                                        <form method="POST"
+                                              action="{{ route('admin.quizzes.confirm', $quiz) }}"
+                                              style="display:inline;"
+                                              onsubmit="return confirm('Una volta confermato il quiz non potrà più essere modificato. Continuare?');">
+                                            @csrf
+                                            <button class="sg-btn-icon info" title="Conferma (lock)">
+                                                <i class="fas fa-lock"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @endif
+
+                                @if(auth()->user()->canDeleteQuiz() && !$quiz->isLocked())
                                     <form method="POST" action="{{ route('admin.quizzes.destroy', $quiz) }}" style="display:inline;">
                                         @csrf
                                         @method('DELETE')

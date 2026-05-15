@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Quiz;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreQuizRequest extends FormRequest
 {
@@ -18,7 +20,7 @@ class StoreQuizRequest extends FormRequest
             'max_questions' => 'required|integer|min:1|max:100',
             'time_limit'    => 'nullable|integer|min:0',
             'max_errors'    => 'nullable|integer|min:0',
-            'is_active'     => 'boolean',
+            'status'        => ['nullable', Rule::in([Quiz::STATUS_DRAFT, Quiz::STATUS_PUBLISHED])],
             'questions'     => 'nullable|array',
             'questions.*'   => 'exists:questions,id',
         ];
@@ -26,10 +28,14 @@ class StoreQuizRequest extends FormRequest
 
     public function prepareForValidation(): void
     {
-        // Un checkbox non spuntato non è presente nel payload; boolean() lo normalizza a false.
-        $this->merge([
-            'is_active' => $this->boolean('is_active'),
-        ]);
+        $status = $this->input('status', Quiz::STATUS_DRAFT);
+
+        // Solo admin può creare direttamente in stato published
+        if ($status === Quiz::STATUS_PUBLISHED && !$this->user()?->isAdmin()) {
+            $status = Quiz::STATUS_DRAFT;
+        }
+
+        $this->merge(['status' => $status]);
     }
 
     public function withValidator($validator): void

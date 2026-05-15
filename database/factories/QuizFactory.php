@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Quiz;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class QuizFactory extends Factory
@@ -12,9 +13,9 @@ class QuizFactory extends Factory
 
         return [
             'title'         => ucfirst($this->faker->words(rand(2, 4), true)),
-            'is_active'     => $this->faker->boolean(80),
+            'status'        => $this->faker->randomElement([Quiz::STATUS_DRAFT, Quiz::STATUS_PUBLISHED]),
             'max_questions' => $maxQuestions,
-            'time_limit'    => $maxQuestions * 60, // 60 secondi per domanda
+            'time_limit'    => $maxQuestions * 60,
             'max_errors'    => $this->faker->randomElement([3, 5]),
             'created_at'    => now()->subDays(rand(0, 30)),
         ];

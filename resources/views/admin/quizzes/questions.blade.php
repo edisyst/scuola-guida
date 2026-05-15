@@ -72,9 +72,15 @@
                     <input type="number" id="param-max" class="sg-form-control" value="{{ $quiz->max_questions }}" min="1" max="100">
                 </div>
                 <div class="col-md-3 d-flex align-items-center" style="padding-top:1.8rem;">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="param-active" {{ $quiz->is_active ? 'checked' : '' }}>
-                        <label class="form-check-label" for="param-active">Quiz attivo</label>
+                    <div>
+                        <span class="sg-label sg-mb-0 d-block">Stato</span>
+                        @if($quiz->isConfirmed())
+                            <span class="sg-badge sg-badge-info"><i class="fas fa-lock"></i> Confermato</span>
+                        @elseif($quiz->isPublished())
+                            <span class="sg-badge sg-badge-success">Pubblicato</span>
+                        @else
+                            <span class="sg-badge">Bozza</span>
+                        @endif
                     </div>
                 </div>
                 <div class="col-md-2" style="padding-top:1.4rem;">
@@ -660,7 +666,6 @@
             _token: "{{ csrf_token() }}",
             title: $('#param-title').val(),
             max_questions: $('#param-max').val(),
-            is_active: $('#param-active').is(':checked') ? 1 : 0,
         }, function(res) {
             $('#max-count').text(res.max_questions);
             updateProgress(parseInt($('#current-count').text()), res.max_questions);
