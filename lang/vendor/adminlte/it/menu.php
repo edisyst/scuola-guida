@@ -17,4 +17,11 @@ return [
     'information' => 'Informazione',
     'admin_area' => 'AMMINISTRAZIONE',
     'homepage' => 'HOME',
+
+    // Sezioni menu personalizzate
+    'area_personale'  => 'AREA PERSONALE',
+    'contenuti'       => 'CONTENUTI',
+    'gestione_quiz'   => 'GESTIONE QUIZ',
+    'amministrazione' => 'AMMINISTRAZIONE',
+    'account'         => 'ACCOUNT',
 ];

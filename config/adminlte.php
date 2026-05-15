@@ -322,6 +322,9 @@ return [
             'type' => 'sidebar-menu-search',
             'text' => 'search',
         ],
+
+        // ── AREA PERSONALE (tutti i ruoli) ──────────────────────────────────
+        ['header' => 'area_personale'],
         [
             'text'  => 'Le mie statistiche',
             'url'   => 'stats',
@@ -348,13 +351,9 @@ return [
             'can'  => 'viewer-quiz-area',
             'key'  => 'quiz-enrollments-mine',
         ],
-        [
-            'text' => 'Dashboard',
-            'url'  => 'admin/dashboard',
-            'icon' => 'fas fa-home',
-            'can'  => 'admin-only',
-        ],
-        ['header' => 'admin_area'],
+
+        // ── CONTENUTI (admin, editor, viewer) ───────────────────────────────
+        ['header' => 'contenuti', 'can' => 'view-admin'],
         [
             'text' => 'Categorie',
             'url'  => 'admin/categories',
@@ -365,21 +364,61 @@ return [
         [
             'text' => 'Domande',
             'url'  => 'admin/questions',
-            'icon' => 'fas fa-question',
+            'icon' => 'fas fa-question-circle',
             'can'  => 'view-admin',
             'key'  => 'questions',
         ],
         [
+            'text' => 'Quizzes',
+            'url'  => 'admin/quizzes',
+            'icon' => 'fas fa-clipboard-list',
+            'can'  => 'view-admin',
+            'key'  => 'quizzes',
+        ],
+
+        // ── GESTIONE QUIZ (solo admin) ───────────────────────────────────────
+        ['header' => 'gestione_quiz', 'can' => 'admin-only'],
+        [
+            'text' => 'Iscrizioni quiz',
+            'url'  => 'admin/enrollments',
+            'icon' => 'fas fa-user-check',
+            'can'  => 'admin-only',
+            'key'  => 'enrollments',
+        ],
+        [
+            'text' => 'Esiti confermati',
+            'url'  => 'admin/confirmed-results',
+            'icon' => 'fas fa-trophy',
+            'can'  => 'admin-only',
+            'key'  => 'confirmed-results',
+        ],
+
+        // ── AMMINISTRAZIONE (solo admin) ─────────────────────────────────────
+        ['header' => 'amministrazione', 'can' => 'admin-only'],
+        [
+            'text' => 'Dashboard',
+            'url'  => 'admin/dashboard',
+            'icon' => 'fas fa-tachometer-alt',
+            'can'  => 'admin-only',
+        ],
+        [
+            'text' => 'Media Manager',
+            'url'  => 'admin/media',
+            'icon' => 'fas fa-images',
+            'can'  => 'admin-only',
+            'key'  => 'media',
+        ],
+        [
             'text' => 'Audit Log',
             'url'  => 'admin/audit-logs',
-            'icon' => 'fas fa-file',
+            'icon' => 'fas fa-history',
             'can'  => 'admin-only',
             'key'  => 'audit',
         ],
         [
-            'text' => 'Users',
+            'text' => 'Utenti',
             'url'  => 'admin/users',
-            'icon' => 'fas fa-user',
+            'icon' => 'fas fa-users',
             'can'  => 'manage-users-menu',
             'key'  => 'users',
         ],
@@ -389,31 +428,13 @@ return [
             'icon' => 'fas fa-user-shield',
             'can'  => 'admin-only',
         ],
-        [
-            'text' => 'Quizzes',
-            'url'  => 'admin/quizzes',
-            'icon' => 'fas fa-check',
-            'key'  => 'quizzes',
-        ],
-        [
-            'text' => 'Iscrizioni quiz',
-            'url'  => 'admin/enrollments',
-            'icon' => 'fas fa-user-check',
-            'can'  => 'admin-only',
-            'key'  => 'enrollments',
-        ],
-        [
-            'text' => 'Esiti quiz confermati',
-            'url'  => 'admin/confirmed-results',
-            'icon' => 'fas fa-trophy',
-            'can'  => 'admin-only',
-            'key'  => 'confirmed-results',
-        ],
-        ['header' => 'account_settings'],
+
+        // ── ACCOUNT (tutti i ruoli) ──────────────────────────────────────────
+        ['header' => 'account'],
         [
             'text' => 'Profilo',
             'url'  => 'profile',
-            'icon' => 'fas fa-fw fa-user',
+            'icon' => 'fas fa-user-circle',
         ],
     ],
 
