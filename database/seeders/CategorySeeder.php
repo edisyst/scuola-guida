@@ -65,5 +65,7 @@ class CategorySeeder extends Seeder
         ];
 
         Category::insert($categories);
+
+        $this->command->info("CREATE LE CATEGORIE");
     }
 }

@@ -32,5 +32,7 @@ class RolePermissionSeeder extends Seeder
         }
 
         // bulk_xxx: solo admin — già incluso in allPermissions(), nessuna riga nel DB necessaria
+
+        $this->command->info("CREATI I RUOLI E I PERMESSI");
     }
 }

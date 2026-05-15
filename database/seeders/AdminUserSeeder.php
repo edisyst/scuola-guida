@@ -39,5 +39,7 @@ class AdminUserSeeder extends Seeder
             'role' => User::ROLE_VIEWER,
             'permissions' => [],
         ]);
+
+        $this->command->info("CREATI UTENTI BASE");
     }
 }

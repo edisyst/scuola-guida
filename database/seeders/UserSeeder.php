@@ -10,7 +10,6 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // 🔥 utenti random
         User::factory(20)->create()->each(function ($user) {
 
             $roles = ['editor', 'viewer'];
@@ -21,5 +20,7 @@ class UserSeeder extends Seeder
                 'created_at' => now()->subDays(rand(0, 30)), // per grafico
             ]);
         });
+
+        $this->command->info("CREATI 20 UTENTI RANDOM");
     }
 }
