@@ -8,7 +8,6 @@ class QuizObserver
 {
     public function creating(Quiz $quiz): void
     {
-        // Se il title non è stato impostato manualmente, generalo
         if (empty($quiz->title)) {
             $quiz->title = 'QUIZ NR. ' . ($quiz->id ?? 'temp');
         }
@@ -16,10 +15,11 @@ class QuizObserver
 
     public function created(Quiz $quiz): void
     {
-        // Dopo la creazione, aggiorna il title con l'ID corretto
         if (str_starts_with($quiz->title, 'QUIZ NR. temp')) {
             $quiz->update(['title' => 'QUIZ NR. ' . $quiz->id]);
         }
+
+        clearAdminBadgesCache();
     }
 
     public function updating(Quiz $quiz): void
@@ -34,5 +34,13 @@ class QuizObserver
         if (str_starts_with($quiz->title, 'QUIZ NR. temp')) {
             $quiz->update(['title' => 'QUIZ NR. ' . $quiz->id]);
         }
+
+        clearAdminBadgesCache();
+    }
+
+    public function deleted(Quiz $quiz): void
+    {
+        // Nota: fired solo su Model::delete(). Le bulk delete chiamano clearAdminBadgesCache() manualmente.
+        clearAdminBadgesCache();
     }
 }

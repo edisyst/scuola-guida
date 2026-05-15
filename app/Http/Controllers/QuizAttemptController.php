@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreQuizRequest;
-use App\Http\Requests\UpdateQuizRequest;
+use App\Http\Requests\StoreQuizAttemptRequest;
+use App\Http\Requests\UpdateQuizAttemptRequest;
 use App\Models\QuizAttempt;
-use App\Models\Quiz;
-use App\Models\QuizResult;
-use App\Services\QuizService;
-use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
+use App\Services\QuizAttemptService;
 
 class QuizAttemptController extends Controller
 {
+    public function __construct(private QuizAttemptService $service) {}
+
     public function index()
     {
         $attempts = QuizAttempt::with('quiz')
@@ -23,48 +21,24 @@ class QuizAttemptController extends Controller
         return view('quiz.attempts', compact('attempts'));
     }
 
-    public function store(Request $request)
+    public function store(StoreQuizAttemptRequest $request)
     {
-        $data = $request->validate([
-            'quiz_id' => 'required|exists:quizzes,id',
-            'answers' => 'required|array',
-            'answers.*' => 'in:0,1',
-            'duration' => 'nullable|integer|min:0',
-        ]);
+        $data = $request->validated();
 
-        $quiz = Quiz::with('questions:id,is_true')->findOrFail($data['quiz_id']);
-
-        $correctMap = $quiz->questions->pluck('is_true', 'id');
-
-        $score = 0;
-
-        foreach ($data['answers'] as $questionId => $answer) {
-
-            if (!isset($correctMap[$questionId])) {
-                continue; // sicurezza
-            }
-
-            if ((int)$answer === (int)$correctMap[$questionId]) {
-                $score++;
-            }
-        }
-
-        $attempt = QuizAttempt::create([
-            'user_id' => auth()->id(), // 🔥 se guest, gestisci dopo
-            'quiz_id' => $quiz->id,
-            'score' => $score,
-            'total_questions' => count($correctMap),
-            'duration' => $data['duration'] ?? null,
-            'answers' => $data['answers'],
-        ]);
+        $attempt = $this->service->record(
+            auth()->id(),
+            $data['quiz_id'],
+            $data['answers'],
+            $data['duration'] ?? null,
+        );
 
         return response()->json([
-            'success' => true,
+            'success'    => true,
             'attempt_id' => $attempt->id,
-            'score' => $score,
-            'total' => count($correctMap),
+            'score'      => $attempt->score,
+            'total'      => $attempt->total_questions,
             'percentage' => $attempt->percentage,
-            'passed' => $attempt->is_passed,
+            'passed'     => $attempt->is_passed,
         ]);
     }
 
@@ -82,43 +56,19 @@ class QuizAttemptController extends Controller
         return view('quiz.attempt', compact('attempt'));
     }
 
-    public function update(Request $request, QuizAttempt $attempt)
+    public function update(UpdateQuizAttemptRequest $request, QuizAttempt $attempt)
     {
-        $data = $request->validate([
-            'answers' => 'required|array',
-            'answers.*' => 'in:0,1',
-            'duration' => 'nullable|integer|min:0',
-        ]);
+        $data = $request->validated();
 
-        // sicurezza: solo owner
-        if ($attempt->user_id !== auth()->id()) {
-            abort(403);
-        }
-
-        $quiz = $attempt->quiz()->with('questions:id,is_true')->first();
-
-        $correctMap = $quiz->questions->pluck('is_true', 'id');
-
-        $score = 0;
-
-        foreach ($data['answers'] as $questionId => $answer) {
-            if (!isset($correctMap[$questionId])) continue;
-
-            if ((int)$answer === (int)$correctMap[$questionId]) {
-                $score++;
-            }
-        }
-
-        $attempt->update([
-            'answers' => $data['answers'],
-            'score' => $score,
-            'total_questions' => count($correctMap),
-            'duration' => $data['duration'] ?? $attempt->duration,
-        ]);
+        $attempt = $this->service->updateAttempt(
+            $attempt,
+            $data['answers'],
+            $data['duration'] ?? null,
+        );
 
         return response()->json([
             'success' => true,
-            'score' => $score,
+            'score'   => $attempt->score,
         ]);
     }
 }

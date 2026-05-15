@@ -11,7 +11,10 @@ use App\Models\Quiz;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use App\Observers\CategoryObserver;
+use App\Observers\QuestionObserver;
 use App\Observers\QuizObserver;
+use App\Observers\UserObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +38,9 @@ class AppServiceProvider extends ServiceProvider
         */
 
         Quiz::observe(QuizObserver::class);
+        Question::observe(QuestionObserver::class);
+        Category::observe(CategoryObserver::class);
+        User::observe(UserObserver::class);
 
         /*
         |--------------------------------------------------------------------------
@@ -64,7 +70,10 @@ class AppServiceProvider extends ServiceProvider
             return $user->canDeleteQuestion();
         });
 
-        // 🔥 Gates dinamiche generate per ogni combinazione action_entity
+        // Gates dinamiche per ogni combinazione action_entity.
+        // hasPermission() gestisce le regole hardcoded:
+        //   read_*  → true per tutti gli utenti autenticati
+        //   bulk_*  → true solo per admin
         foreach (User::ACTIONS as $action) {
             foreach (User::ENTITIES as $entity) {
                 $perm = "{$action}_{$entity}";

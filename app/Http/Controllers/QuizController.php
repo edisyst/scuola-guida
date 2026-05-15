@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateQuizRequest;
+use App\DataTables\QuizQuestionsDataTable;
+use App\Http\Requests\BulkQuizQuestionsRequest;
 use App\Http\Requests\StoreQuizRequest;
-use Illuminate\Http\Request;
-use App\Models\Quiz;
-use App\Models\QuizAttempt;
-use App\Models\QuizResult;
+use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Question;
+use App\Models\Quiz;
+use App\Models\QuizResult;
 use App\Services\QuizService;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Http\Request;
 
 class QuizController extends Controller
 {
+    public function __construct(private QuizService $service) {}
+
     /*
     |--------------------------------------------------------------------------
     | CRUD
@@ -32,32 +33,14 @@ class QuizController extends Controller
     {
         abort_unless(auth()->user()->canCreateQuiz(), 403);
 
-        $questions = Question::limit(200)->get(); // evita carichi enormi
+        $questions = Question::limit(200)->get();
 
         return view('admin.quizzes.create', compact('questions'));
     }
 
     public function store(StoreQuizRequest $request)
     {
-        abort_unless(auth()->user()->canCreateQuiz(), 403);
-
-        $data = $request->validated();
-        $data['is_active'] = $request->has('is_active');
-
-        $quiz = Quiz::create($data);
-
-        // 🔥 collega domande
-        if (!empty($data['questions'])) {
-            if (count($data['questions']) > $quiz->max_questions) {
-                return back()->withErrors([
-                    'questions' => 'Superato limite massimo domande'
-                ]);
-            }
-
-            $quiz->questions()->sync($data['questions']);
-        }
-
-        clearAdminBadgesCache();
+        $this->service->create($request->validated());
 
         return redirect()->route('admin.quizzes.index')
             ->with('success', 'Quiz creato');
@@ -67,34 +50,22 @@ class QuizController extends Controller
     {
         abort_unless(auth()->user()->canEditQuiz(), 403);
 
-        $questionsCount = $quiz->questions()->count();
-        $currentCount = $quiz->questions()->count(); // refactoring: sono la stessa cosa
+        $currentCount = $quiz->questions()->count();
         $max = $quiz->max_questions;
-
         $questions = Question::limit(200)->get();
-//        $quiz->load('questions');
 
-        return view('admin.quizzes.edit', compact('quiz', 'questions', 'questionsCount', 'currentCount', 'max'));
+        return view('admin.quizzes.edit', [
+            'quiz'           => $quiz,
+            'questions'      => $questions,
+            'questionsCount' => $currentCount,
+            'currentCount'   => $currentCount,
+            'max'            => $max,
+        ]);
     }
 
     public function update(UpdateQuizRequest $request, Quiz $quiz)
     {
-        abort_unless(auth()->user()->canEditQuiz(), 403);
-
-        $quiz->update($request->validated());
-
-        $data = $request->validate([
-            'questions' => 'nullable|array',
-            'questions.*' => 'exists:questions,id',
-        ]);
-        $data['is_active'] = $request->has('is_active');
-
-        $quiz->update($data);
-
-        // 🔥 aggiorna pivot
-        $quiz->questions()->sync($data['questions'] ?? []);
-
-        clearAdminBadgesCache();
+        $this->service->update($quiz, $request->validated());
 
         return redirect()->route('admin.quizzes.index')
             ->with('success', 'Quiz aggiornato');
@@ -105,7 +76,6 @@ class QuizController extends Controller
         abort_unless(auth()->user()->canDeleteQuiz(), 403);
 
         $quiz->delete();
-        clearAdminBadgesCache();
 
         return back()->with('success', 'Quiz eliminato');
     }
@@ -125,158 +95,59 @@ class QuizController extends Controller
 
     public function reorder(Request $request, Quiz $quiz)
     {
-        $ids = $request->input('ids'); // array ordinato
-
-        foreach ($ids as $index => $id) {
-            $quiz->questions()->updateExistingPivot($id, [
-                'order' => $index
-            ]);
-        }
+        $this->service->reorderQuestions($quiz, $request->input('ids', []));
 
         return response()->json(['success' => true]);
     }
 
-    public function questionsData(Request $request, Quiz $quiz)
+    public function questionsData(Request $request, Quiz $quiz, QuizQuestionsDataTable $dataTable)
     {
-        $query = Question::with('category')
-            ->select('questions.*');
-
-        if ($request->category_id) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        $quizQuestionIds = $quiz->questions()->pluck('questions.id')->toArray();
-
-        return DataTables::of($query)
-
-            ->addColumn('category', function ($q) {
-                return $q->category->name ?? '-';
-            })
-
-            // 🔥 AGGIUNGI QUESTA COLONNA NASCOSTA
-            ->addColumn('is_in_quiz', function ($q) use ($quiz) {
-                $exists = $quiz->questions()
-                    ->where('question_id', $q->id)
-                    ->exists();
-                return $exists ? 'added' : 'pending'; // ritorna stringa, non HTML
-            })
-
-            ->addColumn('status', function ($q) use ($quiz) {
-                $exists = $quiz->questions()
-                    ->where('question_id', $q->id)
-                    ->exists();
-
-                return $exists
-                    ? '<span class="badge badge-success">✔ Nel quiz</span>'
-                    : '<span class="badge badge-secondary">Non presente</span>';
-            })
-
-            ->addColumn('action', function ($q) use ($quiz) {
-                $exists = $quiz->questions()
-                    ->where('question_id', $q->id)
-                    ->exists();
-
-                $questionText = htmlspecialchars($q->question, ENT_QUOTES, 'UTF-8');
-
-                if ($exists) {
-                    return '<button class="btn btn-sm btn-danger btn-remove"
-                                data-id="'.$q->id.'"
-                                data-text="'.$questionText.'">
-                                Rimuovi
-                            </button>';
-                }
-
-                return '<button class="btn btn-sm btn-success btn-add"
-                            data-id="'.$q->id.'"
-                            data-text="'.$questionText.'">
-                            Aggiungi
-                        </button>';
-            })
-
-            ->addColumn('in_quiz', function ($q) use ($quizQuestionIds) {
-                return in_array($q->id, $quizQuestionIds);
-            })
-
-            ->rawColumns(['status', 'action'])
-            ->make(true);
+        return $dataTable->response($request, $quiz);
     }
 
     public function manageQuestions(Quiz $quiz)
     {
         $quiz->load('questions');
 
-        $questions = Question::with('category')->get();
-
+        $questions    = Question::with('category')->get();
         $currentCount = $quiz->questions()->count();
-        $max = $quiz->max_questions;
+        $max          = $quiz->max_questions;
 
         return view('admin.quizzes.questions', compact('quiz', 'questions', 'currentCount', 'max'));
     }
 
     public function addQuestion(Request $request, Quiz $quiz)
     {
-        if ($quiz->hasReachedLimit()) {
-            return response()->json([
-                'error' => 'Limite massimo raggiunto'
-            ], 422);
+        $result = $this->service->addQuestion($quiz, (int) $request->question_id);
+
+        if (!$result['ok']) {
+            return response()->json(['error' => $result['error']], 422);
         }
 
-//        $request->validate([
-//            'question_id' => 'required|exists:questions,id'
-//        ]);
-
-        $quiz->questions()->syncWithoutDetaching([
-            $request->question_id
-        ]);
-
-//         return back()->with('success', 'Domanda aggiunta');
-        return response()->json([
-                'current' => $quiz->questions()->count() // 🔥 QUESTO SERVE
-            ]);
+        return response()->json(['current' => $result['current']]);
     }
 
     public function removeQuestion(Request $request, Quiz $quiz)
     {
-//         $request->validate([
-//             'question_id' => 'required|exists:questions,id'
-//         ]);
+        $current = $this->service->removeQuestion($quiz, (int) $request->question_id);
 
-        $quiz->questions()->detach($request->question_id);
-
-//         return back()->with('success', 'Domanda rimossa');
-        return response()->json([
-            'current' => $quiz->questions()->count() // 🔥 QUESTO SERVE
-        ]);
+        return response()->json(['current' => $current]);
     }
 
     public function createRandom()
     {
         abort_unless(auth()->user()->canCreateQuiz(), 403);
 
-        $max = 30;
-
-        $quiz = Quiz::create([
-            'title' => 'QUIZ RANDOM NR.',
-            'max_questions' => $max,
-        ]);
-        $quiz->update([
-            'title' => 'QUIZ RANDOM NR. ' . $quiz->id,
-        ]);
-
-        $ids = Question::inRandomOrder()
-            ->limit($max)
-            ->pluck('id');
-
-        $quiz->questions()->attach($ids);
+        $quiz = $this->service->createRandom();
 
         return redirect()
             ->route('admin.quizzes.index')
-            ->with('success', 'Quiz creato con '.$ids->count().' domande');
+            ->with('success', 'Quiz creato con ' . $quiz->questions()->count() . ' domande');
     }
 
     public function randomPlay()
     {
-        $ids = Question::inRandomOrder()->limit(10)->pluck('id');
+        $ids       = Question::inRandomOrder()->limit(10)->pluck('id');
         $questions = Question::whereIn('id', $ids)->get();
 
         return view('quiz.play', compact('questions'));
@@ -284,47 +155,29 @@ class QuizController extends Controller
 
     public function play(Quiz $quiz)
     {
-        $questions = $quiz->questions()->get();
-
-        $attempt = QuizAttempt::create([
-            'user_id' => auth()->id(),
-            'quiz_id' => $quiz->id,
-            'score' => 0,
-            'total_questions' => $quiz->questions()->count(),
-            'answers' => [],
-        ]);
+        $session = $this->service->startPlay($quiz, auth()->id());
 
         return view('quiz.play', [
-            'quiz' => $quiz,
-            'timeLimit' => $quiz->time_limit,
-            'maxErrors' => $quiz->max_errors,
-            'attemptId' => $attempt->id, // 🔥 aggiungi questo
-            'questionsJson' => $questions->map(function ($q) {
-                return [
-                    'id' => $q->id,
-                    'text' => $q->question,
-                    'image' => $q->image ? asset('storage/'.$q->image) : null,
-                    'correct' => (int) $q->is_true,
-                ];
-            })
+            'quiz'          => $quiz,
+            'timeLimit'     => $quiz->time_limit,
+            'maxErrors'     => $quiz->max_errors,
+            'attemptId'     => $session['attempt']->id,
+            'questionsJson' => $session['questions_json'],
         ]);
     }
 
-    public function submit(Request $request, QuizService $service)
+    public function submit(Request $request)
     {
         $answers = $request->input('answers', []);
-
-        $score = $service->calculateScore($answers);
+        $score   = $this->service->calculateScore($answers);
 
         QuizResult::create([
             'user_id' => auth()->id(),
-            'score' => $score,
-            'total' => count($answers),
+            'score'   => $score,
+            'total'   => count($answers),
         ]);
 
-        return response()->json([
-            'score' => $score
-        ]);
+        return response()->json(['score' => $score]);
     }
 
     public function results()
@@ -340,95 +193,34 @@ class QuizController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function bulkAdd(Request $request, Quiz $quiz)
+    public function bulkAdd(BulkQuizQuestionsRequest $request, Quiz $quiz)
     {
-        $max = $quiz->max_questions;
+        $result = $this->service->bulkAddQuestions(
+            $quiz,
+            $request->input('mode', 'selection'),
+            $request->input('ids', []),
+            $request->input('category_id'),
+        );
 
-        // 🔥 count attuale
-        $current = $quiz->questions()->count();
-
-        // 🔥 recupero IDs da aggiungere
-        if ($request->mode === 'all') {
-
-            $query = \App\Models\Question::query();
-
-            if ($request->category_id) {
-                $query->where('category_id', $request->category_id);
-            }
-
-            $ids = $query->pluck('id');
-
-        } else {
-            $ids = collect($request->ids ?? []);
+        if (!$result['ok']) {
+            return response()->json(['error' => $result['error']], 422);
         }
-
-        // 🔥 niente selezione
-        if ($ids->isEmpty()) {
-            return response()->json([
-                'error' => 'Nessuna selezione'
-            ], 422);
-        }
-
-        // 🔥 IDs già presenti nel quiz
-        $existingIds = $quiz->questions()->pluck('questions.id');
-
-        // 🔥 filtro duplicati
-        $idsToInsert = $ids->diff($existingIds);
-
-        if ($idsToInsert->isEmpty()) {
-            return response()->json([
-                'error' => 'Tutte le domande selezionate sono già presenti nel quiz'
-            ], 422);
-        }
-
-        // 🔥 spazio disponibile
-        $available = $max - $current;
-
-        if ($available <= 0) {
-            return response()->json([
-                'error' => 'Limite massimo raggiunto'
-            ], 422);
-        }
-
-        // 🔥 limito al massimo consentito
-        $idsToInsert = $idsToInsert->take($available);
-
-        // 🔥 count prima
-        $before = $quiz->questions()->count();
-
-        // 🔥 insert reale
-        $quiz->questions()->attach($idsToInsert);
-
-        // 🔥 count dopo
-        $after = $quiz->questions()->count();
 
         return response()->json([
-            'current' => $after,
-            'added' => $after - $before,
+            'current' => $result['current'],
+            'added'   => $result['added'],
         ]);
     }
 
-    public function bulkRemove(Request $request, Quiz $quiz)
+    public function bulkRemove(BulkQuizQuestionsRequest $request, Quiz $quiz)
     {
-        if ($request->mode === 'all') {
+        $current = $this->service->bulkRemoveQuestions(
+            $quiz,
+            $request->input('mode', 'selection'),
+            $request->input('ids', []),
+            $request->input('category_id'),
+        );
 
-            $query = Question::query();
-
-            if ($request->category_id) {
-                $query->where('category_id', $request->category_id);
-            }
-
-            $ids = $query->pluck('id');
-
-        } else {
-            $ids = $request->ids ?? [];
-        }
-
-        $quiz->questions()->detach($ids);
-
-        return response()->json([
-            'current' => $quiz->questions()->count(),
-//             'success' => true,
-        ]);
+        return response()->json(['current' => $current]);
     }
 }

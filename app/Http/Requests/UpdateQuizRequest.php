@@ -6,22 +6,33 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateQuizRequest extends FormRequest
 {
-     //Determine if the user is authorized to make this request.
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->canEditQuiz() ?? false;
     }
 
-    // Get the validation rules that apply to the request.
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
+            'title'         => 'required|string|max:255',
             'max_questions' => 'required|integer|min:1|max:100',
+            'time_limit'    => 'nullable|integer|min:0',
+            'max_errors'    => 'nullable|integer|min:0',
+            'is_active'     => 'boolean',
+            'questions'     => 'nullable|array',
+            'questions.*'   => 'exists:questions,id',
         ];
     }
 
-    public function withValidator($validator)
+    public function prepareForValidation(): void
+    {
+        // Un checkbox non spuntato non è presente nel payload; boolean() lo normalizza a false.
+        $this->merge([
+            'is_active' => $this->boolean('is_active'),
+        ]);
+    }
+
+    public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
 
@@ -30,7 +41,6 @@ class UpdateQuizRequest extends FormRequest
             $questions = $this->input('questions', []);
             $max = (int) $this->input('max_questions');
 
-            // 🔥 1. controllo selezione attuale
             if (count($questions) > $max) {
                 $validator->errors()->add(
                     'questions',
@@ -38,7 +48,6 @@ class UpdateQuizRequest extends FormRequest
                 );
             }
 
-            // 🔥 2. controllo domande già salvate (solo update)
             if ($quiz) {
                 $currentCount = $quiz->questions()->count();
 

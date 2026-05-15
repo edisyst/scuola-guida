@@ -3,17 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Services\UserService;
 
 class UserController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | CRUD
-    |--------------------------------------------------------------------------
-    */
+    public function __construct(private UserService $service) {}
 
     public function index()
     {
@@ -29,23 +26,9 @@ class UserController extends Controller
         return view('admin.users.create', $this->permissionViewData());
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        abort_unless(auth()->user()->canCreateUser(), 403);
-
-        $data = $request->validate([
-            'name'          => 'required',
-            'email'         => 'required|email|unique:users',
-            'password'      => 'required|min:6',
-            'role'          => 'required|in:' . implode(',', array_keys(User::ROLES)),
-            'permissions'   => 'nullable|array',
-            'permissions.*' => 'in:' . implode(',', User::allPermissions()),
-        ]);
-
-        $data['password'] = Hash::make($data['password']);
-
-        User::create($data);
-        clearAdminBadgesCache();
+        $this->service->create($request->validated());
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Utente creato');
@@ -61,30 +44,9 @@ class UserController extends Controller
         ));
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        abort_unless(auth()->user()->canEditUser(), 403);
-
-        $data = $request->validate([
-            'name'          => 'required',
-            'email'         => "required|email|unique:users,email,$user->id",
-            'password'      => 'nullable|min:6',
-            'role'          => 'required|in:' . implode(',', array_keys(User::ROLES)),
-            'permissions'   => 'nullable|array',
-            'permissions.*' => 'in:' . implode(',', User::allPermissions()),
-        ]);
-
-        if (!empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        } else {
-            unset($data['password']);
-        }
-
-        // se nessun permesso → salva array vuoto, non null
-        $data['permissions'] = $data['permissions'] ?? [];
-
-        $user->update($data);
-        clearAdminBadgesCache();
+        $this->service->update($user, $request->validated());
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Utente aggiornato');
@@ -99,16 +61,9 @@ class UserController extends Controller
         }
 
         $user->delete();
-        clearAdminBadgesCache();
 
         return back()->with('success', 'Utente eliminato');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | HELPERS
-    |--------------------------------------------------------------------------
-    */
 
     private function permissionViewData(): array
     {

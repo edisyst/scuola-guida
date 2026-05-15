@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Question;
-use App\Models\Category;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Services\QuestionService;
+use App\DataTables\QuestionsDataTable;
+use App\Exports\QuestionsExport;
+use App\Filters\QuestionFilter;
+use App\Http\Requests\BulkDeleteQuestionsRequest;
+use App\Http\Requests\ImportQuestionsRequest;
 use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\UpdateQuestionRequest;
-use Illuminate\Support\Facades\Cache;
-use App\Filters\QuestionFilter;
-use App\Exports\QuestionsExport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\QuestionsImport;
+use App\Models\Category;
+use App\Models\Question;
+use App\Services\QuestionService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Facades\Excel;
 
 class QuestionController extends Controller
 {
@@ -27,50 +30,29 @@ class QuestionController extends Controller
 
     public function index(Request $request, QuestionFilter $filter)
     {
-        $questions = Question::query()
-            ->with('category:id,name');
-
-        $questions = $filter->apply($questions)
+        $questions = $filter->apply(Question::with('category:id,name'))
             ->latest()
             ->get();
 
-        $categories = Cache::remember('categories_list', 3600, function () {
-            return Category::select('id', 'name')->get();
-        });
+        $categories = Cache::remember(
+            'categories_list',
+            3600,
+            fn () => Category::select('id', 'name')->get()
+        );
 
         return view('admin.questions.index', compact('questions', 'categories'));
     }
 
     public function create()
     {
-        $categories = Category::pluck('name', 'id'); // per select
+        $categories = Category::pluck('name', 'id');
 
         return view('admin.questions.create', compact('categories'));
     }
 
-    public function store(Request $request)
+    public function store(StoreQuestionRequest $request)
     {
-        if (!auth()->user()->canCreateQuestion()) {
-            abort(403);
-        }
-
-        $data = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'question'    => 'required|string',
-            'image'       => 'nullable|image|max:2048',
-        ]);
-
-        $data['is_true'] = $request->has('is_true');
-
-        // upload immagine
-        $image = $this->handleImageUpload($request);
-
-        if ($image) {
-            $data['image'] = $image;
-        }
-
-        Question::create($data);
-        clearAdminBadgesCache();
+        $this->service->create($request->validated(), $request->file('image'));
 
         return redirect()->route('admin.questions.index')
             ->with('success', 'Domanda creata');
@@ -83,28 +65,9 @@ class QuestionController extends Controller
         return view('admin.questions.edit', compact('question', 'categories'));
     }
 
-    public function update(Request $request, Question $question)
+    public function update(UpdateQuestionRequest $request, Question $question)
     {
-        if (!auth()->user()->canEditQuestion()) {
-            abort(403);
-        }
-
-        $data = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'question'    => 'required|string',
-            'image'       => 'nullable|image|max:2048',
-        ]);
-
-        $data['is_true'] = $request->has('is_true');
-
-        $image = $this->handleImageUpload($request, $question);
-
-        if ($image) {
-            $data['image'] = $image;
-        }
-
-        $question->update($data);
-        clearAdminBadgesCache();
+        $this->service->update($question, $request->validated(), $request->file('image'));
 
         return redirect()->route('admin.questions.index')
             ->with('success', 'Domanda aggiornata');
@@ -112,12 +75,9 @@ class QuestionController extends Controller
 
     public function destroy(Question $question)
     {
-        if (!auth()->user()->canDeleteQuestion()) {
-            abort(403);
-        }
+        abort_unless(auth()->user()->canDeleteQuestion(), 403);
 
         $this->service->delete($question);
-        clearAdminBadgesCache();
 
         return back()->with('success', 'Domanda eliminata');
     }
@@ -128,90 +88,14 @@ class QuestionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function data(Request $request)
+    public function data(Request $request, QuestionsDataTable $dataTable)
     {
-        $query = Question::with('category:id,name');
-
-        // 🔍 ricerca globale
-        if ($search = $request->input('search.value')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('question', 'like', "%{$search}%")
-                    ->orWhereHas('category', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-        // 🔥 FILTRO CATEGORIA
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        // 🔥 FILTRO TRUE/FALSE
-        if ($request->filled('is_true')) {
-            $query->where('is_true', $request->is_true);
-        }
-
-        // 🔥 FILTRO IMMAGINE
-        if ($request->filled('has_image')) {
-            $query->whereNotNull('image');
-        }
-
-        $total = Question::count();
-        $filtered = $query->count();
-
-        $data = $query
-            ->skip($request->start)
-            ->take($request->length)
-            ->latest()
-            ->get();
-
-        return response()->json([
-            'draw' => intval($request->draw),
-            'recordsTotal' => $total,
-            'recordsFiltered' => $filtered,
-            'data' => $data->map(function ($q) {
-
-                return [
-                    'id' => $q->id,
-                    'category' => $q->category->name,
-                    'question' => \Str::limit($q->question, 50),
-
-                    'is_true' => $q->is_true
-                        ? '<span class="badge badge-success">Vero</span>'
-                        : '<span class="badge badge-danger">Falso</span>',
-
-                    'image' => $q->image
-                        ? '<img src="'.(str_starts_with($q->image, 'http') ? $q->image : asset('storage/'.$q->image)).'" width="50">'
-                        : '',
-
-                    'actions' => view('admin.questions.partials.actions', compact('q'))->render(),
-
-                    'checkbox' => '<input type="checkbox" class="row-checkbox" value="'.$q->id.'">',
-                ];
-            }),
-        ]);
+        return response()->json($dataTable->response($request));
     }
 
-    private function handleImageUpload($request, $question = null)
+    public function bulkDelete(BulkDeleteQuestionsRequest $request)
     {
-        if ($request->hasFile('image')) {
-
-            // se sto aggiornando e c'è già un'immagine → cancello
-            if ($question && $question->image) {
-                \Storage::disk('public')->delete($question->image);
-            }
-
-            return $request->file('image')->store('questions', 'public');
-        }
-        return null;
-    }
-
-    public function bulkDelete(Request $request)
-    {
-        abort_unless(auth()->user()->canDeleteQuestion(), 403);
-
-        Question::whereIn('id', $request->ids)->delete();
+        $this->service->bulkDelete($request->validated('ids'));
 
         return response()->json(['success' => true]);
     }
@@ -227,12 +111,8 @@ class QuestionController extends Controller
         return Excel::download(new QuestionsExport, 'questions.xlsx');
     }
 
-    public function import(Request $request)
+    public function import(ImportQuestionsRequest $request)
     {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx,csv'
-        ]);
-
         Excel::import(new QuestionsImport, $request->file('file'));
 
         return back()->with('success', 'Import completato');
@@ -245,9 +125,8 @@ class QuestionController extends Controller
             ['', 'Segnaletica', 'Esempio domanda', 'VERO', ''],
         ];
 
-        return Excel::download(new class($data) implements \Maatwebsite\Excel\Concerns\FromArray {
-            private $data;
-            public function __construct($data) { $this->data = $data; }
+        return Excel::download(new class($data) implements FromArray {
+            public function __construct(private array $data) {}
             public function array(): array { return $this->data; }
         }, 'template_questions.xlsx');
     }
