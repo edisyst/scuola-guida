@@ -1,45 +1,45 @@
 <div>
     {{-- Flash message --}}
     @if (session()->has('media_success'))
-        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
             <i class="fas fa-check-circle mr-1"></i> {{ session('media_success') }}
             <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
         </div>
     @endif
 
     {{-- TAB CARTELLE --}}
-    <div class="sg-card sg-mb-3">
-        <div class="d-flex align-items-center" style="gap:.5rem; flex-wrap:wrap;">
-            <span class="text-muted small mr-2">
-                <i class="fas fa-folder-open text-warning mr-1"></i> Cartella:
+    <div class="sg-card sg-mb-5 p-4" style="margin-top:1.5rem;">
+        <div class="d-flex align-items-center" style="gap:1rem; flex-wrap:wrap;">
+            <span class="text-muted">
+                <i class="fas fa-folder-open text-warning mr-2"></i> Cartella:
             </span>
             @foreach ($folders as $key => $path)
                 <button type="button"
                         wire:click="switchFolder('{{ $key }}')"
                         class="btn btn-sm {{ $folder === $key ? 'btn-primary' : 'btn-outline-secondary' }}">
                     {{ ucfirst($key) }}
-                    <span class="badge {{ $folder === $key ? 'badge-light' : 'badge-secondary' }} ml-1">
+                    <span class="badge {{ $folder === $key ? 'badge-light' : 'badge-secondary' }} ml-2">
                         {{ $folderCounts[$key] ?? 0 }}
                     </span>
                 </button>
             @endforeach
-            <code class="ml-auto small text-muted">{{ $disk }} &rarr; {{ $directory }}</code>
+            <code class="ml-auto text-muted" style="font-size:0.9rem;">{{ $disk }} &rarr; {{ $directory }}</code>
         </div>
     </div>
 
     {{-- UPLOAD --}}
-    <div class="sg-card sg-mb-4">
-        <h6 class="sg-section-title mb-3">
-            <i class="fas fa-upload mr-1"></i>
+    <div class="sg-card sg-mb-5 p-4">
+        <h5 class="sg-section-title mb-4">
+            <i class="fas fa-upload mr-2"></i>
             Carica nuova immagine in <strong>{{ $folder }}</strong>
-        </h6>
-        <div class="d-flex align-items-start" style="flex-wrap:wrap; gap:.75rem;">
-            <div style="flex:1; min-width:260px;">
+        </h5>
+        <div class="d-flex align-items-start" style="flex-wrap:wrap; gap:1rem;">
+            <div style="flex:1; min-width:260px; padding:1rem; background:#f9fafb; border-radius:var(--sg-radius-sm); border:1px solid #e5e7eb;">
                 <input type="file" wire:model="newImage" accept="image/*" class="form-control">
                 @error('newImage')
-                    <div class="text-danger small mt-1">{{ $message }}</div>
+                    <div class="text-danger mt-2" style="font-size:0.95rem;">{{ $message }}</div>
                 @enderror
-                <div wire:loading wire:target="newImage" class="text-muted small mt-1">
+                <div wire:loading wire:target="newImage" class="text-muted mt-2">
                     <i class="fas fa-spinner fa-spin"></i> Caricamento in corso...
                 </div>
             </div>
@@ -63,13 +63,13 @@
             Nessuna immagine nella cartella <strong>{{ $folder }}</strong>.
         </div>
     @else
-        <div class="row" style="row-gap:1rem;">
+        <div class="row" style="row-gap:1.5rem;">
             @foreach ($files as $file)
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2" wire:key="{{ $file['path'] }}">
-                    <div class="sg-card h-100 p-2 d-flex flex-column" style="gap:.5rem;">
+                    <div class="sg-card h-100 p-3 d-flex flex-column" style="gap:0.75rem;">
 
                         {{-- ANTEPRIMA --}}
-                        <div style="aspect-ratio:4/3; background:#f4f6f8; border-radius:var(--sg-radius-sm); overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                        <div style="aspect-ratio:1; background:#f4f6f8; border-radius:var(--sg-radius-sm); overflow:hidden; display:flex; align-items:center; justify-content:center; padding:0.75rem;">
                             <img src="{{ $file['url'] }}" alt="{{ $file['name'] }}"
                                  style="max-width:100%; max-height:100%; object-fit:contain;">
                         </div>
@@ -84,9 +84,9 @@
                                        wire:keydown.escape="cancelRename"
                                        autofocus>
                                 @error('newName')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                    <div class="text-danger mt-2" style="font-size:0.85rem;">{{ $message }}</div>
                                 @enderror
-                                <div class="d-flex mt-1" style="gap:.25rem;">
+                                <div class="d-flex mt-2" style="gap:0.5rem;">
                                     <button wire:click="rename" class="btn btn-sm btn-success flex-fill" title="Conferma">
                                         <i class="fas fa-check"></i>
                                     </button>
@@ -97,9 +97,9 @@
                             </div>
                         @else
                             <div class="text-center" title="{{ $file['name'] }}"
-                                 style="font-size:.8rem; word-break:break-all; line-height:1.2;">
+                                 style="font-size:0.95rem; word-break:break-all; line-height:1.3;">
                                 <div class="font-weight-medium text-truncate">{{ $file['name'] }}</div>
-                                <div class="text-muted" style="font-size:.7rem;">
+                                <div class="text-muted" style="font-size:0.85rem;">
                                     {{ $file['size'] }}
                                     @if ($file['refs'] > 0)
                                         &middot;
@@ -111,7 +111,7 @@
                             </div>
 
                             {{-- AZIONI --}}
-                            <div class="d-flex mt-auto" style="gap:.25rem;">
+                            <div class="d-flex mt-auto" style="gap:0.5rem;">
                                 <button wire:click="startRename('{{ $file['path'] }}')"
                                         class="btn btn-sm btn-outline-secondary flex-fill" title="Rinomina">
                                     <i class="fas fa-pen"></i>
