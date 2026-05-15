@@ -52,12 +52,40 @@
     <div class="sg-header sg-flex-between">
         <div>
             <p class="sg-header-subtitle">Quiz / {{ $quiz->title }}</p>
-            <h1 class="sg-header-title"><i class="fas fa-list-check mr-2"></i> Gestione domande</h1>
+            <h1 class="sg-header-title"><i class="fas fa-tasks mr-2"></i> Gestione domande</h1>
         </div>
         <a href="{{ route('admin.quizzes.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
             <i class="fas fa-arrow-left"></i> Indietro
         </a>
     </div>
+
+    @if(auth()->user()->canEditQuiz())
+    <div class="sg-card sg-mb-3">
+        <div class="sg-card-body">
+            <div class="row align-items-end" style="gap:0;">
+                <div class="col-md-5">
+                    <label class="sg-label">Titolo</label>
+                    <input type="text" id="param-title" class="sg-form-control" value="{{ $quiz->title }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="sg-label">Max domande</label>
+                    <input type="number" id="param-max" class="sg-form-control" value="{{ $quiz->max_questions }}" min="1" max="100">
+                </div>
+                <div class="col-md-3 d-flex align-items-center" style="padding-top:1.8rem;">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="param-active" {{ $quiz->is_active ? 'checked' : '' }}>
+                        <label class="form-check-label" for="param-active">Quiz attivo</label>
+                    </div>
+                </div>
+                <div class="col-md-2" style="padding-top:1.4rem;">
+                    <button id="btn-update-params" class="sg-btn sg-btn-primary sg-btn-sm" style="width:100%;">
+                        <i class="fas fa-save"></i> Aggiorna parametri
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <div class="row">
         <div class="col-md-8">
@@ -100,6 +128,11 @@
                         <button id="select-all-filtered" class="sg-btn sg-btn-light sg-btn-sm">
                             <i class="fas fa-check-double"></i> Seleziona tutti (filtrati)
                         </button>
+                        @if(auth()->user()->canBulkQuiz())
+                        <button id="btn-add-random" class="sg-btn sg-btn-warning sg-btn-sm">
+                            <i class="fas fa-random"></i> Aggiungi random
+                        </button>
+                        @endif
                     </div>
 
                     <div class="table-responsive">
@@ -187,6 +220,7 @@
         updateProgress({{ $currentCount }}, {{ $max }});
 
         table = $('#questions-table').DataTable({
+            pageLength: 25,
             processing: true,
             serverSide: true,
             ajax: {
@@ -390,7 +424,7 @@
         $.post("{{ route('admin.quizzes.bulkAdd', $quiz) }}", {
             _token: "{{ csrf_token() }}",
             ids: Array.from(selectedIds),
-            mode: selectionMode,
+            mode: selectionMode === 'all' ? 'all' : 'selection',
             category_id: $('#filter-category').val()
 
         }, function(res) {
@@ -442,7 +476,7 @@
         $.post("{{ route('admin.quizzes.bulkRemove', $quiz) }}", {
             _token: "{{ csrf_token() }}",
             ids: Array.from(selectedIds),
-            mode: selectionMode,
+            mode: selectionMode === 'all' ? 'all' : 'selection',
             category_id: $('#filter-category').val()
 
         }, function(res) {
@@ -558,7 +592,7 @@
     function reloadQuizList() {
         $.get("{{ route('admin.quizzes.questions.list', $quiz) }}", function(data) {
 
-            $('#quiz-list').html('');
+            $('#sortable-questions').html('');
 
             data.forEach(q => {
                 addToQuizList(q.id, q.question);
@@ -616,6 +650,46 @@
     function truncate(text, max) {
         return text.length > max ? text.substring(0, max) + '...' : text;
     }
+
+    // AGGIORNA PARAMETRI QUIZ
+    $('#btn-update-params').click(function() {
+        var $btn = $(this);
+        $btn.prop('disabled', true);
+
+        $.post("{{ route('admin.quizzes.updateParams', $quiz) }}", {
+            _token: "{{ csrf_token() }}",
+            title: $('#param-title').val(),
+            max_questions: $('#param-max').val(),
+            is_active: $('#param-active').is(':checked') ? 1 : 0,
+        }, function(res) {
+            $('#max-count').text(res.max_questions);
+            updateProgress(parseInt($('#current-count').text()), res.max_questions);
+            toastr.success('Parametri aggiornati');
+        }).fail(function(xhr) {
+            toastr.error(xhr.responseJSON?.error ?? 'Errore aggiornamento parametri');
+        }).always(function() {
+            $btn.prop('disabled', false);
+        });
+    });
+
+    // AGGIUNGI DOMANDE RANDOM FINO AL MASSIMO
+    $('#btn-add-random').click(function() {
+        var $btn = $(this);
+        $btn.prop('disabled', true);
+
+        $.post("{{ route('admin.quizzes.fillRandom', $quiz) }}", {
+            _token: "{{ csrf_token() }}"
+        }, function(res) {
+            toastr.success('Aggiunte ' + res.added + ' domande random');
+            updateProgress(res.current, parseInt($('#max-count').text()));
+            reloadQuizList();
+            table.ajax.reload(null, false);
+        }).fail(function(xhr) {
+            toastr.error(xhr.responseJSON?.error ?? 'Errore');
+        }).always(function() {
+            $btn.prop('disabled', false);
+        });
+    });
 
 </script>
 

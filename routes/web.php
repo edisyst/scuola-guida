@@ -87,8 +87,12 @@ Route::middleware(['auth'])
                 ->name('quizzes.questions.data');
             Route::get('quizzes/{quiz}/questions', [QuizController::class, 'manageQuestions'])
                 ->name('quizzes.questions');
-            Route::post('quizzes/{quiz}/questions-list', [QuizController::class, 'questionsList'])
+            Route::get('quizzes/{quiz}/questions-list', [QuizController::class, 'questionsList'])
                 ->name('quizzes.questions.list');
+            Route::post('quizzes/{quiz}/fill-random', [QuizController::class, 'fillRandom'])
+                ->name('quizzes.fillRandom');
+            Route::post('quizzes/{quiz}/update-params', [QuizController::class, 'updateParams'])
+                ->name('quizzes.updateParams');
             Route::post('quizzes/{quiz}/reorder', [QuizController::class, 'reorder'])
                 ->name('quizzes.reorder');
             Route::post('quizzes/{quiz}/questions/add', [QuizController::class, 'addQuestion'])
@@ -100,7 +104,7 @@ Route::middleware(['auth'])
             Route::post('quizzes/{quiz}/bulk-remove', [QuizController::class, 'bulkRemove'])
                 ->name('quizzes.bulkRemove');
             Route::resource('quizzes', QuizController::class)
-                ->except(['show']);
+                ->except(['show', 'edit', 'update']);
 
             // USERS
             Route::get('users/{user}/stats', [UserStatsController::class, 'show'])

@@ -35,7 +35,7 @@
                         <th>Titolo</th>
                         <th>Stato</th>
                         <th>Domande</th>
-                        <th style="width:280px;text-align:right;">Azioni</th>
+                        <th style="width:320px;text-align:right;">Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,16 +54,33 @@
                                 <span class="sg-badge sg-badge-info">{{ $quiz->questions_count ?? 0 }}/{{ $quiz->max_questions ?? 0 }}</span>
                             </td>
                             <td class="sg-actions-cell">
-                                <a href="{{ route('quiz.play', $quiz) }}" class="sg-btn-icon info" title="Play">
-                                    <i class="fas fa-play"></i>
-                                </a>
+                                @if(($quiz->questions_count ?? 0) > 0)
+                                    <a href="{{ route('quiz.play', $quiz) }}" class="sg-btn-icon info" title="Play">
+                                        <i class="fas fa-play"></i>
+                                    </a>
+                                @else
+                                    <span class="sg-btn-icon info" title="Nessuna domanda nel quiz" style="opacity:.4;cursor:not-allowed;">
+                                        <i class="fas fa-play"></i>
+                                    </span>
+                                @endif
                                 @if(auth()->user()->canEditQuiz())
                                     <a href="{{ route('admin.quizzes.questions', $quiz) }}" class="sg-btn-icon info" title="Gestisci domande">
-                                        <i class="fas fa-list-check"></i>
+                                        <i class="fas fa-tasks"></i>
                                     </a>
-                                    <a href="{{ route('admin.quizzes.edit', $quiz) }}" class="sg-btn-icon edit" title="Modifica">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                @endif
+                                @if(auth()->user()->canBulkQuiz())
+                                    <form method="POST" action="{{ route('admin.quizzes.fillRandom', $quiz) }}" style="display:inline;">
+                                        @csrf
+                                        @if(($quiz->questions_count ?? 0) === 0)
+                                            <button class="sg-btn-icon success" title="Aggiungi domande random">
+                                                <i class="fas fa-random"></i>
+                                            </button>
+                                        @else
+                                            <span class="sg-btn-icon success" title="Il quiz ha già domande" style="opacity:.4;cursor:not-allowed;">
+                                                <i class="fas fa-random"></i>
+                                            </span>
+                                        @endif
+                                    </form>
                                 @endif
                                 @if(auth()->user()->canDeleteQuiz())
                                     <form method="POST" action="{{ route('admin.quizzes.destroy', $quiz) }}" style="display:inline;">
@@ -88,6 +105,7 @@
     @parent
     <script>
         $('#quiz-table').DataTable({
+            pageLength: 25,
             columnDefs: [{ orderable: false, targets: 4 }]
         });
     </script>
