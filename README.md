@@ -1,18 +1,18 @@
-# Scuola Guida — Quiz App
+# ScuolaGUIDA — Quiz App
 
-Applicazione web per la gestione di quiz della patente di guida. Permette agli admin di creare domande, raggrupparle in quiz e assegnarli agli utenti; gli utenti possono svolgere i quiz e consultare le proprie statistiche.
+Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti richiedono l'iscrizione ai quiz confermati, li svolgono e consultano le proprie statistiche.
 
-**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · MySQL
+**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
 
 ---
 
-## Installazione da zero
+## Installazione
 
 ### Prerequisiti
 
 | Tool | Versione minima |
 |---|---|
-| PHP | 8.2 |
+| PHP | 8.3 |
 | Composer | 2.x |
 | Node.js | 18.x |
 | MySQL | 8.x (o MariaDB 10.6+) |
@@ -40,7 +40,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Apri `.env` e imposta le credenziali del database:
+Imposta le credenziali del database in `.env`:
 
 ```env
 DB_CONNECTION=mysql
@@ -54,13 +54,17 @@ DB_PASSWORD=
 ### 4. Database e dati iniziali
 
 ```bash
+# Reset completo con dati fittizi (sviluppo locale)
 php artisan migrate:fresh --seed
+
+# Solo struttura + dati reali di produzione (admin, ruoli, categorie, domande reali)
+php artisan migrate:fresh
+php artisan db:seed --class=Database\\Seeders\\ProductionSeeder
 ```
 
-Il seeder crea:
-- Un utente **admin** (`admin@test.com` / `password`)
-- Categorie di esempio
-- Domande campione
+Il seeder di default crea:
+- Utente **admin** — `admin@test.com` / `password`
+- Categorie, domande campione, quiz di esempio con tentativi fittizi
 
 ### 5. Storage pubblico
 
@@ -68,21 +72,19 @@ Il seeder crea:
 php artisan storage:link
 ```
 
-Crea il symlink `public/storage → storage/app/public` necessario per le immagini delle domande.
+Crea il symlink `public/storage → storage/app/public` richiesto per le immagini delle domande.
 
 ### 6. Avvia il server di sviluppo
 
-In due terminali separati (oppure con un process manager come [Herd](https://herd.laravel.com/)):
-
 ```bash
-# Terminale 1 — asset Vite
+# Terminale 1 — asset Vite (hot reload)
 npm run dev
 
 # Terminale 2 — server PHP
 php artisan serve
 ```
 
-Apri [http://127.0.0.1:8000](http://127.0.0.1:8000) e accedi con `admin@test.com` / `password`, poi vai su `/admin`.
+Apri [http://127.0.0.1:8000](http://127.0.0.1:8000), accedi con `admin@test.com` / `password` e vai su `/admin/quizzes`.
 
 ### Comandi utili
 
@@ -94,11 +96,74 @@ php artisan route:list              # elenco di tutte le route
 
 ---
 
-## Business logic — flusso di una chiamata
+## Funzionalità
+
+### Area Admin / Editor
+
+- **Domande** — CRUD, upload immagine, import/export Excel, bulk delete, filtro DataTable
+- **Categorie** — CRUD con slug auto-generato
+- **Quiz** — creazione manuale o casuale, gestione domande con drag-and-drop reorder, parametri (numero massimo domande, tempo limite, errori massimi tollerati)
+- **Ciclo di vita quiz** — `draft → published → confirmed` (vedi sotto)
+- **Iscrizioni** — approva o rifiuta le richieste degli utenti; può riaprire un'iscrizione già completata
+- **Esiti confermati** — visualizza i risultati degli utenti sui quiz confermati
+- **Statistiche** — dashboard con metriche aggregate (quiz, tentativi, utenti)
+- **Media Manager** — gestione file upload (componente Livewire)
+- **Audit Log** — storico di ogni create/update/delete con valori prima/dopo
+- **Utenti** — CRUD con assegnazione ruolo
+- **Ruoli & Permessi** — configura i permessi granulari per ogni ruolo dalla UI
+
+### Area Utente (Viewer)
+
+- **Dashboard personale** — statistiche tentativi, punteggio medio, ultima attività
+- **Quiz casuale** — gioca un quiz con domande estratte casualmente (senza iscrizione)
+- **Catalogo quiz confermati** — richiedi iscrizione a un quiz ufficiale
+- **Le mie iscrizioni** — traccia lo stato delle richieste (in attesa / approvata / completata)
+- **Gioca quiz** — interfaccia a domande con timer e feedback finale (score, errori, esito)
+- **Storico tentativi** — rivedi tutti i tuoi quiz svolti
+- **Ricerca** — cerca domande per testo o categoria
+
+---
+
+## Ciclo di vita di un Quiz
+
+```
+     [Admin/Editor]          [Admin]              [Admin]
+          │                    │                    │
+       Crea quiz            Pubblica             Conferma
+          │                    │                    │
+          ▼                    ▼                    ▼
+       draft  ──────────▶  published  ──────────▶ confirmed
+                                                    │
+                                    [Viewer richiede iscrizione]
+                                                    │
+                                                    ▼
+                                                 pending
+                                                    │
+                                    [Admin approva / rifiuta]
+                                                    │
+                                         ┌──────────┴──────────┐
+                                         ▼                     ▼
+                                      approved             rejected
+                                         │
+                                [Viewer gioca il quiz]
+                                         │
+                                         ▼
+                                      completed
+```
+
+| Stato | Descrizione |
+|---|---|
+| `draft` | Visibile solo ad admin/editor; modificabile |
+| `published` | Disponibile per il play casuale; non più modificabile |
+| `confirmed` | Lock definitivo; aperto alle iscrizioni degli utenti |
+
+---
+
+## Architettura — flusso di una chiamata
 
 Esempio: **aggiornamento di una domanda** (`PUT /admin/questions/{id}`).
 
-Il flusso attraversa cinque strati in sequenza: **Route → Middleware → FormRequest → Controller → Service → Model/Observer**.
+Il flusso attraversa cinque strati: **Route → Middleware → FormRequest → Controller → Service → Model/Trait**.
 
 ```
 Browser
@@ -107,10 +172,7 @@ Browser
   ▼
 ┌─────────────────────────────────────────────────────┐
 │  routes/web.php                                     │
-│                                                     │
-│  Route::middleware(['auth', 'role:admin,editor,     │
-│    viewer'])->resource('questions', ...)            │
-│                                                     │
+│  Route::middleware(['auth', 'role:admin,...'])       │
 │  → QuestionController@update                        │
 └───────────────────────┬─────────────────────────────┘
                         │
@@ -118,98 +180,59 @@ Browser
 ┌─────────────────────────────────────────────────────┐
 │  UpdateQuestionRequest (FormRequest)                │
 │                                                     │
-│  1. authorize()  → $user->canEditQuestion()         │
-│     └ verifica il permesso 'edit_questions'         │
-│        nel campo JSON permissions dell'utente       │
-│     └ abort 403 se non autorizzato                  │
-│                                                     │
-│  2. prepareForValidation()                          │
-│     └ normalizza is_true a boolean                  │
-│                                                     │
-│  3. rules() — valida:                               │
-│     · category_id  required|exists:categories,id   │
-│     · question     required|string                  │
-│     · is_true      boolean                          │
-│     · image        nullable|image|max:2048          │
+│  authorize()  → verifica permesso 'edit_questions'  │
+│  prepareForValidation() → normalizza is_true        │
+│  rules() → category_id, question, is_true, image   │
 └───────────────────────┬─────────────────────────────┘
                         │ $request->validated()
                         ▼
 ┌─────────────────────────────────────────────────────┐
 │  QuestionController@update                          │
 │                                                     │
-│  public function update(                            │
-│    UpdateQuestionRequest $request,                  │
-│    Question $question        ← route model binding  │
-│  ) {                                                │
-│    $this->service->update(                          │
-│      $question,                                     │
-│      $request->validated(),                         │
-│      $request->file('image')   ← separato: non     │
-│    );                            passa da validated │
-│    return redirect()->route('admin.questions.index')│
-│      ->with('success', 'Domanda aggiornata');       │
-│  }                                                  │
+│  $this->service->update(                            │
+│    $question,           ← route model binding       │
+│    $request->validated(),                           │
+│    $request->file('image')                          │
+│  );                                                 │
+│  return redirect()->with('success', '...');         │
 └───────────────────────┬─────────────────────────────┘
                         │
                         ▼
 ┌─────────────────────────────────────────────────────┐
 │  QuestionService@update                             │
 │                                                     │
-│  1. Rimuove 'image' dall'array dati                 │
-│     (il file viene gestito a parte)                 │
-│                                                     │
-│  2. Se arriva un nuovo file immagine:               │
-│     a. deleteImage($question)                       │
-│        └ cancella il vecchio file da               │
-│          storage/app/public/questions/              │
-│          (se non è un URL esterno)                  │
-│     b. storeImage($file)                            │
-│        └ salva il nuovo file e aggiunge             │
-│          il path all'array dati                     │
-│                                                     │
-│  3. $question->update($data)                        │
-│     └ Eloquent scrive sul DB                        │
+│  1. Se arriva un nuovo file: deleteImage vecchio,   │
+│     storeImage nuovo (storage/app/public/questions) │
+│  2. $question->update($data)                        │
 └───────────────────────┬─────────────────────────────┘
-                        │  evento 'updated' di Eloquent
+                        │  evento 'updated' Eloquent
                         ▼
 ┌─────────────────────────────────────────────────────┐
-│  Trait Auditable (bootAuditable)                    │
-│                                                     │
-│  Intercetta l'evento updated e scrive su            │
-│  audit_logs:                                        │
-│  · user_id   → chi ha fatto la modifica             │
-│  · event     → 'updated'                            │
-│  · model_type→ 'App\Models\Question'                │
-│  · model_id  → 42                                   │
-│  · old_values→ campi prima della modifica           │
-│  · new_values→ campi dopo la modifica               │
+│  Trait Auditable                                    │
+│  Scrive su audit_logs: user_id, event,              │
+│  model_type, old_values, new_values                 │
 └───────────────────────┬─────────────────────────────┘
-                        │  evento 'saved' di Eloquent
+                        │  evento 'saved' Eloquent
                         ▼
 ┌─────────────────────────────────────────────────────┐
 │  QuestionObserver@saved                             │
-│                                                     │
-│  clearAdminBadgesCache()                            │
-│  └ invalida la cache 'admin_badges' (TTL 60 s)     │
-│    così i contatori in sidebar si aggiornano        │
-│    alla prossima request                            │
+│  clearAdminBadgesCache() → invalida cache sidebar   │
 └───────────────────────┬─────────────────────────────┘
                         │
                         ▼
                    redirect 302
-               → admin.questions.index
-               + flash 'success'
+               → admin.questions.index + flash
 ```
 
-### Punti chiave dell'architettura
+### Strati dell'architettura
 
 | Strato | Responsabilità |
 |---|---|
-| **FormRequest** | Autorizzazione + validazione. Il controller non vede mai dati non validati. |
+| **FormRequest** | Autorizzazione + validazione. Il controller non vede dati non validati. |
 | **Controller** | Orchestrazione pura: chiama il service, ritorna la risposta. Nessuna logica. |
-| **Service** | Tutta la business logic: gestione file, aggiornamento del modello. |
+| **Service** | Tutta la business logic (9 service: Quiz, QuizAttempt, QuizEnrollment, Question, User, UserStats, DashboardStats, RolePermission, Search). |
 | **Trait Auditable** | Logging automatico di ogni create/update/delete su tutti i modelli che lo usano. |
-| **Observer** | Effetti collaterali post-salvataggio (invalidazione cache, notifiche, ecc.) tenuti fuori dal service. |
+| **Observer** | Effetti collaterali post-salvataggio (invalidazione cache, ecc.) tenuti fuori dal service. |
 
 ---
 
@@ -217,8 +240,22 @@ Browser
 
 | Ruolo | Accesso |
 |---|---|
-| `admin` | Tutto, inclusa dashboard, audit log, gestione ruoli |
-| `editor` | CRUD su domande, categorie, quiz |
-| `viewer` | Solo lettura |
+| `admin` | Tutto: CRUD contenuti, publish/confirm quiz, audit log, gestione utenti e ruoli |
+| `editor` | CRUD domande, categorie, quiz (no publish/confirm) |
+| `viewer` | Gioca quiz, richiedi iscrizioni, consulta proprie statistiche |
 
-I permessi granulari (`edit_questions`, `delete_questions`, …) sono configurabili per ruolo dalla pagina **Admin → Ruoli & Permessi** e sono salvati come JSON nel campo `permissions` della tabella `users`.
+I permessi granulari (`edit_questions`, `delete_quiz`, …) sono configurabili per ruolo dalla pagina **Admin → Ruoli & Permessi** e sono salvati come JSON nel campo `permissions` di ogni utente.
+
+---
+
+## Dipendenze principali
+
+| Package | Uso |
+|---|---|
+| `jeroennoten/laravel-adminlte` | Template admin con sidebar, navbar, widget |
+| `livewire/livewire` | Media Manager (componente dinamico) |
+| `maatwebsite/excel` | Import/export domande via Excel |
+| `yajra/laravel-datatables` | Tabelle con ricerca/ordinamento server-side |
+| `laravel/breeze` | Scaffolding autenticazione (Blade preset) |
+| `alpinejs` | Interattività JS leggera (toggle, dropdown) |
+| `barryvdh/laravel-debugbar` | Debug toolbar (solo sviluppo) |
