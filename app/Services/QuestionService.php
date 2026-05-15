@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class QuestionService
 {
-    private const IMAGE_DISK = 'public';
-    private const IMAGE_DIR  = 'questions';
 
     public function create(array $data, ?UploadedFile $image = null): Question
     {
@@ -56,13 +54,13 @@ class QuestionService
 
     private function storeImage(UploadedFile $file): string
     {
-        return $file->store(self::IMAGE_DIR, self::IMAGE_DISK);
+        return $file->store(config('media.directory'), config('media.disk'));
     }
 
     private function deleteImage(Question $question): void
     {
         if ($question->image && !str_starts_with($question->image, 'http')) {
-            Storage::disk(self::IMAGE_DISK)->delete($question->image);
+            Storage::disk(config('media.disk'))->delete($question->image);
         }
     }
 }

@@ -114,9 +114,12 @@ Route::middleware(['auth'])
         });
 
         /*
-        | SOLO ADMIN — gestione sistema (dashboard, audit, role-permissions)
+        | SOLO ADMIN — gestione sistema (dashboard, audit, role-permissions, media)
         */
         Route::middleware('role:admin')->group(function () {
+
+            // MEDIA MANAGER
+            Route::get('media', fn () => view('admin.media.index'))->name('media.index');
 
             Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
                 ->name('dashboard');
