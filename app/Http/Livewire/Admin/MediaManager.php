@@ -107,7 +107,11 @@ class MediaManager extends Component
             ->filter(fn ($path) => in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), $allowed, true));
     }
 
-    public function upload(): void
+    /*
+    | NOTA: il metodo non può chiamarsi 'upload' perché Livewire 3 ha l'alias
+    | $wire.upload → $upload (helper JS per il tmp upload). Vedi livewire.js:4510.
+    */
+    public function save(): void
     {
         $this->validateOnly('newImage');
 

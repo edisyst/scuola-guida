@@ -43,13 +43,13 @@
                     <i class="fas fa-spinner fa-spin"></i> Caricamento in corso...
                 </div>
             </div>
-            <button type="button" wire:click="upload"
+            <button type="button" wire:click="save"
                     class="sg-btn sg-btn-primary sg-btn-sm"
-                    wire:loading.attr="disabled" wire:target="upload,newImage">
-                <span wire:loading.remove wire:target="upload">
+                    wire:loading.attr="disabled" wire:target="save,newImage">
+                <span wire:loading.remove wire:target="save">
                     <i class="fas fa-upload mr-1"></i> Carica
                 </span>
-                <span wire:loading wire:target="upload">
+                <span wire:loading wire:target="save">
                     <i class="fas fa-spinner fa-spin"></i> Caricamento...
                 </span>
             </button>

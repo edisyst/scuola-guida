@@ -68,7 +68,7 @@ class MediaManagerTest extends TestCase
 
         Livewire::test(MediaManager::class)
             ->set('newImage', $file)
-            ->call('upload')
+            ->call('save')
             ->assertHasNoErrors();
 
         Storage::disk($disk)->assertExists("{$dir}/hello.png");
@@ -86,7 +86,7 @@ class MediaManagerTest extends TestCase
 
         Livewire::test(MediaManager::class)
             ->set('newImage', $file)
-            ->call('upload')
+            ->call('save')
             ->assertHasErrors('newImage');
     }
 
