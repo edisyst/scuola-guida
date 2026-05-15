@@ -5,9 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Category;
-use App\Models\Question;
-use App\Models\Quiz;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,20 +14,9 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             AdminUserSeeder::class,
             UserSeeder::class,
-            CategorySeeder::class
+            CategorySeeder::class,
+            QuizSeeder::class,
+            QuizAttemptSeeder::class,
         ]);
-
-        $categories = Category::all();
-
-        // Crea 100 domande usando le categorie esistenti
-        $questions = Question::factory(100)
-            ->recycle($categories)
-            ->create();
-
-        Quiz::factory(10)
-            ->recycle($questions)
-            ->create();
-
-        $this->call(QuizAttemptSeeder::class);
     }
 }
