@@ -1,14 +1,14 @@
 <div>
     {{-- Flash message --}}
     @if (session()->has('media_success'))
-        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <div class="alert alert-success alert-dismissible fade show sg-mb-4" role="alert">
             <i class="fas fa-check-circle mr-1"></i> {{ session('media_success') }}
             <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
         </div>
     @endif
 
     {{-- TAB CARTELLE --}}
-    <div class="sg-card sg-mb-5 p-4" style="margin-top:1.5rem;">
+    <div class="sg-card sg-mb-4 p-4">
         <div class="d-flex align-items-center" style="gap:1rem; flex-wrap:wrap;">
             <span class="text-muted">
                 <i class="fas fa-folder-open text-warning mr-2"></i> Cartella:
@@ -29,12 +29,12 @@
 
     {{-- UPLOAD --}}
     <div class="sg-card sg-mb-5 p-4">
-        <h5 class="sg-section-title mb-4">
-            <i class="fas fa-upload mr-2"></i>
+        <h5 class="sg-section-title sg-mb-3">
+            <i class="fas fa-upload"></i>
             Carica nuova immagine in <strong>{{ $folder }}</strong>
         </h5>
         <div class="d-flex align-items-start" style="flex-wrap:wrap; gap:1rem;">
-            <div style="flex:1; min-width:260px; padding:1rem; background:#f9fafb; border-radius:var(--sg-radius-sm); border:1px solid #e5e7eb;">
+            <div class="sg-upload-box">
                 <input type="file" wire:model="newImage" accept="image/*" class="form-control">
                 @error('newImage')
                     <div class="text-danger mt-2" style="font-size:0.95rem;">{{ $message }}</div>
@@ -69,7 +69,7 @@
                     <div class="sg-card h-100 p-3 d-flex flex-column" style="gap:0.75rem;">
 
                         {{-- ANTEPRIMA --}}
-                        <div style="aspect-ratio:1; background:#f4f6f8; border-radius:var(--sg-radius-sm); overflow:hidden; display:flex; align-items:center; justify-content:center; padding:0.75rem;">
+                        <div class="sg-img-preview">
                             <img src="{{ $file['url'] }}" alt="{{ $file['name'] }}"
                                  style="max-width:100%; max-height:100%; object-fit:contain;">
                         </div>

@@ -1110,10 +1110,14 @@
 .sg-mt-1 { margin-top: .5rem !important; }
 .sg-mt-2 { margin-top: 1rem !important; }
 .sg-mt-3 { margin-top: 1.5rem !important; }
+.sg-mt-4 { margin-top: 2rem !important; }
+.sg-mt-5 { margin-top: 2.5rem !important; }
 .sg-mb-0 { margin-bottom: 0 !important; }
 .sg-mb-1 { margin-bottom: .5rem !important; }
 .sg-mb-2 { margin-bottom: 1rem !important; }
 .sg-mb-3 { margin-bottom: 1.5rem !important; }
+.sg-mb-4 { margin-bottom: 2rem !important; }
+.sg-mb-5 { margin-bottom: 2.5rem !important; }
 .sg-text-muted { color: var(--sg-text-muted) !important; }
 .sg-text-success { color: var(--sg-success) !important; }
 .sg-text-danger { color: var(--sg-danger) !important; }
@@ -1122,3 +1126,330 @@
 .sg-flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .sg-gap-2 { gap: .5rem; }
 .sg-gap-3 { gap: 1rem; }
+
+/* ── Section title (usato nelle card admin) ──────────────── */
+.sg-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--sg-text);
+    margin: 0 0 6px;
+    letter-spacing: .2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Bottone secondary (outline grigio) ─────────────────── */
+.sg-btn-secondary {
+    background: #fff;
+    color: #495057;
+    border-color: #ced4da;
+}
+.sg-btn-secondary:hover:not(:disabled) {
+    background: #f8f9fa;
+    color: #343a40;
+    border-color: #adb5bd;
+}
+
+/* ── Media Manager specifici ────────────────────────────── */
+.sg-upload-box {
+    flex: 1;
+    min-width: 260px;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: var(--sg-radius-sm);
+    border: 1px solid #e5e7eb;
+    transition: background .15s, border-color .15s;
+}
+
+.sg-img-preview {
+    aspect-ratio: 1;
+    background: #f4f6f8;
+    border-radius: var(--sg-radius-sm);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    transition: background .15s;
+}
+
+/* ============================================================
+   DARK MODE — AdminLTE aggiunge `dark-mode` al body
+   ============================================================ */
+
+body.dark-mode .sg-card {
+    background: #2d3436;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .3);
+}
+
+body.dark-mode .sg-card-header-title,
+body.dark-mode .sg-section-title,
+body.dark-mode .sg-page-title {
+    color: #f8f9fa;
+}
+
+body.dark-mode .sg-card-header {
+    border-color: #495057;
+}
+
+body.dark-mode .sg-card-section {
+    border-color: #495057;
+}
+
+body.dark-mode .sg-upload-box {
+    background: #3d4349;
+    border-color: #495057;
+}
+
+body.dark-mode .sg-img-preview {
+    background: #3d4349;
+}
+
+body.dark-mode .sg-form-control {
+    background: #3d4349;
+    border-color: #6c757d;
+    color: #f8f9fa;
+}
+
+body.dark-mode .sg-form-control:focus {
+    border-color: #748ffc;
+    box-shadow: 0 0 0 3px rgba(116, 143, 252, .15);
+}
+
+body.dark-mode .sg-form-label {
+    color: #adb5bd;
+}
+
+body.dark-mode .sg-form-hint {
+    color: #6c757d;
+}
+
+body.dark-mode .sg-stat-card {
+    background: #2d3436;
+    color: #f8f9fa;
+}
+
+body.dark-mode .sg-stat-card:hover { color: #f8f9fa; }
+
+body.dark-mode .sg-stat-value { color: #f8f9fa; }
+
+body.dark-mode .sg-table thead th {
+    background: #3d4349;
+    color: #adb5bd;
+}
+
+body.dark-mode .sg-table tbody td {
+    color: #f8f9fa;
+    border-color: #495057;
+}
+
+body.dark-mode .sg-table tbody tr:hover { background: #3d4349; }
+
+body.dark-mode .sg-form-section {
+    background: #2d3436;
+}
+
+body.dark-mode .sg-form-section-header {
+    background: #3d4349;
+    border-color: #495057;
+}
+
+body.dark-mode .sg-form-section-title { color: #f8f9fa; }
+
+body.dark-mode .sg-save-bar {
+    background: #2d3436;
+    border-color: #495057;
+    box-shadow: 0 -2px 20px rgba(0, 0, 0, .3);
+}
+
+body.dark-mode .sg-save-bar .hint { color: #adb5bd; }
+
+body.dark-mode .sg-perm-entity-card {
+    background: #2d3436;
+    border-color: #495057;
+}
+
+body.dark-mode .sg-perm-entity-head {
+    background: linear-gradient(135deg, #3d4349 0%, #495057 100%);
+    color: #f8f9fa;
+}
+
+body.dark-mode .sg-perm-entity-head i { color: #adb5bd; }
+
+body.dark-mode .sg-perm-toggle .lbl { color: #adb5bd; }
+
+body.dark-mode .sg-perm-toggle:hover { background: #3d4349; }
+
+body.dark-mode .sg-perm-check .box {
+    background: #3d4349;
+    border-color: #6c757d;
+}
+
+body.dark-mode .sg-btn-light {
+    background: #3d4349;
+    color: #f8f9fa;
+    border-color: #495057;
+}
+
+body.dark-mode .sg-btn-secondary {
+    background: #3d4349;
+    color: #f8f9fa;
+    border-color: #495057;
+}
+
+body.dark-mode .sg-btn-secondary:hover:not(:disabled) {
+    background: #495057;
+    color: #fff;
+}
+
+body.dark-mode .sg-btn-icon.edit   { background: #3d3000; color: #ffc107; }
+body.dark-mode .sg-btn-icon.edit:hover { background: #553d00; color: #ffd454; }
+body.dark-mode .sg-btn-icon.delete { background: #3d0a0f; color: #f88; }
+body.dark-mode .sg-btn-icon.delete:hover { background: #5b1018; color: #ffaaaa; }
+body.dark-mode .sg-btn-icon.info   { background: #002f37; color: #5dd; }
+body.dark-mode .sg-btn-icon.info:hover { background: #004455; color: #7ee; }
+
+body.dark-mode .sg-badge { background: #3d4349; color: #adb5bd; }
+body.dark-mode .sg-badge-success { background: #1a3d25; color: #5dd678; }
+body.dark-mode .sg-badge-danger  { background: #3d1418; color: #f88; }
+body.dark-mode .sg-badge-warning { background: #3d2e00; color: #ffc107; }
+body.dark-mode .sg-badge-info    { background: #002f37; color: #5dd; }
+
+/* Override su classi Bootstrap/AdminLTE usate inline nelle viste */
+body.dark-mode .content-wrapper .card {
+    background: #2d3436;
+}
+
+body.dark-mode .content-wrapper .card > .card-header {
+    background: #3d4349;
+    border-color: #495057;
+    color: #f8f9fa;
+}
+
+body.dark-mode .content-wrapper .table thead th {
+    background: #3d4349;
+    color: #adb5bd;
+}
+
+body.dark-mode .content-wrapper .table tbody td {
+    border-color: #495057;
+    color: #f8f9fa;
+}
+
+body.dark-mode .content-wrapper .form-control {
+    background: #3d4349;
+    border-color: #6c757d;
+    color: #f8f9fa;
+}
+
+body.dark-mode .content-wrapper .form-control:focus {
+    border-color: #748ffc;
+    box-shadow: 0 0 0 3px rgba(116, 143, 252, .15);
+}
+
+body.dark-mode .modal-content {
+    background: #2d3436;
+    color: #f8f9fa;
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+    border-color: #495057;
+}
+
+body.dark-mode .modal-title { color: #f8f9fa; }
+
+body.dark-mode code {
+    background: #3d4349;
+    color: #f8c6d6;
+    border-radius: 4px;
+    padding: 1px 6px;
+}
+
+body.dark-mode .text-muted { color: #adb5bd !important; }
+
+body.dark-mode .nav-btn {
+    background: #3d4349;
+    border-color: #6c757d;
+    color: #f8f9fa;
+}
+
+body.dark-mode .sidebar-card { background: #2d3436; }
+
+body.dark-mode .sidebar-section { border-color: #495057; }
+
+/* ── Bootstrap classes usate nelle viste admin (non coperte da AdminLTE dark) ── */
+
+body.dark-mode .sg-card .btn-outline-secondary {
+    color: #adb5bd;
+    border-color: #6c757d;
+    background: transparent;
+}
+body.dark-mode .sg-card .btn-outline-secondary:hover {
+    color: #f8f9fa;
+    background: #495057;
+    border-color: #6c757d;
+}
+body.dark-mode .sg-card .btn-outline-danger {
+    color: #f88;
+    border-color: #dc3545;
+    background: transparent;
+}
+body.dark-mode .sg-card .btn-outline-danger:hover {
+    color: #fff;
+    background: #a71d2a;
+    border-color: #a71d2a;
+}
+body.dark-mode .sg-card .btn-secondary {
+    background: #495057;
+    border-color: #495057;
+    color: #f8f9fa;
+}
+body.dark-mode .sg-card .btn-secondary:hover {
+    background: #5a6268;
+    border-color: #5a6268;
+}
+
+body.dark-mode .badge-light {
+    background: #3d4349;
+    color: #f8f9fa;
+}
+body.dark-mode .badge-secondary {
+    background: #495057;
+    color: #f8f9fa;
+}
+body.dark-mode .badge-info {
+    background: #0c5460;
+    color: #d1ecf1;
+}
+
+body.dark-mode .modal .close {
+    color: #adb5bd;
+    text-shadow: none;
+    opacity: 1;
+}
+body.dark-mode .modal .close:hover {
+    color: #f8f9fa;
+}
+
+body.dark-mode .alert-warning {
+    background: #332d00;
+    border-color: #6b5900;
+    color: #ffc107;
+}
+body.dark-mode .alert-success {
+    background: #0d2b1a;
+    border-color: #155724;
+    color: #5dd678;
+}
+body.dark-mode .alert-danger {
+    background: #2c0a0e;
+    border-color: #721c24;
+    color: #f88;
+}
+body.dark-mode .alert-info {
+    background: #001e26;
+    border-color: #0c5460;
+    color: #5dd;
+}
