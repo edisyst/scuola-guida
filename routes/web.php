@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizAttemptController;
+use App\Http\Controllers\QuizEnrollmentController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\RolePermissionController;
@@ -32,6 +33,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])->name('quiz.play');
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
     Route::get('quiz/results', [QuizController::class, 'results'])->name('quiz.results');
+
+    // Quiz confermati e iscrizioni (viewer)
+    Route::get('quiz/confirmed', [QuizEnrollmentController::class, 'catalog'])
+        ->name('quiz.confirmed.index');
+    Route::post('quiz/{quiz}/enrollments', [QuizEnrollmentController::class, 'store'])
+        ->name('quiz.enrollments.store');
+    Route::get('quiz/enrollments', [QuizEnrollmentController::class, 'myEnrollments'])
+        ->name('quiz.enrollments.mine');
 
     // Dashboard personale stats utente
     Route::get('stats', [UserStatsController::class, 'me'])->name('stats.me');
@@ -131,6 +140,26 @@ Route::middleware(['auth'])
 
             Route::get('quiz-attempts', [QuizAttemptController::class, 'adminIndex'])
                 ->name('quiz.attempts.all');
+
+            // QUIZ STATE TRANSITIONS (admin only)
+            Route::post('quizzes/{quiz}/publish', [QuizController::class, 'publish'])
+                ->name('quizzes.publish');
+            Route::post('quizzes/{quiz}/unpublish', [QuizController::class, 'unpublish'])
+                ->name('quizzes.unpublish');
+            Route::post('quizzes/{quiz}/confirm', [QuizController::class, 'confirm'])
+                ->name('quizzes.confirm');
+            Route::get('confirmed-results', [QuizController::class, 'confirmedResults'])
+                ->name('quizzes.confirmedResults');
+
+            // QUIZ ENROLLMENTS (admin only)
+            Route::get('enrollments', [QuizEnrollmentController::class, 'adminIndex'])
+                ->name('enrollments.index');
+            Route::post('enrollments/{enrollment}/approve', [QuizEnrollmentController::class, 'approve'])
+                ->name('enrollments.approve');
+            Route::post('enrollments/{enrollment}/reject', [QuizEnrollmentController::class, 'reject'])
+                ->name('enrollments.reject');
+            Route::post('quizzes/{quiz}/enrollments/reopen/{user}', [QuizEnrollmentController::class, 'reopen'])
+                ->name('enrollments.reopen');
 
             // Ruoli & Permessi
             Route::get('roles', [RolePermissionController::class, 'index'])

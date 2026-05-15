@@ -19,13 +19,20 @@
     @enderror
 </div>
 
+@if(auth()->user()->isAdmin())
 <div class="sg-form-group">
-    <label class="sg-form-check">
-        <input type="checkbox" name="is_active"
-            {{ old('is_active', $quiz->is_active ?? true) ? 'checked' : '' }}>
-        <span>Quiz attivo</span>
-    </label>
+    <label class="sg-form-label">Stato iniziale</label>
+    <select name="status" class="sg-form-control">
+        @foreach([\App\Models\Quiz::STATUS_DRAFT => 'Bozza', \App\Models\Quiz::STATUS_PUBLISHED => 'Pubblicato'] as $value => $label)
+            <option value="{{ $value }}"
+                @selected(old('status', $quiz->status ?? \App\Models\Quiz::STATUS_DRAFT) === $value)>
+                {{ $label }}
+            </option>
+        @endforeach
+    </select>
+    <small class="sg-form-hint">La conferma può essere applicata solo dopo la creazione, dalla lista.</small>
 </div>
+@endif
 
 <div class="sg-form-group">
     <label class="sg-form-label">Domande</label>

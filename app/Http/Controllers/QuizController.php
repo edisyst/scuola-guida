@@ -8,12 +8,17 @@ use App\Http\Requests\StoreQuizRequest;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizResult;
+use App\Services\QuizEnrollmentService;
 use App\Services\QuizService;
 use Illuminate\Http\Request;
+use RuntimeException;
 
 class QuizController extends Controller
 {
-    public function __construct(private QuizService $service) {}
+    public function __construct(
+        private QuizService $service,
+        private QuizEnrollmentService $enrollmentService,
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -49,9 +54,58 @@ class QuizController extends Controller
     {
         abort_unless(auth()->user()->canDeleteQuiz(), 403);
 
+        if ($quiz->isLocked()) {
+            return back()->with('error', 'Quiz confermato: non è possibile eliminarlo.');
+        }
+
         $quiz->delete();
 
         return back()->with('success', 'Quiz eliminato');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATE TRANSITIONS (admin only)
+    |--------------------------------------------------------------------------
+    */
+
+    public function publish(Quiz $quiz)
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        try {
+            $this->service->publish($quiz);
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Quiz pubblicato.');
+    }
+
+    public function unpublish(Quiz $quiz)
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        try {
+            $this->service->unpublish($quiz);
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Quiz riportato in bozza.');
+    }
+
+    public function confirm(Quiz $quiz)
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        try {
+            $this->service->confirm($quiz, auth()->id());
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Quiz confermato. Non sarà più modificabile.');
     }
 
     /*
@@ -69,7 +123,11 @@ class QuizController extends Controller
 
     public function reorder(Request $request, Quiz $quiz)
     {
-        $this->service->reorderQuestions($quiz, $request->input('ids', []));
+        try {
+            $this->service->reorderQuestions($quiz, $request->input('ids', []));
+        } catch (RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
 
         return response()->json(['success' => true]);
     }
@@ -92,7 +150,11 @@ class QuizController extends Controller
 
     public function addQuestion(Request $request, Quiz $quiz)
     {
-        $result = $this->service->addQuestion($quiz, (int) $request->question_id);
+        try {
+            $result = $this->service->addQuestion($quiz, (int) $request->question_id);
+        } catch (RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
 
         if (!$result['ok']) {
             return response()->json(['error' => $result['error']], 422);
@@ -103,7 +165,11 @@ class QuizController extends Controller
 
     public function removeQuestion(Request $request, Quiz $quiz)
     {
-        $current = $this->service->removeQuestion($quiz, (int) $request->question_id);
+        try {
+            $current = $this->service->removeQuestion($quiz, (int) $request->question_id);
+        } catch (RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
 
         return response()->json(['current' => $current]);
     }
@@ -129,7 +195,29 @@ class QuizController extends Controller
 
     public function play(Quiz $quiz)
     {
-        $session = $this->service->startPlay($quiz, auth()->id());
+        $user = auth()->user();
+
+        $enrollment   = null;
+        $enrollmentId = null;
+
+        if ($quiz->isConfirmed()) {
+            $enrollment = $this->enrollmentService->activeFor($quiz, $user);
+
+            if (!$enrollment || !$enrollment->isApproved()) {
+                abort(403, 'Per svolgere questo quiz serve un\'iscrizione approvata.');
+            }
+
+            $enrollmentId = $enrollment->id;
+        } elseif ($quiz->isDraft()) {
+            abort_unless($user->canEditQuiz() || $user->isAdmin(), 403);
+        }
+
+        $session = $this->service->startPlay($quiz, $user->id, $enrollmentId);
+
+        // Consuma subito l'iscrizione: il viewer può svolgere il quiz una sola volta.
+        if ($enrollment) {
+            $this->enrollmentService->markCompleted($enrollment, $session['attempt']);
+        }
 
         return view('quiz.play', [
             'quiz'          => $quiz,
@@ -161,6 +249,19 @@ class QuizController extends Controller
         return view('quiz.results', compact('results'));
     }
 
+    public function confirmedResults()
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        $attempts = \App\Models\QuizAttempt::with(['quiz', 'user', 'enrollment'])
+            ->whereHas('quiz', fn ($q) => $q->where('status', Quiz::STATUS_CONFIRMED))
+            ->whereNotNull('quiz_enrollment_id')
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.quizzes.confirmed-results', compact('attempts'));
+    }
+
     /*
     |--------------------------------------------------------------------------
     | BULK ACTIONS METHODS
@@ -171,7 +272,14 @@ class QuizController extends Controller
     {
         abort_unless(auth()->user()->canBulkQuiz(), 403);
 
-        $result = $this->service->fillWithRandom($quiz);
+        try {
+            $result = $this->service->fillWithRandom($quiz);
+        } catch (RuntimeException $e) {
+            if (request()->wantsJson()) {
+                return response()->json(['error' => $e->getMessage()], 422);
+            }
+            return back()->with('error', $e->getMessage());
+        }
 
         if (request()->wantsJson()) {
             if (!$result['ok']) {
@@ -192,13 +300,16 @@ class QuizController extends Controller
     {
         abort_unless(auth()->user()->canEditQuiz(), 403);
 
+        if ($quiz->isLocked()) {
+            return response()->json([
+                'error' => 'Il quiz è confermato e non può essere modificato.',
+            ], 422);
+        }
+
         $data = $request->validate([
             'title'         => 'required|string|max:255',
-            'is_active'     => 'boolean',
             'max_questions' => 'required|integer|min:1|max:100',
         ]);
-
-        $data['is_active'] = $request->boolean('is_active');
 
         $currentCount = $quiz->questions()->count();
         if ($data['max_questions'] < $currentCount) {
@@ -214,12 +325,16 @@ class QuizController extends Controller
 
     public function bulkAdd(BulkQuizQuestionsRequest $request, Quiz $quiz)
     {
-        $result = $this->service->bulkAddQuestions(
-            $quiz,
-            $request->input('mode', 'selection'),
-            $request->input('ids', []),
-            $request->input('category_id'),
-        );
+        try {
+            $result = $this->service->bulkAddQuestions(
+                $quiz,
+                $request->input('mode', 'selection'),
+                $request->input('ids', []),
+                $request->input('category_id'),
+            );
+        } catch (RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
 
         if (!$result['ok']) {
             return response()->json(['error' => $result['error']], 422);
@@ -233,12 +348,16 @@ class QuizController extends Controller
 
     public function bulkRemove(BulkQuizQuestionsRequest $request, Quiz $quiz)
     {
-        $current = $this->service->bulkRemoveQuestions(
-            $quiz,
-            $request->input('mode', 'selection'),
-            $request->input('ids', []),
-            $request->input('category_id'),
-        );
+        try {
+            $current = $this->service->bulkRemoveQuestions(
+                $quiz,
+                $request->input('mode', 'selection'),
+                $request->input('ids', []),
+                $request->input('category_id'),
+            );
+        } catch (RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
 
         return response()->json(['current' => $current]);
     }

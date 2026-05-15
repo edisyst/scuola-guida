@@ -335,6 +335,20 @@ return [
             'key'   => 'quiz-attempts',
         ],
         [
+            'text' => 'Quiz disponibili',
+            'url'  => 'quiz/confirmed',
+            'icon' => 'fas fa-clipboard-check',
+            'can'  => 'viewer-quiz-area',
+            'key'  => 'quiz-confirmed',
+        ],
+        [
+            'text' => 'Le mie iscrizioni',
+            'url'  => 'quiz/enrollments',
+            'icon' => 'fas fa-list-check',
+            'can'  => 'viewer-quiz-area',
+            'key'  => 'quiz-enrollments-mine',
+        ],
+        [
             'text' => 'Dashboard',
             'url'  => 'admin/dashboard',
             'icon' => 'fas fa-home',
@@ -380,6 +394,20 @@ return [
             'url'  => 'admin/quizzes',
             'icon' => 'fas fa-check',
             'key'  => 'quizzes',
+        ],
+        [
+            'text' => 'Iscrizioni quiz',
+            'url'  => 'admin/enrollments',
+            'icon' => 'fas fa-user-check',
+            'can'  => 'admin-only',
+            'key'  => 'enrollments',
+        ],
+        [
+            'text' => 'Esiti quiz confermati',
+            'url'  => 'admin/confirmed-results',
+            'icon' => 'fas fa-trophy',
+            'can'  => 'admin-only',
+            'key'  => 'confirmed-results',
         ],
         ['header' => 'account_settings'],
         [

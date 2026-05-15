@@ -36,7 +36,12 @@
       "PowerShell(php -l app/Services/UserStatsService.php; php -l app/Http/Controllers/UserStatsController.php; php -l app/Models/QuizAttempt.php)",
       "PowerShell(php artisan view:clear; php artisan config:clear)",
       "PowerShell(php artisan test --filter=UserStatsTest 2>&1)",
-      "PowerShell(php artisan test 2>&1)"
+      "PowerShell(php artisan test 2>&1)",
+      "Bash(git -C \"C:/laragon/www/scuola-guida\" status)",
+      "Bash(git -C \"C:/laragon/www/scuola-guida\" diff README.md)",
+      "Bash(git -C \"C:/laragon/www/scuola-guida\" add README.md)",
+      "Bash(git -C C:/laragon/www/scuola-guida commit -m ' *)",
+      "Bash(git *)"
     ]
   }
 }

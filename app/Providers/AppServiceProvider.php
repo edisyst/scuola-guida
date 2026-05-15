@@ -90,6 +90,11 @@ class AppServiceProvider extends ServiceProvider
                 || $user->canManageUser();
         });
 
+        // 🔥 Menu iscrizioni quiz lato viewer (l'editor è escluso dalla feature)
+        Gate::define('viewer-quiz-area', function (User $user) {
+            return $user->isViewer() || $user->isAdmin();
+        });
+
         /*
         |--------------------------------------------------------------------------
         | VIEW COMPOSER ADMINLTE
