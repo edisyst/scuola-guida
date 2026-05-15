@@ -24,7 +24,7 @@
 
             <div class="sg-text-center sg-mb-3">
                 <span class="sg-label">Punteggio</span>
-                <div style="font-size:3rem;font-weight:800;line-height:1;color:var(--sg-text);font-variant-numeric:tabular-nums;">
+                <div class="sg-score-display">
                     {{ $attempt->score }}<span class="sg-text-muted" style="font-size:1.6rem;font-weight:600;"> / {{ $attempt->total_questions }}</span>
                 </div>
                 <p class="sg-text-muted sg-mt-1 sg-mb-0">{{ $attempt->percentage }}% di risposte corrette</p>

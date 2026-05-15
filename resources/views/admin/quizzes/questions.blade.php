@@ -17,6 +17,14 @@
         background: var(--sg-bg-soft);
         box-shadow: var(--sg-shadow-card);
     }
+    body.dark-mode #sortable-questions li {
+        background: #2d3436;
+        border-color: #495057;
+        color: #f8f9fa;
+    }
+    body.dark-mode #sortable-questions li:hover {
+        background: #3d4349;
+    }
     .index-badge {
         min-width: 28px;
         text-align: center;

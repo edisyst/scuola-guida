@@ -34,7 +34,7 @@
                         @endif
                     </div>
                 </div>
-                <div class="modal-footer" style="border-top:1px solid var(--sg-border-light);">
+                <div class="modal-footer">
                     <button type="button" class="sg-btn sg-btn-light" data-dismiss="modal">{{ __('Annulla') }}</button>
                     <button type="submit" class="sg-btn sg-btn-danger">
                         <i class="fas fa-trash"></i> {{ __('Elimina account') }}

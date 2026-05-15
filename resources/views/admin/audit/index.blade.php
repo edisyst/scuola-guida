@@ -34,8 +34,8 @@
                             <span class="sg-badge sg-badge-info">{{ $log->event }}</span>
                         </td>
                         <td>{{ class_basename($log->model_type) }} #{{ $log->model_id }}</td>
-                        <td><pre style="margin:0;font-size:.75rem;max-width:280px;overflow:auto;background:var(--sg-bg-soft);padding:8px;border-radius:6px;">{{ json_encode($log->old_values, JSON_PRETTY_PRINT) }}</pre></td>
-                        <td><pre style="margin:0;font-size:.75rem;max-width:280px;overflow:auto;background:var(--sg-bg-soft);padding:8px;border-radius:6px;">{{ json_encode($log->new_values, JSON_PRETTY_PRINT) }}</pre></td>
+                        <td><pre class="sg-pre">{{ json_encode($log->old_values, JSON_PRETTY_PRINT) }}</pre></td>
+                        <td><pre class="sg-pre">{{ json_encode($log->new_values, JSON_PRETTY_PRINT) }}</pre></td>
                         <td class="sg-text-muted">{{ $log->created_at }}</td>
                     </tr>
                 @empty

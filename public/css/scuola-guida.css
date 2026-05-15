@@ -1453,3 +1453,211 @@ body.dark-mode .alert-info {
     border-color: #0c5460;
     color: #5dd;
 }
+
+/* ============================================================
+   DARK MODE — estensioni: contrasto e copertura totale
+   ============================================================ */
+
+/* Testi & link */
+body.dark-mode .sg-text-muted { color: #adb5bd !important; }
+body.dark-mode .sg-card-body { color: #e9ecef; }
+body.dark-mode .sg-card-body p,
+body.dark-mode .sg-card-body span:not([class*="badge"]):not([class*="sg-badge"]),
+body.dark-mode .sg-card-body li,
+body.dark-mode .sg-card-body strong { color: inherit; }
+
+body.dark-mode .sg-link {
+    color: #8aa9ff;
+}
+body.dark-mode .sg-link:hover { color: #b0c4ff; }
+body.dark-mode .sg-link-muted { color: #adb5bd; }
+body.dark-mode .sg-link-muted:hover { color: #f8f9fa; }
+
+/* Quiz play — testo domanda, badge, timer, dots, navigatore */
+body.dark-mode .question-card { background: #2d3436; }
+body.dark-mode #question-text { color: #f8f9fa; }
+body.dark-mode .question-badge {
+    background: #495057;
+    color: #e9ecef;
+}
+body.dark-mode #timer { color: #e9ecef; }
+body.dark-mode #timer.danger { color: #ff7a85; }
+body.dark-mode .sidebar-label { color: #adb5bd; }
+body.dark-mode .error-dot {
+    border-color: #6c757d;
+    background: transparent;
+}
+body.dark-mode .nav-btn.current {
+    border-color: #adb5bd !important;
+    box-shadow: 0 0 0 2px rgba(173, 181, 189, .25);
+}
+body.dark-mode .feedback-correct { color: #5dd678; }
+body.dark-mode .feedback-wrong   { color: #ff7a85; }
+
+/* Search highlight */
+body.dark-mode mark {
+    background: #ffd54f;
+    color: #1a1a2e;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+/* Sortable questions (quizzes/questions.blade.php) */
+body.dark-mode #sortable-questions li {
+    background: #2d3436;
+    border-color: #495057 !important;
+    color: #f8f9fa;
+}
+body.dark-mode #sortable-questions li:hover {
+    background: #3d4349;
+}
+
+/* DataTables — riga evidenziata table-success (Bootstrap) */
+body.dark-mode .content-wrapper table tbody tr.table-success,
+body.dark-mode .sg-table tbody tr.table-success {
+    background-color: rgba(40, 167, 69, .18) !important;
+}
+body.dark-mode .content-wrapper table tbody tr.table-success > td,
+body.dark-mode .sg-table tbody tr.table-success > td {
+    background-color: transparent !important;
+    color: #f8f9fa !important;
+}
+
+/* DataTables controls (info/length/filter/paginate) */
+body.dark-mode .dataTables_wrapper,
+body.dark-mode .dataTables_wrapper .dataTables_info,
+body.dark-mode .dataTables_wrapper .dataTables_length,
+body.dark-mode .dataTables_wrapper .dataTables_filter,
+body.dark-mode .dataTables_wrapper .dataTables_paginate {
+    color: #adb5bd !important;
+}
+body.dark-mode .dataTables_wrapper .dataTables_filter input,
+body.dark-mode .dataTables_wrapper .dataTables_length select {
+    background: #3d4349;
+    border: 1px solid #6c757d;
+    color: #f8f9fa;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+body.dark-mode .dataTables_wrapper .paginate_button {
+    color: #adb5bd !important;
+    background: transparent !important;
+    border-color: #495057 !important;
+}
+body.dark-mode .dataTables_wrapper .paginate_button.current,
+body.dark-mode .dataTables_wrapper .paginate_button.current:hover {
+    background: #495057 !important;
+    border-color: #6c757d !important;
+    color: #fff !important;
+}
+body.dark-mode .dataTables_wrapper .paginate_button:hover {
+    background: #3d4349 !important;
+    border-color: #6c757d !important;
+    color: #f8f9fa !important;
+}
+body.dark-mode .dataTables_wrapper .paginate_button.disabled,
+body.dark-mode .dataTables_wrapper .paginate_button.disabled:hover {
+    color: #6c757d !important;
+    background: transparent !important;
+}
+
+/* Paginazione Laravel (Bootstrap) */
+body.dark-mode .pagination .page-link {
+    background: #3d4349;
+    border-color: #495057;
+    color: #adb5bd;
+}
+body.dark-mode .pagination .page-link:hover {
+    background: #495057;
+    color: #f8f9fa;
+}
+body.dark-mode .pagination .page-item.active .page-link {
+    background: #495057;
+    border-color: #6c757d;
+    color: #fff;
+}
+body.dark-mode .pagination .page-item.disabled .page-link {
+    background: #2d3436;
+    color: #6c757d;
+    border-color: #495057;
+}
+
+/* Toggle permesso (users/form) — stato non checked */
+body.dark-mode .sg-perm-toggle .dot {
+    background: #3d4349;
+    border-color: #6c757d;
+}
+
+/* Hint speciale (es. perms-hint) */
+body.dark-mode .sg-form-section-hint { color: #b794f4; }
+
+/* Bootstrap-switch (form domande Vero/Falso) — wrapper */
+body.dark-mode .bootstrap-switch {
+    border-color: #495057;
+    background: #3d4349;
+}
+body.dark-mode .bootstrap-switch .bootstrap-switch-label {
+    background: #495057;
+    color: #f8f9fa;
+}
+
+/* Score display (quiz/attempt) */
+.sg-score-display {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--sg-text);
+    font-variant-numeric: tabular-nums;
+}
+body.dark-mode .sg-score-display { color: #f8f9fa; }
+
+/* Pre/code blocks (audit log) */
+.sg-pre {
+    margin: 0;
+    font-size: .75rem;
+    max-width: 280px;
+    overflow: auto;
+    background: var(--sg-bg-soft);
+    color: var(--sg-text);
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--sg-border-light);
+}
+body.dark-mode .sg-pre {
+    background: #1f2426;
+    color: #e9ecef;
+    border-color: #495057;
+}
+
+/* Toastr notifiche */
+body.dark-mode #toast-container > .toast-success { background-color: #1a3d25 !important; }
+body.dark-mode #toast-container > .toast-error   { background-color: #3d1418 !important; }
+body.dark-mode #toast-container > .toast-warning { background-color: #3d2e00 !important; color: #ffd454 !important; }
+body.dark-mode #toast-container > .toast-info    { background-color: #002f37 !important; }
+
+/* Modal close button generico (oltre alla regola .modal .close) */
+body.dark-mode .modal-content .close {
+    color: #f8f9fa;
+    text-shadow: none;
+    opacity: .85;
+}
+body.dark-mode .modal-content .close:hover { opacity: 1; color: #fff; }
+
+/* Welcome / sg-home: già scuro, ma garantisce contrasto se forzato in dark-mode */
+body.dark-mode .sg-home,
+body.dark-mode .sg-auth-shell { color: #fff; }
+
+/* sg-badge "neutro" (es. Bozza) */
+body.dark-mode .sg-badge:not([class*="sg-badge-"]) {
+    background: #495057;
+    color: #e9ecef;
+}
+
+/* Card-section / card-header che restano scuri ma con testo leggibile */
+body.dark-mode .sg-card-section { color: inherit; }
+
+/* Spinners / loading text dentro card scuri */
+body.dark-mode .text-danger { color: #ff7a85 !important; }
+body.dark-mode .text-warning { color: #ffd454 !important; }
+body.dark-mode .text-success { color: #5dd678 !important; }
+body.dark-mode .text-info { color: #5ddde9 !important; }
