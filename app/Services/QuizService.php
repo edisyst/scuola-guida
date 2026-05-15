@@ -23,21 +23,6 @@ class QuizService
         return $quiz;
     }
 
-    public function update(Quiz $quiz, array $data): Quiz
-    {
-        $questionIds = $data['questions'] ?? null;
-        unset($data['questions']);
-
-        $quiz->update($data);
-
-        // null = campo assente → pivot invariato; [] = zero domande selezionate → svuota pivot.
-        if ($questionIds !== null) {
-            $quiz->questions()->sync($questionIds);
-        }
-
-        return $quiz;
-    }
-
     public function createRandom(int $max = 30): Quiz
     {
         $quiz = Quiz::create([
@@ -154,6 +139,31 @@ class QuizService
         $quiz->questions()->detach($idsToRemove);
 
         return $quiz->questions()->count();
+    }
+
+    public function fillWithRandom(Quiz $quiz): array
+    {
+        $available = $quiz->max_questions - $quiz->questions()->count();
+
+        if ($available <= 0) {
+            return ['ok' => false, 'error' => 'Limite massimo già raggiunto', 'current' => $quiz->questions()->count(), 'added' => 0];
+        }
+
+        $existingIds = $quiz->questions()->pluck('questions.id');
+        $newIds = Question::whereNotIn('id', $existingIds)
+            ->inRandomOrder()
+            ->limit($available)
+            ->pluck('id');
+
+        if ($newIds->isEmpty()) {
+            return ['ok' => false, 'error' => 'Nessuna domanda disponibile da aggiungere', 'current' => $quiz->questions()->count(), 'added' => 0];
+        }
+
+        $before = $quiz->questions()->count();
+        $quiz->questions()->attach($newIds);
+        $after = $quiz->questions()->count();
+
+        return ['ok' => true, 'current' => $after, 'added' => $after - $before];
     }
 
     public function reorderQuestions(Quiz $quiz, array $orderedIds): void

@@ -73,7 +73,7 @@
     <script>
         $(document).ready(function() {
             $('#categories-table').DataTable({
-                pageLength: 10,
+                pageLength: 25,
                 order: [[0, 'desc']],
                 columnDefs: [
                     { orderable: false, targets: 4 }

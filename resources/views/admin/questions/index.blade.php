@@ -134,6 +134,7 @@
 
         $(function() {
             let table = $('#questions-table').DataTable({
+                pageLength: 25,
                 processing: true,
                 serverSide: true,
                 ajax: {

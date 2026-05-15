@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\DataTables\QuizQuestionsDataTable;
 use App\Http\Requests\BulkQuizQuestionsRequest;
 use App\Http\Requests\StoreQuizRequest;
-use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizResult;
@@ -44,31 +43,6 @@ class QuizController extends Controller
 
         return redirect()->route('admin.quizzes.index')
             ->with('success', 'Quiz creato');
-    }
-
-    public function edit(Quiz $quiz)
-    {
-        abort_unless(auth()->user()->canEditQuiz(), 403);
-
-        $currentCount = $quiz->questions()->count();
-        $max = $quiz->max_questions;
-        $questions = Question::limit(200)->get();
-
-        return view('admin.quizzes.edit', [
-            'quiz'           => $quiz,
-            'questions'      => $questions,
-            'questionsCount' => $currentCount,
-            'currentCount'   => $currentCount,
-            'max'            => $max,
-        ]);
-    }
-
-    public function update(UpdateQuizRequest $request, Quiz $quiz)
-    {
-        $this->service->update($quiz, $request->validated());
-
-        return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Quiz aggiornato');
     }
 
     public function destroy(Quiz $quiz)
@@ -192,6 +166,51 @@ class QuizController extends Controller
     | BULK ACTIONS METHODS
     |--------------------------------------------------------------------------
     */
+
+    public function fillRandom(Quiz $quiz)
+    {
+        abort_unless(auth()->user()->canBulkQuiz(), 403);
+
+        $result = $this->service->fillWithRandom($quiz);
+
+        if (request()->wantsJson()) {
+            if (!$result['ok']) {
+                return response()->json(['error' => $result['error']], 422);
+            }
+
+            return response()->json($result);
+        }
+
+        if (!$result['ok']) {
+            return back()->with('error', $result['error']);
+        }
+
+        return back()->with('success', "Aggiunte {$result['added']} domande random al quiz");
+    }
+
+    public function updateParams(Request $request, Quiz $quiz)
+    {
+        abort_unless(auth()->user()->canEditQuiz(), 403);
+
+        $data = $request->validate([
+            'title'         => 'required|string|max:255',
+            'is_active'     => 'boolean',
+            'max_questions' => 'required|integer|min:1|max:100',
+        ]);
+
+        $data['is_active'] = $request->boolean('is_active');
+
+        $currentCount = $quiz->questions()->count();
+        if ($data['max_questions'] < $currentCount) {
+            return response()->json([
+                'error' => "Il limite non può essere inferiore alle domande già presenti ($currentCount)",
+            ], 422);
+        }
+
+        $quiz->update($data);
+
+        return response()->json(['ok' => true, 'max_questions' => $quiz->fresh()->max_questions]);
+    }
 
     public function bulkAdd(BulkQuizQuestionsRequest $request, Quiz $quiz)
     {
