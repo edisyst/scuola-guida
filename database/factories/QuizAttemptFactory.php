@@ -13,14 +13,18 @@ class QuizAttemptFactory extends Factory
 {
     public function definition(): array
     {
-        return [
-            'user_id' => User::factory(),
-            'quiz_id' => Quiz::factory(),
-            'score' => rand(0, 10),
-            'total_questions' => 10,
+        $totalQuestions = $this->faker->randomElement([10, 20, 30]);
+        $score          = rand(0, $totalQuestions);
+        $timeLimit      = $totalQuestions * 60;
 
-            // 🔥 distribuzione su 30 giorni
-            'created_at' => now()->subDays(rand(0, 30)),
+        return [
+            'user_id'         => User::factory(),
+            'quiz_id'         => Quiz::factory(),
+            'score'           => $score,
+            'total_questions' => $totalQuestions,
+            'duration'        => rand(60, $timeLimit),
+            'answers'         => null,
+            'created_at'      => now()->subDays(rand(0, 30)),
         ];
     }
 }

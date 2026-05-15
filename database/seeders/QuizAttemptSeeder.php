@@ -11,27 +11,51 @@ class QuizAttemptSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::all();
-        $quizzes = Quiz::all();
+        $users   = User::all();
+        $quizzes = Quiz::with('questions')->get();
 
         if ($quizzes->isEmpty()) {
-            // fallback se non hai quiz
-            $quizzes = Quiz::factory(5)->create();
+            $this->call(QuizSeeder::class);
+            $quizzes = Quiz::with('questions')->get();
         }
 
         foreach ($users as $user) {
+            $attemptsCount = rand(3, 10);
 
-            // ogni utente fa tra 3 e 10 quiz
-            for ($i = 0; $i < rand(3, 10); $i++) {
+            for ($i = 0; $i < $attemptsCount; $i++) {
+                $quiz           = $quizzes->random();
+                $quizQuestions  = $quiz->questions;
+                $totalQuestions = $quizQuestions->count();
+
+                if ($totalQuestions === 0) {
+                    continue;
+                }
+
+                // genera una risposta casuale per ogni domanda e calcola lo score
+                $answers = [];
+                $score   = 0;
+
+                foreach ($quizQuestions as $question) {
+                    $userAnswer = fake()->randomElement([0, 1]);
+                    $answers[$question->id] = $userAnswer;
+
+                    if ($userAnswer === (int) $question->is_true) {
+                        $score++;
+                    }
+                }
 
                 QuizAttempt::create([
-                    'user_id' => $user->id,
-                    'quiz_id' => $quizzes->random()->id,
-                    'score' => rand(3, 10),
-                    'total_questions' => 10,
-                    'created_at' => now()->subDays(rand(0, 30)),
+                    'user_id'         => $user->id,
+                    'quiz_id'         => $quiz->id,
+                    'score'           => $score,
+                    'total_questions' => $totalQuestions,
+                    'duration'        => rand(60, $quiz->time_limit),
+                    'answers'         => $answers,
+                    'created_at'      => now()->subDays(rand(0, 30)),
                 ]);
             }
         }
+
+        $this->command->info('CREATI TENTATIVI QUIZ CON RISPOSTE E SCORE COERENTI');
     }
 }

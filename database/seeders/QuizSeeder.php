@@ -23,6 +23,20 @@ class QuizSeeder extends Seeder
             $questions = Question::factory(100)->recycle($categories)->create();
         }
 
-        Quiz::factory(10)->recycle($questions)->create();
+        $quizzes = Quiz::factory(10)->create();
+
+        foreach ($quizzes as $quiz) {
+            $count    = min($quiz->max_questions, $questions->count());
+            $selected = $questions->random($count);
+
+            // costruisce il pivot con il campo 'order'
+            $pivot = $selected->values()->mapWithKeys(
+                fn ($question, $index) => [$question->id => ['order' => $index + 1]]
+            );
+
+            $quiz->questions()->attach($pivot);
+        }
+
+        $this->command->info('CREATI 10 QUIZ CON DOMANDE ASSOCIATE');
     }
 }
