@@ -7,129 +7,124 @@
         </div>
     @endif
 
-    {{-- INFO CARTELLA --}}
+    {{-- TAB CARTELLE --}}
     <div class="sg-card sg-mb-3">
-        <div class="d-flex align-items-center gap-2">
-            <i class="fas fa-folder-open text-warning mr-2"></i>
-            <span class="text-muted small">Cartella attiva:</span>
-            <code class="ml-1">{{ $disk }} &rarr; {{ $directory }}</code>
-            <span class="badge badge-secondary ml-2">{{ count($files) }} file</span>
+        <div class="d-flex align-items-center" style="gap:.5rem; flex-wrap:wrap;">
+            <span class="text-muted small mr-2">
+                <i class="fas fa-folder-open text-warning mr-1"></i> Cartella:
+            </span>
+            @foreach ($folders as $key => $path)
+                <button type="button"
+                        wire:click="switchFolder('{{ $key }}')"
+                        class="btn btn-sm {{ $folder === $key ? 'btn-primary' : 'btn-outline-secondary' }}">
+                    {{ ucfirst($key) }}
+                    <span class="badge {{ $folder === $key ? 'badge-light' : 'badge-secondary' }} ml-1">
+                        {{ $folderCounts[$key] ?? 0 }}
+                    </span>
+                </button>
+            @endforeach
+            <code class="ml-auto small text-muted">{{ $disk }} &rarr; {{ $directory }}</code>
         </div>
     </div>
 
     {{-- UPLOAD --}}
     <div class="sg-card sg-mb-4">
-        <h6 class="sg-section-title mb-3"><i class="fas fa-upload mr-1"></i> Carica nuova immagine</h6>
-        <form wire:submit.prevent="upload">
-            <div class="d-flex align-items-start gap-3" style="flex-wrap:wrap; gap:.75rem;">
-                <div style="flex:1; min-width:260px;">
-                    <input type="file" wire:model="newImage" accept="image/*" class="form-control-file">
-                    @error('newImage')
-                        <div class="text-danger small mt-1">{{ $message }}</div>
-                    @enderror
-                    <div wire:loading wire:target="newImage" class="text-muted small mt-1">
-                        <i class="fas fa-spinner fa-spin"></i> Caricamento...
-                    </div>
+        <h6 class="sg-section-title mb-3">
+            <i class="fas fa-upload mr-1"></i>
+            Carica nuova immagine in <strong>{{ $folder }}</strong>
+        </h6>
+        <div class="d-flex align-items-start" style="flex-wrap:wrap; gap:.75rem;">
+            <div style="flex:1; min-width:260px;">
+                <input type="file" wire:model="newImage" accept="image/*" class="form-control">
+                @error('newImage')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                @enderror
+                <div wire:loading wire:target="newImage" class="text-muted small mt-1">
+                    <i class="fas fa-spinner fa-spin"></i> Caricamento in corso...
                 </div>
-                <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm"
-                        wire:loading.attr="disabled" wire:target="upload">
-                    <span wire:loading.remove wire:target="upload">
-                        <i class="fas fa-upload mr-1"></i> Carica
-                    </span>
-                    <span wire:loading wire:target="upload">
-                        <i class="fas fa-spinner fa-spin"></i> Caricamento...
-                    </span>
-                </button>
             </div>
-        </form>
+            <button type="button" wire:click="upload"
+                    class="sg-btn sg-btn-primary sg-btn-sm"
+                    wire:loading.attr="disabled" wire:target="upload,newImage">
+                <span wire:loading.remove wire:target="upload">
+                    <i class="fas fa-upload mr-1"></i> Carica
+                </span>
+                <span wire:loading wire:target="upload">
+                    <i class="fas fa-spinner fa-spin"></i> Caricamento...
+                </span>
+            </button>
+        </div>
     </div>
 
     {{-- GRIGLIA FILE --}}
     @if (count($files) === 0)
-        <div class="sg-card text-center text-muted py-4">
+        <div class="sg-card text-center text-muted py-5">
             <i class="fas fa-images fa-2x mb-2 d-block"></i>
-            Nessuna immagine nella cartella.
+            Nessuna immagine nella cartella <strong>{{ $folder }}</strong>.
         </div>
     @else
-        <div class="sg-card">
-            <div class="table-responsive">
-                <table class="table table-sm table-hover mb-0">
-                    <thead class="thead-light">
-                        <tr>
-                            <th style="width:80px"></th>
-                            <th>Nome file</th>
-                            <th>Dimensione</th>
-                            <th>Domande</th>
-                            <th class="text-right">Azioni</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($files as $file)
-                        <tr wire:key="{{ $file['path'] }}">
-                            {{-- ANTEPRIMA --}}
-                            <td class="align-middle">
-                                <img src="{{ $file['url'] }}" alt="{{ $file['name'] }}"
-                                     style="width:60px; height:45px; object-fit:cover; border-radius:4px; border:1px solid #dee2e6;">
-                            </td>
+        <div class="row" style="row-gap:1rem;">
+            @foreach ($files as $file)
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2" wire:key="{{ $file['path'] }}">
+                    <div class="sg-card h-100 p-2 d-flex flex-column" style="gap:.5rem;">
 
-                            {{-- NOME / RENAME INLINE --}}
-                            <td class="align-middle">
-                                @if ($renamingFile === $file['path'])
-                                    <div class="d-flex align-items-center" style="gap:.4rem;">
-                                        <input type="text"
-                                               wire:model.defer="newName"
-                                               class="form-control form-control-sm @error('newName') is-invalid @enderror"
-                                               style="max-width:200px;"
-                                               wire:keydown.enter="rename"
-                                               wire:keydown.escape="cancelRename"
-                                               autofocus>
-                                        <button wire:click="rename" class="btn btn-sm btn-success" title="Conferma">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button wire:click="cancelRename" class="btn btn-sm btn-secondary" title="Annulla">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                    @error('newName')
-                                        <div class="text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                @else
-                                    <span class="font-weight-medium">{{ $file['name'] }}</span>
-                                @endif
-                            </td>
+                        {{-- ANTEPRIMA --}}
+                        <div style="aspect-ratio:4/3; background:#f4f6f8; border-radius:var(--sg-radius-sm); overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                            <img src="{{ $file['url'] }}" alt="{{ $file['name'] }}"
+                                 style="max-width:100%; max-height:100%; object-fit:contain;">
+                        </div>
 
-                            {{-- DIMENSIONE --}}
-                            <td class="align-middle text-muted small">{{ $file['size'] }}</td>
-
-                            {{-- RIFERIMENTI --}}
-                            <td class="align-middle">
-                                @if ($file['refs'] > 0)
-                                    <span class="badge badge-info" title="Domande che usano questa immagine">
-                                        {{ $file['refs'] }}
-                                    </span>
-                                @else
-                                    <span class="text-muted small">—</span>
-                                @endif
-                            </td>
+                        {{-- NOME / RENAME INLINE --}}
+                        @if ($renamingFile === $file['path'])
+                            <div>
+                                <input type="text"
+                                       wire:model.defer="newName"
+                                       class="form-control form-control-sm @error('newName') is-invalid @enderror"
+                                       wire:keydown.enter="rename"
+                                       wire:keydown.escape="cancelRename"
+                                       autofocus>
+                                @error('newName')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                                <div class="d-flex mt-1" style="gap:.25rem;">
+                                    <button wire:click="rename" class="btn btn-sm btn-success flex-fill" title="Conferma">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button wire:click="cancelRename" class="btn btn-sm btn-secondary flex-fill" title="Annulla">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-center" title="{{ $file['name'] }}"
+                                 style="font-size:.8rem; word-break:break-all; line-height:1.2;">
+                                <div class="font-weight-medium text-truncate">{{ $file['name'] }}</div>
+                                <div class="text-muted" style="font-size:.7rem;">
+                                    {{ $file['size'] }}
+                                    @if ($file['refs'] > 0)
+                                        &middot;
+                                        <span class="badge badge-info" title="Domande che usano questa immagine">
+                                            {{ $file['refs'] }} {{ $file['refs'] === 1 ? 'ref' : 'refs' }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
 
                             {{-- AZIONI --}}
-                            <td class="align-middle text-right">
-                                @if ($renamingFile !== $file['path'])
-                                    <button wire:click="startRename('{{ $file['path'] }}')"
-                                            class="btn btn-sm btn-outline-secondary mr-1" title="Rinomina">
-                                        <i class="fas fa-pen"></i>
-                                    </button>
-                                    <button wire:click="confirmDelete('{{ $file['path'] }}')"
-                                            class="btn btn-sm btn-outline-danger" title="Elimina">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                            <div class="d-flex mt-auto" style="gap:.25rem;">
+                                <button wire:click="startRename('{{ $file['path'] }}')"
+                                        class="btn btn-sm btn-outline-secondary flex-fill" title="Rinomina">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button wire:click="confirmDelete('{{ $file['path'] }}')"
+                                        class="btn btn-sm btn-outline-danger flex-fill" title="Elimina">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
         </div>
     @endif
 

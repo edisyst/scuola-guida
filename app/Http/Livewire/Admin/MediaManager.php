@@ -11,6 +11,9 @@ class MediaManager extends Component
 {
     use WithFileUploads;
 
+    /** Cartella attiva: 'test' o 'production'. */
+    public string $folder = 'test';
+
     public $newImage;
 
     public ?string $renamingFile = null;
@@ -35,16 +38,54 @@ class MediaManager extends Component
         'newName.regex'     => 'Nome non valido (solo lettere, numeri, trattini, underscore e un\'estensione).',
     ];
 
+    public function mount(): void
+    {
+        if (! array_key_exists($this->folder, config('media.directories', []))) {
+            $this->folder = array_key_first(config('media.directories'));
+        }
+    }
+
+    public function switchFolder(string $folder): void
+    {
+        if (! array_key_exists($folder, config('media.directories', []))) {
+            return;
+        }
+
+        $this->folder = $folder;
+        $this->cancelRename();
+        $this->cancelDelete();
+        $this->reset('newImage');
+        $this->resetErrorBag();
+    }
+
+    /** Percorso (relativo al disco) della cartella attualmente selezionata. */
+    public function getDirectoryProperty(): string
+    {
+        return config('media.directories.' . $this->folder);
+    }
+
+    /** Conteggi file per cartella, per popolare le tab. */
+    public function getFolderCountsProperty(): array
+    {
+        $disk   = config('media.disk');
+        $counts = [];
+
+        foreach (config('media.directories', []) as $key => $dir) {
+            $this->ensureDirectory($dir);
+            $counts[$key] = $this->imageFiles($disk, $dir)->count();
+        }
+
+        return $counts;
+    }
+
     public function getFilesProperty(): array
     {
         $disk = config('media.disk');
-        $dir  = config('media.directory');
+        $dir  = $this->directory;
 
-        if (! Storage::disk($disk)->exists($dir)) {
-            Storage::disk($disk)->makeDirectory($dir);
-        }
+        $this->ensureDirectory($dir);
 
-        return collect(Storage::disk($disk)->files($dir))
+        return $this->imageFiles($disk, $dir)
             ->map(fn ($path) => [
                 'path' => $path,
                 'name' => basename($path),
@@ -52,8 +93,18 @@ class MediaManager extends Component
                 'size' => $this->humanSize(Storage::disk($disk)->size($path)),
                 'refs' => Question::where('image', $path)->count(),
             ])
+            ->sortBy('name')
             ->values()
             ->toArray();
+    }
+
+    /** Solo file con estensione immagine; esclude .gitkeep e affini. */
+    private function imageFiles(string $disk, string $dir): \Illuminate\Support\Collection
+    {
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        return collect(Storage::disk($disk)->files($dir))
+            ->filter(fn ($path) => in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), $allowed, true));
     }
 
     public function upload(): void
@@ -61,7 +112,7 @@ class MediaManager extends Component
         $this->validateOnly('newImage');
 
         $disk = config('media.disk');
-        $dir  = config('media.directory');
+        $dir  = $this->directory;
         $name = $this->newImage->getClientOriginalName();
 
         if (Storage::disk($disk)->exists("{$dir}/{$name}")) {
@@ -71,7 +122,7 @@ class MediaManager extends Component
 
         $this->newImage->storeAs($dir, $name, $disk);
         $this->reset('newImage');
-        session()->flash('media_success', "Immagine «{$name}» caricata.");
+        session()->flash('media_success', "Immagine «{$name}» caricata in {$this->folder}.");
     }
 
     public function startRename(string $path): void
@@ -92,7 +143,7 @@ class MediaManager extends Component
         $this->validateOnly('newName');
 
         $disk    = config('media.disk');
-        $dir     = config('media.directory');
+        $dir     = $this->directory;
         $oldPath = $this->renamingFile;
         $newPath = "{$dir}/{$this->newName}";
 
@@ -143,10 +194,21 @@ class MediaManager extends Component
     public function render()
     {
         return view('livewire.admin.media-manager', [
-            'files'     => $this->files,
-            'directory' => config('media.directory'),
-            'disk'      => config('media.disk'),
+            'files'        => $this->files,
+            'directory'    => $this->directory,
+            'disk'         => config('media.disk'),
+            'folders'      => config('media.directories', []),
+            'folderCounts' => $this->folderCounts,
         ]);
+    }
+
+    private function ensureDirectory(string $dir): void
+    {
+        $disk = config('media.disk');
+
+        if (! Storage::disk($disk)->exists($dir)) {
+            Storage::disk($disk)->makeDirectory($dir);
+        }
     }
 
     private function humanSize(int $bytes): string

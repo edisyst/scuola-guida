@@ -14,10 +14,11 @@ class UpdateQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'required|exists:categories,id',
-            'question'    => 'required|string',
-            'is_true'     => 'boolean',
-            'image'       => 'nullable|image|max:2048',
+            'category_id'  => 'required|exists:categories,id',
+            'question'     => 'required|string',
+            'is_true'      => 'boolean',
+            'image'        => 'nullable|image|max:2048',
+            'remove_image' => 'boolean',
         ];
     }
 
@@ -25,7 +26,8 @@ class UpdateQuestionRequest extends FormRequest
     {
         // Un checkbox non spuntato non è presente nel payload; boolean() lo normalizza a false.
         $this->merge([
-            'is_true' => $this->boolean('is_true'),
+            'is_true'      => $this->boolean('is_true'),
+            'remove_image' => $this->boolean('remove_image'),
         ]);
     }
 }

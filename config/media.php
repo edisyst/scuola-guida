@@ -9,11 +9,19 @@ return [
     'disk' => env('MEDIA_DISK', 'public'),
 
     /*
-    | Cartella relativa al disco dove vengono salvate le immagini delle domande.
-    | Valori consigliati:
-    |   local/test  -> questions/images/test
-    |   production  -> questions/images
+    | Cartelle gestite dal Media Manager.
+    |   test       -> immagini usate dai seeder in locale
+    |   production -> immagini reali utilizzate in produzione
     */
-    'directory' => env('MEDIA_IMAGE_DIR', 'questions/images/test'),
+    'directories' => [
+        'test'       => 'questions/images/test',
+        'production' => 'questions/images/production',
+    ],
+
+    /*
+    | Cartella attiva: quella in cui finiscono le immagini caricate dal form
+    | di creazione/modifica domanda. In locale conviene 'test', in produzione 'production'.
+    */
+    'active' => env('MEDIA_ACTIVE_DIR', 'test'),
 
 ];
