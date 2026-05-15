@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $isAdminView ? "Statistiche di {$user->name}" : 'Le mie statistiche')
+@section('title', $isAdminView ? "Statistiche di {$user->name}" : 'Dashboard')
 
 @section('content_header')@endsection
 
@@ -11,7 +11,7 @@
         <div>
             <p class="sg-header-subtitle">
                 @if($isAdminView)
-                    Dashboard statistiche — vista admin
+                    Statistiche — vista admin
                 @else
                     La tua dashboard personale
                 @endif
@@ -21,7 +21,7 @@
                 @if($isAdminView)
                     Statistiche di {{ $user->name }}
                 @else
-                    Le mie statistiche
+                    Dashboard
                 @endif
             </h1>
             <p class="sg-text-muted sg-mt-1">
@@ -37,7 +37,7 @@
                     <i class="fas fa-arrow-left"></i> Torna agli utenti
                 </a>
             @endif
-            <form method="POST" action="{{ route('stats.refresh', $user) }}" style="display:inline;">
+            <form method="POST" action="{{ route('dashboard.refresh', $user) }}" style="display:inline;">
                 @csrf
                 @if($isAdminView)
                     <input type="hidden" name="as_admin" value="1">

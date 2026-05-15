@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard Admin')
+@section('title', 'Statistiche')
 
 @section('content_header')@endsection
 
@@ -9,7 +9,7 @@
 
     <div class="sg-header">
         <p class="sg-header-subtitle">Panoramica</p>
-        <h1 class="sg-header-title">Dashboard Admin</h1>
+        <h1 class="sg-header-title">Statistiche</h1>
     </div>
 
     {{-- KPI BOX --}}

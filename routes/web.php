@@ -42,10 +42,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('quiz/enrollments', [QuizEnrollmentController::class, 'myEnrollments'])
         ->name('quiz.enrollments.mine');
 
-    // Dashboard personale stats utente
-    Route::get('stats', [UserStatsController::class, 'me'])->name('stats.me');
-    Route::post('stats/{user}/refresh', [UserStatsController::class, 'refresh'])
-        ->name('stats.refresh');
+    // Dashboard personale utente
+    Route::get('dashboard', [UserStatsController::class, 'me'])->name('dashboard');
+    Route::post('dashboard/{user}/refresh', [UserStatsController::class, 'refresh'])
+        ->name('dashboard.refresh');
 
     // Storico tentativi — solo i propri
     Route::get('quiz/attempts', [QuizAttemptController::class, 'index'])->name('quiz.attempts.index');
@@ -130,8 +130,8 @@ Route::middleware(['auth'])
             // MEDIA MANAGER
             Route::get('media', fn () => view('admin.media.index'))->name('media.index');
 
-            Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
-                ->name('dashboard');
+            Route::get('stats', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
+                ->name('stats');
 
             Route::get('audit-logs', function () {
                 $logs = \App\Models\AuditLog::with('user')->latest()->paginate(20);
@@ -168,10 +168,5 @@ Route::middleware(['auth'])
                 ->name('roles.update');
         });
     });
-
-// Dashboard Breeze (legacy)
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/auth.php';

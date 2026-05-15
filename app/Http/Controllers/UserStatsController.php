@@ -57,7 +57,7 @@ class UserStatsController extends Controller
 
         $back = $request->boolean('as_admin')
             ? route('admin.users.stats', $user)
-            : ($isSelf ? route('stats.me') : route('admin.users.stats', $user));
+            : ($isSelf ? route('dashboard') : route('admin.users.stats', $user));
 
         return redirect($back)->with('success', 'Statistiche aggiornate');
     }

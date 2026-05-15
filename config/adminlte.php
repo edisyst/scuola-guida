@@ -326,10 +326,10 @@ return [
         // ── AREA PERSONALE (tutti i ruoli) ──────────────────────────────────
         ['header' => 'area_personale'],
         [
-            'text'  => 'Le mie statistiche',
-            'url'   => 'stats',
-            'icon'  => 'fas fa-chart-line',
-            'key'   => 'stats-me',
+            'text'  => 'Dashboard',
+            'url'   => 'dashboard',
+            'icon'  => 'fas fa-tachometer-alt',
+            'key'   => 'dashboard',
         ],
         [
             'text'  => 'I miei tentativi',
@@ -396,9 +396,9 @@ return [
         // ── AMMINISTRAZIONE (solo admin) ─────────────────────────────────────
         ['header' => 'amministrazione', 'can' => 'admin-only'],
         [
-            'text' => 'Dashboard',
-            'url'  => 'admin/dashboard',
-            'icon' => 'fas fa-tachometer-alt',
+            'text' => 'Statistiche',
+            'url'  => 'admin/stats',
+            'icon' => 'fas fa-chart-bar',
             'can'  => 'admin-only',
         ],
         [

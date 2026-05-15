@@ -37,10 +37,10 @@ class UserStatsTest extends TestCase
             ['score' => 10, 'created_at' => now()],             // 100% pass
         ]);
 
-        $response = $this->actingAs($user)->get(route('stats.me'));
+        $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Le mie statistiche');
+        $response->assertSee('Dashboard');
         $response->assertSee('Quiz Demo');
         $response->assertSee('Tentativi totali');
         // 3 tentativi totali
@@ -51,7 +51,7 @@ class UserStatsTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get(route('stats.me'));
+        $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertOk();
         $response->assertSee('Nessun tentativo registrato');
@@ -174,7 +174,7 @@ class UserStatsTest extends TestCase
 
     public function test_guest_is_redirected_from_stats(): void
     {
-        $response = $this->get(route('stats.me'));
+        $response = $this->get(route('dashboard'));
 
         $response->assertRedirect(route('login'));
     }
@@ -192,9 +192,9 @@ class UserStatsTest extends TestCase
         $service->get($user);
         $this->assertTrue(Cache::has(UserStatsService::cacheKey($user->id)));
 
-        $response = $this->actingAs($user)->post(route('stats.refresh', $user));
+        $response = $this->actingAs($user)->post(route('dashboard.refresh', $user));
 
-        $response->assertRedirect(route('stats.me'));
+        $response->assertRedirect(route('dashboard'));
         $this->assertFalse(Cache::has(UserStatsService::cacheKey($user->id)));
     }
 
