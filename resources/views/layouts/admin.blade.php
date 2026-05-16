@@ -55,6 +55,17 @@
             @endif
 
         });
+
+        // Intercettiamo il submit della ricerca navbar: apriamo i risultati
+        // in una nuova scheda e costruiamo l'URL noi (il form di AdminLTE
+        // include _token nel GET e l'action potrebbe non essere impostata).
+        $(document).on('submit', '.navbar-search-block form', function (e) {
+            e.preventDefault();
+            var q = $(this).find('input[type="search"]').val().trim();
+            if (q) {
+                window.open('{{ route("search") }}?q=' + encodeURIComponent(q), '_blank');
+            }
+        });
     </script>
     @livewireScripts
 @stop
