@@ -110,6 +110,9 @@ class AppServiceProvider extends ServiceProvider
                     'categories' => Category::count(),
                     'quizzes' => Quiz::count(),
                     'audit' => AuditLog::count(),
+                    'pending_registrations' => User::where('role', User::ROLE_VIEWER)
+                        ->where('registration_status', User::REG_PENDING)
+                        ->count(),
                 ];
             });
 
@@ -142,6 +145,13 @@ class AppServiceProvider extends ServiceProvider
                     case 'audit':
                         $item['label'] = $counts['audit'];
                         $item['label_color'] = 'danger';
+                        break;
+
+                    case 'registrations':
+                        if ($counts['pending_registrations'] > 0) {
+                            $item['label'] = $counts['pending_registrations'];
+                            $item['label_color'] = 'warning';
+                        }
                         break;
                 }
 

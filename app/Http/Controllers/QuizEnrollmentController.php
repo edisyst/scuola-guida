@@ -37,7 +37,9 @@ class QuizEnrollmentController extends Controller
             ->get()
             ->groupBy('quiz_id');
 
-        return view('quiz.confirmed.index', compact('quizzes', 'enrollments'));
+        $canEnroll = !$user->isViewer() || $user->canEnrollOfficialExams();
+
+        return view('quiz.confirmed.index', compact('quizzes', 'enrollments', 'canEnroll', 'user'));
     }
 
     /**

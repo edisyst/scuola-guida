@@ -379,6 +379,13 @@ return [
         // ── GESTIONE QUIZ (solo admin) ───────────────────────────────────────
         ['header' => 'gestione_quiz', 'can' => 'admin-only'],
         [
+            'text' => 'Iscrizioni anagrafiche',
+            'url'  => 'admin/registrations',
+            'icon' => 'fas fa-id-card',
+            'can'  => 'admin-only',
+            'key'  => 'registrations',
+        ],
+        [
             'text' => 'Iscrizioni quiz',
             'url'  => 'admin/enrollments',
             'icon' => 'fas fa-user-check',

@@ -26,6 +26,20 @@
         </div>
     </div>
 
+    @if($user->requiresRegistration())
+        <div class="sg-card sg-mb-3">
+            <div class="sg-card-header sg-flex-between">
+                <h2 class="sg-card-header-title">
+                    <i class="fas fa-id-card mr-2"></i> Iscrizione esami ufficiali
+                </h2>
+                @include('profile.partials.registration-status-badge', ['user' => $user])
+            </div>
+            <div class="sg-card-body">
+                @include('profile.partials.registration-form')
+            </div>
+        </div>
+    @endif
+
     <div class="sg-card sg-mb-3">
         <div class="sg-card-header">
             <h2 class="sg-card-header-title">Aggiorna password</h2>

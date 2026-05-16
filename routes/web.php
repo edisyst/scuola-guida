@@ -7,6 +7,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\QuizEnrollmentController;
+use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\RolePermissionController;
@@ -27,6 +28,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Iscrizione anagrafica viewer (invio dati per esami ufficiali)
+    Route::post('/profile/registration', [RegistrationController::class, 'submit'])
+        ->name('profile.registration.submit');
 
     // Quiz: gioca (viewer / user)
     Route::get('quiz/random-play', [QuizController::class, 'randomPlay'])->name('quiz.random');
@@ -166,6 +171,16 @@ Route::middleware(['auth'])
                 ->name('roles.index');
             Route::put('roles', [RolePermissionController::class, 'update'])
                 ->name('roles.update');
+
+            // ISCRIZIONI ANAGRAFICHE (richieste viewer)
+            Route::get('registrations', [\App\Http\Controllers\Admin\RegistrationController::class, 'index'])
+                ->name('registrations.index');
+            Route::get('registrations/{user}', [\App\Http\Controllers\Admin\RegistrationController::class, 'show'])
+                ->name('registrations.show');
+            Route::post('registrations/{user}/approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'approve'])
+                ->name('registrations.approve');
+            Route::post('registrations/{user}/reject', [\App\Http\Controllers\Admin\RegistrationController::class, 'reject'])
+                ->name('registrations.reject');
         });
     });
 

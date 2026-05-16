@@ -18,6 +18,28 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
+    | STATI ISCRIZIONE DEFINITIVA (viewer)
+    |--------------------------------------------------------------------------
+    | Solo i viewer hanno un ciclo di iscrizione anagrafica con approvazione admin.
+    | Un viewer non approvato può esercitarsi liberamente coi quiz casuali ma non
+    | può iscriversi agli esami ufficiali. Se modifica i dati dopo l'approvazione
+    | e li reinvia, lo stato torna a 'pending' e perde l'abilitazione agli esami.
+    */
+
+    public const REG_NONE     = 'none';
+    public const REG_PENDING  = 'pending';
+    public const REG_APPROVED = 'approved';
+    public const REG_REJECTED = 'rejected';
+
+    public const REG_STATUSES = [
+        self::REG_NONE     => 'Da compilare',
+        self::REG_PENDING  => 'In attesa',
+        self::REG_APPROVED => 'Approvata',
+        self::REG_REJECTED => 'Rifiutata',
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
     | CATALOGO PERMESSI
     |--------------------------------------------------------------------------
     | Pattern: {action}_{entity}
@@ -76,6 +98,19 @@ class User extends Authenticatable
         'password',
         'role',
         'permissions',
+        // Dati anagrafici per iscrizione esami ufficiali
+        'first_name',
+        'last_name',
+        'address',
+        'birth_date',
+        'birth_place',
+        'fiscal_code',
+        'id_document_path',
+        'registration_status',
+        'registration_submitted_at',
+        'registration_reviewed_at',
+        'registration_reviewed_by',
+        'registration_rejection_reason',
     ];
 
     protected $hidden = [
@@ -89,6 +124,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'permissions' => 'array',
+            'birth_date' => 'date',
+            'registration_submitted_at' => 'datetime',
+            'registration_reviewed_at' => 'datetime',
         ];
     }
 
@@ -101,6 +139,66 @@ class User extends Authenticatable
     public function quizAttempts()
     {
         return $this->hasMany(QuizAttempt::class);
+    }
+
+    public function registrationReviewer()
+    {
+        return $this->belongsTo(User::class, 'registration_reviewed_by');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | REGISTRAZIONE DEFINITIVA (viewer)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Solo i viewer hanno l'obbligo di completare l'iscrizione anagrafica.
+     * Admin ed editor non partecipano agli esami ufficiali.
+     */
+    public function requiresRegistration(): bool
+    {
+        return $this->isViewer();
+    }
+
+    public function isRegistrationApproved(): bool
+    {
+        return $this->registration_status === self::REG_APPROVED;
+    }
+
+    public function isRegistrationPending(): bool
+    {
+        return $this->registration_status === self::REG_PENDING;
+    }
+
+    public function isRegistrationRejected(): bool
+    {
+        return $this->registration_status === self::REG_REJECTED;
+    }
+
+    public function hasSubmittedRegistration(): bool
+    {
+        return in_array($this->registration_status, [
+            self::REG_PENDING,
+            self::REG_APPROVED,
+            self::REG_REJECTED,
+        ], true);
+    }
+
+    /**
+     * Può iscriversi agli esami ufficiali per la patente?
+     * Solo i viewer con registrazione approvata. Admin/editor restano esclusi
+     * per design (la feature è riservata agli studenti).
+     */
+    public function canEnrollOfficialExams(): bool
+    {
+        return $this->isViewer() && $this->isRegistrationApproved();
+    }
+
+    public function fullAnagraphicName(): string
+    {
+        $parts = array_filter([$this->first_name, $this->last_name]);
+        return $parts ? implode(' ', $parts) : $this->name;
     }
 
     /*

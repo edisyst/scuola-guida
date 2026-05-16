@@ -1,6 +1,6 @@
 # ScuolaGUIDA — Quiz App
 
-Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti richiedono l'iscrizione ai quiz confermati, li svolgono e consultano le proprie statistiche.
+Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. Le esercitazioni con quiz casuali restano sempre libere.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
 
@@ -104,7 +104,8 @@ php artisan route:list              # elenco di tutte le route
 - **Categorie** — CRUD con slug auto-generato
 - **Quiz** — creazione manuale o casuale, gestione domande con drag-and-drop reorder, parametri (numero massimo domande, tempo limite, errori massimi tollerati)
 - **Ciclo di vita quiz** — `draft → published → confirmed` (vedi sotto)
-- **Iscrizioni** — approva o rifiuta le richieste degli utenti; può riaprire un'iscrizione già completata
+- **Iscrizioni anagrafiche** — visualizza i dati anagrafici inviati dai viewer (nome, cognome, indirizzo, data e luogo di nascita, codice fiscale, documento di identità), approva o rifiuta la richiesta di iscrizione definitiva con motivazione opzionale
+- **Iscrizioni quiz** — approva o rifiuta le richieste degli utenti già abilitati; può riaprire un'iscrizione già completata
 - **Esiti confermati** — visualizza i risultati degli utenti sui quiz confermati
 - **Statistiche** — dashboard con metriche aggregate (quiz, tentativi, utenti)
 - **Media Manager** — gestione file upload (componente Livewire)
@@ -114,13 +115,57 @@ php artisan route:list              # elenco di tutte le route
 
 ### Area Utente (Viewer)
 
+- **Registrazione account** — email e password (livello base, abilita subito le esercitazioni)
+- **Iscrizione anagrafica** — dal proprio profilo il viewer compila nome, cognome, indirizzo, data e luogo di nascita, codice fiscale e carica il documento di identità (PDF/JPG/PNG, max 5 MB), poi invia la richiesta all'amministratore. Solo dopo l'approvazione può iscriversi agli esami ufficiali; può modificare i dati in seguito, ma ogni reinvio richiede una nuova approvazione e disabilita temporaneamente l'iscrizione a nuovi esami
 - **Dashboard personale** — statistiche tentativi, punteggio medio, ultima attività
-- **Quiz casuale** — gioca un quiz con domande estratte casualmente (senza iscrizione)
-- **Catalogo quiz confermati** — richiedi iscrizione a un quiz ufficiale
+- **Quiz casuale** — gioca un quiz con domande estratte casualmente (sempre disponibile, non richiede iscrizione anagrafica)
+- **Catalogo quiz confermati** — richiedi iscrizione a un quiz ufficiale (riservato ai viewer approvati)
 - **Le mie iscrizioni** — traccia lo stato delle richieste (in attesa / approvata / completata)
-- **Gioca quiz** — interfaccia a domande con timer e feedback finale (score, errori, esito)
+- **Gioca quiz** — interfaccia a domande con timer e feedback finale (score, errori, esito). Sui quiz ufficiali ogni iscrizione consente un solo tentativo
 - **Storico tentativi** — rivedi tutti i tuoi quiz svolti
 - **Ricerca** — cerca domande per testo o categoria
+
+---
+
+## Ciclo di vita dell'iscrizione anagrafica (viewer)
+
+Solo i viewer hanno un percorso di iscrizione anagrafica con approvazione admin: serve a verificare l'identità prima di consentire la partecipazione agli esami ufficiali. Admin ed editor non sono soggetti a questo flusso (non partecipano agli esami).
+
+```
+   [Viewer registra account]
+            │
+            ▼
+        none ──────────────────────────────┐
+        (può esercitarsi liberamente,      │
+         non può iscriversi agli esami)    │
+                                           │ Viewer invia
+                                           │ dati anagrafici
+                                           ▼
+                                       pending
+                                           │
+                              [Admin revisiona richiesta]
+                                           │
+                              ┌────────────┴────────────┐
+                              ▼                         ▼
+                           approved                 rejected
+                  (abilitato esami)         (può correggere e reinviare)
+                              │                         │
+                              │   Modifica & reinvia    │   reinvia
+                              ▼                         ▼
+                           pending  ◀──────────────  pending
+                  (perde temporaneamente
+                   l'abilitazione fino
+                   alla riapprovazione)
+```
+
+| Stato | Significato |
+|---|---|
+| `none` | Account creato ma nessun dato anagrafico inviato. Esercitazioni libere, esami bloccati. |
+| `pending` | Dati inviati, in attesa di revisione admin. Esami bloccati. |
+| `approved` | Iscrizione definitiva accettata. Il viewer può iscriversi agli esami ufficiali. |
+| `rejected` | Richiesta rifiutata (con motivazione opzionale). Il viewer può correggere e reinviare. |
+
+**Campi obbligatori:** nome, cognome, indirizzo, data di nascita, luogo di nascita, codice fiscale (univoco, validato con regex), documento di identità (PDF/JPG/PNG, max 5 MB, salvato in `storage/app/public/registrations`).
 
 ---
 
@@ -238,11 +283,11 @@ Browser
 
 ## Ruoli e permessi
 
-| Ruolo | Accesso |
-|---|---|
-| `admin` | Tutto: CRUD contenuti, publish/confirm quiz, audit log, gestione utenti e ruoli |
-| `editor` | CRUD domande, categorie, quiz (no publish/confirm) |
-| `viewer` | Gioca quiz, richiedi iscrizioni, consulta proprie statistiche |
+| Ruolo | Accesso | Iscrizione anagrafica |
+|---|---|---|
+| `admin` | Tutto: CRUD contenuti, publish/confirm quiz, audit log, gestione utenti e ruoli, approvazione iscrizioni anagrafiche | Non richiesta |
+| `editor` | CRUD domande, categorie, quiz (no publish/confirm) | Non richiesta |
+| `viewer` | Esercitazioni libere; iscrizione agli esami ufficiali solo dopo approvazione dei dati anagrafici | **Obbligatoria** per partecipare agli esami |
 
 I permessi granulari (`edit_questions`, `delete_quiz`, …) sono configurabili per ruolo dalla pagina **Admin → Ruoli & Permessi** e sono salvati come JSON nel campo `permissions` di ogni utente.
 

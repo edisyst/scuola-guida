@@ -19,6 +19,13 @@ class QuizEnrollmentService
             throw new RuntimeException('Puoi iscriverti solo a quiz confermati.');
         }
 
+        if ($user->isViewer() && !$user->canEnrollOfficialExams()) {
+            throw new RuntimeException(
+                'Devi completare l\'iscrizione anagrafica ed essere approvato dall\'amministratore '
+                . 'prima di poterti iscrivere agli esami ufficiali. Vai al tuo profilo per inviare i dati.'
+            );
+        }
+
         if ($this->hasActiveEnrollment($quiz, $user)) {
             throw new RuntimeException('Hai già un\'iscrizione attiva per questo quiz.');
         }
