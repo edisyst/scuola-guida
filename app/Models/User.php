@@ -222,14 +222,6 @@ class User extends Authenticatable
         return $this->role === self::ROLE_VIEWER;
     }
 
-    public function canEdit(): bool
-    {
-        return in_array($this->role, [
-            self::ROLE_ADMIN,
-            self::ROLE_EDITOR
-        ]);
-    }
-
     /*
     |--------------------------------------------------------------------------
     | PERMESSI — API GENERICA

@@ -53,6 +53,17 @@ class QuizAttemptController extends Controller
 
     public function show(QuizAttempt $attempt)
     {
+        // IDOR guard: un viewer può vedere solo i propri tentativi.
+        // Admin e utenti con canEditUser() possono vedere qualsiasi tentativo.
+        $user = auth()->user();
+        if ($attempt->user_id !== $user->id && !$user->isAdmin() && !$user->canEditUser()) {
+            abort(403);
+        }
+
+        // Eager load del quiz: la view accede a $attempt->quiz->isConfirmed() per
+        // decidere il link "Riprova" (W-4). Senza loadMissing si scatena una lazy query.
+        $attempt->loadMissing('quiz');
+
         return view('quiz.attempt', compact('attempt'));
     }
 

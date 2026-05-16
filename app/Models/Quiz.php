@@ -34,13 +34,6 @@ class Quiz extends Model
         'confirmed_at'  => 'datetime',
     ];
 
-    public static function generateRandom($limit = 10)
-    {
-        return Question::inRandomOrder()
-            ->limit($limit)
-            ->get();
-    }
-
     /*
     |--------------------------------------------------------------------------
     | HELPERS

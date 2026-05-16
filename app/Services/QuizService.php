@@ -238,21 +238,6 @@ class QuizService
         }
     }
 
-    public function calculateScore(array $answers): int
-    {
-        $score = 0;
-
-        foreach ($answers as $questionId => $answer) {
-            $question = Question::find($questionId);
-
-            if ($question && $question->is_true == $answer) {
-                $score++;
-            }
-        }
-
-        return $score;
-    }
-
     private function resolveIds(string $mode, array $ids, ?int $categoryId): Collection
     {
         if ($mode === 'all') {

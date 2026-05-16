@@ -62,8 +62,9 @@
                     @endif
                 </p>
                 @unless($isAdminView)
-                    <a href="{{ route('quiz.random') }}" class="sg-btn sg-btn-success sg-mt-2">
-                        <i class="fas fa-play"></i> Inizia un quiz
+                    {{-- entry point quiz: catalogo dei quiz confermati per iscrizione --}}
+                    <a href="{{ route('quiz.confirmed.index') }}" class="sg-btn sg-btn-success sg-mt-2">
+                        <i class="fas fa-clipboard-list"></i> Scegli un quiz
                     </a>
                 @endunless
             </div>

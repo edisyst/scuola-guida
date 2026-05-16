@@ -34,10 +34,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('profile.registration.submit');
 
     // Quiz: gioca (viewer / user)
-    Route::get('quiz/random-play', [QuizController::class, 'randomPlay'])->name('quiz.random');
     Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])->name('quiz.play');
-    Route::post('quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
-    Route::get('quiz/results', [QuizController::class, 'results'])->name('quiz.results');
 
     // Quiz confermati e iscrizioni (viewer)
     Route::get('quiz/confirmed', [QuizEnrollmentController::class, 'catalog'])

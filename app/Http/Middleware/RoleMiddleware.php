@@ -15,8 +15,6 @@ class RoleMiddleware
             abort(403);
         }
 
-        // dd($user->role, $roles);
-
         if (!in_array($user->role, $roles)) {
             abort(403, 'Non autorizzato da RoleMiddleware');
         }

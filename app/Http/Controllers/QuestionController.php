@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\DataTables\QuestionsDataTable;
 use App\Exports\QuestionsExport;
-use App\Filters\QuestionFilter;
 use App\Http\Requests\BulkDeleteQuestionsRequest;
 use App\Http\Requests\ImportQuestionsRequest;
 use App\Http\Requests\StoreQuestionRequest;
@@ -28,19 +27,17 @@ class QuestionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index(Request $request, QuestionFilter $filter)
+    public function index()
     {
-        $questions = $filter->apply(Question::with('category:id,name'))
-            ->latest()
-            ->get();
-
+        // $questions rimossa: la tabella è popolata via AJAX (/questions/data).
+        // Caricare tutte le domande qui era un N+K inutile. Vedi W-3.
         $categories = Cache::remember(
             'categories_list',
             3600,
             fn () => Category::select('id', 'name')->get()
         );
 
-        return view('admin.questions.index', compact('questions', 'categories'));
+        return view('admin.questions.index', compact('categories'));
     }
 
     public function create()

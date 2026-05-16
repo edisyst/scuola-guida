@@ -124,7 +124,8 @@
                         <div class="col-md-6">
                             <select id="filter-category" class="sg-form-control">
                                 <option value="">— Tutte le categorie —</option>
-                                @foreach(\App\Models\Category::all() as $cat)
+                                {{-- $categories è passata dal controller (manageQuestions) --}}
+                                @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                 @endforeach
                             </select>

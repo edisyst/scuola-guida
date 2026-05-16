@@ -7,7 +7,6 @@ use App\Http\Requests\BulkQuizQuestionsRequest;
 use App\Http\Requests\StoreQuizRequest;
 use App\Models\Question;
 use App\Models\Quiz;
-use App\Models\QuizResult;
 use App\Services\QuizEnrollmentService;
 use App\Services\QuizService;
 use Illuminate\Http\Request;
@@ -123,6 +122,8 @@ class QuizController extends Controller
 
     public function reorder(Request $request, Quiz $quiz)
     {
+        abort_unless(auth()->user()->canEditQuiz(), 403);
+
         try {
             $this->service->reorderQuestions($quiz, $request->input('ids', []));
         } catch (RuntimeException $e) {
@@ -141,15 +142,19 @@ class QuizController extends Controller
     {
         $quiz->load('questions');
 
-        $questions    = Question::with('category')->get();
+        // $questions rimossa: la tabella carica via AJAX (admin.quizzes.questions.data).
+        // $categories serve solo per il filtro dropdown nella view.
+        $categories   = \App\Models\Category::orderBy('name')->get(['id', 'name']);
         $currentCount = $quiz->questions()->count();
         $max          = $quiz->max_questions;
 
-        return view('admin.quizzes.questions', compact('quiz', 'questions', 'currentCount', 'max'));
+        return view('admin.quizzes.questions', compact('quiz', 'categories', 'currentCount', 'max'));
     }
 
     public function addQuestion(Request $request, Quiz $quiz)
     {
+        abort_unless(auth()->user()->canEditQuiz(), 403);
+
         try {
             $result = $this->service->addQuestion($quiz, (int) $request->question_id);
         } catch (RuntimeException $e) {
@@ -165,6 +170,8 @@ class QuizController extends Controller
 
     public function removeQuestion(Request $request, Quiz $quiz)
     {
+        abort_unless(auth()->user()->canEditQuiz(), 403);
+
         try {
             $current = $this->service->removeQuestion($quiz, (int) $request->question_id);
         } catch (RuntimeException $e) {
@@ -183,14 +190,6 @@ class QuizController extends Controller
         return redirect()
             ->route('admin.quizzes.index')
             ->with('success', 'Quiz creato con ' . $quiz->questions()->count() . ' domande');
-    }
-
-    public function randomPlay()
-    {
-        $ids       = Question::inRandomOrder()->limit(10)->pluck('id');
-        $questions = Question::whereIn('id', $ids)->get();
-
-        return view('quiz.play', compact('questions'));
     }
 
     public function play(Quiz $quiz)
@@ -226,27 +225,6 @@ class QuizController extends Controller
             'attemptId'     => $session['attempt']->id,
             'questionsJson' => $session['questions_json'],
         ]);
-    }
-
-    public function submit(Request $request)
-    {
-        $answers = $request->input('answers', []);
-        $score   = $this->service->calculateScore($answers);
-
-        QuizResult::create([
-            'user_id' => auth()->id(),
-            'score'   => $score,
-            'total'   => count($answers),
-        ]);
-
-        return response()->json(['score' => $score]);
-    }
-
-    public function results()
-    {
-        $results = QuizResult::with('user')->latest()->get();
-
-        return view('quiz.results', compact('results'));
     }
 
     public function confirmedResults()

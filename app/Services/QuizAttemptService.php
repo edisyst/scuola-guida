@@ -43,7 +43,8 @@ class QuizAttemptService
         ]);
 
         if ($enrollmentId) {
-            $this->enrollmentService->markCompleted($attempt->enrollment, $attempt);
+            // $enrollment è già caricato sopra: evita la lazy query su $attempt->enrollment (W-5).
+            $this->enrollmentService->markCompleted($enrollment, $attempt);
         }
 
         return $attempt;

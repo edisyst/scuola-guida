@@ -1,3 +1,4 @@
+{{-- Tabella popolata via AJAX da admin.questions.data (DataTables) --}}
 @extends('layouts.admin')
 
 @section('title', 'Domande')

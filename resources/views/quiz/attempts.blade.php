@@ -13,8 +13,9 @@
             <h1 class="sg-header-title">I miei tentativi</h1>
         </div>
         <div class="sg-header-actions">
-            <a href="{{ route('quiz.play', 1) }}" class="sg-btn sg-btn-light sg-btn-sm">
-                <i class="fas fa-play"></i> Inizia un nuovo quiz
+            {{-- entry point quiz: catalogo dei quiz confermati per iscrizione --}}
+            <a href="{{ route('quiz.confirmed.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
+                <i class="fas fa-clipboard-list"></i> Scegli un quiz
             </a>
         </div>
     </div>
@@ -23,8 +24,9 @@
         @if($attempts->isEmpty())
             <div class="sg-table-empty">
                 <p class="sg-mb-2">Nessun tentativo ancora registrato.</p>
-                <a href="{{ route('quiz.play', 1) }}" class="sg-btn sg-btn-primary">
-                    <i class="fas fa-play"></i> Prova un quiz
+                {{-- entry point quiz: catalogo dei quiz confermati per iscrizione --}}
+                <a href="{{ route('quiz.confirmed.index') }}" class="sg-btn sg-btn-primary">
+                    <i class="fas fa-clipboard-list"></i> Scegli un quiz
                 </a>
             </div>
         @else

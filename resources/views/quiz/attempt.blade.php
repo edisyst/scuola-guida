@@ -63,8 +63,13 @@
                 <a href="{{ route('quiz.attempts.index') }}" class="sg-btn sg-btn-outline">
                     <i class="fas fa-list"></i> Tutti i miei tentativi
                 </a>
-                <a href="{{ route('quiz.play', $attempt->quiz_id ?? 1) }}" class="sg-btn sg-btn-primary">
-                    <i class="fas fa-redo"></i> Riprova
+                {{--
+                    "Scegli un altro quiz": il sistema random è stato rimosso.
+                    Mandiamo sempre l'utente al catalogo dei quiz confermati,
+                    dove può richiedere una nuova iscrizione o riprendere un quiz disponibile.
+                --}}
+                <a href="{{ route('quiz.confirmed.index') }}" class="sg-btn sg-btn-primary">
+                    <i class="fas fa-clipboard-list"></i> Scegli un altro quiz
                 </a>
             </div>
 
