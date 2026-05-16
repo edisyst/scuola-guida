@@ -19,7 +19,7 @@
     </div>
 
     <div class="sg-card sg-mb-3">
-        <div class="sg-card-body sg-flex" style="gap:8px;flex-wrap:wrap;">
+        <div class="sg-card-body sg-flex flex-wrap" style="gap:8px;">
             <a href="{{ route('admin.registrations.index') }}"
                class="sg-btn sg-btn-sm {{ !$status ? 'sg-btn-primary' : 'sg-btn-light' }}">Tutte</a>
             @foreach(\App\Models\User::REG_STATUSES as $key => $label)
@@ -46,7 +46,7 @@
                             <th>Codice fiscale</th>
                             <th>Stato</th>
                             <th>Inviata il</th>
-                            <th style="text-align:right;">Azioni</th>
+                            <th class="text-right">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,14 +60,14 @@
                                 <td class="sg-text-muted">
                                     {{ $u->registration_submitted_at?->format('d/m/Y H:i') ?? '—' }}
                                 </td>
-                                <td style="text-align:right;">
+                                <td class="text-right">
                                     <a href="{{ route('admin.registrations.show', $u) }}"
                                        class="sg-btn sg-btn-light sg-btn-sm">
                                         <i class="fas fa-eye"></i> Dettagli
                                     </a>
                                     @if($u->isRegistrationPending())
                                         <form method="POST" action="{{ route('admin.registrations.approve', $u) }}"
-                                              style="display:inline;"
+                                              class="d-inline"
                                               onsubmit="return confirm('Approvare l\'iscrizione di {{ $u->fullAnagraphicName() }}?');">
                                             @csrf
                                             <button class="sg-btn sg-btn-success sg-btn-sm">

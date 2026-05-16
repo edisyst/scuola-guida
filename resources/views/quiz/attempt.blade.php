@@ -59,7 +59,7 @@
                 </div>
             </div>
 
-            <div class="sg-mt-3 sg-d-flex sg-gap-2" style="justify-content:center;flex-wrap:wrap;">
+            <div class="sg-mt-3 sg-d-flex sg-gap-2 justify-content-center flex-wrap">
                 <a href="{{ route('quiz.attempts.index') }}" class="sg-btn sg-btn-outline">
                     <i class="fas fa-list"></i> Tutti i miei tentativi
                 </a>

@@ -45,7 +45,7 @@
                             <th>Stato</th>
                             <th>Richiesta</th>
                             <th>Revisionata da</th>
-                            <th style="text-align:right;">Azioni</th>
+                            <th class="text-right">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,15 +74,15 @@
                                 <td class="sg-text-muted">
                                     {{ $enrollment->reviewer->name ?? '—' }}
                                 </td>
-                                <td style="text-align:right;">
+                                <td class="text-right">
                                     @if($enrollment->isPending())
-                                        <form method="POST" action="{{ route('admin.enrollments.approve', $enrollment) }}" style="display:inline;">
+                                        <form method="POST" action="{{ route('admin.enrollments.approve', $enrollment) }}" class="d-inline">
                                             @csrf
                                             <button class="sg-btn sg-btn-success sg-btn-sm">
                                                 <i class="fas fa-check"></i> Approva
                                             </button>
                                         </form>
-                                        <form method="POST" action="{{ route('admin.enrollments.reject', $enrollment) }}" style="display:inline;">
+                                        <form method="POST" action="{{ route('admin.enrollments.reject', $enrollment) }}" class="d-inline">
                                             @csrf
                                             <button class="sg-btn sg-btn-outline sg-btn-sm">
                                                 <i class="fas fa-times"></i> Rifiuta
@@ -91,7 +91,7 @@
                                     @elseif($enrollment->isCompleted() || $enrollment->isRejected())
                                         <form method="POST"
                                               action="{{ route('admin.enrollments.reopen', ['quiz' => $enrollment->quiz_id, 'user' => $enrollment->user_id]) }}"
-                                              style="display:inline;"
+                                              class="d-inline"
                                               onsubmit="return confirm('Riaprire una nuova iscrizione approvata per questo utente?');">
                                             @csrf
                                             <button class="sg-btn sg-btn-light sg-btn-sm">

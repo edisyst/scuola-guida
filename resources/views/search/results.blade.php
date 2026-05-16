@@ -68,7 +68,7 @@
                 </div>
                 <div>
                     @foreach($questions as $question)
-                        <div class="sg-card-section sg-flex-between" style="align-items:flex-start;">
+                        <div class="sg-card-section sg-flex-between align-items-start">
                             <span>
                                 <i class="fas fa-circle {{ $question->is_true ? 'sg-text-success' : 'sg-text-danger' }} sg-status-dot-xs"></i>
                                 {!! preg_replace('/(' . preg_quote($q, '/') . ')/iu', '<mark>$1</mark>', e($question->question)) !!}

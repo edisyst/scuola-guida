@@ -32,7 +32,7 @@
                         <th>Email</th>
                         <th>Ruolo</th>
                         <th>Permessi extra</th>
-                        <th style="width:160px;text-align:right;">Azioni</th>
+                        <th class="text-right" style="width:160px;">Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,7 +66,7 @@
 
                                 @if(auth()->user()->canDeleteUser() && $u->id !== auth()->id())
                                     <form method="POST" action="{{ route('admin.users.destroy', $u) }}"
-                                          style="display:inline;" onsubmit="return confirm('Eliminare {{ $u->name }}?')">
+                                          class="d-inline" onsubmit="return confirm('Eliminare {{ $u->name }}?')">
                                         @csrf
                                         @method('DELETE')
                                         <button class="sg-btn-icon delete" title="Elimina">

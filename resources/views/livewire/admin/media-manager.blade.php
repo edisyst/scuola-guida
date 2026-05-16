@@ -9,7 +9,7 @@
 
     {{-- TAB CARTELLE --}}
     <div class="sg-card sg-mb-4 p-4">
-        <div class="d-flex align-items-center" style="gap:1rem; flex-wrap:wrap;">
+        <div class="d-flex align-items-center flex-wrap" style="gap:1rem;">
             <span class="text-muted">
                 <i class="fas fa-folder-open text-warning mr-2"></i> Cartella:
             </span>
@@ -33,7 +33,7 @@
             <i class="fas fa-upload"></i>
             Carica nuova immagine in <strong>{{ $folder }}</strong>
         </h5>
-        <div class="d-flex align-items-start" style="flex-wrap:wrap; gap:1rem;">
+        <div class="d-flex align-items-start flex-wrap" style="gap:1rem;">
             <div class="sg-upload-box">
                 <input type="file" wire:model="newImage" accept="image/*" class="form-control">
                 @error('newImage')

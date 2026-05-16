@@ -16,7 +16,7 @@
                 <a href="{{ route('admin.quizzes.create') }}" class="sg-btn sg-btn-light sg-btn-sm">
                     <i class="fas fa-plus"></i> Nuovo Quiz
                 </a>
-                <form method="POST" action="{{ route('admin.quizzes.random') }}" style="display:inline;">
+                <form method="POST" action="{{ route('admin.quizzes.random') }}" class="d-inline">
                     @csrf
                     <button class="sg-btn sg-btn-success sg-btn-sm">
                         <i class="fas fa-random"></i> Quiz Random
@@ -35,7 +35,7 @@
                         <th>Titolo</th>
                         <th>Stato</th>
                         <th>Domande</th>
-                        <th style="width:360px;text-align:right;">Azioni</th>
+                        <th class="text-right" style="width:360px;">Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,7 +61,7 @@
                                         <i class="fas fa-play"></i>
                                     </a>
                                 @else
-                                    <span class="sg-btn-icon info" title="Nessuna domanda nel quiz" style="opacity:.4;cursor:not-allowed;">
+                                    <span class="sg-btn-icon info sg-btn-icon--disabled" title="Nessuna domanda nel quiz">
                                         <i class="fas fa-play"></i>
                                     </span>
                                 @endif
@@ -71,20 +71,20 @@
                                         <i class="fas fa-tasks"></i>
                                     </a>
                                 @else
-                                    <span class="sg-btn-icon info" title="Quiz confermato: domande bloccate" style="opacity:.4;cursor:not-allowed;">
+                                    <span class="sg-btn-icon info sg-btn-icon--disabled" title="Quiz confermato: domande bloccate">
                                         <i class="fas fa-tasks"></i>
                                     </span>
                                 @endif
 
                                 @if(auth()->user()->canBulkQuiz() && !$quiz->isLocked())
-                                    <form method="POST" action="{{ route('admin.quizzes.fillRandom', $quiz) }}" style="display:inline;">
+                                    <form method="POST" action="{{ route('admin.quizzes.fillRandom', $quiz) }}" class="d-inline">
                                         @csrf
                                         @if(($quiz->questions_count ?? 0) === 0)
                                             <button class="sg-btn-icon success" title="Aggiungi domande random">
                                                 <i class="fas fa-random"></i>
                                             </button>
                                         @else
-                                            <span class="sg-btn-icon success" title="Il quiz ha già domande" style="opacity:.4;cursor:not-allowed;">
+                                            <span class="sg-btn-icon success sg-btn-icon--disabled" title="Il quiz ha già domande">
                                                 <i class="fas fa-random"></i>
                                             </span>
                                         @endif
@@ -93,14 +93,14 @@
 
                                 @if(auth()->user()->isAdmin() && !$quiz->isConfirmed())
                                     @if($quiz->isPublished())
-                                        <form method="POST" action="{{ route('admin.quizzes.unpublish', $quiz) }}" style="display:inline;">
+                                        <form method="POST" action="{{ route('admin.quizzes.unpublish', $quiz) }}" class="d-inline">
                                             @csrf
                                             <button class="sg-btn-icon" title="Riporta in bozza">
                                                 <i class="fas fa-eye-slash"></i>
                                             </button>
                                         </form>
                                     @else
-                                        <form method="POST" action="{{ route('admin.quizzes.publish', $quiz) }}" style="display:inline;">
+                                        <form method="POST" action="{{ route('admin.quizzes.publish', $quiz) }}" class="d-inline">
                                             @csrf
                                             <button class="sg-btn-icon success" title="Pubblica">
                                                 <i class="fas fa-globe"></i>
@@ -111,7 +111,7 @@
                                     @if(($quiz->questions_count ?? 0) > 0)
                                         <form method="POST"
                                               action="{{ route('admin.quizzes.confirm', $quiz) }}"
-                                              style="display:inline;"
+                                              class="d-inline"
                                               onsubmit="return confirm('Una volta confermato il quiz non potrà più essere modificato. Continuare?');">
                                             @csrf
                                             <button class="sg-btn-icon info" title="Conferma (lock)">
@@ -122,7 +122,7 @@
                                 @endif
 
                                 @if(auth()->user()->canDeleteQuiz() && !$quiz->isLocked())
-                                    <form method="POST" action="{{ route('admin.quizzes.destroy', $quiz) }}" style="display:inline;">
+                                    <form method="POST" action="{{ route('admin.quizzes.destroy', $quiz) }}" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button class="sg-btn-icon delete" title="Elimina" onclick="return confirm('Sei sicuro?')">

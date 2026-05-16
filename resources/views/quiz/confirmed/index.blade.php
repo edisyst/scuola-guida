@@ -38,7 +38,7 @@
                             <th>Domande</th>
                             <th>Tempo</th>
                             <th>Stato iscrizione</th>
-                            <th style="text-align:right;">Azioni</th>
+                            <th class="text-right">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -70,7 +70,7 @@
                                         <span class="sg-text-muted">—</span>
                                     @endif
                                 </td>
-                                <td style="text-align:right;">
+                                <td class="text-right">
                                     @if($active && $active->isApproved())
                                         <a href="{{ route('quiz.play', $quiz) }}"
                                            class="sg-btn sg-btn-primary sg-btn-sm"
@@ -86,7 +86,7 @@
                                             <i class="fas fa-id-card"></i> Completa profilo
                                         </a>
                                     @else
-                                        <form method="POST" action="{{ route('quiz.enrollments.store', $quiz) }}" style="display:inline;">
+                                        <form method="POST" action="{{ route('quiz.enrollments.store', $quiz) }}" class="d-inline">
                                             @csrf
                                             <button class="sg-btn sg-btn-outline sg-btn-sm">
                                                 <i class="fas fa-paper-plane"></i> Richiedi iscrizione

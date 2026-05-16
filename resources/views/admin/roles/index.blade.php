@@ -62,7 +62,7 @@
                                 <tr>
                                     <td>
                                         <strong>{{ $roleLabel }}</strong>
-                                        <span class="sg-badge-role role-{{ $roleKey }}" style="margin-left:8px;">{{ $roleKey }}</span>
+                                        <span class="sg-badge-role role-{{ $roleKey }} ml-2">{{ $roleKey }}</span>
                                     </td>
                                     @foreach($actions as $action)
                                         @php

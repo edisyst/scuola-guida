@@ -23,7 +23,7 @@
                             <th>Stato</th>
                             <th>Richiesta</th>
                             <th>Revisione</th>
-                            <th style="text-align:right;"></th>
+                            <th class="text-right"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -55,7 +55,7 @@
                                         —
                                     @endif
                                 </td>
-                                <td style="text-align:right;">
+                                <td class="text-right">
                                     @if($enrollment->isApproved())
                                         <a href="{{ route('quiz.play', $enrollment->quiz) }}"
                                            class="sg-btn sg-btn-primary sg-btn-sm"

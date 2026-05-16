@@ -97,7 +97,7 @@
             <div class="sg-card-header">
                 <h2 class="sg-card-header-title">Decisione</h2>
             </div>
-            <div class="sg-card-body sg-flex" style="gap:8px;flex-wrap:wrap;">
+            <div class="sg-card-body sg-flex flex-wrap" style="gap:8px;">
                 <form method="POST" action="{{ route('admin.registrations.approve', $user) }}"
                       onsubmit="return confirm('Approvare definitivamente l\'iscrizione anagrafica di {{ $user->fullAnagraphicName() }}?');">
                     @csrf
@@ -110,7 +110,7 @@
                       style="flex:1;min-width:280px;"
                       onsubmit="return confirm('Rifiutare la richiesta? L\'utente potrà correggere i dati e reinviarla.');">
                     @csrf
-                    <div class="sg-flex" style="gap:8px;align-items:flex-start;">
+                    <div class="sg-flex align-items-start" style="gap:8px;">
                         <input name="reason" type="text" class="sg-form-control"
                                placeholder="Motivo del rifiuto (opzionale)" maxlength="500">
                         <button class="sg-btn sg-btn-outline">

@@ -51,7 +51,7 @@
 
     <div class="sg-card sg-card-danger">
         <div class="sg-card-header">
-            <h2 class="sg-card-header-title" style="color:var(--sg-danger);">Elimina account</h2>
+            <h2 class="sg-card-header-title sg-text-danger">Elimina account</h2>
         </div>
         <div class="sg-card-body">
             @include('profile.partials.delete-user-form')

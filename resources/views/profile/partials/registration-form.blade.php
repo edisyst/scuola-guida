@@ -112,9 +112,9 @@
     <div class="sg-form-group">
         <label for="fiscal_code" class="sg-form-label">Codice fiscale *</label>
         <input id="fiscal_code" name="fiscal_code" type="text"
-               class="sg-form-control @error('fiscal_code') is-invalid @enderror"
+               class="sg-form-control text-uppercase @error('fiscal_code') is-invalid @enderror"
                value="{{ old('fiscal_code', $user->fiscal_code) }}" required
-               maxlength="16" style="text-transform:uppercase;">
+               maxlength="16">
         @error('fiscal_code')<div class="sg-form-error">{{ $message }}</div>@enderror
     </div>
 

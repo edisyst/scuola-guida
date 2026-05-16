@@ -883,6 +883,7 @@
 .sg-btn-icon.delete:hover { background: #f5c2c7; color: #5b181e; }
 .sg-btn-icon.info   { background: #d1ecf1; color: #0c5460; }
 .sg-btn-icon.info:hover   { background: #b8dde5; color: #062c33; }
+.sg-btn-icon--disabled { opacity: .4; cursor: not-allowed; }
 
 /* ============================================================
    AUTH / GUEST LAYOUT

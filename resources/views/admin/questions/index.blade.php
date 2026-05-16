@@ -13,7 +13,7 @@
             <h1 class="sg-header-title"><i class="fas fa-question-circle mr-2"></i> Domande</h1>
         </div>
         @if(auth()->user()->canCreateQuestion())
-            <div class="sg-header-actions" style="flex-wrap:wrap;">
+            <div class="sg-header-actions flex-wrap">
                 <a href="{{ route('admin.questions.create') }}" class="sg-btn sg-btn-light sg-btn-sm">
                     <i class="fas fa-plus"></i> Nuova
                 </a>
@@ -30,9 +30,9 @@
     @if(auth()->user()->canCreateQuestion())
         <div class="sg-card sg-mb-3">
             <div class="sg-card-body" style="padding:1rem 1.25rem;">
-                <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="sg-d-flex sg-gap-2" style="align-items:center;flex-wrap:wrap;">
+                <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="sg-d-flex sg-gap-2 align-items-center flex-wrap">
                     @csrf
-                    <span class="sg-label sg-mb-0" style="margin-right:6px;"><i class="fas fa-file-import"></i> Import Excel</span>
+                    <span class="sg-label sg-mb-0 mr-2"><i class="fas fa-file-import"></i> Import Excel</span>
                     <input type="file" name="file" required class="sg-form-control" style="max-width:340px;">
                     <button class="sg-btn sg-btn-primary sg-btn-sm">
                         <i class="fas fa-upload"></i> Carica

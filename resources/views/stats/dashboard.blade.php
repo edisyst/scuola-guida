@@ -37,7 +37,7 @@
                     <i class="fas fa-arrow-left"></i> Torna agli utenti
                 </a>
             @endif
-            <form method="POST" action="{{ route('dashboard.refresh', $user) }}" style="display:inline;">
+            <form method="POST" action="{{ route('dashboard.refresh', $user) }}" class="d-inline">
                 @csrf
                 @if($isAdminView)
                     <input type="hidden" name="as_admin" value="1">
@@ -51,8 +51,8 @@
 
     @if($stats['total_attempts'] === 0)
         <div class="sg-card sg-mt-3">
-            <div class="sg-card-body sg-text-center" style="padding:48px;">
-                <i class="fas fa-inbox" style="font-size:48px;color:#adb5bd;"></i>
+            <div class="sg-card-body sg-text-center p-5">
+                <i class="fas fa-inbox text-muted" style="font-size:48px;"></i>
                 <h3 class="sg-mt-2">Nessun tentativo registrato</h3>
                 <p class="sg-text-muted">
                     @if($isAdminView)
@@ -194,22 +194,22 @@
                         <thead>
                             <tr>
                                 <th>Quiz</th>
-                                <th style="text-align:right;">Tentativi</th>
-                                <th style="text-align:right;">Media %</th>
-                                <th style="text-align:right;">Miglior %</th>
+                                <th class="text-right">Tentativi</th>
+                                <th class="text-right">Media %</th>
+                                <th class="text-right">Miglior %</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($stats['avg_by_quiz'] as $row)
                                 <tr>
                                     <td>{{ $row['title'] }}</td>
-                                    <td style="text-align:right;">{{ $row['attempts'] }}</td>
-                                    <td style="text-align:right;">
+                                    <td class="text-right">{{ $row['attempts'] }}</td>
+                                    <td class="text-right">
                                         <span class="sg-badge {{ $row['avg_pct'] >= 60 ? 'sg-badge-success' : 'sg-badge-warning' }}">
                                             {{ $row['avg_pct'] }}%
                                         </span>
                                     </td>
-                                    <td style="text-align:right;">{{ $row['best_pct'] }}%</td>
+                                    <td class="text-right">{{ $row['best_pct'] }}%</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -230,10 +230,10 @@
                             <tr>
                                 <th>Quiz</th>
                                 <th>Data</th>
-                                <th style="text-align:right;">Punteggio</th>
-                                <th style="text-align:right;">%</th>
+                                <th class="text-right">Punteggio</th>
+                                <th class="text-right">%</th>
                                 <th>Esito</th>
-                                <th style="text-align:right;">Durata</th>
+                                <th class="text-right">Durata</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -243,8 +243,8 @@
                                     <td class="sg-text-muted">
                                         {{ \Illuminate\Support\Carbon::parse($a['created_at'])->format('d/m/Y H:i') }}
                                     </td>
-                                    <td style="text-align:right;">{{ $a['score'] }}/{{ $a['total_questions'] }}</td>
-                                    <td style="text-align:right;"><strong>{{ $a['percentage'] }}%</strong></td>
+                                    <td class="text-right">{{ $a['score'] }}/{{ $a['total_questions'] }}</td>
+                                    <td class="text-right"><strong>{{ $a['percentage'] }}%</strong></td>
                                     <td>
                                         @if($a['is_passed'])
                                             <span class="sg-badge sg-badge-success">Superato</span>
@@ -252,7 +252,7 @@
                                             <span class="sg-badge sg-badge-danger">Non superato</span>
                                         @endif
                                     </td>
-                                    <td style="text-align:right;" class="sg-text-muted">
+                                    <td class="text-right sg-text-muted">
                                         {{ $a['duration'] ? gmdate('i:s', $a['duration']) : '—' }}
                                     </td>
                                 </tr>

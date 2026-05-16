@@ -5,7 +5,7 @@
 @endif
 
 @if(auth()->user()->canDeleteQuestion())
-    <form action="{{ route('admin.questions.destroy', $q) }}" method="POST" style="display:inline;">
+    <form action="{{ route('admin.questions.destroy', $q) }}" method="POST" class="d-inline">
         @csrf
         @method('DELETE')
         <button class="sg-btn-icon delete" title="Elimina" onclick="return confirm('Sei sicuro?')">

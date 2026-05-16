@@ -27,7 +27,7 @@
                         <th>Nome</th>
                         <th>Slug</th>
                         <th>Domande</th>
-                        <th style="width:160px;text-align:right;">Azioni</th>
+                        <th class="text-right" style="width:160px;">Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,7 +50,7 @@
                                 </a>
                             @endif
                             @if(auth()->user()->canDeleteCategory())
-                                <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button class="sg-btn-icon delete" title="Elimina" onclick="return confirm('Sei sicuro?')">

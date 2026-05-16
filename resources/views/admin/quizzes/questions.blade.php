@@ -72,7 +72,7 @@
     @if(auth()->user()->canEditQuiz())
     <div class="sg-card sg-mb-3">
         <div class="sg-card-body">
-            <div class="row align-items-end" style="gap:0;">
+            <div class="row align-items-end">
                 <div class="col-md-5">
                     <label class="sg-label">Titolo</label>
                     <input type="text" id="param-title" class="sg-form-control" value="{{ $quiz->title }}">
@@ -94,7 +94,7 @@
                     </div>
                 </div>
                 <div class="col-md-2" style="padding-top:1.4rem;">
-                    <button id="btn-update-params" class="sg-btn sg-btn-primary sg-btn-sm" style="width:100%;">
+                    <button id="btn-update-params" class="sg-btn sg-btn-primary sg-btn-sm w-100">
                         <i class="fas fa-save"></i> Aggiorna parametri
                     </button>
                 </div>
@@ -135,7 +135,7 @@
                     </div>
 
                     {{-- BULK ACTIONS --}}
-                    <div class="sg-mb-3 sg-d-flex sg-gap-2" style="flex-wrap:wrap;">
+                    <div class="sg-mb-3 sg-d-flex sg-gap-2 flex-wrap">
                         <button id="bulk-add" class="sg-btn sg-btn-success sg-btn-sm">
                             <i class="fas fa-plus"></i> Aggiungi selezionate
                         </button>
@@ -179,7 +179,7 @@
                     </button>
                 </div>
                 <div class="sg-sortable-scroll">
-                    <ul id="sortable-questions" class="list-unstyled" style="margin:0;">
+                    <ul id="sortable-questions" class="list-unstyled m-0">
                         @foreach($quiz->questions as $i => $q)
                             <li data-id="{{ $q->id }}" data-text="{{ $q->question }}"
                                 class="d-flex align-items-center justify-content-between">
