@@ -19,3 +19,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/.claude/agents/alpine-frontend.md
+/.claude/agents/laravel-architect.md
+/.claude/agents/livewire-blade-specialist.md
+/.claude/agents/php-reviewer.md
