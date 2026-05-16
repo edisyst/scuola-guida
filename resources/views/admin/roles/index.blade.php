@@ -13,15 +13,15 @@
         </p>
         <div class="sg-legend">
             <span class="sg-legend-item">
-                <span class="sg-legend-dot" style="background: linear-gradient(135deg,#28a745,#20c997);"></span>
+                <span class="sg-legend-dot sg-legend-dot--granted"></span>
                 Concesso
             </span>
             <span class="sg-legend-item">
-                <span class="sg-legend-dot" style="background: linear-gradient(135deg,#6f42c1,#5a32a3);"></span>
+                <span class="sg-legend-dot sg-legend-dot--admin"></span>
                 Admin (sempre attivo)
             </span>
             <span class="sg-legend-item">
-                <span class="sg-legend-dot" style="background:#fff;border:2px solid #dee2e6;"></span>
+                <span class="sg-legend-dot sg-legend-dot--denied"></span>
                 Negato
             </span>
         </div>

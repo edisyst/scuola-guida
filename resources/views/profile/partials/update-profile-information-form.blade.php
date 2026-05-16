@@ -31,7 +31,7 @@
             <div class="sg-mt-2">
                 <p class="sg-form-hint sg-mb-1">
                     {{ __('Il tuo indirizzo email non è verificato.') }}
-                    <button form="send-verification" class="sg-link" style="background:none;border:none;padding:0;cursor:pointer;font-size:.82rem;">
+                    <button form="send-verification" class="sg-btn-reset sg-link" style="font-size:.82rem;">
                         {{ __('Clicca qui per inviare nuovamente l\'email di verifica.') }}
                     </button>
                 </p>

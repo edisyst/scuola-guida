@@ -10,7 +10,7 @@
         </div>
     @endif
 
-    <div class="sg-flex-between sg-mt-3" style="flex-wrap:wrap;gap:12px;">
+    <div class="sg-flex-between sg-flex-wrap sg-mt-3">
         <form method="POST" action="{{ route('verification.send') }}">
             @csrf
             <x-primary-button>
@@ -20,7 +20,7 @@
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="sg-link sg-link-muted" style="font-size:.85rem;background:none;border:none;cursor:pointer;">
+            <button type="submit" class="sg-btn-reset sg-link sg-link-muted" style="font-size:.85rem;">
                 {{ __('Esci') }}
             </button>
         </form>

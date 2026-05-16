@@ -1,5 +1,5 @@
 @if ($errors->any())
-    <div class="alert alert-danger" style="border-radius:var(--sg-radius-sm);border:none;">
+    <div class="alert alert-danger">
         <strong>Ci sono errori nel form:</strong>
         <ul class="mb-0 mt-2">
             @foreach ($errors->all() as $error)

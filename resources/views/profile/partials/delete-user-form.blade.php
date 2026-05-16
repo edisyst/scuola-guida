@@ -11,12 +11,12 @@
         <form method="post" action="{{ route('profile.destroy') }}">
             @csrf
             @method('delete')
-            <div class="modal-content" style="border:none;border-radius:var(--sg-radius);box-shadow:var(--sg-shadow-card);overflow:hidden;">
-                <div class="modal-header" style="background:var(--sg-gradient-dark);color:#fff;border:none;">
+            <div class="modal-content sg-modal-content">
+                <div class="modal-header sg-modal-header-dark">
                     <h5 class="modal-title" id="confirmDeletionLabel">
                         {{ __('Vuoi davvero eliminare il tuo account?') }}
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:#fff;opacity:.8;">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>

@@ -417,6 +417,10 @@
     background: #0e0e1f;
     border-color: #0e0e1f;
 }
+.content-wrapper .alert {
+    border-radius: var(--sg-radius-sm);
+    border: none;
+}
 .content-wrapper .badge {
     border-radius: var(--sg-radius-pill);
     padding: 5px 10px;
@@ -797,6 +801,21 @@
     box-shadow: 0 4px 10px rgba(111, 66, 193, .3);
 }
 
+/* ── Modal stile sg ── */
+.sg-modal-content {
+    border: none;
+    border-radius: var(--sg-radius);
+    box-shadow: var(--sg-shadow-card);
+    overflow: hidden;
+}
+.sg-modal-header-dark {
+    background: var(--sg-gradient-dark);
+    color: #fff;
+    border: none;
+}
+.sg-modal-header-dark .close { color: #fff; opacity: .8; }
+.sg-modal-header-dark .close:hover { opacity: 1; }
+
 /* ── Save bar sticky in fondo ── */
 .sg-save-bar {
     position: sticky;
@@ -831,6 +850,9 @@
 .sg-legend-dot {
     width: 14px; height: 14px; border-radius: 4px;
 }
+.sg-legend-dot--granted { background: linear-gradient(135deg, #28a745, #20c997); }
+.sg-legend-dot--admin   { background: linear-gradient(135deg, #6f42c1, #5a32a3); }
+.sg-legend-dot--denied  { background: #fff; border: 2px solid #dee2e6; }
 
 /* ── Action cell allineata a destra ── */
 .sg-actions-cell {
@@ -1121,11 +1143,19 @@
 .sg-text-muted { color: var(--sg-text-muted) !important; }
 .sg-text-success { color: var(--sg-success) !important; }
 .sg-text-danger { color: var(--sg-danger) !important; }
+.sg-text-primary { color: var(--sg-primary) !important; }
 .sg-text-center { text-align: center; }
 .sg-d-flex { display: flex; }
 .sg-flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sg-flex-wrap { flex-wrap: wrap; }
 .sg-gap-2 { gap: .5rem; }
 .sg-gap-3 { gap: 1rem; }
+.sg-btn-reset { background: none; border: none; padding: 0; cursor: pointer; }
+.sg-disabled { opacity: .5; pointer-events: none; }
+.sg-form-label-note { font-weight: 400; text-transform: none; letter-spacing: 0; }
+/* Colonna griglia con spaziatura standard (padding laterale + gap inferiore) */
+.sg-grid-row { margin: 0 -8px; }
+.sg-grid-col { padding: 0 8px; margin-bottom: 16px; }
 
 /* ── Section title (usato nelle card admin) ──────────────── */
 .sg-section-title {
@@ -1173,6 +1203,9 @@
     padding: 0.75rem;
     transition: background .15s;
 }
+.sg-img-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.sg-img-thumb { border-radius: var(--sg-radius-sm); box-shadow: var(--sg-shadow-card); }
+.sg-media-filename { font-size: .95rem; word-break: break-all; line-height: 1.3; }
 
 /* ============================================================
    DARK MODE — AdminLTE aggiunge `dark-mode` al body

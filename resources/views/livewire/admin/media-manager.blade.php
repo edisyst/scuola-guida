@@ -70,8 +70,7 @@
 
                         {{-- ANTEPRIMA --}}
                         <div class="sg-img-preview">
-                            <img src="{{ $file['url'] }}" alt="{{ $file['name'] }}"
-                                 style="max-width:100%; max-height:100%; object-fit:contain;">
+                            <img src="{{ $file['url'] }}" alt="{{ $file['name'] }}">
                         </div>
 
                         {{-- NOME / RENAME INLINE --}}
@@ -96,8 +95,7 @@
                                 </div>
                             </div>
                         @else
-                            <div class="text-center" title="{{ $file['name'] }}"
-                                 style="font-size:0.95rem; word-break:break-all; line-height:1.3;">
+                            <div class="text-center sg-media-filename" title="{{ $file['name'] }}">
                                 <div class="font-weight-medium text-truncate">{{ $file['name'] }}</div>
                                 <div class="text-muted" style="font-size:0.85rem;">
                                     {{ $file['size'] }}

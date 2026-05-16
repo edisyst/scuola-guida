@@ -40,7 +40,7 @@
                     <label class="sg-form-label">
                         Password
                         @isset($user)
-                            <span class="sg-text-muted" style="font-weight:400;text-transform:none;letter-spacing:0;">(lascia vuoto per non modificare)</span>
+                            <span class="sg-text-muted sg-form-label-note">(lascia vuoto per non modificare)</span>
                         @endisset
                     </label>
                     <input name="password" type="password" class="sg-form-control @error('password') is-invalid @enderror" autocomplete="new-password">
@@ -69,12 +69,12 @@
         <h2 class="sg-form-section-title">
             <i class="fas fa-key"></i> Permessi individuali
         </h2>
-        <span class="sg-form-section-hint" id="perms-hint" style="{{ $isAdminRole ? '' : 'display:none' }}">
+        <span class="sg-form-section-hint" id="perms-hint" @class(['d-none' => !$isAdminRole])>
             <i class="fas fa-info-circle"></i>
             Il ruolo <strong>Admin</strong> ha tutti i permessi automaticamente
         </span>
     </div>
-    <div class="sg-form-section-body" id="perms-section" style="{{ $isAdminRole ? 'opacity:.5; pointer-events:none' : '' }}">
+    <div class="sg-form-section-body" id="perms-section" @class(['sg-disabled' => $isAdminRole])>
 
         <p class="sg-text-muted sg-mb-3" style="font-size:.9rem;">
             Spunta le caselle per concedere permessi <strong>aggiuntivi</strong> a questo utente

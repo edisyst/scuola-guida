@@ -13,9 +13,9 @@
     </div>
 
     {{-- KPI BOX --}}
-    <div class="row" style="margin:0 -8px;">
+    <div class="row sg-grid-row">
 
-        <div class="col-lg-3 col-6" style="padding:0 8px;margin-bottom:16px;">
+        <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
                 <div class="sg-stat-icon grad-blue"><i class="fas fa-users"></i></div>
                 <div>
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-6" style="padding:0 8px;margin-bottom:16px;">
+        <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
                 <div class="sg-stat-icon grad-green"><i class="fas fa-question-circle"></i></div>
                 <div>
@@ -35,7 +35,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-6" style="padding:0 8px;margin-bottom:16px;">
+        <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
                 <div class="sg-stat-icon grad-orange"><i class="fas fa-folder-open"></i></div>
                 <div>
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-6" style="padding:0 8px;margin-bottom:16px;">
+        <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
                 <div class="sg-stat-icon grad-red"><i class="fas fa-clipboard-list"></i></div>
                 <div>
@@ -58,9 +58,9 @@
     </div>
 
     {{-- GRAFICI --}}
-    <div class="row" style="margin:0 -8px;">
+    <div class="row sg-grid-row">
 
-        <div class="col-md-6" style="padding:0 8px;margin-bottom:16px;">
+        <div class="col-md-6 sg-grid-col">
             <div class="sg-card">
                 <div class="sg-card-header">
                     <h2 class="sg-card-header-title">Domande ultimi 30 giorni</h2>
@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        <div class="col-md-6" style="padding:0 8px;margin-bottom:16px;">
+        <div class="col-md-6 sg-grid-col">
             <div class="sg-card">
                 <div class="sg-card-header">
                     <h2 class="sg-card-header-title">Utenti ultimi 30 giorni</h2>

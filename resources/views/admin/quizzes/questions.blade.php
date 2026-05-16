@@ -49,6 +49,8 @@
     }
     .quiz-q-progress .bar.warn   { background: linear-gradient(90deg, #ffc107, #fd7e14); }
     .quiz-q-progress .bar.danger { background: linear-gradient(90deg, #dc3545, #e83e8c); }
+    .sg-sortable-scroll { max-height: 800px; overflow-y: auto; padding: 14px; }
+    .sg-q-text { font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 @stop
 
@@ -176,14 +178,14 @@
                         <i class="fas fa-shuffle"></i> Shuffle
                     </button>
                 </div>
-                <div style="max-height:800px;overflow-y:auto;padding:14px;">
+                <div class="sg-sortable-scroll">
                     <ul id="sortable-questions" class="list-unstyled" style="margin:0;">
                         @foreach($quiz->questions as $i => $q)
                             <li data-id="{{ $q->id }}" data-text="{{ $q->question }}"
                                 class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center" style="gap:8px;flex:1;min-width:0;">
                                     <span class="index-badge">{{ $i + 1 }}</span>
-                                    <span class="sg-text-muted" style="font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                    <span class="sg-text-muted sg-q-text">
                                         {{ Str::limit($q->question, 60) }}
                                     </span>
                                 </div>
@@ -565,7 +567,7 @@
                 class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center" style="gap:8px;flex:1;min-width:0;">
                     <span class="index-badge"></span>
-                    <span class="sg-text-muted" style="font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${truncate(text, 60)}</span>
+                    <span class="sg-text-muted sg-q-text">${truncate(text, 60)}</span>
                 </div>
                 <button class="sg-btn-icon delete btn-remove-from-list" title="Rimuovi">
                     <i class="fas fa-times"></i>

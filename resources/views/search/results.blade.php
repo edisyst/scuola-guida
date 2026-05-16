@@ -3,6 +3,13 @@
 @section('title', 'Risultati ricerca')
 @section('content_header')@endsection
 
+@section('css')
+@parent
+<style>
+    .sg-status-dot-xs { font-size: .55rem; vertical-align: middle; margin-right: 8px; }
+</style>
+@stop
+
 @section('content')
 <div class="sg-wrapper">
 
@@ -39,7 +46,7 @@
                     @foreach($categories as $category)
                         <div class="sg-card-section sg-flex-between">
                             <span>
-                                <i class="fas fa-folder-open" style="color:var(--sg-primary);margin-right:8px;"></i>
+                                <i class="fas fa-folder-open sg-text-primary mr-2"></i>
                                 <strong>{{ $category->name }}</strong>
                             </span>
                             @if(!empty($category->questions_count))
@@ -63,11 +70,10 @@
                     @foreach($questions as $question)
                         <div class="sg-card-section sg-flex-between" style="align-items:flex-start;">
                             <span>
-                                <i class="fas fa-circle {{ $question->is_true ? 'sg-text-success' : 'sg-text-danger' }}"
-                                   style="font-size:.55rem;vertical-align:middle;margin-right:8px;"></i>
+                                <i class="fas fa-circle {{ $question->is_true ? 'sg-text-success' : 'sg-text-danger' }} sg-status-dot-xs"></i>
                                 {!! preg_replace('/(' . preg_quote($q, '/') . ')/iu', '<mark>$1</mark>', e($question->question)) !!}
                             </span>
-                            <span class="sg-badge" style="white-space:nowrap;">
+                            <span class="sg-badge text-nowrap">
                                 {{ $question->category->name ?? '—' }}
                             </span>
                         </div>
