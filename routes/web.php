@@ -11,6 +11,10 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\RolePermissionController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
+use App\Models\AuditLog;
 
 Route::get('/', function () {
     return view('welcome');
@@ -120,7 +124,7 @@ Route::middleware(['auth'])
             // USERS
             Route::get('users/{user}/stats', [UserStatsController::class, 'show'])
                 ->name('users.stats');
-            Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+            Route::resource('users', AdminUserController::class)
                 ->except(['show']);
         });
 
@@ -132,11 +136,11 @@ Route::middleware(['auth'])
             // MEDIA MANAGER
             Route::get('media', fn () => view('admin.media.index'))->name('media.index');
 
-            Route::get('stats', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
+            Route::get('stats', [DashboardController::class, 'index'])
                 ->name('stats');
 
             Route::get('audit-logs', function () {
-                $logs = \App\Models\AuditLog::with('user')->latest()->paginate(20);
+                $logs = AuditLog::with('user')->latest()->paginate(20);
                 return view('admin.audit.index', compact('logs'));
             })->name('audit.index');
 
@@ -170,13 +174,13 @@ Route::middleware(['auth'])
                 ->name('roles.update');
 
             // ISCRIZIONI ANAGRAFICHE (richieste viewer)
-            Route::get('registrations', [\App\Http\Controllers\Admin\RegistrationController::class, 'index'])
+            Route::get('registrations', [AdminRegistrationController::class, 'index'])
                 ->name('registrations.index');
-            Route::get('registrations/{user}', [\App\Http\Controllers\Admin\RegistrationController::class, 'show'])
+            Route::get('registrations/{user}', [AdminRegistrationController::class, 'show'])
                 ->name('registrations.show');
-            Route::post('registrations/{user}/approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'approve'])
+            Route::post('registrations/{user}/approve', [AdminRegistrationController::class, 'approve'])
                 ->name('registrations.approve');
-            Route::post('registrations/{user}/reject', [\App\Http\Controllers\Admin\RegistrationController::class, 'reject'])
+            Route::post('registrations/{user}/reject', [AdminRegistrationController::class, 'reject'])
                 ->name('registrations.reject');
         });
     });
