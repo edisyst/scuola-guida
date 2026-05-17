@@ -1,6 +1,6 @@
 # ScuolaGUIDA — Quiz App
 
-Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche.
+Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio, marcando le domande "da ripassare".
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
 
@@ -121,6 +121,7 @@ php artisan route:list              # elenco di tutte le route
 - **Catalogo quiz confermati** — richiedi iscrizione a un quiz ufficiale (riservato ai viewer approvati)
 - **Le mie iscrizioni** — traccia lo stato delle richieste (in attesa / approvata / completata)
 - **Gioca quiz** — interfaccia a domande con timer e feedback finale (score, errori, esito). Sui quiz ufficiali ogni iscrizione consente un solo tentativo
+- **Modalità Studio** — allenamento libero senza timer né punteggio: si scelgono le domande da un quiz pubblicato/confermato, da una categoria oppure casualmente da tutto il database. Per ogni domanda l'utente riceve feedback inline immediato (corretta/errata) e può navigare liberamente avanti e indietro. Ogni domanda può essere marcata come "da ripassare" (stato salvato in sessione, niente DB); al termine il riepilogo mostra totale, risposte date, lista delle marcate e un pulsante per avviare subito una nuova sessione che le contenga
 - **Storico tentativi** — rivedi tutti i tuoi quiz svolti
 - **Ricerca** — cerca domande per testo o categoria
 
@@ -274,7 +275,7 @@ Browser
 |---|---|
 | **FormRequest** | Autorizzazione + validazione. Il controller non vede dati non validati. |
 | **Controller** | Orchestrazione pura: chiama il service, ritorna la risposta. Nessuna logica. |
-| **Service** | Tutta la business logic (9 service: Quiz, QuizAttempt, QuizEnrollment, Question, User, UserStats, DashboardStats, RolePermission, Search). |
+| **Service** | Tutta la business logic (11 service: Quiz, QuizAttempt, QuizEnrollment, Question, User, UserRegistration, UserStats, DashboardStats, RolePermission, Search, Study). |
 | **Trait Auditable** | Logging automatico di ogni create/update/delete su tutti i modelli che lo usano. |
 | **Observer** | Effetti collaterali post-salvataggio (invalidazione cache, ecc.) tenuti fuori dal service. |
 

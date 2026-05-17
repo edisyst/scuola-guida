@@ -9,6 +9,7 @@ use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\QuizEnrollmentController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\StudyController;
 use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -58,6 +59,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('quiz/attempts', [QuizAttemptController::class, 'store'])->name('quiz.attempts.store');
     Route::get('quiz/attempts/{attempt}', [QuizAttemptController::class, 'show'])->name('quiz.attempts.show');
     Route::put('quiz/attempts/{attempt}', [QuizAttemptController::class, 'update'])->name('quiz.attempts.update');
+
+    // Modalità Studio — allenamento libero senza timer/punteggio
+    Route::prefix('study')->name('study.')->group(function () {
+        Route::get('/', [StudyController::class, 'index'])->name('index');
+        Route::post('/start', [StudyController::class, 'start'])->name('start');
+        Route::get('/play', [StudyController::class, 'play'])->name('play');
+        Route::post('/flag/{question}', [StudyController::class, 'flag'])->name('flag');
+        Route::get('/summary', [StudyController::class, 'summary'])->name('summary');
+        Route::delete('/session', [StudyController::class, 'destroy'])->name('destroy');
+    });
 });
 
 /*

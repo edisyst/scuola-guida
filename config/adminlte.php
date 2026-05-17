@@ -338,6 +338,12 @@ return [
             'key'   => 'quiz-attempts',
         ],
         [
+            'text'  => 'Modalità Studio',
+            'url'   => 'study',
+            'icon'  => 'fas fa-graduation-cap',
+            'key'   => 'study',
+        ],
+        [
             'text' => 'Quiz disponibili',
             'url'  => 'quiz/confirmed',
             'icon' => 'fas fa-clipboard-check',
