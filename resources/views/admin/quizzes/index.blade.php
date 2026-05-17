@@ -114,6 +114,17 @@
                                     </form>
                                 @endif
 
+                                @if(auth()->user()->isAdmin() && $quiz->isConfirmed())
+                                    <a href="{{ route('admin.quizzes.summary', $quiz) }}"
+                                       class="sg-btn-icon info" title="Riepilogo">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </a>
+                                    <a href="{{ route('admin.quizzes.schedule.edit', $quiz) }}"
+                                       class="sg-btn-icon" title="Schedulazione iscrizioni">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </a>
+                                @endif
+
                                 @if(auth()->user()->isAdmin() && !$quiz->isConfirmed())
                                     @if($quiz->isPublished())
                                         <form method="POST" action="{{ route('admin.quizzes.unpublish', $quiz) }}" class="d-inline">

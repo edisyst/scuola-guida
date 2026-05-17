@@ -26,6 +26,17 @@ class QuizEnrollmentService
             throw new RuntimeException('Puoi iscriverti solo a quiz confermati.');
         }
 
+        if ($quiz->enrollmentsNotYetOpen()) {
+            throw new RuntimeException(
+                'Le iscrizioni per questo quiz apriranno il '
+                . $quiz->enrollments_open_at->format('d/m/Y H:i') . '.'
+            );
+        }
+
+        if ($quiz->enrollmentsClosed()) {
+            throw new RuntimeException('Le iscrizioni per questo quiz sono chiuse.');
+        }
+
         if ($user->isViewer() && !$user->canEnrollOfficialExams()) {
             throw new RuntimeException(
                 'Devi completare l\'iscrizione anagrafica ed essere approvato dall\'amministratore '

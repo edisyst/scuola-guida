@@ -101,6 +101,24 @@ class QuizService
         return $quiz;
     }
 
+    /**
+     * Aggiorna la finestra di iscrizione (apertura/chiusura) di un quiz confermato.
+     * I valori null sono ammessi e rappresentano "nessuna schedulazione".
+     */
+    public function updateSchedule(Quiz $quiz, ?string $openAt, ?string $closeAt): Quiz
+    {
+        if (!$quiz->isConfirmed()) {
+            throw new RuntimeException('La schedulazione iscrizioni si applica solo a quiz confermati.');
+        }
+
+        $quiz->update([
+            'enrollments_open_at'  => $openAt ?: null,
+            'enrollments_close_at' => $closeAt ?: null,
+        ]);
+
+        return $quiz->refresh();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | GAMEPLAY

@@ -176,6 +176,18 @@ Route::middleware(['auth'])
             Route::get('confirmed-results', [QuizController::class, 'confirmedResults'])
                 ->name('quizzes.confirmedResults');
 
+            // RIEPILOGO + EXPORT EXCEL (solo per quiz confermati)
+            Route::get('quizzes/{quiz}/summary', [QuizController::class, 'summary'])
+                ->name('quizzes.summary');
+            Route::get('quizzes/{quiz}/export-results', [QuizController::class, 'exportResults'])
+                ->name('quizzes.export-results');
+
+            // SCHEDULAZIONE ISCRIZIONI (solo per quiz confermati)
+            Route::get('quizzes/{quiz}/schedule', [QuizController::class, 'editSchedule'])
+                ->name('quizzes.schedule.edit');
+            Route::put('quizzes/{quiz}/schedule', [QuizController::class, 'updateSchedule'])
+                ->name('quizzes.schedule.update');
+
             // QUIZ ENROLLMENTS (admin only)
             Route::get('enrollments', [QuizEnrollmentController::class, 'adminIndex'])
                 ->name('enrollments.index');

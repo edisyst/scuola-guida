@@ -81,6 +81,15 @@
                                         <span class="sg-text-muted"><i class="fas fa-hourglass-half"></i> Attendi approvazione</span>
                                     @elseif($latest && $latest->isCompleted())
                                         <span class="sg-text-muted">Tentativo già usato</span>
+                                    @elseif($quiz->enrollmentsNotYetOpen())
+                                        <span class="sg-text-muted">
+                                            <i class="fas fa-clock"></i>
+                                            Iscrizioni aperte dal {{ $quiz->enrollments_open_at->translatedFormat('d F Y \a\l\l\e H:i') }}
+                                        </span>
+                                    @elseif($quiz->enrollmentsClosed())
+                                        <span class="sg-text-muted">
+                                            <i class="fas fa-lock"></i> Iscrizioni chiuse
+                                        </span>
                                     @elseif(!$canEnroll)
                                         <a href="{{ route('profile.edit') }}" class="sg-btn sg-btn-light sg-btn-sm">
                                             <i class="fas fa-id-card"></i> Completa profilo

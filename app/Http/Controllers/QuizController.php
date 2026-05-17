@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\QuizQuestionsDataTable;
+use App\Exports\QuizResultsExport;
 use App\Http\Requests\BulkQuizQuestionsRequest;
 use App\Http\Requests\StoreQuizRequest;
+use App\Http\Requests\UpdateQuizScheduleRequest;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Services\QuizEnrollmentService;
 use App\Services\QuizService;
+use App\Services\QuizSummaryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use RuntimeException;
 
 class QuizController extends Controller
@@ -238,6 +243,67 @@ class QuizController extends Controller
             ->paginate(20);
 
         return view('admin.quizzes.confirmed-results', compact('attempts'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RIEPILOGO PER SINGOLO QUIZ CONFERMATO (admin only)
+    |--------------------------------------------------------------------------
+    */
+
+    public function summary(Quiz $quiz, QuizSummaryService $summaries)
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless($quiz->isConfirmed(), 404);
+
+        $summary = $summaries->getSummary($quiz);
+
+        return view('admin.quizzes.summary', [
+            'quiz'        => $quiz,
+            'kpi'         => $summary['kpi'],
+            'enrollments' => $summary['enrollments'],
+        ]);
+    }
+
+    public function exportResults(Quiz $quiz)
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless($quiz->isConfirmed(), 404);
+
+        $filename = 'risultati-' . Str::slug($quiz->title ?: ('quiz-' . $quiz->id))
+            . '-' . now()->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new QuizResultsExport($quiz), $filename);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SCHEDULAZIONE ISCRIZIONI (admin only)
+    |--------------------------------------------------------------------------
+    */
+
+    public function editSchedule(Quiz $quiz)
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless($quiz->isConfirmed(), 404);
+
+        return view('admin.quizzes.schedule', compact('quiz'));
+    }
+
+    public function updateSchedule(UpdateQuizScheduleRequest $request, Quiz $quiz)
+    {
+        try {
+            $this->service->updateSchedule(
+                $quiz,
+                $request->input('enrollments_open_at'),
+                $request->input('enrollments_close_at'),
+            );
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage())->withInput();
+        }
+
+        return redirect()->route('admin.quizzes.index')
+            ->with('success', 'Schedulazione iscrizioni aggiornata.');
     }
 
     /*

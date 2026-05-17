@@ -104,7 +104,29 @@ php artisan queue:work --queue=emails
 
 Il workflow utente non si blocca mai se il worker è spento o se l'SMTP è down: le email sono "fire-and-forget" e verranno processate quando il worker tornerà attivo.
 
-### 8. Avvia il server di sviluppo
+### 8. Scheduler (chiusura automatica iscrizioni scadute)
+
+Il comando `enrollments:close-expired` chiude ogni giorno le iscrizioni `pending` rimaste oltre la data di chiusura impostata sui quiz confermati (vedi *Schedulazione iscrizioni* nell'area admin). È registrato in `routes/console.php` con frequenza `dailyAt('00:05')`.
+
+**In produzione** basta una singola voce di crontab che esegue lo scheduler di Laravel ogni minuto:
+
+```cron
+* * * * * cd /percorso/del/progetto && php artisan schedule:run >> /dev/null 2>&1
+```
+
+**In sviluppo**, per verificare il comportamento subito:
+
+```bash
+# Esecuzione manuale del singolo comando
+php artisan enrollments:close-expired
+
+# Oppure lo scheduler in foreground (esegue i comandi schedulati al momento giusto)
+php artisan schedule:work
+```
+
+Ogni esecuzione registra in `storage/logs/laravel.log` (`Log::info`) il quiz toccato, il numero di iscrizioni chiuse e la `enrollments_close_at` di riferimento.
+
+### 9. Avvia il server di sviluppo
 
 ```bash
 # Terminale 1 — asset Vite (hot reload)
@@ -139,6 +161,8 @@ php artisan route:list              # elenco di tutte le route
 - **Ciclo di vita quiz** — `draft → published → confirmed` (vedi sotto)
 - **Iscrizioni anagrafiche** — visualizza i dati anagrafici inviati dai viewer (nome, cognome, indirizzo, data e luogo di nascita, codice fiscale, documento di identità), approva o rifiuta la richiesta di iscrizione definitiva con motivazione opzionale
 - **Iscrizioni quiz** — approva o rifiuta le richieste degli utenti già abilitati; può riaprire un'iscrizione già completata
+- **Schedulazione iscrizioni** — per ogni quiz confermato l'admin può impostare data/ora di **apertura** e di **chiusura** delle iscrizioni (`admin/quizzes/{quiz}/schedule`). Entrambi i campi sono facoltativi: lasciandoli vuoti il quiz mantiene il comportamento attuale. Prima della data di apertura il pulsante "Richiedi iscrizione" è nascosto al viewer (compare il messaggio *"Iscrizioni aperte dal …"*); dopo la data di chiusura compare *"Iscrizioni chiuse"*. Validazione: `enrollments_close_at` deve essere successiva a `enrollments_open_at`. Un comando schedulato giornaliero (`enrollments:close-expired`) sposta in `rejected` le iscrizioni `pending` rimaste oltre la data di chiusura.
+- **Riepilogo quiz confermato** (`admin/quizzes/{quiz}/summary`) — pagina dedicata con 4 KPI (totale iscritti, completati, non ancora svolti, punteggio medio) e tabella iscritti ordinata per cognome, colorata per esito (Promosso/Rimandato/Non svolto). Il pulsante "Esporta Excel" in cima alla card scarica un `.xlsx` con i risultati ufficiali (formato pensato per segreteria e istruttori): `Cognome | Nome | Email | Data tentativo | Punteggio | Totale | Percentuale | Esito | Durata (min)`. L'esito è derivato dal `max_errors` del quiz.
 - **Esiti confermati** — visualizza i risultati degli utenti sui quiz confermati
 - **Statistiche** — dashboard con metriche aggregate (quiz, tentativi, utenti)
 - **Media Manager** — gestione file upload (componente Livewire)

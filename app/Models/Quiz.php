@@ -27,11 +27,15 @@ class Quiz extends Model
         'max_questions',
         'time_limit',
         'max_errors',
+        'enrollments_open_at',
+        'enrollments_close_at',
     ];
 
     protected $casts = [
-        'max_questions' => 'integer',
-        'confirmed_at'  => 'datetime',
+        'max_questions'        => 'integer',
+        'confirmed_at'         => 'datetime',
+        'enrollments_open_at'  => 'datetime',
+        'enrollments_close_at' => 'datetime',
     ];
 
     /*
@@ -73,6 +77,32 @@ class Quiz extends Model
     public function statusLabel(): string
     {
         return self::STATUSES[$this->status] ?? $this->status;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ENROLLMENT SCHEDULING
+    |--------------------------------------------------------------------------
+    */
+
+    public function enrollmentsNotYetOpen(): bool
+    {
+        return $this->enrollments_open_at && $this->enrollments_open_at->isFuture();
+    }
+
+    public function enrollmentsClosed(): bool
+    {
+        return $this->enrollments_close_at && $this->enrollments_close_at->isPast();
+    }
+
+    /**
+     * True quando esiste una finestra di schedulazione attiva e siamo dentro.
+     * False sia se non c'è schedulazione (comportamento attuale) sia se
+     * la finestra è chiusa o non ancora aperta.
+     */
+    public function enrollmentsCurrentlyOpen(): bool
+    {
+        return !$this->enrollmentsNotYetOpen() && !$this->enrollmentsClosed();
     }
 
     /*
