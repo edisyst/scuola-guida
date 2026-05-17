@@ -17,9 +17,12 @@ class UpdateQuizAttemptRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'answers'    => 'required|array',
-            'answers.*'  => 'in:0,1',
-            'duration'   => 'nullable|integer|min:0',
+            'answers'                       => 'nullable|array',
+            'answers.*.correct'             => 'sometimes|integer|in:0,1',
+            'answers.*.answered_at'         => 'sometimes|nullable|integer',
+            'answers.*.time_spent_seconds'  => 'sometimes|nullable|integer|min:0',
+            'answers.*.position'            => 'sometimes|nullable|integer|min:1',
+            'duration'                      => 'nullable|integer|min:0',
         ];
     }
 }

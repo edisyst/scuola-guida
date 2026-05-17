@@ -32,6 +32,8 @@ class QuizAttemptService
             $enrollmentId = $enrollment->id;
         }
 
+        $normalized = $this->normalizeAnswers($answers);
+
         $attempt = QuizAttempt::create([
             'user_id'            => $userId,
             'quiz_id'            => $quiz->id,
@@ -39,7 +41,7 @@ class QuizAttemptService
             'score'              => $this->scoreAnswers($answers, $correctMap),
             'total_questions'    => $correctMap->count(),
             'duration'           => $duration,
-            'answers'            => $answers,
+            'answers'            => $normalized,
         ]);
 
         if ($enrollmentId) {
@@ -58,8 +60,10 @@ class QuizAttemptService
         $quiz = $attempt->quiz()->with('questions:id,is_true')->first();
         $correctMap = $quiz->questions->pluck('is_true', 'id');
 
+        $normalized = $this->normalizeAnswers($answers);
+
         $attempt->update([
-            'answers'         => $answers,
+            'answers'         => $normalized,
             'score'           => $this->scoreAnswers($answers, $correctMap),
             'total_questions' => $correctMap->count(),
             'duration'        => $duration ?? $attempt->duration,
@@ -70,8 +74,9 @@ class QuizAttemptService
 
     /**
      * Calcola il numero di risposte corrette confrontandole con la mappa truth.
+     * Gestisce sia il formato esteso { correct: 0|1, ... } sia il formato flat legacy.
      *
-     * @param  array  $answers      [question_id => "0"|"1"]
+     * @param  array  $answers      [question_id => 0|1]  oppure  [question_id => {correct: 0|1, ...}]
      * @param  iterable  $correctMap [question_id => bool]
      */
     private function scoreAnswers(array $answers, $correctMap): int
@@ -79,16 +84,50 @@ class QuizAttemptService
         $score = 0;
 
         foreach ($answers as $questionId => $answer) {
-            // Salta domande non appartenenti al quiz (input manomesso o race condition).
             if (!isset($correctMap[$questionId])) {
                 continue;
             }
 
-            if ((int) $answer === (int) $correctMap[$questionId]) {
+            $result = is_array($answer) ? (int) ($answer['correct'] ?? 0) : (int) $answer;
+
+            if ($result === (int) $correctMap[$questionId]) {
                 $score++;
             }
         }
 
         return $score;
+    }
+
+    /**
+     * Converte il formato flat legacy nel formato esteso, lasciando invariato
+     * ciò che è già nel nuovo formato. Empty string → null per campi nullable.
+     *
+     * @param  array  $answers  [question_id => 0|1]  oppure  [question_id => {correct: 0|1, ...}]
+     * @return array            [question_id => {correct: 0|1, answered_at: int|null, ...}]
+     */
+    private function normalizeAnswers(array $answers): array
+    {
+        $normalized = [];
+
+        foreach ($answers as $questionId => $answer) {
+            if (is_array($answer)) {
+                $toInt = fn ($v) => ($v !== null && $v !== '') ? (int) $v : null;
+                $normalized[$questionId] = [
+                    'correct'            => (int) ($answer['correct'] ?? 0),
+                    'answered_at'        => $toInt($answer['answered_at'] ?? null),
+                    'time_spent_seconds' => $toInt($answer['time_spent_seconds'] ?? null),
+                    'position'           => $toInt($answer['position'] ?? null),
+                ];
+            } else {
+                $normalized[$questionId] = [
+                    'correct'            => (int) $answer,
+                    'answered_at'        => null,
+                    'time_spent_seconds' => null,
+                    'position'           => null,
+                ];
+            }
+        }
+
+        return $normalized;
     }
 }

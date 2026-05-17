@@ -6,9 +6,14 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 ## [Unreleased] — Refactor
 
 ### Added
+- **Evoluzione formato `QuizAttempt.answers`** (migration non-distruttiva `2026_05_17_220000_migrate_quiz_attempts_answers_to_extended_format`): il campo JSON passa dal formato flat `{ "12": 1 }` al formato esteso `{ "12": { "correct": 1, "answered_at": <unix>, "time_spent_seconds": null, "position": 1 } }`. La migration converte i record esistenti con `lazy()` (nessuna memory spike); il `down()` ripristina il formato flat. Campi per risposta: `correct` (0|1, obbligatorio), `answered_at` (Unix timestamp), `time_spent_seconds` (nullable), `position` (posizione nella sequenza, nullable).
+- **`QuizAttempt::getAnswerResult(int|string $questionId): ?int`** — punto di accesso unico al risultato di una singola risposta. Gestisce sia il formato esteso sia il flat legacy; restituisce `null` se la domanda non ha risposta.
 - **Anteprima ingrandita immagine domanda** in `/admin/questions`: cliccando sulla miniatura nella DataTable si apre un modal Bootstrap con l'immagine a piena dimensione (max 500×500). Il titolo del modal mostra il **testo integrale della domanda** (passato via attributo `data-question` sul tag `<img>` da `QuestionsDataTable`), in modo che anche le domande troncate a 50 caratteri nella colonna "Domanda" siano leggibili per esteso senza tooltip.
 
 ### Changed
+- **`QuizAttemptService`** — `scoreAnswers()` gestisce ora sia il formato esteso (`$answer['correct']`) sia il flat legacy (`(int) $answer`). Aggiunto metodo privato `normalizeAnswers()` che converte flat → esteso prima del salvataggio, castando i tipi (empty string da jQuery form encoding → `null` per i campi nullable). `record()` e `updateAttempt()` chiamano `normalizeAnswers()` prima di ogni write su DB.
+- **`StoreQuizAttemptRequest` e `UpdateQuizAttemptRequest`** — sostituita la regola `answers.* => 'in:0,1'` (flat) con quattro regole `answers.*.correct | answered_at | time_spent_seconds | position`, tutte con `sometimes` per accettare entrambi i formati durante la transizione.
+- **JS `quiz/play.blade.php`** — l'oggetto risposta inviato all'autosave e al submit passa da `answers[id] = value` al formato esteso `{ correct, answered_at: Math.floor(Date.now()/1000), time_spent_seconds: null, position: currentIndex + 1 }`. Aggiornate le comparazioni nel navigatore e nel calcolo errori da `answers[id] === q.correct` a `answers[id].correct === q.correct`.
 - **Filtro Vero/Falso nascosto ai viewer** in `/admin/questions`: la `<select id="filter-is-true">` è ora dentro `@if(!auth()->user()->isViewer())`. Coerente con la già esistente esclusione delle colonne "Risposta" e "Azioni" dalla DataTable per il ruolo viewer, che non deve poter filtrare per la risposta corretta.
 
 ### Security
@@ -47,6 +52,7 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 - Commento di debug `// dd(...)` rimasto in `RoleMiddleware`
 
 ### Tests
+- **`tests/Feature/QuizTest.php`** — i 3 test adattati al formato `answers` esteso (da `[$q->id => 1]` a `[$q->id => ['correct' => 1, 'answered_at' => null, ...]]`). Suite: 3 test, 10 asserzioni, tutti verdi.
 - Proposta una batteria di **65 nuovi test** organizzati in 9 aree funzionali (Quiz CRUD/state machine, gameplay, QuizAttempt, QuizEnrollment, Domande, Categorie, Utenti, Ruoli/Permessi, Dashboard/Ricerca) — vedi `REFACTOR_REPORT_ARCHITECT.md` per il dettaglio
 - `QuizTest.php` riscritto sul nuovo flusso `/quiz/attempts` (POST per creare il tentativo, PUT per aggiornare/calcolare lo score). Suite completa: 70 test, 188 asserzioni, tutti verdi
 

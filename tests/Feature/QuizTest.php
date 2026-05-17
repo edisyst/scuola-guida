@@ -63,7 +63,9 @@ class QuizTest extends TestCase
         $viewer = $this->approvedViewer();
         ['quiz' => $quiz, 'questions' => $questions] = $this->quizWithQuestions(Quiz::STATUS_PUBLISHED, 3);
 
-        $answers = $questions->mapWithKeys(fn (Question $q) => [$q->id => (int) $q->is_true])->all();
+        $answers = $questions->mapWithKeys(fn (Question $q) => [
+            $q->id => ['correct' => (int) $q->is_true, 'answered_at' => null, 'time_spent_seconds' => null, 'position' => null],
+        ])->all();
 
         $response = $this->actingAs($viewer)->postJson(route('quiz.attempts.store'), [
             'quiz_id' => $quiz->id,
@@ -92,7 +94,9 @@ class QuizTest extends TestCase
             'status'  => QuizEnrollment::STATUS_APPROVED,
         ]);
 
-        $answers = $questions->mapWithKeys(fn (Question $q) => [$q->id => (int) $q->is_true])->all();
+        $answers = $questions->mapWithKeys(fn (Question $q) => [
+            $q->id => ['correct' => (int) $q->is_true, 'answered_at' => null, 'time_spent_seconds' => null, 'position' => null],
+        ])->all();
 
         $response = $this->actingAs($viewer)->postJson(route('quiz.attempts.store'), [
             'quiz_id' => $quiz->id,
@@ -127,10 +131,15 @@ class QuizTest extends TestCase
             'answers'         => [],
         ]);
 
-        // 3 risposte corrette su 4: invertiamo la prima rispetto al valore atteso.
+        // 3 risposte corrette su 4: invertiamo la prima risposta rispetto al valore atteso.
         $answers = [];
         foreach ($questions as $index => $q) {
-            $answers[$q->id] = $index === 0 ? (int) !$q->is_true : (int) $q->is_true;
+            $answers[$q->id] = [
+                'correct'            => $index === 0 ? (int) !$q->is_true : (int) $q->is_true,
+                'answered_at'        => null,
+                'time_spent_seconds' => null,
+                'position'           => $index + 1,
+            ];
         }
 
         $response = $this->actingAs($viewer)->putJson(

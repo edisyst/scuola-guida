@@ -153,7 +153,7 @@
             questions.forEach((q, i) => {
                 let cls = '';
                 if (answers[q.id] !== undefined) {
-                    cls = answers[q.id] === q.correct ? 'answered-ok' : 'answered-ko';
+                    cls = answers[q.id].correct === q.correct ? 'answered-ok' : 'answered-ko';
                 }
                 if (i === currentIndex) cls += ' current';
 
@@ -192,14 +192,19 @@
             const isCorrect = value === q.correct;
 
             if (answers[q.id] !== undefined) {
-                const wasCorrect = answers[q.id] === q.correct;
+                const wasCorrect = answers[q.id].correct === q.correct;
                 if (!wasCorrect &&  isCorrect) errors--;
                 if ( wasCorrect && !isCorrect) errors++;
             } else {
                 if (!isCorrect) errors++;
             }
 
-            answers[q.id] = value;
+            answers[q.id] = {
+                correct:            value,
+                answered_at:        Math.floor(Date.now() / 1000),
+                time_spent_seconds: null,
+                position:           currentIndex + 1,
+            };
             autosave();
 
             renderErrorDots();

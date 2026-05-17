@@ -67,6 +67,20 @@ class QuizAttempt extends Model
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * Restituisce il risultato (0|1) per una singola risposta, gestendo sia il
+     * formato esteso { correct: 1, ... } sia il formato flat legacy { id: 1 }.
+     */
+    public function getAnswerResult(int|string $questionId): ?int
+    {
+        $answers = $this->answers ?? [];
+        $entry   = $answers[$questionId] ?? null;
+
+        if (is_null($entry))  return null;
+        if (is_array($entry)) return (int) ($entry['correct'] ?? 0);
+        return (int) $entry;
+    }
+
     // percentuale risultato
     public function getPercentageAttribute(): float
     {

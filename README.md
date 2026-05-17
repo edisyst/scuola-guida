@@ -289,6 +289,33 @@ Solo i viewer hanno un percorso di iscrizione anagrafica con approvazione admin:
 
 ---
 
+## Struttura dati — `QuizAttempt.answers`
+
+Il campo `answers` su `quiz_attempts` è un JSON indicizzato per `question_id`. Dal formato flat originale (`{ "12": 1 }`) è stato migrato al formato esteso:
+
+```json
+{
+  "12": { "correct": 1, "answered_at": 1747123456, "time_spent_seconds": null, "position": 1 },
+  "15": { "correct": 0, "answered_at": 1747123470, "time_spent_seconds": null, "position": 2 }
+}
+```
+
+| Campo | Tipo | Note |
+|---|---|---|
+| `correct` | `int` 0\|1 | Risposta corretta (1) o errata (0). Obbligatorio. |
+| `answered_at` | `int` Unix | Momento della risposta. Obbligatorio per le nuove risposte. |
+| `time_spent_seconds` | `int\|null` | Secondi sulla domanda (opzionale). |
+| `position` | `int\|null` | Posizione nella sequenza mostrata all'utente (utile dopo shuffle). |
+
+**Compat. legacy** — il formato flat (`{ "12": 1 }`) è ancora accettato dal service durante la transizione:
+- `QuizAttempt::getAnswerResult($questionId)` — metodo da usare per leggere il risultato (gestisce entrambi i formati).
+- `QuizAttemptService::normalizeAnswers()` — converte flat → esteso prima di ogni scrittura su DB.
+- `QuizAttemptService::scoreAnswers()` — calcola lo score leggendo `$answer['correct']` se array, `(int) $answer` se scalare.
+
+La migration `2026_05_17_220000_migrate_quiz_attempts_answers_to_extended_format` ha convertito i record storici in modo non-distruttivo (con `down()` di rollback).
+
+---
+
 ## Architettura — flusso di una chiamata
 
 Esempio: **aggiornamento di una domanda** (`PUT /admin/questions/{id}`).
