@@ -63,7 +63,7 @@ class QuestionsDataTable
                     ? '<span class="badge badge-success">Vero</span>'
                     : '<span class="badge badge-danger">Falso</span>'),
             'image' => $q->image
-                ? '<img src="' . (str_starts_with($q->image, 'http') ? $q->image : asset('storage/' . $q->image)) . '" width="50">'
+                ? '<img src="' . (str_starts_with($q->image, 'http') ? $q->image : asset('storage/' . $q->image)) . '" width="50" class="question-thumb" style="cursor:zoom-in;" data-full-src="' . (str_starts_with($q->image, 'http') ? $q->image : asset('storage/' . $q->image)) . '">'
                 : '',
             'actions'  => view('admin.questions.partials.actions', compact('q'))->render(),
             'checkbox' => '<input type="checkbox" class="row-checkbox" value="' . $q->id . '">',

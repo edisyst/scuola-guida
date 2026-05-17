@@ -99,6 +99,23 @@
         </div>
     </div>
 </div>
+
+{{-- Modal anteprima immagine domanda --}}
+<div class="modal fade" id="questionImageModal" tabindex="-1" role="dialog" aria-labelledby="questionImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width:540px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionImageModalLabel">Immagine domanda</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Chiudi">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="questionImageModalImg" src="" alt="" style="max-width:500px; max-height:500px; width:auto; height:auto;">
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
@@ -107,6 +124,18 @@
     <script>
         $('#select-all').on('click', function() {
             $('.row-checkbox').prop('checked', this.checked);
+        });
+
+        // Apertura modal al click sulla miniatura (delegato perché DataTables rigenera il DOM)
+        $(document).on('click', '#questions-table .question-thumb', function() {
+            var url = $(this).data('full-src');
+            if (!url) return;
+            $('#questionImageModalImg').attr('src', url);
+            $('#questionImageModal').modal('show');
+        });
+
+        $('#questionImageModal').on('hidden.bs.modal', function() {
+            $('#questionImageModalImg').attr('src', '');
         });
 
         $('#bulk-delete').click(function() {
