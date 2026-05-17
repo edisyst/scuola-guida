@@ -332,17 +332,24 @@ return [
             'key'   => 'dashboard',
         ],
         [
-            'text'  => 'I miei tentativi',
-            'url'   => 'quiz/attempts',
-            'icon'  => 'fas fa-history',
-            'key'   => 'quiz-attempts',
+            'text'        => 'Notifiche',
+            'url'         => 'notifications',
+            'icon'        => 'far fa-bell',
+            'key'         => 'notifications',
+            'label_color' => 'warning',
         ],
+
+        // ── STUDIO (allenamento libero, tutti i ruoli) ──────────────────────
+        ['header' => 'studio'],
         [
             'text'  => 'Modalità Studio',
             'url'   => 'study',
             'icon'  => 'fas fa-graduation-cap',
             'key'   => 'study',
         ],
+
+        // ── ESAMI UFFICIALI (viewer + admin) ────────────────────────────────
+        ['header' => 'esami', 'can' => 'viewer-quiz-area'],
         [
             'text' => 'Quiz disponibili',
             'url'  => 'quiz/confirmed',
@@ -357,9 +364,15 @@ return [
             'can'  => 'viewer-quiz-area',
             'key'  => 'quiz-enrollments-mine',
         ],
+        [
+            'text'  => 'I miei tentativi',
+            'url'   => 'quiz/attempts',
+            'icon'  => 'fas fa-history',
+            'key'   => 'quiz-attempts',
+        ],
 
-        // ── CONTENUTI (admin, editor, viewer) ───────────────────────────────
-        ['header' => 'contenuti', 'can' => 'view-admin'],
+        // ── CATALOGO (admin, editor, viewer) ────────────────────────────────
+        ['header' => 'catalogo', 'can' => 'view-admin'],
         [
             'text' => 'Categorie',
             'url'  => 'admin/categories',
@@ -374,6 +387,9 @@ return [
             'can'  => 'view-admin',
             'key'  => 'questions',
         ],
+
+        // ── QUIZ (admin, editor, viewer) ────────────────────────────────────
+        ['header' => 'quiz', 'can' => 'view-admin'],
         [
             'text' => 'Quizzes',
             'url'  => 'admin/quizzes',
@@ -382,8 +398,8 @@ return [
             'key'  => 'quizzes',
         ],
 
-        // ── GESTIONE QUIZ (solo admin) ───────────────────────────────────────
-        ['header' => 'gestione_quiz', 'can' => 'admin-only'],
+        // ── ISCRIZIONI (solo admin) ─────────────────────────────────────────
+        ['header' => 'iscrizioni', 'can' => 'admin-only'],
         [
             'text' => 'Iscrizioni anagrafiche',
             'url'  => 'admin/registrations',
@@ -398,6 +414,9 @@ return [
             'can'  => 'admin-only',
             'key'  => 'enrollments',
         ],
+
+        // ── ESITI & STATISTICHE (solo admin) ────────────────────────────────
+        ['header' => 'esiti', 'can' => 'admin-only'],
         [
             'text' => 'Esiti confermati',
             'url'  => 'admin/confirmed-results',
@@ -405,15 +424,15 @@ return [
             'can'  => 'admin-only',
             'key'  => 'confirmed-results',
         ],
-
-        // ── AMMINISTRAZIONE (solo admin) ─────────────────────────────────────
-        ['header' => 'amministrazione', 'can' => 'admin-only'],
         [
             'text' => 'Statistiche',
             'url'  => 'admin/stats',
             'icon' => 'fas fa-chart-bar',
             'can'  => 'admin-only',
         ],
+
+        // ── SISTEMA (media + audit, solo admin) ─────────────────────────────
+        ['header' => 'sistema', 'can' => 'admin-only'],
         [
             'text' => 'Media Manager',
             'url'  => 'admin/media',
@@ -428,6 +447,9 @@ return [
             'can'  => 'admin-only',
             'key'  => 'audit',
         ],
+
+        // ── UTENTI & RUOLI (solo admin) ─────────────────────────────────────
+        ['header' => 'utenti_ruoli', 'can' => 'admin-only'],
         [
             'text' => 'Utenti',
             'url'  => 'admin/users',

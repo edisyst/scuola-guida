@@ -101,21 +101,33 @@ class AppServiceProvider extends ServiceProvider
         */
 
         View::composer('*', function () {
+            // I badge in sidebar mostrano solo gli elementi aggiunti nell'ultima ora.
+            $since = now()->subHour();
+
             // 🔥 cache unica per tutti i badge (più efficiente)
-            $counts = Cache::remember('admin_badges', 60, function () {
+            $counts = Cache::remember('admin_badges', 60, function () use ($since) {
                 return [
-                    'users' => User::count(),
-                    'questions' => Question::count(),
-                    'categories' => Category::count(),
-                    'quizzes' => Quiz::count(),
-                    'audit' => AuditLog::count(),
+                    'users'      => User::where('created_at', '>=', $since)->count(),
+                    'questions'  => Question::where('created_at', '>=', $since)->count(),
+                    'categories' => Category::where('created_at', '>=', $since)->count(),
+                    'quizzes'    => Quiz::where('created_at', '>=', $since)->count(),
+                    'audit'      => AuditLog::where('created_at', '>=', $since)->count(),
                     'pending_registrations' => User::where('role', User::ROLE_VIEWER)
                         ->where('registration_status', User::REG_PENDING)
+                        ->where('registration_submitted_at', '>=', $since)
                         ->count(),
                 ];
             });
 
-            config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($counts) {
+            // Conteggio non-lette per l'utente corrente (non cacheato: per-utente).
+            // Anche qui filtriamo all'ultima ora per coerenza con gli altri badge.
+            $unreadNotifications = auth()->check()
+                ? auth()->user()->unreadNotifications()
+                    ->where('created_at', '>=', $since)
+                    ->count()
+                : 0;
+
+            config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($counts, $unreadNotifications) {
 
                 if (!isset($item['key']))
                     return $item;
@@ -150,6 +162,12 @@ class AppServiceProvider extends ServiceProvider
                         if ($counts['pending_registrations'] > 0) {
                             $item['label'] = $counts['pending_registrations'];
                             $item['label_color'] = 'warning';
+                        }
+                        break;
+
+                    case 'notifications':
+                        if ($unreadNotifications > 0) {
+                            $item['label'] = $unreadNotifications;
                         }
                         break;
                 }

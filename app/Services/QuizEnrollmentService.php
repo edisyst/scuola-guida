@@ -6,10 +6,17 @@ use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\QuizEnrollment;
 use App\Models\User;
+use App\Notifications\IscrizioneQuizApprovataNotification;
+use App\Notifications\IscrizioneQuizRiapertaNotification;
+use App\Notifications\IscrizioneQuizRifiutataNotification;
+use App\Notifications\NuovaIscrizioneQuizNotification;
+use App\Notifications\QuizEsameCompletatoNotification;
 use RuntimeException;
 
 class QuizEnrollmentService
 {
+    public function __construct(private NotificationService $notifications) {}
+
     /**
      * Un viewer richiede l'iscrizione a un quiz confermato.
      */
@@ -34,11 +41,15 @@ class QuizEnrollmentService
             throw new RuntimeException('Hai già svolto questo quiz. Chiedi all\'amministratore di riaprire una nuova iscrizione.');
         }
 
-        return QuizEnrollment::create([
+        $enrollment = QuizEnrollment::create([
             'quiz_id' => $quiz->id,
             'user_id' => $user->id,
             'status'  => QuizEnrollment::STATUS_PENDING,
         ]);
+
+        $this->notifications->sendToAdmins(new NuovaIscrizioneQuizNotification($user, $quiz));
+
+        return $enrollment;
     }
 
     public function approve(QuizEnrollment $enrollment, User $admin): QuizEnrollment
@@ -53,10 +64,20 @@ class QuizEnrollmentService
             'reviewed_by' => $admin->id,
         ]);
 
-        return $enrollment->refresh();
+        $enrollment->refresh();
+        $enrollment->loadMissing(['user', 'quiz']);
+
+        if ($enrollment->user) {
+            $this->notifications->send(
+                $enrollment->user,
+                new IscrizioneQuizApprovataNotification($enrollment->quiz)
+            );
+        }
+
+        return $enrollment;
     }
 
-    public function reject(QuizEnrollment $enrollment, User $admin): QuizEnrollment
+    public function reject(QuizEnrollment $enrollment, User $admin, ?string $reason = null): QuizEnrollment
     {
         if (!$enrollment->isPending()) {
             throw new RuntimeException('Solo le iscrizioni in attesa possono essere rifiutate.');
@@ -68,7 +89,17 @@ class QuizEnrollmentService
             'reviewed_by' => $admin->id,
         ]);
 
-        return $enrollment->refresh();
+        $enrollment->refresh();
+        $enrollment->loadMissing(['user', 'quiz']);
+
+        if ($enrollment->user) {
+            $this->notifications->send(
+                $enrollment->user,
+                new IscrizioneQuizRifiutataNotification($enrollment->quiz, $reason)
+            );
+        }
+
+        return $enrollment;
     }
 
     /**
@@ -85,13 +116,17 @@ class QuizEnrollmentService
             throw new RuntimeException('L\'utente ha già un\'iscrizione attiva.');
         }
 
-        return QuizEnrollment::create([
+        $enrollment = QuizEnrollment::create([
             'quiz_id'     => $quiz->id,
             'user_id'     => $user->id,
             'status'      => QuizEnrollment::STATUS_APPROVED,
             'reviewed_at' => now(),
             'reviewed_by' => $admin->id,
         ]);
+
+        $this->notifications->send($user, new IscrizioneQuizRiapertaNotification($quiz));
+
+        return $enrollment;
     }
 
     /**
@@ -108,7 +143,16 @@ class QuizEnrollmentService
             $attempt->update(['quiz_enrollment_id' => $enrollment->id]);
         }
 
-        return $enrollment->refresh();
+        $enrollment->refresh();
+        $enrollment->loadMissing(['user', 'quiz']);
+
+        if ($enrollment->user && $enrollment->quiz) {
+            $this->notifications->sendToAdmins(
+                new QuizEsameCompletatoNotification($enrollment->user, $enrollment->quiz, $attempt)
+            );
+        }
+
+        return $enrollment;
     }
 
     /**

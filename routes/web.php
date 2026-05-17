@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
@@ -68,6 +69,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/flag/{question}', [StudyController::class, 'flag'])->name('flag');
         Route::get('/summary', [StudyController::class, 'summary'])->name('summary');
         Route::delete('/session', [StudyController::class, 'destroy'])->name('destroy');
+    });
+
+    // Notifiche in-app (database notifications)
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/',        [NotificationController::class, 'index'])->name('index');
+        Route::delete('/',     [NotificationController::class, 'destroyAll'])->name('destroyAll');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
     });
 });
 

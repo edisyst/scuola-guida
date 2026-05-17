@@ -20,8 +20,18 @@ return [
 
     // Sezioni menu personalizzate
     'area_personale'  => 'AREA PERSONALE',
+    'studio'          => 'STUDIO',
+    'esami'           => 'ESAMI UFFICIALI',
+    'catalogo'        => 'CATALOGO',
+    'quiz'            => 'QUIZ',
+    'iscrizioni'      => 'ISCRIZIONI',
+    'esiti'           => 'ESITI & STATISTICHE',
+    'sistema'         => 'SISTEMA',
+    'utenti_ruoli'    => 'UTENTI & RUOLI',
+    'account'         => 'ACCOUNT',
+
+    // Deprecati (lasciati per retrocompatibilità con eventuali override esterni)
     'contenuti'       => 'CONTENUTI',
     'gestione_quiz'   => 'GESTIONE QUIZ',
     'amministrazione' => 'AMMINISTRAZIONE',
-    'account'         => 'ACCOUNT',
 ];

@@ -3,6 +3,10 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Notifications\AnagraficaModificataNotification;
+use App\Notifications\NuovaRichiestaAnagraficaNotification;
+use App\Notifications\RegistrazioneApprovataNotification;
+use App\Notifications\RegistrazioneRifiutataNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -11,6 +15,8 @@ class UserRegistrationService
 {
     private const DOCUMENT_DISK = 'public';
     private const DOCUMENT_DIR  = 'registrations';
+
+    public function __construct(private NotificationService $notifications) {}
 
     /**
      * Il viewer invia (o reinvia) i suoi dati anagrafici per essere
@@ -23,6 +29,10 @@ class UserRegistrationService
         if (!$user->isViewer()) {
             throw new RuntimeException('Solo gli utenti viewer possono inviare la richiesta di iscrizione.');
         }
+
+        // Cattura lo stato precedente PRIMA del fill: se l'utente era già approvato,
+        // il re-invio toglie l'abilitazione agli esami e richiede una nuova revisione.
+        $wasApproved = $user->isRegistrationApproved();
 
         if ($document) {
             $this->deleteDocument($user);
@@ -38,7 +48,15 @@ class UserRegistrationService
         $user->fill($data);
         $user->save();
 
-        return $user->refresh();
+        $user->refresh();
+
+        $notification = $wasApproved
+            ? new AnagraficaModificataNotification($user)
+            : new NuovaRichiestaAnagraficaNotification($user);
+
+        $this->notifications->sendToAdmins($notification);
+
+        return $user;
     }
 
     public function approve(User $user, User $admin): User
@@ -54,7 +72,11 @@ class UserRegistrationService
             'registration_rejection_reason' => null,
         ]);
 
-        return $user->refresh();
+        $user->refresh();
+
+        $this->notifications->send($user, new RegistrazioneApprovataNotification());
+
+        return $user;
     }
 
     public function reject(User $user, User $admin, ?string $reason = null): User
@@ -70,7 +92,11 @@ class UserRegistrationService
             'registration_rejection_reason' => $reason,
         ]);
 
-        return $user->refresh();
+        $user->refresh();
+
+        $this->notifications->send($user, new RegistrazioneRifiutataNotification($reason));
+
+        return $user;
     }
 
     public function documentUrl(User $user): ?string

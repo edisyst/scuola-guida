@@ -5,11 +5,15 @@ namespace App\Services;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
+use App\Models\User;
+use App\Notifications\QuizConfermatoNotification;
 use Illuminate\Support\Collection;
 use RuntimeException;
 
 class QuizService
 {
+    public function __construct(private NotificationService $notifications) {}
+
     public function create(array $data): Quiz
     {
         $questionIds = $data['questions'] ?? [];
@@ -84,7 +88,17 @@ class QuizService
             'confirmed_by' => $adminId,
         ]);
 
-        return $quiz->refresh();
+        $quiz->refresh();
+
+        $eligibleViewers = User::where('role', User::ROLE_VIEWER)
+            ->where('registration_status', User::REG_APPROVED)
+            ->get();
+
+        if ($eligibleViewers->isNotEmpty()) {
+            $this->notifications->send($eligibleViewers, new QuizConfermatoNotification($quiz));
+        }
+
+        return $quiz;
     }
 
     /*

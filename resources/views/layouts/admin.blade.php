@@ -9,6 +9,10 @@
     @livewireStyles
 @stop
 
+@section('content_top_nav_right')
+    <livewire:notification-bell />
+@stop
+
 @section('content_header')
     <h1>{{ $header ?? 'Admin Dashboard' }}</h1>
 @stop
