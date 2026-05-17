@@ -21,6 +21,12 @@ class QuestionProductionSeeder extends Seeder
             return;
         }
 
+        // Correzioni typo presenti nell'Excel rispetto ai nomi canonici nel DB
+        $typoFixes = [
+            'Incidenti, Assicurazini e Primo soccorso'                       => 'Incidenti, Assicurazioni e Primo soccorso',
+            'Luci, specchietti, autstrade e strade extraurbane principali'   => 'Luci, specchietti, autostrade e strade extraurbane principali',
+        ];
+
         // Mappa nome categoria => id (dipende da CategorySeeder già eseguito)
         $categoryMap = Category::pluck('id', 'name')->all();
 
@@ -53,6 +59,7 @@ class QuestionProductionSeeder extends Seeder
 
             $questionName = trim((string) $questionName);
             $categoryName = trim((string) $categoryName);
+            $categoryName = $typoFixes[$categoryName] ?? $categoryName;
 
             if ($questionName === '' || !isset($categoryMap[$categoryName])) {
                 $skipped++;
