@@ -53,6 +53,7 @@
                         @endforeach
                     </select>
                 </div>
+                @if(!auth()->user()->isViewer())
                 <div class="col-md-3 sg-mb-1">
                     <select id="filter-is-true" class="sg-form-control">
                         <option value="">Vero / Falso</option>
@@ -60,6 +61,7 @@
                         <option value="0">Falso</option>
                     </select>
                 </div>
+                @endif
                 <div class="col-md-3 sg-mb-1">
                     <select id="filter-image" class="sg-form-control">
                         <option value="">Tutte</option>
@@ -105,7 +107,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width:540px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="questionImageModalLabel">Immagine domanda</h5>
+                <h5 class="modal-title" id="questionImageModalLabel"></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Chiudi">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -131,11 +133,13 @@
             var url = $(this).data('full-src');
             if (!url) return;
             $('#questionImageModalImg').attr('src', url);
+            $('#questionImageModalLabel').text($(this).data('question') || '');
             $('#questionImageModal').modal('show');
         });
 
         $('#questionImageModal').on('hidden.bs.modal', function() {
             $('#questionImageModalImg').attr('src', '');
+            $('#questionImageModalLabel').text('');
         });
 
         $('#bulk-delete').click(function() {
