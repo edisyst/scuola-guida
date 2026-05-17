@@ -10,57 +10,96 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        // 10 categorie precise
         $categories = [
             [
                 'id'        => 1,
-                'name'      => 'Semafori',
-                'slug'      => 'semafori',
+                'name'      => 'Veicoli e Strade',
+                'slug'      => 'veicoli-e-strade',
             ],
             [
                 'id'        => 2,
-                'name'      => 'Obbligo',
-                'slug'      => 'obbligo',
+                'name'      => 'Segnali di pericolo',
+                'slug'      => 'segnali-di-pericolo',
             ],
             [
                 'id'        => 3,
-                'name'      => 'Cartelli',
-                'slug'      => 'cartelli',
+                'name'      => 'Segnali di precedenza',
+                'slug'      => 'segnali-di-precedenza',
             ],
             [
                 'id'        => 4,
-                'name'      => 'Guida',
-                'slug'      => 'guida',
+                'name'      => 'Segnali di divieto',
+                'slug'      => 'segnali-di-divieto',
             ],
             [
                 'id'        => 5,
-                'name'      => 'Motore',
-                'slug'      => 'motore',
+                'name'      => 'Segnali di obbligo',
+                'slug'      => 'segnali-di-obbligo',
             ],
             [
                 'id'        => 6,
-                'name'      => 'Incroci',
-                'slug'      => 'incroci',
+                'name'      => 'Segnali di indicazione',
+                'slug'      => 'segnali-di-indicazione',
             ],
             [
                 'id'        => 7,
-                'name'      => 'Pedoni',
-                'slug'      => 'pedoni',
+                'name'      => 'Segnali temporanei e complementari e pannelli integrativi',
+                'slug'      => 'segnali-temporanei-e-complementari-e-pannelli-integrativi',
             ],
             [
                 'id'        => 8,
-                'name'      => 'Pericolo',
-                'slug'      => 'pericolo',
+                'name'      => 'Semafori, vigile e strisce',
+                'slug'      => 'semafori-vigile-e-strisce',
             ],
             [
                 'id'        => 9,
-                'name'      => 'Divieto',
-                'slug'      => 'divieto',
+                'name'      => 'Luci, specchietti, autostrade e strade extraurbane principali',
+                'slug'      => 'luci-specchietti-autostrade-e-strade-extraurbane-principali',
             ],
             [
                 'id'        => 10,
-                'name'      => 'Motociclo',
-                'slug'      => 'motociclo',
+                'name'      => 'Velocità e distanze',
+                'slug'      => 'velocita-e-distanze',
+            ],
+            [
+                'id'        => 11,
+                'name'      => 'Posizione veicoli e manovre',
+                'slug'      => 'posizione-veicoli-e-manovre',
+            ],
+            [
+                'id'        => 12,
+                'name'      => 'Norme sulla precedenza',
+                'slug'      => 'norme-sulla-precedenza',
+            ],
+            [
+                'id'        => 13,
+                'name'      => 'Sorpasso',
+                'slug'      => 'sorpasso',
+            ],
+            [
+                'id'        => 14,
+                'name'      => 'Arresto Fermata e Sosta, uso del triangolo e carico',
+                'slug'      => 'arresto-fermata-e-sosta-uso-del-triangolo-e-carico',
+            ],
+            [
+                'id'        => 15,
+                'name'      => 'Norme varie',
+                'slug'      => 'norme-varie',
+            ],
+            [
+                'id'        => 16,
+                'name'      => 'Incidenti, Assicurazioni e Primo soccorso',
+                'slug'      => 'incidenti-assicurazioni-e-primo-soccorso',
+            ],
+            [
+                'id'        => 17,
+                'name'      => 'Veicoli e inquinamento',
+                'slug'      => 'veicoli-e-inquinamento',
+            ],
+            [
+                'id'        => 18,
+                'name'      => 'Patenti',
+                'slug'      => 'patenti',
             ],
         ];
 
