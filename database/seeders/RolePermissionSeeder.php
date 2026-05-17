@@ -10,7 +10,10 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // read_xxx: tutti gli utenti autenticati (viewer, editor) — admin li riceve già via allPermissions()
+        // Default sensati: viewer/editor leggono tutto, editor scrive su entità di contenuto.
+        // Admin riceve sempre tutti i permessi via allPermissions(): nessuna riga in DB.
+        // bulk_* e manage_* restano off di default — configurabili da /admin/roles.
+
         $readAll = [
             'read_question', 'read_quiz', 'read_category', 'read_user',
         ];
@@ -20,7 +23,6 @@ class RolePermissionSeeder extends Seeder
             RolePermission::firstOrCreate(['role' => User::ROLE_EDITOR, 'permission' => $perm]);
         }
 
-        // Editor: scrittura su question/quiz/category (no delete, no user, no bulk)
         $editorOnly = [
             'create_question', 'edit_question',
             'create_quiz', 'edit_quiz',
@@ -30,8 +32,6 @@ class RolePermissionSeeder extends Seeder
         foreach ($editorOnly as $perm) {
             RolePermission::firstOrCreate(['role' => User::ROLE_EDITOR, 'permission' => $perm]);
         }
-
-        // bulk_xxx: solo admin — già incluso in allPermissions(), nessuna riga nel DB necessaria
 
         $this->command->info("CREATI I RUOLI E I PERMESSI");
     }

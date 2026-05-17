@@ -44,23 +44,16 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     | Pattern: {action}_{entity}
     |
-    | HARDCODED (non configurabili per ruolo):
-    |   read_*  → true per tutti gli utenti autenticati (viewer+)
-    |   bulk_*  → true solo per admin
-    |
-    | MANAGED (configurabili dalla UI ruoli):
-    |   create, edit, delete, manage
-    |   manage_{entity} = bypass totale sull'entità
+    | Tutte le actions sono configurabili dalla UI dei ruoli e persistite nel DB.
+    | Admin riceve sempre l'elenco completo via allPermissions().
+    | manage_{entity} = bypass totale su quella entità (include read e bulk).
     */
 
     public const ENTITIES = ['question', 'quiz', 'category', 'user'];
     public const ACTIONS  = ['read', 'create', 'edit', 'delete', 'bulk', 'manage'];
 
-    /** Actions gestite dal DB e configurabili dalla UI dei ruoli */
-    public const MANAGED_ACTIONS = ['create', 'edit', 'delete', 'manage'];
-
-    /** Actions con regole hardcoded: non configurabili per ruolo */
-    public const HARDCODED_ACTIONS = ['read', 'bulk'];
+    /** Alias: tutte le actions sono ora gestite dalla UI dei ruoli */
+    public const MANAGED_ACTIONS = self::ACTIONS;
 
     public const LABELS = [
         'question' => 'Domande',
@@ -78,13 +71,8 @@ class User extends Authenticatable
         'manage' => 'Gestisci (tutto)',
     ];
 
-    /** Etichette solo per le actions gestite dalla UI */
-    public const MANAGED_ACTION_LABELS = [
-        'create' => 'Crea',
-        'edit'   => 'Modifica',
-        'delete' => 'Elimina',
-        'manage' => 'Gestisci (tutto)',
-    ];
+    /** Alias: l'UI dei ruoli mostra tutte le actions */
+    public const MANAGED_ACTION_LABELS = self::ACTION_LABELS;
 
     public const ROLES = [
         self::ROLE_ADMIN  => 'Admin',
@@ -240,17 +228,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Solo i permessi configurabili dal pannello ruoli (esclude read e bulk).
+     * Permessi configurabili dal pannello ruoli (oggi: tutti).
      */
     public static function managedPermissions(): array
     {
-        $perms = [];
-        foreach (self::ENTITIES as $entity) {
-            foreach (self::MANAGED_ACTIONS as $action) {
-                $perms[] = "{$action}_{$entity}";
-            }
-        }
-        return $perms;
+        return self::allPermissions();
     }
 
     /**
@@ -286,17 +268,7 @@ class User extends Authenticatable
 
     public function hasPermission(string $permission): bool
     {
-        // Controllato prima di effectivePermissions() così manage_{entity} non bypassa bulk.
-        if (str_starts_with($permission, 'bulk_')) {
-            return $this->isAdmin();
-        }
-
         if ($this->isAdmin()) {
-            return true;
-        }
-
-        // read_* è garantito a tutti gli utenti autenticati senza passare dal DB.
-        if (str_starts_with($permission, 'read_')) {
             return true;
         }
 

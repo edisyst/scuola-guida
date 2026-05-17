@@ -94,7 +94,7 @@
         <div class="sg-save-bar">
             <span class="hint">
                 <i class="fas fa-info-circle"></i>
-                <strong>manage</strong> concede automaticamente create/edit/delete sull'entità.
+                <strong>manage</strong> concede automaticamente tutte le azioni (read, create, edit, delete, bulk) sull'entità.
             </span>
             <button type="submit" class="sg-btn sg-btn-primary">
                 <i class="fas fa-save"></i> Salva permessi

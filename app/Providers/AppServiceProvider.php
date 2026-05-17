@@ -71,9 +71,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Gates dinamiche per ogni combinazione action_entity.
-        // hasPermission() gestisce le regole hardcoded:
-        //   read_*  → true per tutti gli utenti autenticati
-        //   bulk_*  → true solo per admin
+        // Tutti i permessi (incluso read_* e bulk_*) sono configurabili per ruolo
+        // dal pannello /admin/roles e risolti da hasPermission().
         foreach (User::ACTIONS as $action) {
             foreach (User::ENTITIES as $entity) {
                 $perm = "{$action}_{$entity}";

@@ -11,7 +11,7 @@ class RolePermissionService
 {
     /**
      * Matrice [role][permission] = bool per la UI.
-     * Contiene solo le MANAGED_ACTIONS (esclude read e bulk, che sono hardcoded).
+     * Copre tutte le ACTIONS (read, create, edit, delete, bulk, manage).
      */
     public function buildMatrix(): array
     {
@@ -36,7 +36,7 @@ class RolePermissionService
 
     /**
      * Sincronizza la matrice salvata.
-     * Ignora il ruolo admin e permette solo MANAGED_ACTIONS.
+     * Ignora il ruolo admin (riceve sempre allPermissions()).
      */
     public function syncMatrix(array $matrix): void
     {
