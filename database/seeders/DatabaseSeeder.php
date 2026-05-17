@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             UserSeeder::class,
             CategorySeeder::class,
+            QuestionProductionSeeder::class,
             QuizSeeder::class,
             QuizAttemptSeeder::class,
         ]);
