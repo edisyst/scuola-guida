@@ -26,6 +26,24 @@
         @endif
     </div>
 
+    <div class="sg-card sg-card-body-tight mb-3">
+        <p class="sg-text-muted mb-2"><i class="fas fa-info-circle mr-1"></i> Stati del quiz</p>
+        <ul class="list-unstyled mb-0 small">
+            <li class="mb-1">
+                <span class="sg-badge">Bozza</span>
+                — quiz in preparazione. Visibile e modificabile solo da admin/editor; non giocabile dai viewer.
+            </li>
+            <li class="mb-1">
+                <span class="sg-badge sg-badge-success">Pubblicato</span>
+                — disponibile per tutti gli utenti in modalità allenamento. Si può ancora modificare o riportare in bozza.
+            </li>
+            <li>
+                <span class="sg-badge sg-badge-info"><i class="fas fa-lock"></i> Confermato</span>
+                — quiz bloccato per esame ufficiale. Non più modificabile; i viewer lo svolgono solo dopo iscrizione approvata.
+            </li>
+        </ul>
+    </div>
+
     <div class="sg-card">
         <div class="table-responsive">
             <table class="sg-table" id="quiz-table">
@@ -56,11 +74,16 @@
                                 <span class="sg-badge sg-badge-info">{{ $quiz->questions_count ?? 0 }}/{{ $quiz->max_questions ?? 0 }}</span>
                             </td>
                             <td class="sg-actions-cell">
-                                @if(($quiz->questions_count ?? 0) > 0)
+                                @php
+                                    $hasQuestions = ($quiz->questions_count ?? 0) > 0;
+                                    $canPlayHere = $quiz->isPublished()
+                                        || ($quiz->isDraft() && (auth()->user()->canEditQuiz() || auth()->user()->isAdmin()));
+                                @endphp
+                                @if($hasQuestions && $canPlayHere)
                                     <a href="{{ route('quiz.play', $quiz) }}" class="sg-btn-icon info" title="Play">
                                         <i class="fas fa-play"></i>
                                     </a>
-                                @else
+                                @elseif($canPlayHere)
                                     <span class="sg-btn-icon info sg-btn-icon--disabled" title="Nessuna domanda nel quiz">
                                         <i class="fas fa-play"></i>
                                     </span>

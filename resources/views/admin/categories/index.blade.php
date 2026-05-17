@@ -25,9 +25,13 @@
                     <tr>
                         <th>ID</th>
                         <th>Nome</th>
-                        <th>Slug</th>
+                        @if(!auth()->user()->isViewer())
+                            <th>Slug</th>
+                        @endif
                         <th>Domande</th>
-                        <th class="text-right" style="width:160px;">Azioni</th>
+                        @if(!auth()->user()->isViewer())
+                            <th class="text-right" style="width:160px;">Azioni</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -35,7 +39,9 @@
                     <tr>
                         <td class="sg-text-muted">{{ $category->id }}</td>
                         <td><strong>{{ $category->name }}</strong></td>
-                        <td class="sg-text-muted">{{ $category->slug }}</td>
+                        @if(!auth()->user()->isViewer())
+                            <td class="sg-text-muted">{{ $category->slug }}</td>
+                        @endif
                         <td>
                             @if($category->questions_count > 0)
                                 <span class="sg-badge sg-badge-info">{{ $category->questions_count }}</span>
@@ -43,22 +49,24 @@
                                 <span class="sg-text-muted">—</span>
                             @endif
                         </td>
-                        <td class="sg-actions-cell">
-                            @if(auth()->user()->canEditCategory())
-                                <a href="{{ route('admin.categories.edit', $category) }}" class="sg-btn-icon edit" title="Modifica">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                            @endif
-                            @if(auth()->user()->canDeleteCategory())
-                                <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="sg-btn-icon delete" title="Elimina" onclick="return confirm('Sei sicuro?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            @endif
-                        </td>
+                        @if(!auth()->user()->isViewer())
+                            <td class="sg-actions-cell">
+                                @if(auth()->user()->canEditCategory())
+                                    <a href="{{ route('admin.categories.edit', $category) }}" class="sg-btn-icon edit" title="Modifica">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
+                                @if(auth()->user()->canDeleteCategory())
+                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="sg-btn-icon delete" title="Elimina" onclick="return confirm('Sei sicuro?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </td>
+                        @endif
                     </tr>
                 @endforeach
                 </tbody>
@@ -75,9 +83,11 @@
             $('#categories-table').DataTable({
                 pageLength: 25,
                 order: [[0, 'desc']],
+                @if(!auth()->user()->isViewer())
                 columnDefs: [
                     { orderable: false, targets: 4 }
                 ]
+                @endif
             });
         });
     </script>

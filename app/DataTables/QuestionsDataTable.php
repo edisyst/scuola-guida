@@ -50,13 +50,18 @@ class QuestionsDataTable
 
     private function row(Question $q): array
     {
+        $user = auth()->user();
+        $hideAnswer = $user && $user->isViewer();
+
         return [
             'id'       => $q->id,
             'category' => $q->category->name,
-            'question' => Str::limit($q->question, 50),
-            'is_true'  => $q->is_true
-                ? '<span class="badge badge-success">Vero</span>'
-                : '<span class="badge badge-danger">Falso</span>',
+            'question' => '<span title="' . e($q->question) . '">' . e(Str::limit($q->question, 50)) . '</span>',
+            'is_true'  => $hideAnswer
+                ? ''
+                : ($q->is_true
+                    ? '<span class="badge badge-success">Vero</span>'
+                    : '<span class="badge badge-danger">Falso</span>'),
             'image' => $q->image
                 ? '<img src="' . (str_starts_with($q->image, 'http') ? $q->image : asset('storage/' . $q->image)) . '" width="50">'
                 : '',

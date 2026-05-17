@@ -82,9 +82,13 @@
                             <th>ID</th>
                             <th>Categoria</th>
                             <th>Domanda</th>
-                            <th>Risposta</th>
+                            @if(!auth()->user()->isViewer())
+                                <th>Risposta</th>
+                            @endif
                             <th>Img</th>
-                            <th>Azioni</th>
+                            @if(!auth()->user()->isViewer())
+                                <th>Azioni</th>
+                            @endif
                             @if(auth()->user()->canDeleteQuestion())
                                 <th><input type="checkbox" id="select-all"></th>
                             @endif
@@ -151,9 +155,13 @@
                     { data: 'id' },
                     { data: 'category' },
                     { data: 'question' },
+                    @if(!auth()->user()->isViewer())
                     { data: 'is_true', orderable: false },
+                    @endif
                     { data: 'image', orderable: false },
+                    @if(!auth()->user()->isViewer())
                     { data: 'actions', orderable: false },
+                    @endif
                     @if(auth()->user()->canDeleteQuestion())
                     { data: 'checkbox', orderable: false, searchable: false },
                     @endif
