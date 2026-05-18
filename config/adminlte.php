@@ -348,7 +348,7 @@ return [
             'key'   => 'study',
         ],
 
-        // ── ESAMI UFFICIALI (viewer + admin) ────────────────────────────────
+        // ── ESAMI UFFICIALI (viewer partecipa, admin/editor sola lettura) ───
         ['header' => 'esami', 'can' => 'viewer-quiz-area'],
         [
             'text' => 'Quiz disponibili',
@@ -361,13 +361,14 @@ return [
             'text' => 'Le mie iscrizioni',
             'url'  => 'quiz/enrollments',
             'icon' => 'fas fa-list-check',
-            'can'  => 'viewer-quiz-area',
+            'can'  => 'exam-participant',
             'key'  => 'quiz-enrollments-mine',
         ],
         [
             'text'  => 'I miei tentativi',
             'url'   => 'quiz/attempts',
             'icon'  => 'fas fa-history',
+            'can'   => 'exam-participant',
             'key'   => 'quiz-attempts',
         ],
 
@@ -446,6 +447,13 @@ return [
             'icon' => 'fas fa-history',
             'can'  => 'admin-only',
             'key'  => 'audit',
+        ],
+        [
+            'text' => 'Comandi utili',
+            'url'  => 'admin/commands',
+            'icon' => 'fas fa-terminal',
+            'can'  => 'admin-only',
+            'key'  => 'commands',
         ],
 
         // ── UTENTI & RUOLI (solo admin) ─────────────────────────────────────

@@ -89,9 +89,16 @@ class AppServiceProvider extends ServiceProvider
                 || $user->canManageUser();
         });
 
-        // 🔥 Menu iscrizioni quiz lato viewer (l'editor è escluso dalla feature)
+        // 🔥 Catalogo "Quiz disponibili": viewer (partecipa), admin/editor (sola lettura).
         Gate::define('viewer-quiz-area', function (User $user) {
-            return $user->isViewer() || $user->isAdmin();
+            return $user->isViewer() || $user->isAdmin() || $user->isEditor();
+        });
+
+        // 🔥 Aree riservate a chi partecipa effettivamente agli esami ufficiali:
+        // "Le mie iscrizioni" e "I miei tentativi" sono dati personali del viewer.
+        // Admin/editor non sostengono esami → menu nascosto.
+        Gate::define('exam-participant', function (User $user) {
+            return $user->isViewer();
         });
 
         /*
