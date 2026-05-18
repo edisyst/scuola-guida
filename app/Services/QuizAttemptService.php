@@ -73,6 +73,89 @@ class QuizAttemptService
     }
 
     /**
+     * Prepara tutti i dati necessari per la view di dettaglio di un tentativo.
+     * Nessuna query N+1: le domande sono caricate con una singola query via relationship.
+     */
+    public function getAttemptDetail(QuizAttempt $attempt): array
+    {
+        $attempt->loadMissing(['quiz', 'user']);
+        $quiz = $attempt->quiz;
+
+        // Single query; Question::$with = ['category'] triggers a second query for categories
+        // (eager load, not N+1).
+        $quizQuestions = $quiz->questions()->get();
+        $answersData   = $attempt->answers ?? [];
+
+        $questionsCollection = $quizQuestions->map(function ($question, $pivotIndex) use ($answersData, $attempt) {
+            $qid      = $question->id;
+            $rawEntry = $answersData[$qid] ?? null;
+
+            $userAnswer = $attempt->getAnswerResult($qid);
+            $position   = is_array($rawEntry) && isset($rawEntry['position'])
+                ? (int) $rawEntry['position']
+                : null;
+            $timeSpent  = is_array($rawEntry) && isset($rawEntry['time_spent_seconds'])
+                ? (int) $rawEntry['time_spent_seconds']
+                : null;
+
+            $correctAnswer = (int) $question->is_true;
+            $isCorrect     = $userAnswer !== null ? ($userAnswer === $correctAnswer) : null;
+
+            return [
+                'question'       => $question,
+                'user_answer'    => $userAnswer,
+                'correct_answer' => $correctAnswer,
+                'is_correct'     => $isCorrect,
+                'position'       => $position,
+                'time_spent'     => $timeSpent,
+                '_pivot_index'   => $pivotIndex,
+            ];
+        });
+
+        // Answered questions sorted by position; unpositioned appended in pivot order.
+        $withPos    = $questionsCollection->filter(fn ($i) => $i['position'] !== null)->sortBy('position');
+        $withoutPos = $questionsCollection->filter(fn ($i) => $i['position'] === null)->sortBy('_pivot_index');
+
+        $questions = $withPos->concat($withoutPos)
+            ->map(function ($item) {
+                unset($item['_pivot_index']);
+                return $item;
+            })
+            ->values();
+
+        $total       = $questions->count();
+        $correct     = $questions->filter(fn ($i) => $i['is_correct'] === true)->count();
+        $wrong       = $questions->filter(fn ($i) => $i['is_correct'] === false)->count();
+        $notAnswered = $questions->filter(fn ($i) => $i['user_answer'] === null)->count();
+        $answered    = $total - $notAnswered;
+        $percentage  = $total > 0 ? round($correct / $total * 100, 1) : 0.0;
+        $passed      = $wrong <= ($quiz->max_errors ?? $total);
+
+        $durationHuman = null;
+        if ($attempt->duration) {
+            $mins = intdiv($attempt->duration, 60);
+            $secs = $attempt->duration % 60;
+            $durationHuman = $mins > 0 ? "{$mins} min {$secs} sec" : "{$secs} sec";
+        }
+
+        return [
+            'attempt'   => $attempt,
+            'quiz'      => $quiz,
+            'stats'     => [
+                'total'          => $total,
+                'answered'       => $answered,
+                'correct'        => $correct,
+                'wrong'          => $wrong,
+                'not_answered'   => $notAnswered,
+                'percentage'     => $percentage,
+                'passed'         => $passed,
+                'duration_human' => $durationHuman,
+            ],
+            'questions' => $questions,
+        ];
+    }
+
+    /**
      * Calcola il numero di risposte corrette confrontandole con la mappa truth.
      * Gestisce sia il formato esteso { correct: 0|1, ... } sia il formato flat legacy.
      *

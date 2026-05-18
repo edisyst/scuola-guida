@@ -6,6 +6,7 @@ use App\Http\Requests\StoreQuizAttemptRequest;
 use App\Http\Requests\UpdateQuizAttemptRequest;
 use App\Models\QuizAttempt;
 use App\Services\QuizAttemptService;
+use Illuminate\Contracts\View\View;
 
 class QuizAttemptController extends Controller
 {
@@ -51,7 +52,7 @@ class QuizAttemptController extends Controller
         return view('admin.quiz-attempts.index', compact('attempts'));
     }
 
-    public function show(QuizAttempt $attempt)
+    public function show(QuizAttempt $attempt): View
     {
         // IDOR guard: un viewer può vedere solo i propri tentativi.
         // Admin e utenti con canEditUser() possono vedere qualsiasi tentativo.
@@ -60,11 +61,9 @@ class QuizAttemptController extends Controller
             abort(403);
         }
 
-        // Eager load del quiz: la view accede a $attempt->quiz->isConfirmed() per
-        // decidere il link "Riprova" (W-4). Senza loadMissing si scatena una lazy query.
-        $attempt->loadMissing('quiz');
+        $detail = $this->service->getAttemptDetail($attempt);
 
-        return view('quiz.attempt', compact('attempt'));
+        return view('quiz.attempt', $detail);
     }
 
     public function update(UpdateQuizAttemptRequest $request, QuizAttempt $attempt)
