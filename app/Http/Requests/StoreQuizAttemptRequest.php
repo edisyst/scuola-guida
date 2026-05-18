@@ -16,6 +16,7 @@ class StoreQuizAttemptRequest extends FormRequest
         return [
             'quiz_id'                       => 'required|exists:quizzes,id',
             'answers'                        => 'required|array',
+            'answers.*'                      => 'nullable',
             'answers.*.correct'              => 'sometimes|integer|in:0,1',
             'answers.*.answered_at'          => 'sometimes|nullable|integer',
             'answers.*.time_spent_seconds'   => 'sometimes|nullable|integer|min:0',
