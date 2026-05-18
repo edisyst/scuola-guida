@@ -177,13 +177,20 @@ php artisan route:list              # elenco di tutte le route
 
 - **Registrazione account** — email e password (livello base, abilita subito le esercitazioni)
 - **Iscrizione anagrafica** — dal proprio profilo il viewer compila nome, cognome, indirizzo, data e luogo di nascita, codice fiscale e carica il documento di identità (PDF/JPG/PNG, max 5 MB), poi invia la richiesta all'amministratore. Solo dopo l'approvazione può iscriversi agli esami ufficiali; può modificare i dati in seguito, ma ogni reinvio richiede una nuova approvazione e disabilita temporaneamente l'iscrizione a nuovi esami
-- **Dashboard personale** — statistiche tentativi, punteggio medio, ultima attività
+- **Dashboard personale** — statistiche tentativi con cache 10 minuti (`UserStatsService`), invalidata automaticamente ad ogni nuovo tentativo tramite `QuizAttempt::booted()`. KPI: tentativi totali, media %, miglior %, tasso di superamento, durata media, risposte corrette/totali. Grafici Chart.js: andamento ultimi 30 giorni (line + bar) e ciambella esiti (superati/non superati). Tabella dei 10 ultimi tentativi con link al dettaglio. Il pulsante "Aggiorna ora" forza l'invalidazione della cache via `POST /dashboard/{user}/refresh`
 - **Catalogo quiz confermati** — richiedi iscrizione a un quiz ufficiale (riservato ai viewer approvati)
 - **Le mie iscrizioni** — traccia lo stato delle richieste (in attesa / approvata / completata)
 - **Gioca quiz** — interfaccia a domande con timer e feedback finale (score, errori, esito). Sui quiz ufficiali ogni iscrizione consente un solo tentativo
-- **Modalità Studio** — allenamento libero senza timer né punteggio: si scelgono le domande da un quiz pubblicato/confermato, da una categoria oppure casualmente da tutto il database. Per ogni domanda l'utente riceve feedback inline immediato (corretta/errata) e può navigare liberamente avanti e indietro. Ogni domanda può essere marcata come "da ripassare" (stato salvato in sessione, niente DB); al termine il riepilogo mostra totale, risposte date, lista delle marcate e un pulsante per avviare subito una nuova sessione che le contenga
-- **Storico tentativi** — rivedi tutti i tuoi quiz svolti
-- **Ricerca** — cerca domande per testo o categoria
+- **Dettaglio tentativo** (`/quiz/attempts/{id}`) — pagina di riepilogo post-quiz con punteggio, percentuale, esito, durata. Protezione IDOR: ogni viewer vede solo i propri tentativi; admin e utenti con `canEditUser()` possono consultare qualsiasi tentativo
+- **Modalità Studio** — allenamento libero senza timer né punteggio. Quattro sorgenti selezionabili:
+  - *Da un quiz specifico* — qualsiasi quiz `published` o `confirmed`
+  - *Da una categoria* — tutte le domande di una categoria in ordine casuale
+  - *Domande casuali* — fino a 30 domande estratte casualmente dall'intero database
+  - *Domande marcate* — ripassa solo le domande segnate come "da ripassare" nella sessione corrente (sorgente disponibile solo dal riepilogo)
+
+  Per ogni domanda il viewer riceve feedback inline immediato (corretta/errata, Alpine.js, nessun round-trip) e può navigare liberamente avanti e indietro tramite URL `?index=N`. Ogni domanda può essere marcata come "da ripassare" (stato salvato in sessione PHP, niente DB) via chiamata AJAX al flag endpoint. Al termine, la pagina di riepilogo mostra totale domande, risposte date, conteggio e lista delle marcate, con pulsante per avviare subito una nuova sessione sulle marcate
+- **Storico tentativi** — elenco paginato di tutti i quiz svolti con link al dettaglio
+- **Ricerca** — cerca domande per testo o categoria dalla barra della navbar; i risultati si aprono in una nuova scheda
 
 ### Notifiche (email + in-app)
 
@@ -390,7 +397,7 @@ Browser
 |---|---|
 | **FormRequest** | Autorizzazione + validazione. Il controller non vede dati non validati. |
 | **Controller** | Orchestrazione pura: chiama il service, ritorna la risposta. Nessuna logica. |
-| **Service** | Tutta la business logic (11 service: Quiz, QuizAttempt, QuizEnrollment, Question, User, UserRegistration, UserStats, DashboardStats, RolePermission, Search, Study). |
+| **Service** | Tutta la business logic (13 service: Quiz, QuizAttempt, QuizEnrollment, QuizSummary, Question, User, UserRegistration, UserStats, DashboardStats, RolePermission, Search, Study, Notification). |
 | **Trait Auditable** | Logging automatico di ogni create/update/delete su tutti i modelli che lo usano. |
 | **Observer** | Effetti collaterali post-salvataggio (invalidazione cache, ecc.) tenuti fuori dal service. |
 
@@ -633,14 +640,81 @@ I permessi granulari (`edit_questions`, `delete_quiz`, …) sono configurabili p
 
 ---
 
+## Statistiche utente — dettaglio tecnico
+
+La dashboard personale (`GET /dashboard`) è servita dal `UserStatsController::me()`:
+
+- Gli **admin ed editor** vedono i KPI globali (`DashboardStatsService::kpi()`): totale utenti, domande, categorie, quiz + grafici `dailyCreated` degli ultimi 30 giorni (Chart.js line).
+- I **viewer** vedono le proprie statistiche aggregate (`UserStatsService::get($user)`): tutto viene calcolato con un batch di query SQL e salvato in cache `user_stats_{id}` per 10 minuti (`CACHE_TTL = 600`).
+
+### Dati calcolati per viewer
+
+| Metrica | Fonte |
+|---|---|
+| `total_attempts` | `COUNT(*)` su `quiz_attempts` |
+| `total_correct` / `total_questions` | `SUM(score)` / `SUM(total_questions)` |
+| `avg_percentage` / `best_percentage` / `worst_percentage` | `AVG`/`MAX`/`MIN` su `(score*100/total_questions)` |
+| `passed_count` / `failed_count` / `pass_rate` | soglia 60% |
+| `avg_duration` / `total_duration` | `AVG`/`SUM(duration)` |
+| `latest_attempts` | ultimi 10 con eager load `quiz:id,title` |
+| `daily_chart` | `COUNT` e `AVG %` per giorno, ultimi 30 gg |
+| `avg_by_quiz` | top-10 quiz per numero di tentativi, con media e best % |
+
+### Invalidazione cache
+
+Il model `QuizAttempt` usa `static::booted()` per chiamare `UserStatsService::forget($userId)` su `saved` e `deleted`. L'admin può forzare manualmente l'invalidazione con il pulsante "Aggiorna ora" (`POST /dashboard/{user}/refresh`). L'admin può inoltre consultare le statistiche di qualsiasi utente via `GET /admin/users/{user}/stats` (protezione: `canEditUser()` o `isAdmin()`).
+
+---
+
+## Modalità Studio — dettaglio tecnico
+
+Il `StudyService` gestisce una sessione di allenamento interamente in `$_SESSION` (nessuna tabella dedicata). Chiavi di sessione:
+
+| Chiave | Contenuto |
+|---|---|
+| `study_questions` | Array degli ID domanda nell'ordine della sessione |
+| `study_index` | Indice corrente (0-based), clampato all'intervallo valido |
+| `study_flagged` | Array degli ID marcati come "da ripassare" |
+| `study_answers` | Map `question_id => 0|1` per il conteggio nel riepilogo |
+| `study_source` | Sorgente (`quiz`, `category`, `random`, `flagged`) |
+
+Sorgente `flagged`: disponibile solo se la sessione contiene già domande marcate; al click su "Ripassa le domande marcate" nel riepilogo, viene avviata una nuova sessione con le sole `study_flagged` della sessione precedente.
+
+Limite domande casuali: `RANDOM_LIMIT = 30`.
+
+---
+
+## Test — copertura
+
+La suite attuale copre le funzionalità principali con test di integrazione (Feature tests):
+
+| File | Test | Aree coperte |
+|---|---|---|
+| `QuizTest` | 3 | Creazione tentativo, tentativo su quiz confermato con iscrizione, aggiornamento score |
+| `AdminOperativityTest` | 8 | Export Excel, riepilogo KPI, schedulazione iscrizioni, comando `close-expired` |
+| `NotificationsTest` | 19 | Dispatch 11 notifiche, fallback fire-and-forget, payload DB, pagina, bell Livewire |
+| `GdprTest` | 7 | PII anonimizzata, blocco admin, dry-run, login impossibile, sessioni DB, gdpr:list |
+| `RegistrationFlowTest` | 9 | Workflow iscrizione anagrafica end-to-end |
+| `StudyTest` | 10 | Sessione studio, sorgenti, navigazione, flag, riepilogo |
+| `UserStatsTest` | 9 | Dashboard, aggregati, cache, invalidazione, vista admin |
+| `MediaManagerTest` | 8 | Render, switch folder, upload, duplicati, rename, delete |
+| `AuditLogTest` | 6 | Creazione log su CRUD, accesso admin-only |
+| `CategoryTest` | 4 | CRUD, permessi |
+| `QuestionTest` | vari | CRUD domande |
+| `ProfileTest` | 4 | Profilo, aggiornamento, cancellazione account |
+| `Auth/*` | 13 | Login, logout, registrazione, reset password, verifica email |
+
+---
+
 ## Dipendenze principali
 
 | Package | Uso |
 |---|---|
 | `jeroennoten/laravel-adminlte` | Template admin con sidebar, navbar, widget |
-| `livewire/livewire` | Media Manager (componente dinamico) |
-| `maatwebsite/excel` | Import/export domande via Excel |
+| `livewire/livewire` | Media Manager e NotificationBell (componenti dinamici) |
+| `maatwebsite/excel` | Import/export domande via Excel; export risultati quiz |
 | `yajra/laravel-datatables` | Tabelle con ricerca/ordinamento server-side |
-| `laravel/breeze` | Scaffolding autenticazione (Blade preset) |
-| `alpinejs` | Interattività JS leggera (toggle, dropdown) |
+| `laravel/breeze` | Scaffolding autenticazione (Blade preset, dev) |
+| `alpinejs` | Interattività JS leggera (toggle, dropdown, feedback studio) |
 | `barryvdh/laravel-debugbar` | Debug toolbar (solo sviluppo) |
+| `laravel/pint` | Code style (solo sviluppo) |

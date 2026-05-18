@@ -3,7 +3,27 @@
 Tutte le modifiche significative a questo progetto sono documentate in questo file.
 Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
-## [Unreleased] — Refactor
+---
+
+## [2026-05-18] — GDPR, Comandi utili, UI responsive e fix badge sidebar
+
+### Added
+
+- **Comandi Artisan GDPR** (`app/Console/Commands/GdprAnonymize.php`, `GdprList.php`) — vedi sezione GDPR nel README per la descrizione completa.
+- **Pannello admin "Comandi utili"** (`GET /admin/commands`, solo `admin`) — vedi sezione dedicata nel README.
+
+### Fixed
+
+- **Badge sidebar nascosti quando a zero** — `AppServiceProvider` view composer: i contatori `questions`, `categories`, `quizzes`, `users`, `audit` ora compaiono solo se il valore è `> 0`, allineando il comportamento ai contatori `registrations` e `notifications` che già applicavano questa logica.
+- **UI responsive mobile** — audit responsive su viste admin (`admin/questions`, `admin/quizzes`, `admin/users`, `admin/audit`), quiz (`quiz/play`, `quiz/attempt`, `quiz/attempts`), studio (`study/play`, `study/summary`) e profilo (`profile/edit`): rimossi stili inline incompatibili con schermi piccoli, sostituiti con classi utility `sg-*` e breakpoint Bootstrap.
+
+### Changed
+
+- **Sidebar** — miglioramento estetico voci e sezioni; voce "Comandi utili" aggiunta nella sezione SISTEMA (`fas fa-terminal`).
+
+---
+
+## [Unreleased] — Refactor cumulativo (sicurezza, pulizia, evoluzione formato answers)
 
 ### Added
 - **Comandi Artisan GDPR** — anonimizzazione e visibilità dei dati personali dei viewer:
@@ -177,71 +197,82 @@ tests/Feature/AdminOperativityTest.php                # nuovo file
 
 ---
 
-## [2026-05-16] — Iscrizioni anagrafica
+## [2026-05-17] — Modalità Studio, statistiche utente e seeder di produzione
 
 ### Added
-- **Iscrizione anagrafica viewer** con approvazione admin: nuova interfaccia per la gestione delle iscrizioni con workflow di approvazione
+
+- **Modalità Studio** (`GET /study`, `POST /study/start`, `GET /study/play`, `POST /study/flag/{question}`, `GET /study/summary`, `DELETE /study/session`) — allenamento libero senza timer né punteggio. `StudyService` gestisce la sessione interamente in PHP session (chiavi: `study_questions`, `study_index`, `study_flagged`, `study_answers`, `study_source`). Quattro sorgenti: quiz specifico (`published`/`confirmed`), categoria (ordine casuale), 30 domande casuali da tutto il database, domande marcate nella sessione precedente. Interfaccia Alpine.js con feedback inline immediato (nessun round-trip), navigazione avanti/indietro via `?index=N`, toggle segnalibro "da ripassare" via AJAX. Riepilogo finale con totale, risposte date, lista marcate e pulsante "Ripassa le marcate". 10 test in `tests/Feature/StudyTest.php`.
+
+- **Dashboard personale e statistiche utente** (`GET /dashboard`, `POST /dashboard/{user}/refresh`, `GET /admin/users/{user}/stats`):
+  - `UserStatsService` — calcola e cachea (`user_stats_{id}`, 10 min) le seguenti metriche: `total_attempts`, `total_correct`, `avg/best/worst_percentage`, `passed_count`, `failed_count`, `pass_rate`, `avg/total_duration`, `latest_attempts` (top 10), `daily_chart` (ultimi 30 gg), `avg_by_quiz` (top 10 per tentativi).
+  - Cache invalidata automaticamente in `QuizAttempt::booted()` su `saved`/`deleted`. Il pulsante "Aggiorna ora" forza l'invalidazione via `UserStatsService::forget()`.
+  - Grafici Chart.js: linea + barre (andamento 30 gg, doppio asse Y) e ciambella (esiti superati/non superati).
+  - Admin e editor vedono la dashboard con KPI globali (`DashboardStatsService`); viewer vedono le proprie statistiche.
+  - Protezione: un viewer non può accedere alle statistiche di un altro utente (403); admin e utenti con `canEditUser()` possono consultare qualsiasi profilo.
+  - 9 test in `tests/Feature/UserStatsTest.php`.
+
+- **Seeder domande reali** (`QuestionProductionSeeder`) — legge 7143 domande da un file Excel via `PhpSpreadsheet` e le importa nella tabella `questions` associando le 18 categorie della scuola guida (aggiornate in `CategorySeeder`). Usato dal `DatabaseSeeder` in luogo del seeder con domande fake.
+
+- **Design system `sg-*`** — set di classi CSS utility (`sg-wrapper`, `sg-card`, `sg-btn`, `sg-stat-card`, `sg-badge`, `sg-table`, `sg-gap-*`, `sg-mt-*`, `sg-mb-*`, ecc.) che sostituisce gli stili inline nelle viste Blade, garantendo coerenza grafica e semplificando gli override responsive.
+
+- **Adattamento UI admin per i viewer** — legenda stati quiz nella lista admin, filtro "Vero/Falso" nelle domande nascosto ai viewer (non devono poter filtrare per risposta corretta).
+
+- **Permessi `read_*` e `bulk_*` configurabili dalla UI** — i permessi `read_question`, `read_quiz`, `read_category`, `read_user`, `bulk_question`, `bulk_quiz`, `bulk_category`, `bulk_user` sono ora gestibili dal pannello `Admin → Ruoli & Permessi` (`/admin/roles`).
+
+- **Anteprima immagine domanda in modal** — nella DataTable delle domande admin, cliccando sulla miniatura si apre un modal Bootstrap con l'immagine a piena dimensione (max 500×500) e il testo integrale della domanda nell'header del modal (passato via `data-question` sull'`<img>` da `QuestionsDataTable`).
+
+### Changed
+
+- **`DashboardController`** reindirizziato: admin e editor che accedono a `/dashboard` vedono i KPI globali; i viewer vedono il proprio pannello statistiche. Separazione netta delle due viste (`admin.dashboard` vs `stats.dashboard`).
+- **Riordino sidebar** — voci raggruppate in 10 sezioni semantiche (`AREA PERSONALE`, `STUDIO`, `ESAMI UFFICIALI`, `CATALOGO`, `QUIZ`, `ISCRIZIONI`, `ESITI & STATISTICHE`, `SISTEMA`, `UTENTI & RUOLI`, `ACCOUNT`).
+- **Refactoring CSS** — eliminati stili inline complessi nelle view, sostituite con classi `sg-*`; rimossi i namespace inline da `web.php`.
+
+---
+
+## [2026-05-16] — Iscrizioni anagrafica, Dark Mode e Media Manager
+
+### Added
+- **Iscrizione anagrafica viewer** con approvazione admin: workflow completo `none → pending → approved/rejected`, form nel profilo con upload documento (PDF/JPG/PNG, max 5 MB), gestione approvazione/rifiuto con motivazione opzionale, stato visibile nel badge profilo (`registration-status-badge`).
+- **Dark mode completo** — contrasto migliorato su tutte le viste; toggle nella navbar.
+- **Media Manager Livewire** (`App\Http\Livewire\Admin\MediaManager`) — tab multi-cartella (`test`/`production`), griglia immagini con lazy load, upload (JPG/PNG/GIF/WEBP, max 2 MB), rinomina con aggiornamento referenze su `questions.image`, eliminazione con conteggio referenze. 8 test in `tests/Feature/MediaManagerTest.php`.
+- **Branding** — favicon personalizzata, logo ScuolaGUIDA, rimozione riferimenti AdminLTE dalla UI.
+- **Pagine errore personalizzate** — `401`, `403`, `404`, `500` con layout uniforme.
 
 ### Fixed
-- Ricerca navbar apre risultati in nuova scheda (fix comportamento clic)
+- Ricerca navbar apre risultati in nuova scheda (fix comportamento clic).
+- Media Manager: rinominato `upload()` in `save()` per evitare conflitto con il metodo riservato di Livewire 3 (`$wire` proxy aliasa `upload` a una magic JS).
 
 ### Changed
-- Test: aggiorna redirect atteso dopo login da admin
+- Dashboard e stats ridenominati: `/dashboard` è la homepage utente; `/admin/stats` è la panoramica admin.
+- Riordino menu laterale con sezioni e separatori per ruolo.
+- Test: aggiornato redirect atteso dopo login.
 
 ---
 
-## [2026-05-10] — Dark Mode & Media Manager
+## [2026-05-15] — Iscrizioni quiz & gestione interfaccia
 
 ### Added
-- **Dark mode completo**: migliora contrasto su tutte le views, copertura completa
+- **Iscrizioni ai quiz** (`QuizEnrollmentController`, `QuizEnrollmentService`) — workflow completo: richiesta viewer → approvazione/rifiuto admin → gioco → completamento. Stato: `pending → approved/rejected/completed`. Riapertura da parte dell'admin.
+- **Pagine di errore personalizzate** — layout uniforme per 404, 401, 403, 500.
 
 ### Changed
-- Media manager: spaziatura verticale, classi CSS mancanti, dark mode completa
-- UI: migliora grafica media manager con spaziamento e dimensioni corretti
-- Branding: favicon volante, logo ScuolaGUIDA, rimozione riferimenti AdminLTE
-- README: aggiorna documentazione con funzionalità, architettura e ciclo di vita quiz attuali
+- Refactoring interfaccia edit e manage quiz.
+- Riordino menu laterale con sezioni e separatori per ruolo.
+
+---
+
+## [2026-05-14] — Refactoring business logic
+
+### Added
+- Permessi `read_xxx` e `bulk_xxx` per entità.
+- Permessi granulari per ruolo in controller e viste admin.
+
+### Changed
+- **Refactor business logic** — logica estratta dai controller in Service (`QuizService`, `QuestionService`, `UserService`, `UserRegistrationService`, `SearchService`), FormRequest, Observer (`QuestionObserver`, `CategoryObserver`, `UserObserver`, `QuizObserver`) e DataTables (`QuestionsDataTable`).
+- README: riscritto con istruzioni di installazione e documentazione del flusso business logic.
 
 ### Fixed
-- Media manager: rinomina `upload()` in `save()` per evitare alias riservato Livewire 3
-
----
-
-## [2026-05-01] — Media Manager & Dashboard Refactor
-
-### Added
-- **Media manager completo**: tab multi-cartella, griglia immagini, gestione file separata dallo storage
-- Seeder di produzione separato per domande reali
-
-### Changed
-- Rinomina dashboard e stats: `/dashboard` è la homepage utente, `/admin/stats` è la panoramica admin
-- Riordino menu laterale con sezioni e separatori per ruolo
-- Pagine di errore personalizzate (404, 401, 403, 500)
-
----
-
-## [2026-04-20] — Iscrizioni & Quiz Management
-
-### Added
-- **Iscrizioni ai quiz**: gestione completa del workflow di iscrizione
-
-### Changed
-- Refactoring edit e manage quiz: migliora interfaccia e UX
-- Fix interfaccia edit e manage quiz
-
----
-
-## [2026-04-10] — Business Logic Refactor
-
-### Changed
-- **Refactor business logic**: estrai logica da controller in Services, FormRequests, Observers e DataTables
-- README: riscrivi documentazione con istruzioni di installazione e flusso business logic
-
-### Added
-- Permessi `read_xxx` e `bulk_xxx` per entità
-- Permessi granulari per ruolo in controller e viste admin
-
-### Fixed
-- Fix DB seeder: risolve problemi di integrità dei dati
+- DB seeder: risolti problemi di integrità dei dati.
 
 ---
 
