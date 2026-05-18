@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Quiz;
 use App\Models\User;
 use App\Services\DashboardStatsService;
 use App\Services\UserStatsService;
@@ -30,10 +31,14 @@ class UserStatsController extends Controller
             ]);
         }
 
+        $nextSession = Quiz::confirmed()->enrollmentsOpen()->first()
+            ?? Quiz::confirmed()->enrollmentsUpcoming()->orderBy('enrollments_open_at')->first();
+
         return view('stats.dashboard', [
             'user'        => $user,
             'stats'       => $this->service->get($user),
             'isAdminView' => false,
+            'nextSession' => $nextSession,
         ]);
     }
 

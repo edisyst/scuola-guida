@@ -49,6 +49,27 @@
         </div>
     </div>
 
+    @if(!$isAdminView && !empty($nextSession))
+        <div class="info-box bg-gradient-success mb-3">
+            <span class="info-box-icon"><i class="fas fa-calendar-check"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Prossima sessione</span>
+                <span class="info-box-number">{{ $nextSession->title }}</span>
+                <span class="progress-description">
+                    @if($nextSession->enrollment_status === 'open')
+                        Iscrizioni aperte
+                        @if($nextSession->enrollments_close_at)
+                            fino al {{ $nextSession->enrollments_close_at->format('d/m/Y') }}
+                        @endif
+                    @else
+                        Apre il {{ $nextSession->enrollments_open_at->format('d/m/Y H:i') }}
+                    @endif
+                    &mdash; <a href="{{ route('calendar.index') }}" class="text-white"><u>Vedi calendario</u></a>
+                </span>
+            </div>
+        </div>
+    @endif
+
     @if($stats['total_attempts'] === 0)
         <div class="sg-card sg-mt-3">
             <div class="sg-card-body sg-text-center p-5">

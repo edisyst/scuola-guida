@@ -367,6 +367,13 @@ return [
             'key'  => 'quiz-confirmed',
         ],
         [
+            'text' => 'Calendario sessioni',
+            'url'  => 'calendar',
+            'icon' => 'fas fa-calendar-alt',
+            'can'  => 'viewer-quiz-area',
+            'key'  => 'calendar',
+        ],
+        [
             'text' => 'Le mie iscrizioni',
             'url'  => 'quiz/enrollments',
             'icon' => 'fas fa-list-check',

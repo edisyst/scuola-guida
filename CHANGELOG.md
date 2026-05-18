@@ -5,6 +5,45 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-19] — Calendario sessioni d'esame
+
+### Added
+
+- **Scopes Eloquent su `Quiz`**: `scopeEnrollmentsOpen`, `scopeEnrollmentsUpcoming`, `scopeEnrollmentsClosed` — query builder riutilizzabili per filtrare i quiz confermati in base alla finestra di iscrizione. Compatibili con MySQL e SQLite (nessun raw SQL).
+- **Accessor `enrollment_status` su `Quiz`**: restituisce `'open'` / `'upcoming'` / `'closed'` calcolato a runtime dalle date, pronto per le view senza logica condizionale inline.
+- **`GET /calendar`** — pagina calendario sessioni (`CalendarController::index()`): carica le tre collection (`$upcoming`, `$open`, `$closed`) con query separate senza N+1, recupera gli ID iscrizioni dell'utente corrente e la variabile `$canEnroll` con la stessa logica del catalogo quiz confermati.
+- **`resources/views/calendar/index.blade.php`** — lista cronologica divisa in tre card con bordo colorato (arancio/verde/grigio): *Prossime sessioni*, *Iscrizioni aperte*, *Sessioni chiuse* (ultime 10). Countdown Alpine.js via `@push('js')` per quiz `upcoming` (decorativo, zero dipendenze aggiuntive).
+- **`resources/views/calendar/_quiz-row.blade.php`** — partial riusato nelle tre sezioni; mostra date apertura/chiusura, badge stato iscrizioni, badge "Già iscritto", pulsante "Richiedi iscrizione" (logica di visibilità copiata esattamente dal catalogo `quiz/confirmed/index.blade.php`: `$canEnroll` + finestra aperta + nessuna iscrizione esistente) o "Completa profilo" se il viewer non è ancora approvato.
+- **Widget "Prossima sessione" nella dashboard viewer** — `info-box` AdminLTE `bg-gradient-success` inserita in `stats/dashboard.blade.php` prima delle statistiche; mostra il titolo del quiz più vicino tra `enrollmentsOpen()` e `enrollmentsUpcoming()` con link al calendario. Visibile solo nella vista personale (`!$isAdminView`).
+- **Route `GET /calendar`** (`name: calendar.index`) nel gruppo `auth` di `routes/web.php`.
+- **Voce sidebar "Calendario sessioni"** in `config/adminlte.php` — icona `fas fa-calendar-alt`, gate `viewer-quiz-area`, posizionata dopo "Quiz disponibili" nella sezione *ESAMI UFFICIALI*.
+- **`tests/Feature/CalendarTest.php`** — 16 test (34 asserzioni): accesso autenticato (200) e anonimo (redirect login), quiz nelle sezioni corrette per ogni combinazione di date, quiz senza date → sezione open, badge "Già iscritto", assenza pulsante iscrizione per quiz upcoming/closed e per viewer non approvato, 4 test unitari sull'accessor `enrollment_status`, widget dashboard con quiz esistente e con scelta tra open e upcoming.
+
+### Changed
+
+- `app/Http/Controllers/UserStatsController::me()` — aggiunta query `$nextSession` (doppia query `enrollmentsOpen` / `enrollmentsUpcoming` senza `orderByRaw` per compatibilità SQLite) passata alla view `stats.dashboard`.
+
+### Files
+
+```
+app/
+  Http/Controllers/CalendarController.php          # nuovo controller
+  Http/Controllers/UserStatsController.php          # +$nextSession per la dashboard viewer
+  Models/Quiz.php                                   # +scopeEnrollmentsOpen/Upcoming/Closed, +getEnrollmentStatusAttribute
+config/
+  adminlte.php                                      # +voce "Calendario sessioni"
+resources/views/
+  calendar/index.blade.php                          # nuova pagina
+  calendar/_quiz-row.blade.php                      # nuovo partial
+  stats/dashboard.blade.php                         # +widget "Prossima sessione"
+routes/
+  web.php                                           # +Route::get('/calendar', ...)
+tests/Feature/
+  CalendarTest.php                                  # 16 test, 34 asserzioni
+```
+
+---
+
 ## [2026-05-19] — Bookmark domande persistente
 
 ### Added

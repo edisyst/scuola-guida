@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -124,6 +125,40 @@ class Quiz extends Model
     public function scopeConfirmed($query)
     {
         return $query->where('status', self::STATUS_CONFIRMED);
+    }
+
+    public function scopeEnrollmentsOpen(Builder $query): Builder
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('enrollments_open_at')
+              ->orWhere('enrollments_open_at', '<=', now());
+        })->where(function ($q) {
+            $q->whereNull('enrollments_close_at')
+              ->orWhere('enrollments_close_at', '>', now());
+        });
+    }
+
+    public function scopeEnrollmentsUpcoming(Builder $query): Builder
+    {
+        return $query->whereNotNull('enrollments_open_at')
+                     ->where('enrollments_open_at', '>', now());
+    }
+
+    public function scopeEnrollmentsClosed(Builder $query): Builder
+    {
+        return $query->whereNotNull('enrollments_close_at')
+                     ->where('enrollments_close_at', '<=', now());
+    }
+
+    public function getEnrollmentStatusAttribute(): string
+    {
+        if ($this->enrollments_close_at && $this->enrollments_close_at->isPast()) {
+            return 'closed';
+        }
+        if ($this->enrollments_open_at && $this->enrollments_open_at->isFuture()) {
+            return 'upcoming';
+        }
+        return 'open';
     }
 
     /*

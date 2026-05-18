@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -78,6 +79,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/',              [BookmarkController::class, 'index'])->name('index');
         Route::delete('/{question}', [BookmarkController::class, 'destroy'])->name('destroy');
     });
+
+    // Calendario sessioni d'esame (viewer)
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 
     // Notifiche in-app (database notifications)
     Route::prefix('notifications')->name('notifications.')->group(function () {
