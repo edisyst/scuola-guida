@@ -6,6 +6,12 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 ## [Unreleased] — Refactor
 
 ### Added
+- **Pannello admin "Comandi utili"** (`GET /admin/commands`, solo `admin`) — pagina dedicata con tile + pulsante "Esegui" per una whitelist di comandi `php artisan`, organizzati in tre gruppi:
+  - *Code*: `queue:work --queue=emails --stop-when-empty --tries=3`, `queue:work --stop-when-empty --tries=3`, `queue:failed`, `queue:retry all`, `queue:flush` (distruttivo, dietro `confirm()` JS).
+  - *Cache*: `cache:clear`, `config:clear`, `route:clear`, `view:clear`, `optimize:clear`.
+  - *Sistema*: `migrate:status`, `storage:link`, `about`.
+
+  Esecuzione sincrona via `Artisan::call()` con cattura output, exit code e durata; il risultato dell'ultimo comando è mostrato in cima alla pagina (comando ricostruito, exit code, durata in ms, output integrale in `<pre>`). I comandi long-running come `queue:work` usano sempre `--stop-when-empty` per garantire la terminazione entro la request HTTP — la pagina non lancia daemon. Whitelist nella costante `CommandController::COMMANDS`: lo slug è validato (404 se non in whitelist), niente input utente passato come argomento. Gate `admin-only` su `index()` e `run()`. Nuova voce menu "Comandi utili" (`fas fa-terminal`) nella sezione SISTEMA.
 - **Evoluzione formato `QuizAttempt.answers`** (migration non-distruttiva `2026_05_17_220000_migrate_quiz_attempts_answers_to_extended_format`): il campo JSON passa dal formato flat `{ "12": 1 }` al formato esteso `{ "12": { "correct": 1, "answered_at": <unix>, "time_spent_seconds": null, "position": 1 } }`. La migration converte i record esistenti con `lazy()` (nessuna memory spike); il `down()` ripristina il formato flat. Campi per risposta: `correct` (0|1, obbligatorio), `answered_at` (Unix timestamp), `time_spent_seconds` (nullable), `position` (posizione nella sequenza, nullable).
 - **`QuizAttempt::getAnswerResult(int|string $questionId): ?int`** — punto di accesso unico al risultato di una singola risposta. Gestisce sia il formato esteso sia il flat legacy; restituisce `null` se la domanda non ha risposta.
 - **Anteprima ingrandita immagine domanda** in `/admin/questions`: cliccando sulla miniatura nella DataTable si apre un modal Bootstrap con l'immagine a piena dimensione (max 500×500). Il titolo del modal mostra il **testo integrale della domanda** (passato via attributo `data-question` sul tag `<img>` da `QuestionsDataTable`), in modo che anche le domande troncate a 50 caratteri nella colonna "Domanda" siano leggibili per esteso senza tooltip.
@@ -25,6 +31,7 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 - **Fix autorizzazione su API gestione domande del quiz**: `addQuestion`, `removeQuestion` e `reorder` su `QuizController` erano accessibili a qualsiasi utente con ruolo `viewer` (gruppo rotta `role:admin,editor,viewer`). Aggiunto `abort_unless(canEditQuiz(), 403)` su tutti e tre
 
 ### Fixed
+- **Badge sidebar nascosti quando a zero** — i contatori nel menu laterale (Domande, Categorie, Utenti, Quiz, Audit Log) vengono ora mostrati **solo quando il valore è > 0**; prima comparivano sempre, anche mostrando "0". `Registrations` e `Notifications` già applicavano questa logica; uniformato il comportamento su tutti i casi (`AppServiceProvider` — view composer dei badge).
 - **N+1 query in `QuizService::calculateScore()`** (poi rimosso): `Question::find()` dentro il `foreach` sostituita con singola `Question::whereIn()->pluck()`
 - **Lazy-load in `QuizAttemptController::show()`**: aggiunto `$attempt->loadMissing('quiz')` per evitare query lazy nella view dopo il fix IDOR
 - **Lazy-load in `QuizAttemptService::record()`**: passato direttamente l'oggetto `$enrollment` già risolto a `markCompleted()`, evitando il lazy load via `$attempt->enrollment`

@@ -141,28 +141,38 @@ class AppServiceProvider extends ServiceProvider
 
                 switch ($item['key']) {
                     case 'questions':
-                        $item['label'] = $counts['questions'];
-                        $item['label_color'] = 'success';
+                        if ($counts['questions'] > 0) {
+                            $item['label'] = $counts['questions'];
+                            $item['label_color'] = 'success';
+                        }
                         break;
 
                     case 'categories':
-                        $item['label'] = $counts['categories'];
-                        $item['label_color'] = 'info';
+                        if ($counts['categories'] > 0) {
+                            $item['label'] = $counts['categories'];
+                            $item['label_color'] = 'info';
+                        }
                         break;
 
                     case 'users':
-                        $item['label'] = $counts['users'];
-                        $item['label_color'] = 'primary';
+                        if ($counts['users'] > 0) {
+                            $item['label'] = $counts['users'];
+                            $item['label_color'] = 'primary';
+                        }
                         break;
 
                     case 'quizzes':
-                        $item['label'] = $counts['quizzes'];
-                        $item['label_color'] = 'warning';
+                        if ($counts['quizzes'] > 0) {
+                            $item['label'] = $counts['quizzes'];
+                            $item['label_color'] = 'warning';
+                        }
                         break;
 
                     case 'audit':
-                        $item['label'] = $counts['audit'];
-                        $item['label_color'] = 'danger';
+                        if ($counts['audit'] > 0) {
+                            $item['label'] = $counts['audit'];
+                            $item['label_color'] = 'danger';
+                        }
                         break;
 
                     case 'registrations':
