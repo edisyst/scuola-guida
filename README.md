@@ -169,7 +169,7 @@ php artisan route:list              # elenco di tutte le route
 - **Statistiche** — dashboard con metriche aggregate (quiz, tentativi, utenti)
 - **Media Manager** — gestione file upload (componente Livewire)
 - **Audit Log** — storico di ogni create/update/delete con valori prima/dopo
-- **Comandi utili** (`admin/commands`, solo admin) — pannello con pulsanti per lanciare da web una whitelist di comandi `php artisan` (svuota cache, processa la coda email, retry/flush job falliti, stato migrazioni, `storage:link`, ecc.). Esecuzione sincrona con cattura di exit code, durata e output, mostrati in un pannello in cima alla pagina. I comandi long-running come `queue:work` sono lanciati con `--stop-when-empty` per terminare entro la request — la UI non avvia daemon
+- **Comandi utili** (`admin/commands`, solo admin) — pannello con pulsanti per lanciare da web una whitelist di comandi `php artisan` divisa in quattro gruppi: *Code* (queue:work `--stop-when-empty`, queue:failed/retry/flush), *Cache* (cache/config/route/view/optimize:clear), *Sistema* (migrate:status, storage:link, about), *GDPR* (vedi sezione dedicata). Esecuzione sincrona con cattura di exit code, durata e output, mostrati in un pannello in cima alla pagina. I comandi long-running come `queue:work` sono lanciati con `--stop-when-empty` per terminare entro la request — la UI non avvia daemon. I comandi che richiedono argomenti (es. `gdpr:anonymize {id}`) hanno un input dedicato nella tile, validato lato server
 - **Utenti** — CRUD con assegnazione ruolo
 - **Ruoli & Permessi** — configura i permessi granulari per ogni ruolo dalla UI
 
@@ -483,6 +483,63 @@ resources/views/
 database/migrations/
   *_create_notifications_table.php        # generata con `php artisan notifications:table`
 ```
+
+---
+
+## GDPR — anonimizzazione dati personali
+
+Due comandi Artisan dedicati permettono di rispondere alle richieste di cancellazione (art. 17 GDPR) **senza** distruggere le statistiche aggregate sui quiz. I dati anagrafici dei viewer (PII) vivono interamente nella tabella `users` — non esiste un profilo separato — quindi l'anonimizzazione opera su un singolo record + due tabelle satellite (`notifications`, `sessions`) + il documento allegato su filesystem.
+
+### Comandi
+
+```bash
+# Elenco di tutti i viewer con marker "Anonimizzato" (Sì/No)
+php artisan gdpr:list
+
+# Anteprima: mostra cosa verrebbe modificato, NON scrive nulla
+php artisan gdpr:anonymize 42 --dry-run
+
+# Anonimizzazione definitiva (irreversibile)
+php artisan gdpr:anonymize 42
+```
+
+Gli stessi comandi sono disponibili dal pannello **Admin → Comandi utili** nel gruppo *GDPR*: tile con input `ID utente` per `gdpr:anonymize` (variante dry-run e variante definitiva, quest'ultima protetta da `confirm()` JS).
+
+### Cosa anonimizza `gdpr:anonymize {id}`
+
+Tutto dentro una `DB::transaction()` (rollback in caso di errore):
+
+| Tabella / risorsa | Operazione |
+|---|---|
+| `users` | `name` → `"Utente Anonimo {id}"`, `email` → `"anonimo-{id}@eliminato.invalid"` (dominio RFC 2606 — riservato, non risolvibile), `password` rihashata con stringa random da 64 char, `email_verified_at` e `remember_token` azzerati |
+| `users` (PII) | `first_name`, `last_name`, `address`, `birth_date`, `birth_place`, `fiscal_code`, `id_document_path` → `null` |
+| `users` (registration) | tutti i campi `registration_*` → `null` / `none` |
+| Documento identità | file eliminato dal disk `public` (cartella `registrations/`) |
+| `notifications` | tutte le notifiche dell'utente (`$user->notifications()->delete()`) |
+| `sessions` | se `SESSION_DRIVER=database`, righe con `user_id` matching cancellate (driver `file`/`redis` → warn esplicito: da invalidare manualmente) |
+
+### Cosa NON tocca
+
+| Tabella | Motivo |
+|---|---|
+| `quiz_attempts` | Statistiche aggregate (score, durata, risposte) — non contengono PII diretta. Restano collegate al record anonimizzato per preservare gli aggregati storici. |
+| `quiz_enrollments` | Storico iscrizioni ai quiz ufficiali — i record puntano all'utente anonimizzato. |
+| `audit_logs` | Fuori scope, gestiti a livello infrastrutturale (rotation/retention policy separata). |
+| Log applicativi (`storage/logs/laravel.log`) | Fuori scope. |
+
+### Protezioni
+
+- **Utente inesistente** → `$this->error()` + exit code 1.
+- **Ruolo `admin`** → blocco esplicito con messaggio + exit code 1. Solo viewer (ed editor, se mai accadesse) possono essere anonimizzati.
+- **`--dry-run`** → elenca i campi/contatori/sessioni che verrebbero toccati, zero scritture sul DB.
+- **Logging** → `Log::info()` finale con `user_id` / `executor` / `timestamp` / contatori notifiche e documento. **Non** logga la PII originale.
+- **Login post-anonimizzazione** → impossibile: la password è hash di stringa random, e l'email originale non esiste più (il record è raggiungibile solo via nuovo dominio `@eliminato.invalid`).
+
+### Note implementative
+
+- La scrittura su `users` passa da `DB::table('users')->update(...)` invece di `User::save()`: il cast `'hashed'` sul campo `password` (definito in `User::casts()`) rihasherebbe automaticamente un valore già hashato, causando un doppio hash e un login indefinitamente impossibile per altri motivi.
+- Le notifiche sono Database Notifications native di Laravel (`Notifiable` trait) — la cancellazione passa dalla relazione, niente query manuale sulla tabella `notifications`.
+- Test in `tests/Feature/GdprTest.php` (7 test): scenario completo con documento su disk faked, blocco admin, ID inesistente, idempotenza del dry-run su email/fiscal_code/storage/notifiche, login impossibile su entrambe le email, chiusura effettiva delle righe in `sessions` (DB driver), marker corretto in `gdpr:list`.
 
 ---
 

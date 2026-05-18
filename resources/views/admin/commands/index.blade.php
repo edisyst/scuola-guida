@@ -65,6 +65,26 @@
                                           onsubmit="return confirm('Sei sicuro? Questa operazione è distruttiva.');"
                                       @endif>
                                     @csrf
+                                    @if(!empty($cmd['inputs']))
+                                        @foreach($cmd['inputs'] as $inputName => $inputSpec)
+                                            <div class="form-group mb-2">
+                                                <label for="{{ $cmd['slug'] }}_{{ $inputName }}" class="sg-text-muted" style="font-size:.8rem; margin-bottom:4px;">
+                                                    {{ $inputSpec['label'] }}@if(!empty($inputSpec['required'])) <span class="text-danger">*</span>@endif
+                                                </label>
+                                                <input
+                                                    type="{{ $inputSpec['type'] ?? 'text' }}"
+                                                    id="{{ $cmd['slug'] }}_{{ $inputName }}"
+                                                    name="{{ $inputName }}"
+                                                    class="form-control form-control-sm @error($inputName) is-invalid @enderror"
+                                                    @if(isset($inputSpec['min'])) min="{{ $inputSpec['min'] }}" @endif
+                                                    @if(!empty($inputSpec['placeholder'])) placeholder="{{ $inputSpec['placeholder'] }}" @endif
+                                                    @if(!empty($inputSpec['required'])) required @endif>
+                                                @error($inputName)
+                                                    <small class="text-danger d-block">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        @endforeach
+                                    @endif
                                     <button type="submit"
                                             class="sg-btn sg-btn-sm sg-btn-block {{ !empty($cmd['danger']) ? 'sg-btn-danger' : 'sg-btn-primary' }}">
                                         <i class="fas fa-play mr-1"></i> Esegui

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -128,6 +129,53 @@ class CommandController extends Controller
             'args'        => [],
             'icon'        => 'fas fa-info-circle',
         ],
+
+        // ── GDPR ────────────────────────────────────────────────────────────
+        'gdpr-list' => [
+            'group'       => 'GDPR',
+            'label'       => 'Elenca viewer',
+            'description' => "Tabella di tutti i viewer con marker di anonimizzazione.\nphp artisan gdpr:list",
+            'command'     => 'gdpr:list',
+            'args'        => [],
+            'icon'        => 'fas fa-users',
+        ],
+        'gdpr-anonymize-dry-run' => [
+            'group'       => 'GDPR',
+            'label'       => 'Anonimizza utente — dry-run',
+            'description' => "Simulazione: mostra cosa verrebbe anonimizzato senza modificare nulla.\nphp artisan gdpr:anonymize {id} --dry-run",
+            'command'     => 'gdpr:anonymize',
+            'args'        => ['--dry-run' => true],
+            'icon'        => 'fas fa-user-shield',
+            'inputs'      => [
+                'user_id' => [
+                    'label'       => 'ID utente',
+                    'type'        => 'number',
+                    'min'         => 1,
+                    'required'    => true,
+                    'placeholder' => 'es. 42',
+                    'arg'         => 'user_id',
+                ],
+            ],
+        ],
+        'gdpr-anonymize' => [
+            'group'       => 'GDPR',
+            'label'       => 'Anonimizza utente (definitivo)',
+            'description' => "Anonimizza PII, elimina documento, notifiche e sessioni. Operazione irreversibile.\nphp artisan gdpr:anonymize {id}",
+            'command'     => 'gdpr:anonymize',
+            'args'        => [],
+            'icon'        => 'fas fa-user-slash',
+            'danger'      => true,
+            'inputs'      => [
+                'user_id' => [
+                    'label'       => 'ID utente',
+                    'type'        => 'number',
+                    'min'         => 1,
+                    'required'    => true,
+                    'placeholder' => 'es. 42',
+                    'arg'         => 'user_id',
+                ],
+            ],
+        ],
     ];
 
     public function index(): View
@@ -144,7 +192,7 @@ class CommandController extends Controller
         ]);
     }
 
-    public function run(string $slug): RedirectResponse
+    public function run(Request $request, string $slug): RedirectResponse
     {
         Gate::authorize('admin-only');
 
@@ -153,6 +201,15 @@ class CommandController extends Controller
         }
 
         $cfg = self::COMMANDS[$slug];
+
+        try {
+            $args = self::mergeInputs($cfg, $request);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()
+                ->route('admin.commands.index')
+                ->withErrors($e->errors())
+                ->with('error', "Input non validi per \"{$cfg['label']}\".");
+        }
 
         @set_time_limit(0);
         ignore_user_abort(true);
@@ -163,7 +220,7 @@ class CommandController extends Controller
         $error     = null;
 
         try {
-            $exitCode = Artisan::call($cfg['command'], $cfg['args']);
+            $exitCode = Artisan::call($cfg['command'], $args);
             $output   = Artisan::output();
         } catch (Throwable $e) {
             $error  = $e->getMessage();
@@ -185,7 +242,7 @@ class CommandController extends Controller
                 'slug'        => $slug,
                 'label'       => $cfg['label'],
                 'command'     => $cfg['command'],
-                'command_str' => 'php artisan '.$cfg['command'].self::formatArgs($cfg['args']),
+                'command_str' => 'php artisan '.$cfg['command'].self::formatArgs($args),
                 'exit_code'   => $exitCode,
                 'duration_ms' => $durationMs,
                 'output'      => trim($output) !== '' ? $output : '(nessun output)',
@@ -193,6 +250,51 @@ class CommandController extends Controller
                 'ok'          => $ok,
                 'ran_at'      => now()->format('d/m/Y H:i:s'),
             ]);
+    }
+
+    /**
+     * Mescola gli argomenti statici del comando con gli input runtime.
+     * Gli input sono dichiarati nella whitelist; ogni input mappa su un argomento
+     * o opzione Artisan tramite la chiave `arg`.
+     */
+    private static function mergeInputs(array $cfg, Request $request): array
+    {
+        $args = $cfg['args'] ?? [];
+        $inputs = $cfg['inputs'] ?? [];
+
+        if ($inputs === []) {
+            return $args;
+        }
+
+        $rules = [];
+        foreach ($inputs as $name => $spec) {
+            $rule = [];
+            $rule[] = ($spec['required'] ?? false) ? 'required' : 'nullable';
+
+            if (($spec['type'] ?? null) === 'number') {
+                $rule[] = 'integer';
+                if (isset($spec['min'])) {
+                    $rule[] = 'min:'.(int) $spec['min'];
+                }
+            } else {
+                $rule[] = 'string';
+                $rule[] = 'max:255';
+            }
+
+            $rules[$name] = $rule;
+        }
+
+        $validated = $request->validate($rules);
+
+        foreach ($inputs as $name => $spec) {
+            $value = $validated[$name] ?? null;
+            if ($value === null || $value === '') {
+                continue;
+            }
+            $args[$spec['arg']] = $value;
+        }
+
+        return $args;
     }
 
     private static function formatArgs(array $args): string
