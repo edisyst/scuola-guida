@@ -12,7 +12,7 @@
             <p class="sg-header-subtitle">Account</p>
             <h1 class="sg-header-title">Il mio profilo</h1>
         </div>
-        <div class="sg-header-actions">
+        <div class="sg-header-actions d-none d-sm-flex">
             <i class="fas fa-user-circle" style="font-size:2rem;opacity:.6;"></i>
         </div>
     </div>

@@ -7,7 +7,7 @@
 </button>
 
 <div class="modal fade" id="confirmDeletionModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeletionLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
         <form method="post" action="{{ route('profile.destroy') }}">
             @csrf
             @method('delete')

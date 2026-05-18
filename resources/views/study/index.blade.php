@@ -13,16 +13,17 @@
     </div>
 
     @if($hasSession)
-        <div class="alert alert-info d-flex justify-content-between align-items-center sg-mb-3">
+        {{-- Su mobile alert + azioni vanno in colonna (flex-wrap) --}}
+        <div class="alert alert-info d-flex flex-column flex-md-row justify-content-between align-items-md-center sg-gap-2 sg-mb-3">
             <div>
                 <i class="fas fa-info-circle"></i>
                 Hai una sessione di studio in corso.
             </div>
-            <div>
+            <div class="d-flex flex-wrap sg-gap-2">
                 <a href="{{ route('study.play') }}" class="sg-btn sg-btn-primary sg-btn-sm">
                     <i class="fas fa-play"></i> Riprendi
                 </a>
-                <form action="{{ route('study.destroy') }}" method="POST" class="d-inline ml-2">
+                <form action="{{ route('study.destroy') }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
                     <button class="sg-btn sg-btn-outline sg-btn-sm"

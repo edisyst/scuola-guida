@@ -107,10 +107,11 @@
                 </form>
 
                 <form method="POST" action="{{ route('admin.registrations.reject', $user) }}"
-                      style="flex:1;min-width:280px;"
+                      style="flex:1;min-width:260px;"
                       onsubmit="return confirm('Rifiutare la richiesta? L\'utente potrà correggere i dati e reinviarla.');">
                     @csrf
-                    <div class="sg-flex align-items-start" style="gap:8px;">
+                    {{-- Mobile: input + bottone in colonna; >sm: in fila --}}
+                    <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-start sg-gap-2">
                         <input name="reason" type="text" class="sg-form-control"
                                placeholder="Motivo del rifiuto (opzionale)" maxlength="500">
                         <button class="sg-btn sg-btn-outline">

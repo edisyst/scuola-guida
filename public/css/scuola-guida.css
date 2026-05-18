@@ -1184,8 +1184,8 @@
 
 /* ── Media Manager specifici ────────────────────────────── */
 .sg-upload-box {
-    flex: 1;
-    min-width: 260px;
+    flex: 1 1 260px;
+    min-width: 0;
     padding: 1rem;
     background: #f9fafb;
     border-radius: var(--sg-radius-sm);
@@ -1695,3 +1695,241 @@ body.dark-mode .text-danger { color: #ff7a85 !important; }
 body.dark-mode .text-warning { color: #ffd454 !important; }
 body.dark-mode .text-success { color: #5dd678 !important; }
 body.dark-mode .text-info { color: #5ddde9 !important; }
+
+/* ============================================================
+   RESPONSIVE — mobile first overrides
+   Tutto il CSS sopra è desktop; qui adattiamo i blocchi rigidi
+   (header, card, quiz, tabelle, form, home, auth, sidebar) alle
+   viewport <= 991px (tablet) e <= 575px (mobile vero).
+   ============================================================ */
+
+/* ── Tablet e sotto ───────────────────────────────────────── */
+@media (max-width: 991.98px) {
+    /* Wrapper: niente più padding inutile sui lati di AdminLTE */
+    .sg-wrapper,
+    .sg-wrapper-sm { padding-left: 4px; padding-right: 4px; }
+
+    /* Header con titolo + azioni: vanno in colonna */
+    .sg-header { padding: 18px 18px; }
+    .sg-header.sg-flex-between {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+    .sg-header-title { font-size: 1.2rem; }
+    .sg-header-actions {
+        flex-wrap: wrap;
+        margin-top: 10px;
+        width: 100%;
+    }
+    .sg-header-actions .sg-btn,
+    .sg-header-actions form { flex: 0 1 auto; }
+
+    /* Card padding più contenuto */
+    .sg-card-body { padding: 1.25rem; }
+    .sg-card-body-tight { padding: 1rem; }
+    .sg-card-header { padding: 12px 16px; flex-wrap: wrap; }
+    .sg-card-section { padding: 14px 16px; }
+
+    /* sg-flex-between fa wrap di default sui dispositivi piccoli */
+    .sg-flex-between { flex-wrap: wrap; }
+
+    /* Stat card: leggermente più compatto */
+    .sg-stat-card { padding: 16px 18px; gap: 12px; }
+    .sg-stat-value { font-size: 1.5rem; }
+    .sg-stat-icon { width: 46px; height: 46px; font-size: 1.2rem; }
+
+    /* Tabella custom: scroll orizzontale già fornito da .table-responsive,
+       ma riduciamo padding celle e font per più contenuto a vista */
+    .sg-table thead th { padding: 10px 12px; font-size: .68rem; }
+    .sg-table tbody td { padding: 10px 12px; font-size: .88rem; }
+
+    /* Quiz player: la sidebar passa sotto la domanda */
+    .quiz-header { padding: 14px 18px; }
+    .quiz-title { font-size: 1.05rem; }
+    .quiz-header.d-flex {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    /* Container progresso a tutta larghezza sotto al titolo */
+    .quiz-header-progress,
+    .quiz-header > div:last-child {
+        width: 100%;
+        min-width: 0 !important;
+    }
+
+    #question-text { font-size: 1.1rem; min-height: auto; }
+    .question-card .card-body { padding: 1.25rem !important; }
+    .answer-area { gap: 10px; margin-top: 20px; }
+    .btn-answer { padding: 14px 8px; font-size: .95rem; letter-spacing: 1px; }
+
+    /* Sidebar quiz player più compatta */
+    #timer { font-size: 1.8rem; letter-spacing: 1px; }
+    .sidebar-section { padding: 12px 14px; }
+
+    /* Form admin sezioni: header in colonna */
+    .sg-form-section-header { padding: 12px 16px; }
+    .sg-form-section-body { padding: 1rem; }
+
+    /* Permessi: una colonna sola su tablet */
+    .sg-perm-entity-body { grid-template-columns: 1fr; }
+
+    /* Welcome */
+    .sg-home-nav { padding: 16px 5%; }
+    .sg-home-hero { padding: 32px 5% 24px; }
+    .sg-home-features { padding: 24px 5% 48px; }
+    .sg-home-cta { width: 100%; }
+    .sg-home-cta .sg-btn { flex: 1 1 200px; justify-content: center; }
+}
+
+/* ── Mobile (< 576px) ─────────────────────────────────────── */
+@media (max-width: 575.98px) {
+    /* Header: titolo più piccolo, padding minimo */
+    .sg-header { padding: 16px 16px; border-radius: 10px; margin-bottom: 14px; }
+    .sg-header-title { font-size: 1.05rem; }
+    .sg-header-subtitle { font-size: .72rem; }
+    .sg-page-title { font-size: 1.25rem; }
+
+    /* Bottoni: leggermente più grandi per essere "touch friendly" */
+    .sg-btn { padding: 10px 16px; font-size: .88rem; }
+    .sg-btn-sm { padding: 8px 12px; font-size: .78rem; }
+
+    /* Bottoni nelle azioni header non più allineati a destra: vanno full-width
+       quando da soli, altrimenti restano in fila e fanno wrap */
+    .sg-header-actions { gap: 6px; }
+    .sg-header-actions form { width: auto; }
+    .sg-header-actions .sg-btn { padding: 8px 14px; font-size: .8rem; }
+
+    /* Card */
+    .sg-card { border-radius: 10px; }
+    .sg-card-body { padding: 1rem; }
+    .sg-card-body-tight { padding: .85rem; }
+
+    /* Stat cards: full-width per migliore leggibilità sui telefoni */
+    .sg-stat-card { padding: 14px 16px; }
+    .sg-stat-value { font-size: 1.4rem; }
+    .sg-stat-label { font-size: .68rem; }
+    .sg-stat-icon { width: 42px; height: 42px; font-size: 1.05rem; }
+
+    /* Quiz player: layout ulteriormente compatto */
+    .quiz-header { padding: 12px 14px; }
+    .quiz-title { font-size: .98rem; }
+    .quiz-progress { height: 6px; }
+
+    #question-text { font-size: 1rem; line-height: 1.5; }
+    .question-card .card-body { padding: 1rem !important; }
+    .question-badge { font-size: .68rem; padding: 3px 9px; margin-bottom: 12px; }
+    .answer-area { gap: 8px; margin-top: 16px; }
+    .btn-answer {
+        padding: 14px 6px;
+        font-size: .9rem;
+        letter-spacing: .8px;
+    }
+    .btn-answer i { font-size: .95rem; }
+
+    /* Sidebar quiz player */
+    #timer { font-size: 1.55rem; }
+    #navigator { gap: 4px; justify-content: center; }
+    .nav-btn { width: 28px; height: 28px; font-size: .7rem; }
+    #finish-quiz { padding: 10px; font-size: .88rem; }
+    .error-dot { width: 12px; height: 12px; }
+
+    /* sg-table: padding ulteriormente ridotto */
+    .sg-table thead th { padding: 8px 10px; font-size: .65rem; }
+    .sg-table tbody td { padding: 8px 10px; font-size: .82rem; }
+
+    /* Form */
+    .sg-form-control { padding: 9px 12px; font-size: .9rem; }
+    .sg-form-label { font-size: .8rem; }
+    .sg-form-group { margin-bottom: .85rem; }
+
+    /* Auth card: niente padding eccessivo né shadow pesante su schermi piccoli */
+    .sg-auth-shell { padding: 12px; }
+    .sg-auth-card {
+        padding: 26px 22px;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    }
+    .sg-auth-title { font-size: 1.2rem; }
+    .sg-auth-subtitle { font-size: .82rem; margin-bottom: 18px; }
+
+    /* Home / welcome: hero più contenuta */
+    .sg-home-nav {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 14px 5%;
+    }
+    .sg-home-brand { font-size: 1rem; }
+    .sg-home-brand-icon { width: 36px; height: 36px; font-size: 1rem; }
+    .sg-home-actions {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    .sg-home-hero { padding: 26px 5% 18px; }
+    .sg-home-eyebrow { font-size: .68rem; margin-bottom: 16px; }
+    .sg-home-lead { font-size: .95rem; margin-bottom: 22px; }
+    .sg-home-cta { flex-direction: column; width: 100%; }
+    .sg-home-cta .sg-btn { width: 100%; }
+    .sg-feature-grid { grid-template-columns: 1fr; gap: 12px; }
+    .sg-feature-card { padding: 18px 18px; }
+
+    /* AdminLTE: la navbar mostra pulsante hamburger; assicuriamoci che il
+       dropdown notifiche non superi lo schermo */
+    .navbar-nav .dropdown-menu.dropdown-menu-lg {
+        width: calc(100vw - 24px);
+        max-width: 360px;
+    }
+    .navbar-nav .dropdown-menu .dropdown-item .float-right { float: none !important; display: block; }
+}
+
+/* ── Force AdminLTE small-box numeri leggibili su tutto < md ── */
+@media (max-width: 767.98px) {
+    .content-wrapper .small-box h3 { font-size: 1.5rem; }
+    .content-wrapper .small-box .icon { display: none; }
+}
+
+/* ── Modal scrollabile su schermi piccoli ─────────────────── */
+@media (max-width: 575.98px) {
+    .modal-dialog { margin: .5rem; }
+}
+
+/* ── Study nav footer ─────────────────────────────────────
+   Desktop: 3 gruppi (prev | azioni | next) su una riga.
+   Mobile: tutto in colonna, ogni bottone a tutta larghezza. */
+.sg-study-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.sg-study-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+@media (max-width: 575.98px) {
+    .sg-study-nav {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .sg-study-nav-prev,
+    .sg-study-nav-next,
+    .sg-study-nav-actions {
+        width: 100%;
+    }
+    /* prev / next: bottone unico full-width */
+    .sg-study-nav-prev > .sg-btn,
+    .sg-study-nav-next > .sg-btn {
+        width: 100%;
+    }
+    /* azioni: i due bottoni vanno in colonna */
+    .sg-study-nav-actions {
+        flex-direction: column;
+        order: 3; /* azioni in fondo */
+    }
+    .sg-study-nav-actions > .sg-btn { width: 100%; }
+    .sg-study-nav-next { order: 2; }
+    .sg-study-nav-prev { order: 1; }
+}

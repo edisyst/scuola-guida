@@ -11,13 +11,15 @@
 @section('content')
 <div class="quiz-wrapper">
 
-    {{-- ── Header ── --}}
-    <div class="quiz-header d-flex justify-content-between align-items-end">
-        <div>
+    {{-- ── Header ──
+         Mobile: titolo e progress vanno in colonna grazie a .quiz-header CSS
+         (vedi media query in scuola-guida.css). --}}
+    <div class="quiz-header d-flex flex-wrap justify-content-between align-items-end">
+        <div class="quiz-header-info">
             <p class="progress-label">Domanda <span id="current-num">1</span> di <span id="total-num"></span></p>
             <h1 class="quiz-title">{{ $quiz->title ?? 'Quiz Random' }}</h1>
         </div>
-        <div style="min-width:140px">
+        <div class="quiz-header-progress" style="min-width:140px">
             <p class="progress-label text-end mb-1"><span id="progress-percent">0%</span></p>
             <div class="quiz-progress">
                 <div id="progress-bar" class="bar" style="width:0%"></div>

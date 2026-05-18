@@ -104,9 +104,11 @@
 
         </div>
 
-        {{-- ── Footer con navigazione ───────────────────────── --}}
-        <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
-            <div>
+        {{-- ── Footer con navigazione ─────────────────────────
+             Mobile (<sm): tutti i bottoni full-width in colonna (.sg-study-nav).
+             Da sm in su: layout a 3 gruppi (prev / azioni / next) in fila. --}}
+        <div class="card-footer sg-study-nav">
+            <div class="sg-study-nav-prev">
                 @if($prevUrl)
                     <a href="{{ $prevUrl }}" class="sg-btn sg-btn-outline">
                         <i class="fas fa-chevron-left"></i> Precedente
@@ -118,7 +120,7 @@
                 @endif
             </div>
 
-            <div>
+            <div class="sg-study-nav-actions">
                 <button type="button"
                         class="sg-btn"
                         :class="flagged ? 'sg-btn-warning' : 'sg-btn-light'"
@@ -127,12 +129,12 @@
                     <span x-text="flagged ? 'Segnata da ripassare' : 'Segna da ripassare'"></span>
                 </button>
 
-                <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-dark ml-2">
+                <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-dark">
                     <i class="fas fa-flag-checkered"></i> Termina sessione
                 </a>
             </div>
 
-            <div>
+            <div class="sg-study-nav-next">
                 @if($nextUrl)
                     <a href="{{ $nextUrl }}" class="sg-btn sg-btn-primary">
                         Prossima <i class="fas fa-chevron-right"></i>

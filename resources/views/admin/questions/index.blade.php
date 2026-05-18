@@ -104,16 +104,17 @@
 
 {{-- Modal anteprima immagine domanda --}}
 <div class="modal fade" id="questionImageModal" tabindex="-1" role="dialog" aria-labelledby="questionImageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width:540px;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document" style="max-width:540px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="questionImageModalLabel"></h5>
+                <h5 class="modal-title text-truncate" id="questionImageModalLabel"></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Chiudi">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body text-center">
-                <img id="questionImageModalImg" src="" alt="" style="max-width:500px; max-height:500px; width:auto; height:auto;">
+                {{-- img-fluid: si adatta a viewport ridotte; max-height limita altezza --}}
+                <img id="questionImageModalImg" src="" alt="" class="img-fluid" style="max-height:500px;">
             </div>
         </div>
     </div>

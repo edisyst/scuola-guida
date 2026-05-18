@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-between sg-mt-3">
+    <div class="d-flex flex-wrap justify-content-between sg-gap-2 sg-mt-3">
         <form action="{{ route('study.destroy') }}" method="POST">
             @csrf
             @method('DELETE')
