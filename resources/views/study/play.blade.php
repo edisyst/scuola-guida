@@ -64,7 +64,7 @@
             @endif
 
             <div class="row">
-                <div class="col-6">
+                <div class="col-12 col-sm-6 mb-2 mb-sm-0">
                     <button type="button"
                             class="btn btn-block btn-lg"
                             :class="answerButtonClass(1)"
@@ -73,7 +73,7 @@
                         <i class="fas fa-check"></i> VERO
                     </button>
                 </div>
-                <div class="col-6">
+                <div class="col-12 col-sm-6">
                     <button type="button"
                             class="btn btn-block btn-lg"
                             :class="answerButtonClass(0)"

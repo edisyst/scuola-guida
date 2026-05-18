@@ -23,7 +23,7 @@
                     </span>
                 </button>
             @endforeach
-            <code class="ml-auto text-muted" style="font-size:0.9rem;">{{ $disk }} &rarr; {{ $directory }}</code>
+            <code class="ml-auto text-muted d-none d-md-inline" style="font-size:0.9rem;">{{ $disk }} &rarr; {{ $directory }}</code>
         </div>
     </div>
 

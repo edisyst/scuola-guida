@@ -59,7 +59,7 @@
     @csrf
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="sg-form-group">
                 <label for="first_name" class="sg-form-label">Nome *</label>
                 <input id="first_name" name="first_name" type="text"
@@ -68,7 +68,7 @@
                 @error('first_name')<div class="sg-form-error">{{ $message }}</div>@enderror
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="sg-form-group">
                 <label for="last_name" class="sg-form-label">Cognome *</label>
                 <input id="last_name" name="last_name" type="text"
@@ -89,7 +89,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="sg-form-group">
                 <label for="birth_date" class="sg-form-label">Data di nascita *</label>
                 <input id="birth_date" name="birth_date" type="date"
@@ -98,7 +98,7 @@
                 @error('birth_date')<div class="sg-form-error">{{ $message }}</div>@enderror
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="sg-form-group">
                 <label for="birth_place" class="sg-form-label">Luogo di nascita *</label>
                 <input id="birth_place" name="birth_place" type="text"

@@ -62,7 +62,7 @@
                             Da un quiz specifico
                         </label>
                     </div>
-                    <div class="mt-2 ml-4">
+                    <div class="mt-2 ml-3">
                         <select name="quiz_id" class="form-control"
                                 onfocus="document.getElementById('source-quiz').checked = true;">
                             <option value="">— Seleziona un quiz —</option>
@@ -91,7 +91,7 @@
                             Da una categoria
                         </label>
                     </div>
-                    <div class="mt-2 ml-4">
+                    <div class="mt-2 ml-3">
                         <select name="category_id" class="form-control"
                                 onfocus="document.getElementById('source-category').checked = true;">
                             <option value="">— Seleziona una categoria —</option>
@@ -117,12 +117,12 @@
                             Domande casuali
                         </label>
                     </div>
-                    <small class="text-muted ml-4">
+                    <small class="text-muted ml-3">
                         Verranno estratte fino a {{ \App\Services\StudyService::RANDOM_LIMIT }} domande casuali da tutto il database.
                     </small>
                 </div>
 
-                <div class="text-right mt-4">
+                <div class="d-grid d-sm-flex justify-content-sm-end mt-4">
                     <button type="submit" class="sg-btn sg-btn-primary">
                         <i class="fas fa-play"></i> Inizia a studiare
                     </button>

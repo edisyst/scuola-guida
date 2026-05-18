@@ -60,7 +60,7 @@
     {{-- GRAFICI --}}
     <div class="row sg-grid-row">
 
-        <div class="col-md-6 sg-grid-col">
+        <div class="col-12 col-md-6 sg-grid-col">
             <div class="sg-card">
                 <div class="sg-card-header">
                     <h2 class="sg-card-header-title">Domande ultimi 30 giorni</h2>
@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        <div class="col-md-6 sg-grid-col">
+        <div class="col-12 col-md-6 sg-grid-col">
             <div class="sg-card">
                 <div class="sg-card-header">
                     <h2 class="sg-card-header-title">Utenti ultimi 30 giorni</h2>

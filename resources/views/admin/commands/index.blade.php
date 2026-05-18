@@ -37,7 +37,7 @@
                     <code>{{ $result['command_str'] }}</code>
                     <span class="ml-2">— {{ $result['ran_at'] }}</span>
                 </div>
-                <pre class="sg-pre" style="max-height:420px; overflow:auto;">{{ $result['output'] }}</pre>
+                <pre class="sg-pre" style="max-height:420px; overflow:auto; word-break:break-all; white-space:pre-wrap;">{{ $result['output'] }}</pre>
             </div>
         </div>
     @endif
@@ -50,7 +50,7 @@
             <div class="sg-card-body">
                 <div class="row">
                     @foreach($commands as $cmd)
-                        <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="col-12 col-md-6 col-lg-4 mb-3">
                             <div class="sg-cmd-tile h-100 p-3" style="border:1px solid #e9ecef; border-radius:10px; display:flex; flex-direction:column; gap:10px;">
                                 <div>
                                     <h3 style="font-size:1rem; margin:0 0 4px;">

@@ -33,7 +33,7 @@
                 <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="sg-d-flex sg-gap-2 align-items-center flex-wrap">
                     @csrf
                     <span class="sg-label sg-mb-0 mr-2"><i class="fas fa-file-import"></i> Import Excel</span>
-                    <input type="file" name="file" required class="sg-form-control" style="max-width:340px;">
+                    <input type="file" name="file" required class="sg-form-control" style="max-width:min(340px, 100%);">
                     <button class="sg-btn sg-btn-primary sg-btn-sm">
                         <i class="fas fa-upload"></i> Carica
                     </button>
@@ -45,7 +45,7 @@
     <div class="sg-card">
         <div class="sg-card-body" style="padding:1.25rem;">
             <div class="row sg-mb-2">
-                <div class="col-md-3 sg-mb-1">
+                <div class="col-12 col-md-3 sg-mb-1">
                     <select id="filter-category" class="sg-form-control">
                         <option value="">Tutte le categorie</option>
                         @foreach($categories as $c)
@@ -54,7 +54,7 @@
                     </select>
                 </div>
                 @if(!auth()->user()->isViewer())
-                <div class="col-md-3 sg-mb-1">
+                <div class="col-12 col-md-3 sg-mb-1">
                     <select id="filter-is-true" class="sg-form-control">
                         <option value="">Vero / Falso</option>
                         <option value="1">Vero</option>
@@ -62,14 +62,14 @@
                     </select>
                 </div>
                 @endif
-                <div class="col-md-3 sg-mb-1">
+                <div class="col-12 col-md-3 sg-mb-1">
                     <select id="filter-image" class="sg-form-control">
                         <option value="">Tutte</option>
                         <option value="1">Con immagine</option>
                     </select>
                 </div>
                 @if(auth()->user()->canDeleteQuestion())
-                <div class="col-md-3 sg-mb-1 sg-text-center">
+                <div class="col-12 col-md-3 sg-mb-1 sg-text-center">
                     <button id="bulk-delete" class="sg-btn sg-btn-danger sg-btn-sm">
                         <i class="fas fa-trash"></i> Elimina selezionati
                     </button>

@@ -19,7 +19,7 @@
     </div>
 
     <div class="sg-card sg-mb-3">
-        <div class="sg-card-body sg-flex" style="gap:8px;">
+        <div class="sg-card-body sg-flex flex-wrap" style="gap:8px;">
             <a href="{{ route('admin.enrollments.index') }}"
                class="sg-btn sg-btn-sm {{ !$status ? 'sg-btn-primary' : 'sg-btn-light' }}">Tutte</a>
             @foreach(\App\Models\QuizEnrollment::STATUSES as $key => $label)
@@ -75,30 +75,33 @@
                                     {{ $enrollment->reviewer->name ?? '—' }}
                                 </td>
                                 <td class="text-right">
-                                    @if($enrollment->isPending())
-                                        <form method="POST" action="{{ route('admin.enrollments.approve', $enrollment) }}" class="d-inline">
-                                            @csrf
-                                            <button class="sg-btn sg-btn-success sg-btn-sm">
-                                                <i class="fas fa-check"></i> Approva
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{{ route('admin.enrollments.reject', $enrollment) }}" class="d-inline">
-                                            @csrf
-                                            <button class="sg-btn sg-btn-outline sg-btn-sm">
-                                                <i class="fas fa-times"></i> Rifiuta
-                                            </button>
-                                        </form>
-                                    @elseif($enrollment->isCompleted() || $enrollment->isRejected())
-                                        <form method="POST"
-                                              action="{{ route('admin.enrollments.reopen', ['quiz' => $enrollment->quiz_id, 'user' => $enrollment->user_id]) }}"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Riaprire una nuova iscrizione approvata per questo utente?');">
-                                            @csrf
-                                            <button class="sg-btn sg-btn-light sg-btn-sm">
-                                                <i class="fas fa-redo"></i> Riapri
-                                            </button>
-                                        </form>
-                                    @endif
+                                    {{-- bottoni azione: gap-2 separa Approva e Rifiuta --}}
+                                    <div class="d-inline-flex gap-2 align-items-center">
+                                        @if($enrollment->isPending())
+                                            <form method="POST" action="{{ route('admin.enrollments.approve', $enrollment) }}" class="d-inline">
+                                                @csrf
+                                                <button class="sg-btn sg-btn-success sg-btn-sm">
+                                                    <i class="fas fa-check"></i> Approva
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ route('admin.enrollments.reject', $enrollment) }}" class="d-inline">
+                                                @csrf
+                                                <button class="sg-btn sg-btn-outline sg-btn-sm">
+                                                    <i class="fas fa-times"></i> Rifiuta
+                                                </button>
+                                            </form>
+                                        @elseif($enrollment->isCompleted() || $enrollment->isRejected())
+                                            <form method="POST"
+                                                  action="{{ route('admin.enrollments.reopen', ['quiz' => $enrollment->quiz_id, 'user' => $enrollment->user_id]) }}"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Riaprire una nuova iscrizione approvata per questo utente?');">
+                                                @csrf
+                                                <button class="sg-btn sg-btn-light sg-btn-sm">
+                                                    <i class="fas fa-redo"></i> Riapri
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

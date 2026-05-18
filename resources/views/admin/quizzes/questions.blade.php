@@ -72,16 +72,16 @@
     @if(auth()->user()->canEditQuiz())
     <div class="sg-card sg-mb-3">
         <div class="sg-card-body">
-            <div class="row align-items-end">
-                <div class="col-md-5">
+            <div class="row align-items-end g-2">
+                <div class="col-12 col-md-5">
                     <label class="sg-label">Titolo</label>
                     <input type="text" id="param-title" class="sg-form-control" value="{{ $quiz->title }}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-6 col-md-2">
                     <label class="sg-label">Max domande</label>
                     <input type="number" id="param-max" class="sg-form-control" value="{{ $quiz->max_questions }}" min="1" max="100">
                 </div>
-                <div class="col-md-3 d-flex align-items-center" style="padding-top:1.8rem;">
+                <div class="col-6 col-md-3 d-flex align-items-center pt-3 pt-md-4">
                     <div>
                         <span class="sg-label sg-mb-0 d-block">Stato</span>
                         @if($quiz->isConfirmed())
@@ -93,7 +93,7 @@
                         @endif
                     </div>
                 </div>
-                <div class="col-md-2" style="padding-top:1.4rem;">
+                <div class="col-12 col-md-2 pt-2 pt-md-4">
                     <button id="btn-update-params" class="sg-btn sg-btn-primary sg-btn-sm w-100">
                         <i class="fas fa-save"></i> Aggiorna parametri
                     </button>
@@ -104,7 +104,7 @@
     @endif
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-12 col-md-8 order-md-first">
             <div class="sg-card">
                 <div class="sg-card-body">
                     {{-- PROGRESS --}}
@@ -123,7 +123,7 @@
 
                     {{-- FILTRI --}}
                     <div class="row sg-mb-2">
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <select id="filter-category" class="sg-form-control">
                                 <option value="">— Tutte le categorie —</option>
                                 {{-- $categories è passata dal controller (manageQuestions) --}}
@@ -170,7 +170,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-12 col-md-4 order-md-last mt-4 mt-md-0">
             <div class="sg-card">
                 <div class="sg-card-header">
                     <h2 class="sg-card-header-title">Ordine del quiz</h2>

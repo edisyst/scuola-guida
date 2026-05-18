@@ -12,8 +12,9 @@
         <h1 class="sg-header-title"><i class="fas fa-flag-checkered mr-2"></i> Riepilogo studio</h1>
     </div>
 
+    {{-- mb-3 sulle colonne: su mobile (col-12) le info-box si impilano e si toccano senza margine --}}
     <div class="row sg-mb-3">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4 mb-3 mb-md-0">
             <div class="info-box bg-info">
                 <span class="info-box-icon"><i class="fas fa-list"></i></span>
                 <div class="info-box-content">
@@ -22,7 +23,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4 mb-3 mb-md-0">
             <div class="info-box bg-success">
                 <span class="info-box-icon"><i class="fas fa-pen"></i></span>
                 <div class="info-box-content">
@@ -31,7 +32,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="info-box bg-warning">
                 <span class="info-box-icon"><i class="fas fa-bookmark"></i></span>
                 <div class="info-box-content">

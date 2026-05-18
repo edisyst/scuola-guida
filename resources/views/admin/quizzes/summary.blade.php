@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mb-3">
         <div class="col-lg-3 col-6">
             <div class="small-box bg-info">
                 <div class="inner">
@@ -68,7 +68,7 @@
             <div class="sg-table-empty">Nessuna iscrizione registrata per questo quiz.</div>
         @else
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover mb-0 sg-table">
                     <thead>
                         <tr>
                             <th>Cognome</th>

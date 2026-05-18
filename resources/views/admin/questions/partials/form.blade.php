@@ -37,7 +37,7 @@
 @if(!empty($question->image))
     <div class="sg-mb-3">
         <span class="sg-label d-block mb-1">Immagine attuale</span>
-        <img src="{{ asset('storage/'.$question->image) }}" width="160" class="sg-img-thumb">
+        <img src="{{ asset('storage/'.$question->image) }}" width="160" class="sg-img-thumb img-fluid" style="max-width:160px;">
         <div class="mt-2">
             <label class="text-danger" style="cursor:pointer;">
                 <input type="checkbox" name="remove_image" value="1"

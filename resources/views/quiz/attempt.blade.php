@@ -31,7 +31,7 @@
             </div>
 
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-12 col-sm-6">
                     <div class="sg-card-section">
                         <span class="sg-label">Esito</span>
                         @if($attempt->is_passed)
@@ -45,7 +45,7 @@
                         @endif
                     </div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-12 col-sm-6">
                     <div class="sg-card-section">
                         <span class="sg-label">Tempo impiegato</span>
                         <strong>

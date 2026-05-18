@@ -19,7 +19,7 @@
     </div>
     <div class="sg-form-section-body">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="sg-form-group">
                     <label class="sg-form-label">Nome</label>
                     <input name="name" class="sg-form-control @error('name') is-invalid @enderror"
@@ -27,7 +27,7 @@
                     @error('name') <div class="sg-form-error">{{ $message }}</div> @enderror
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="sg-form-group">
                     <label class="sg-form-label">Email</label>
                     <input name="email" type="email" class="sg-form-control @error('email') is-invalid @enderror"
@@ -35,7 +35,7 @@
                     @error('email') <div class="sg-form-error">{{ $message }}</div> @enderror
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="sg-form-group">
                     <label class="sg-form-label">
                         Password
@@ -47,7 +47,7 @@
                     @error('password') <div class="sg-form-error">{{ $message }}</div> @enderror
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="sg-form-group">
                     <label class="sg-form-label">Ruolo</label>
                     <select name="role" id="role-select" class="sg-form-control">
@@ -84,7 +84,7 @@
 
         <div class="row">
             @foreach($entities as $entity)
-                <div class="col-md-6 sg-mb-2">
+                <div class="col-12 col-md-6 sg-mb-2">
                     <div class="sg-perm-entity-card">
                         <div class="sg-perm-entity-head">
                             <i class="fas {{ $icons[$entity] ?? 'fa-cube' }}"></i>

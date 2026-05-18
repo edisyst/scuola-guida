@@ -57,6 +57,11 @@
             width: 90%;
             box-shadow: 0 24px 64px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
         }
+        @media (max-width: 575.98px) {
+            body { overflow-y: auto; align-items: flex-start; padding: 60px 0 24px; }
+            .error-card { padding: 2rem 1.5rem; border-radius: 18px; }
+            .btn-ghost-error { margin-left: 0; margin-top: 8px; }
+        }
 
         .error-icon {
             width: 72px; height: 72px;

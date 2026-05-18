@@ -61,20 +61,23 @@
                                     {{ $u->registration_submitted_at?->format('d/m/Y H:i') ?? '—' }}
                                 </td>
                                 <td class="text-right">
-                                    <a href="{{ route('admin.registrations.show', $u) }}"
-                                       class="sg-btn sg-btn-light sg-btn-sm">
-                                        <i class="fas fa-eye"></i> Dettagli
-                                    </a>
-                                    @if($u->isRegistrationPending())
-                                        <form method="POST" action="{{ route('admin.registrations.approve', $u) }}"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Approvare l\'iscrizione di {{ $u->fullAnagraphicName() }}?');">
-                                            @csrf
-                                            <button class="sg-btn sg-btn-success sg-btn-sm">
-                                                <i class="fas fa-check"></i> Approva
-                                            </button>
-                                        </form>
-                                    @endif
+                                    {{-- bottoni azione: gap-2 evita che si tocchino --}}
+                                    <div class="d-inline-flex gap-2 align-items-center">
+                                        <a href="{{ route('admin.registrations.show', $u) }}"
+                                           class="sg-btn sg-btn-light sg-btn-sm">
+                                            <i class="fas fa-eye"></i> Dettagli
+                                        </a>
+                                        @if($u->isRegistrationPending())
+                                            <form method="POST" action="{{ route('admin.registrations.approve', $u) }}"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Approvare l\'iscrizione di {{ $u->fullAnagraphicName() }}?');">
+                                                @csrf
+                                                <button class="sg-btn sg-btn-success sg-btn-sm">
+                                                    <i class="fas fa-check"></i> Approva
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

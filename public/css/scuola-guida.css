@@ -1933,3 +1933,57 @@ body.dark-mode .text-info { color: #5ddde9 !important; }
     .sg-study-nav-next { order: 2; }
     .sg-study-nav-prev { order: 1; }
 }
+
+/* ============================================================
+   Mobile responsive overrides — aggiunti nella revisione
+   responsive globale del progetto.
+   ============================================================ */
+
+/* ── Save bar sticky: su mobile diventa colonna ─────────────── */
+@media (max-width: 575.98px) {
+    .sg-save-bar {
+        flex-direction: column;
+        align-items: stretch;
+        bottom: 0;
+        border-radius: var(--sg-radius) var(--sg-radius) 0 0;
+    }
+    .sg-save-bar .hint { font-size: .78rem; }
+    .sg-save-bar .sg-btn { width: 100%; }
+}
+
+/* ── Cmd tile comandi artisan: pre con wrap su mobile ────────── */
+@media (max-width: 575.98px) {
+    .sg-cmd-tile { padding: .85rem !important; }
+}
+
+/* ── Tabella audit: celle pre non sforano ────────────────────── */
+@media (max-width: 767.98px) {
+    .sg-pre { max-width: 160px; }
+}
+
+/* ── Roles matrix: su mobile la tabella è scrollabile;
+   la colonna Ruolo non si stringe troppo ─────────────────────── */
+@media (max-width: 575.98px) {
+    .sg-form-section .sg-table thead th,
+    .sg-form-section .sg-table tbody td { padding: 8px 10px; }
+}
+
+/* ── Quiz player: sidebar quiz viene SOTTO la domanda su mobile── */
+@media (max-width: 991.98px) {
+    .quiz-wrapper .col-lg-4 { margin-top: 1.25rem; }
+}
+
+/* ── Stat-card "Ultimo tentativo": testo lungo non sforano ────── */
+@media (max-width: 575.98px) {
+    .sg-stat-value { word-break: break-word; }
+}
+
+/* ── Study/index: bottone submit full-width su xs ─────────────── */
+@media (max-width: 575.98px) {
+    .sg-card .d-grid > .sg-btn { width: 100%; }
+}
+
+/* ── Sortable quiz questions: altezza ridotta su mobile ─────────── */
+@media (max-width: 767.98px) {
+    .sg-sortable-scroll { max-height: 360px; }
+}
