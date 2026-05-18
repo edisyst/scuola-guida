@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
+use App\Http\Controllers\Admin\CommandController as AdminCommandController;
 use App\Models\AuditLog;
 
 Route::get('/', function () {
@@ -203,6 +204,13 @@ Route::middleware(['auth'])
                 ->name('roles.index');
             Route::put('roles', [RolePermissionController::class, 'update'])
                 ->name('roles.update');
+
+            // COMANDI UTILI (artisan via UI)
+            Route::get('commands', [AdminCommandController::class, 'index'])
+                ->name('commands.index');
+            Route::post('commands/{slug}', [AdminCommandController::class, 'run'])
+                ->where('slug', '[a-z0-9\-]+')
+                ->name('commands.run');
 
             // ISCRIZIONI ANAGRAFICHE (richieste viewer)
             Route::get('registrations', [AdminRegistrationController::class, 'index'])
