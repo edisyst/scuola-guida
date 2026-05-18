@@ -3,26 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\DashboardStatsService;
 use App\Services\UserStatsService;
 use Illuminate\Http\Request;
 
 class UserStatsController extends Controller
 {
-    public function __construct(private readonly UserStatsService $service)
-    {
-    }
+    public function __construct(
+        private readonly UserStatsService $service,
+        private readonly DashboardStatsService $dashboardStats,
+    ) {}
 
     /**
      * Dashboard personale dell'utente autenticato.
+     * Admin ed editor vedono i KPI globali; viewer vede le proprie statistiche.
      */
     public function me()
     {
-        $user  = auth()->user();
-        $stats = $this->service->get($user);
+        $user = auth()->user();
+
+        if ($user->isAdmin() || $user->isEditor()) {
+            return view('admin.dashboard', [
+                'stats'          => $this->dashboardStats->kpi(),
+                'questionsChart' => $this->dashboardStats->dailyCreated(\App\Models\Question::class),
+                'usersChart'     => $this->dashboardStats->dailyCreated(\App\Models\User::class),
+            ]);
+        }
 
         return view('stats.dashboard', [
-            'user'  => $user,
-            'stats' => $stats,
+            'user'        => $user,
+            'stats'       => $this->service->get($user),
             'isAdminView' => false,
         ]);
     }

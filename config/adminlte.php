@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'admin/quizzes',
+    'dashboard_url' => 'dashboard',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -339,13 +339,14 @@ return [
             'label_color' => 'warning',
         ],
 
-        // ── STUDIO (allenamento libero, tutti i ruoli) ──────────────────────
-        ['header' => 'studio'],
+        // ── STUDIO (allenamento libero, solo viewer/exam-participant) ────────
+        ['header' => 'studio', 'can' => 'exam-participant'],
         [
             'text'  => 'Modalità Studio',
             'url'   => 'study',
             'icon'  => 'fas fa-graduation-cap',
             'key'   => 'study',
+            'can'   => 'exam-participant',
         ],
 
         // ── ESAMI UFFICIALI (viewer partecipa, admin/editor sola lettura) ───
