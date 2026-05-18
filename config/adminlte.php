@@ -348,6 +348,14 @@ return [
             'key'   => 'study',
             'can'   => 'exam-participant',
         ],
+        [
+            'text'        => 'Domande salvate',
+            'url'         => 'bookmarks',
+            'icon'        => 'fas fa-bookmark',
+            'key'         => 'bookmarks',
+            'can'         => 'exam-participant',
+            // TODO: aggiungere label con contatore bookmark dell'utente via View Composer
+        ],
 
         // ── ESAMI UFFICIALI (viewer partecipa, admin/editor sola lettura) ───
         ['header' => 'esami', 'can' => 'viewer-quiz-area'],

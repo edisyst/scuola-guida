@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/flag/{question}', [StudyController::class, 'flag'])->name('flag');
         Route::get('/summary', [StudyController::class, 'summary'])->name('summary');
         Route::delete('/session', [StudyController::class, 'destroy'])->name('destroy');
+    });
+
+    // Domande salvate (bookmark persistenti viewer)
+    Route::prefix('bookmarks')->name('bookmarks.')->group(function () {
+        Route::get('/',              [BookmarkController::class, 'index'])->name('index');
+        Route::delete('/{question}', [BookmarkController::class, 'destroy'])->name('destroy');
     });
 
     // Notifiche in-app (database notifications)

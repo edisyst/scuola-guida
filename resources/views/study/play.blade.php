@@ -129,6 +129,10 @@
                     <span x-text="flagged ? 'Segnata da ripassare' : 'Segna da ripassare'"></span>
                 </button>
 
+                @auth @if(auth()->user()->isViewer())
+                    <livewire:bookmark-button :question-id="$question->id" :key="'bm-'.$question->id" />
+                @endif @endauth
+
                 <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-dark">
                     <i class="fas fa-flag-checkered"></i> Termina sessione
                 </a>
@@ -156,9 +160,6 @@
 
 @section('js')
     @parent
-
-    {{-- Alpine.js via CDN: il layout admin non bundla resources/js/app.js --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
         function studyPlay(config) {

@@ -1,6 +1,6 @@
 # ScuolaGUIDA — Quiz App
 
-Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio, marcando le domande "da ripassare".
+Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio, marcando le domande "da ripassare" o **salvandole** in modo persistente con nota personale opzionale.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
 
@@ -181,14 +181,16 @@ php artisan route:list              # elenco di tutte le route
 - **Catalogo quiz confermati** — richiedi iscrizione a un quiz ufficiale (riservato ai viewer approvati)
 - **Le mie iscrizioni** — traccia lo stato delle richieste (in attesa / approvata / completata)
 - **Gioca quiz** — interfaccia a domande con timer e feedback finale (score, errori, esito). Sui quiz ufficiali ogni iscrizione consente un solo tentativo
-- **Dettaglio tentativo** (`/quiz/attempts/{id}`) — pagina di riepilogo post-quiz con punteggio, percentuale, esito, durata. Protezione IDOR: ogni viewer vede solo i propri tentativi; admin e utenti con `canEditUser()` possono consultare qualsiasi tentativo
-- **Modalità Studio** — allenamento libero senza timer né punteggio. Quattro sorgenti selezionabili:
+- **Dettaglio tentativo** (`/quiz/attempts/{id}`) — pagina completa di revisione post-quiz: card riepilogo verde/rossa (PROMOSSO/RIMANDATO) con 6 KPI (punteggio, percentuale, errori/max, non risposto, durata, data) e barra di progresso; una card per ogni domanda con bordo colorato (verde = corretta, rosso = errata, arancione = non risposta), categoria, risposta utente vs corretta, tempo speso per domanda e immagine opzionale. Protezione IDOR: ogni viewer vede solo i propri tentativi; admin e utenti con `canEditUser()` possono consultare qualsiasi tentativo (con banner informativo)
+- **Modalità Studio** — allenamento libero senza timer né punteggio. Cinque sorgenti selezionabili:
   - *Da un quiz specifico* — qualsiasi quiz `published` o `confirmed`
   - *Da una categoria* — tutte le domande di una categoria in ordine casuale
   - *Domande casuali* — fino a 30 domande estratte casualmente dall'intero database
   - *Domande marcate* — ripassa solo le domande segnate come "da ripassare" nella sessione corrente (sorgente disponibile solo dal riepilogo)
+  - *Domande salvate* — ripassa solo le domande bookmarkate in modo permanente dall'utente (sorgente disponibile dalla pagina "Domande salvate")
 
-  Per ogni domanda il viewer riceve feedback inline immediato (corretta/errata, Alpine.js, nessun round-trip) e può navigare liberamente avanti e indietro tramite URL `?index=N`. Ogni domanda può essere marcata come "da ripassare" (stato salvato in sessione PHP, niente DB) via chiamata AJAX al flag endpoint. Al termine, la pagina di riepilogo mostra totale domande, risposte date, conteggio e lista delle marcate, con pulsante per avviare subito una nuova sessione sulle marcate
+  Per ogni domanda il viewer riceve feedback inline immediato (corretta/errata, Alpine.js, nessun round-trip) e può navigare liberamente avanti e indietro tramite URL `?index=N`. Ogni domanda può essere marcata come "da ripassare" (stato salvato in sessione PHP, niente DB) via chiamata AJAX al flag endpoint, oppure **salvata in modo permanente** con il pulsante bookmark (stato persistente su DB, vedi sotto). Al termine, la pagina di riepilogo mostra totale domande, risposte date, conteggio e lista delle marcate, con pulsante per avviare subito una nuova sessione sulle marcate
+- **Domande salvate (Bookmark)** — `GET /bookmarks`. Il viewer può aggiungere o rimuovere il segnalibro su qualsiasi domanda direttamente dalla revisione del tentativo (`quiz/attempts/{id}`) e dalla modalità studio (`study/play`), tramite il componente Livewire `BookmarkButton`. Ogni bookmark può avere una **nota personale** (max 500 caratteri) opzionale, modificabile inline. La pagina "Domande salvate" mostra l'elenco completo con filtro per categoria e testo libero; il pulsante "Studia le domande salvate" avvia una sessione studio sulle sole domande bookmarkate. Al momento dell'eliminazione di un account utente (`gdpr:anonymize`), tutti i bookmark dell'utente vengono rimossi automaticamente via `cascadeOnDelete` sulla FK
 - **Storico tentativi** — elenco paginato di tutti i quiz svolti con link al dettaglio
 - **Ricerca** — cerca domande per testo o categoria dalla barra della navbar; i risultati si aprono in una nuova scheda
 
@@ -676,9 +678,11 @@ Il `StudyService` gestisce una sessione di allenamento interamente in `$_SESSION
 | `study_index` | Indice corrente (0-based), clampato all'intervallo valido |
 | `study_flagged` | Array degli ID marcati come "da ripassare" |
 | `study_answers` | Map `question_id => 0|1` per il conteggio nel riepilogo |
-| `study_source` | Sorgente (`quiz`, `category`, `random`, `flagged`) |
+| `study_source` | Sorgente (`quiz`, `category`, `random`, `flagged`, `bookmarks`) |
 
 Sorgente `flagged`: disponibile solo se la sessione contiene già domande marcate; al click su "Ripassa le domande marcate" nel riepilogo, viene avviata una nuova sessione con le sole `study_flagged` della sessione precedente.
+
+Sorgente `bookmarks`: disponibile dalla pagina "Domande salvate" tramite il pulsante "Studia le domande salvate" (POST `/study/start` con `source=bookmarks`). La lista domande viene costruita da `auth()->user()->bookmarkedQuestions()->pluck('questions.id')`. Se la lista è vuota, `StudyController::start()` reindirizza a `GET /bookmarks` con flash `warning`.
 
 Limite domande casuali: `RANDOM_LIMIT = 30`.
 
@@ -690,6 +694,7 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 
 | File | Test | Aree coperte |
 |---|---|---|
+| `BookmarkTest` | 9 | Toggle add/remove, unique constraint, isolamento dati tra utenti, destroy 200/403, studio da bookmarks, redirect warning su lista vuota, cascade delete |
 | `QuizTest` | 3 | Creazione tentativo, tentativo su quiz confermato con iscrizione, aggiornamento score |
 | `AdminOperativityTest` | 8 | Export Excel, riepilogo KPI, schedulazione iscrizioni, comando `close-expired` |
 | `NotificationsTest` | 19 | Dispatch 11 notifiche, fallback fire-and-forget, payload DB, pagina, bell Livewire |

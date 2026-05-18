@@ -5,6 +5,34 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-19] — Bookmark domande persistente
+
+### Added
+
+- **Tabella pivot `question_user_bookmarks`** (migration `2026_05_18_000001`) — `user_id`, `question_id`, `note` (nullable, max 500 char), timestamps. Constraint unique su `(user_id, question_id)`; `cascadeOnDelete` su entrambe le FK: eliminando un utente i suoi bookmark spariscono automaticamente (compatibile con `gdpr:anonymize`).
+- **Relazione `User::bookmarkedQuestions(): BelongsToMany`** — con `withPivot('note')`, `withTimestamps()`, `orderByPivot('created_at', 'desc')`.
+- **Relazione `Question::bookmarkedBy(): BelongsToMany`** — con `withPivot('note')`, `withTimestamps()`.
+- **Componente Livewire `BookmarkButton`** (`app/Http/Livewire/BookmarkButton.php`) — riceve `$questionId`, gestisce toggle (usando `BelongsToMany::toggle()`) e salvataggio nota sul pivot. Solo per viewer autenticati; admin/editor non vedono il pulsante. UI: pulsante `btn-sm btn-outline-secondary` / `btn-warning` con icona `far`/`fas fa-bookmark` + label "Salva"/"Salvato"; nota collassabile via Alpine `x-data`/`x-show`/`x-transition` con textarea `wire:model.defer` e `saveNote()` a chiamata esplicita.
+- **`GET /bookmarks`** — pagina "Domande salvate" (`BookmarkController::index()`): filtri GET per categoria e testo, paginazione 20/pagina, card per ogni domanda con categoria/data salvataggio/risposta corretta/nota/immagine. Empty state con link a Modalità Studio. In cima (se ci sono bookmark) pulsante "Studia le domande salvate" che avvia la sessione studio con `source=bookmarks`.
+- **`DELETE /bookmarks/{question}`** — rimozione bookmark (`BookmarkController::destroy()`): 403 se la domanda non è nel bookmark dell'utente autenticato (protezione cross-user).
+- **Sorgente `bookmarks` in Modalità Studio** (`StudyService::SOURCE_BOOKMARKS`) — `questionsFromBookmarks()` preleva gli ID da `auth()->user()->bookmarkedQuestions()->pluck('questions.id')`. Se la lista è vuota, `StudyController::start()` reindirizza a `GET /bookmarks` con flash `warning` invece della generica `back()->with('error')`.
+- **Voce sidebar "Domande salvate"** in `config/adminlte.php` — icona `fas fa-bookmark`, gate `exam-participant` (solo viewer), posizionata sotto "Modalità Studio" nella sezione *STUDIO*.
+- **Pulsante bookmark in `quiz/attempt.blade.php`** — in fondo a ogni card domanda nella revisione post-quiz, allineato a destra, visibile solo ai viewer.
+- **Pulsante bookmark in `study/play.blade.php`** — accanto al pulsante "Segna da ripassare" nel footer navigazione. Rimosso il caricamento CDN Alpine ridondante: `@livewireScripts` (presente nel layout) include già Alpine 3; la funzione `studyPlay()` non richiede modifiche.
+- **Test** (`tests/Feature/BookmarkTest.php`, 9 test, 19 asserzioni): toggle add/remove, constraint unique, isolamento dati tra utenti, `destroy` 200 e 403 cross-user, avvio studio da bookmarks, redirect con warning se bookmarks vuoti, cascade delete su eliminazione utente.
+
+---
+
+## [2026-05-18] — Pagina dettaglio tentativo (revisione domande)
+
+### Added
+
+- **Pagina dettaglio tentativo** (`GET /quiz/attempts/{id}`) — riscritta completamente con revisione domanda per domanda. Struttura: card riepilogo verde (`card-success`) se promosso, rossa (`card-danger`) se rimandato, con 6 KPI (punteggio, percentuale, errori/max, non risposto, durata, data) e barra di progresso Bootstrap; una card per ogni domanda ordinata per `position` (con `_pivot_index` come fallback) con bordo colorato `card-outline card-success/danger/warning`, badge categoria, testo domanda, immagine opzionale via `Storage::url()`, risposta utente vs corretta, tempo speso discreto. Banner `alert-info` quando un admin visualizza il tentativo di un altro utente.
+- **`QuizAttemptService::getAttemptDetail(QuizAttempt): array`** — costruisce la collection senza N+1 (domande caricate in una singola query via relationship, categorie tramite `Question::$with`), calcola i KPI incluso `passed = errori ≤ quiz.max_errors`, formatta la durata in `"X min Y sec"`. Ritorna l'array completo con `attempt`, `quiz`, `stats`, `questions` pronto per la view.
+- **Test** (`tests/Feature/QuizTest.php`) — 5 nuovi test: viewer vede il proprio tentativo, viewer bloccato (403) sul tentativo altrui, admin bypass IDOR, calcolo KPI (`correct`/`wrong`/`not_answered`/`passed`) con dati nel formato esteso, `assertSee('PROMOSSO')` e `assertSee('RIMANDATO')` in base a `max_errors`.
+
+---
+
 ## [2026-05-18] — GDPR, Comandi utili, UI responsive e fix badge sidebar
 
 ### Added

@@ -41,6 +41,10 @@ class StudyController extends Controller
         try {
             $this->service->start($request->input('source'), $request->sourceId());
         } catch (RuntimeException $e) {
+            if ($request->input('source') === StudyService::SOURCE_BOOKMARKS) {
+                return redirect()->route('bookmarks.index')
+                    ->with('warning', 'Non hai domande salvate da studiare.');
+            }
             return back()->with('error', $e->getMessage())->withInput();
         }
 

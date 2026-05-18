@@ -11,10 +11,11 @@ use RuntimeException;
 
 class StudyService
 {
-    public const SOURCE_QUIZ     = 'quiz';
-    public const SOURCE_CATEGORY = 'category';
-    public const SOURCE_RANDOM   = 'random';
-    public const SOURCE_FLAGGED  = 'flagged';
+    public const SOURCE_QUIZ      = 'quiz';
+    public const SOURCE_CATEGORY  = 'category';
+    public const SOURCE_RANDOM    = 'random';
+    public const SOURCE_FLAGGED   = 'flagged';
+    public const SOURCE_BOOKMARKS = 'bookmarks';
 
     public const KEY_QUESTIONS = 'study_questions';
     public const KEY_INDEX     = 'study_index';
@@ -37,11 +38,12 @@ class StudyService
     public function start(string $source, ?int $sourceId = null): void
     {
         $ids = match ($source) {
-            self::SOURCE_QUIZ     => $this->questionsFromQuiz($sourceId),
-            self::SOURCE_CATEGORY => $this->questionsFromCategory($sourceId),
-            self::SOURCE_RANDOM   => $this->randomQuestions(),
-            self::SOURCE_FLAGGED  => $this->flaggedFromSession(),
-            default               => throw new RuntimeException("Sorgente studio non valida: {$source}"),
+            self::SOURCE_QUIZ       => $this->questionsFromQuiz($sourceId),
+            self::SOURCE_CATEGORY   => $this->questionsFromCategory($sourceId),
+            self::SOURCE_RANDOM     => $this->randomQuestions(),
+            self::SOURCE_FLAGGED    => $this->flaggedFromSession(),
+            self::SOURCE_BOOKMARKS  => $this->questionsFromBookmarks(),
+            default                 => throw new RuntimeException("Sorgente studio non valida: {$source}"),
         };
 
         if (empty($ids)) {
@@ -278,5 +280,13 @@ class StudyService
         }
 
         return $flagged;
+    }
+
+    private function questionsFromBookmarks(): array
+    {
+        return auth()->user()
+            ->bookmarkedQuestions()
+            ->pluck('questions.id')
+            ->all();
     }
 }

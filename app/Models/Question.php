@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Traits\Auditable;
 
 class Question extends Model
@@ -53,5 +54,12 @@ class Question extends Model
     public function quizzes()
     {
         return $this->belongsToMany(Quiz::class);
+    }
+
+    public function bookmarkedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'question_user_bookmarks')
+                    ->withPivot('note')
+                    ->withTimestamps();
     }
 }

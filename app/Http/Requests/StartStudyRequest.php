@@ -24,6 +24,7 @@ class StartStudyRequest extends FormRequest
                     StudyService::SOURCE_CATEGORY,
                     StudyService::SOURCE_RANDOM,
                     StudyService::SOURCE_FLAGGED,
+                    StudyService::SOURCE_BOOKMARKS,
                 ]),
             ],
             'quiz_id' => [
