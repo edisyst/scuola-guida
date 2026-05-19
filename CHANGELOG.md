@@ -5,6 +5,34 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-19] — Refactoring seeder domande e categorie
+
+### Changed
+
+- **`CategorySeeder`** — le categorie non sono più hardcodate in PHP: vengono lette dinamicamente dal foglio `Categorie` del file `storage/app/imports/file_con_category_id.xlsx` (colonne `category_name` / `category_id`). Lo slug viene generato con `Str::slug()`. L'aggiunta o rinomina di una categoria richiede solo la modifica dell'Excel, senza toccare il seeder.
+- **`QuestionProductionSeeder` rinominato in `QuestionSeeder`** — rimosso il suffisso `Production` per allinearsi al naming standard; il seeder è già l'unico usato in tutti i contesti (sviluppo e produzione). Aggiornati i riferimenti in `DatabaseSeeder` e `ProductionSeeder`.
+- **`QuestionSeeder`** — usa ora `category_id` direttamente dalla colonna D del foglio `Domande` invece di costruire una mappa nome→id con `Category::pluck()`. Eliminati `$typoFixes` (workaround per typo nell'Excel precedente) e `$categoryMap` (query non più necessaria). Il seeder non dipende più dall'ordine di esecuzione di `CategorySeeder` né dai nomi testuali delle categorie. Path file aggiornato a `storage/app/imports/file_con_category_id.xlsx`.
+- **`ProductionSeeder`** — rimosso il docblock descrittivo (informazioni spostate nel README).
+- **README** — aggiunto box `> Prerequisito` nella sezione `### 4. Database e dati iniziali` con il percorso atteso del file Excel e la struttura dei due fogli.
+
+### Removed
+
+- `database/seeders/QuestionProductionSeeder.php` — sostituito da `QuestionSeeder.php`.
+
+### Files
+
+```
+database/seeders/
+  CategorySeeder.php            # legge dal foglio "Categorie" dell'Excel
+  QuestionSeeder.php            # nuovo (era QuestionProductionSeeder)
+  QuestionProductionSeeder.php  # rimosso
+  DatabaseSeeder.php            # →QuestionSeeder
+  ProductionSeeder.php          # →QuestionSeeder, rimosso docblock
+README.md                       # prerequisito file Excel nella sezione installazione
+```
+
+---
+
 ## [2026-05-19] — Import listato MIT (patente B)
 
 ### Added

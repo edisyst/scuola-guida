@@ -66,6 +66,23 @@ Il seeder di default crea:
 - Utente **admin** — `admin@test.com` / `password`
 - Categorie, domande campione, quiz di esempio con tentativi fittizi
 
+> **Prerequisito per il seeding di categorie e domande reali**
+>
+> `CategorySeeder` e `QuestionSeeder` (usati da entrambi `DatabaseSeeder` e `ProductionSeeder`) leggono i dati da un file Excel che **non è incluso nel repository** e deve essere posizionato manualmente prima di eseguire qualsiasi seed:
+>
+> ```
+> storage/app/imports/file_con_category_id.xlsx
+> ```
+>
+> Il file deve contenere due fogli:
+>
+> | Foglio | Colonne | Contenuto |
+> |---|---|---|
+> | `Categorie` | `category_name`, `category_id` | Le 18 categorie della scuola guida con il loro ID |
+> | `Domande` | `question`, `is_true`, `image`, `category_id`, `category_name` | Le domande del listato (7143 righe) |
+>
+> Se il file è assente, i seeder stampano un errore e terminano senza modificare il database.
+
 ### 5. Storage pubblico
 
 ```bash

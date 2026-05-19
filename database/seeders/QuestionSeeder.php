@@ -2,50 +2,36 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
 use App\Models\Question;
 use Illuminate\Database\Seeder;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class QuestionProductionSeeder extends Seeder
+class QuestionSeeder extends Seeder
 {
-    private const EXCEL_PATH  = 'domande-e-categorie.xlsx';
-    private const CHUNK_SIZE  = 500;
+    private const EXCEL_PATH = 'file_con_category_id.xlsx';
+    private const CHUNK_SIZE = 500;
 
     public function run(): void
     {
-        $filePath = base_path(self::EXCEL_PATH);
+        $filePath = storage_path('app/imports/' . self::EXCEL_PATH);
 
         if (!file_exists($filePath)) {
             $this->command->error("File non trovato: {$filePath}");
             return;
         }
 
-        // Correzioni typo presenti nell'Excel rispetto ai nomi canonici nel DB
-        $typoFixes = [
-            'Incidenti, Assicurazini e Primo soccorso'                       => 'Incidenti, Assicurazioni e Primo soccorso',
-            'Luci, specchietti, autstrade e strade extraurbane principali'   => 'Luci, specchietti, autostrade e strade extraurbane principali',
-        ];
-
-        // Mappa nome categoria => id (dipende da CategorySeeder già eseguito)
-        $categoryMap = Category::pluck('id', 'name')->all();
-
-        if (empty($categoryMap)) {
-            $this->command->error('Nessuna categoria trovata. Eseguire prima CategorySeeder.');
-            return;
-        }
-
         $reader = IOFactory::createReader('Xlsx');
         $reader->setReadDataOnly(true);
         $spreadsheet = $reader->load($filePath);
-        $worksheet   = $spreadsheet->getSheet(0);
+        $worksheet   = $spreadsheet->getSheetByName('Domande');
 
-        $now   = now();
-        $batch = [];
-        $total = 0;
+        $now     = now();
+        $batch   = [];
+        $total   = 0;
         $skipped = 0;
 
         // Riga 1 = header, si parte da riga 2
+        // Colonne: A=question, B=is_true, C=image, D=category_id
         foreach ($worksheet->getRowIterator(2) as $row) {
             $cellIterator = $row->getCellIterator('A', 'D');
             $cellIterator->setIterateOnlyExistingCells(false);
@@ -55,20 +41,18 @@ class QuestionProductionSeeder extends Seeder
                 $data[] = $cell->getValue();
             }
 
-            [$questionName, $isTrue, $image, $categoryName] = array_pad($data, 4, null);
+            [$question, $isTrue, $image, $categoryId] = array_pad($data, 4, null);
 
-            $questionName = trim((string) $questionName);
-            $categoryName = trim((string) $categoryName);
-            $categoryName = $typoFixes[$categoryName] ?? $categoryName;
+            $question = trim((string) $question);
 
-            if ($questionName === '' || !isset($categoryMap[$categoryName])) {
+            if ($question === '' || $categoryId === null) {
                 $skipped++;
                 continue;
             }
 
             $batch[] = [
-                'category_id' => $categoryMap[$categoryName],
-                'question'    => $questionName,
+                'category_id' => (int) $categoryId,
+                'question'    => $question,
                 'is_true'     => (bool) $isTrue,
                 'image'       => ($image !== '' && $image !== null) ? (string) $image : null,
                 'created_at'  => $now,
@@ -91,6 +75,6 @@ class QuestionProductionSeeder extends Seeder
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
 
-        $this->command->info("CREATE {$total} DOMANDE DI PRODUZIONE (saltate: {$skipped})");
+        $this->command->info("CREATE {$total} DOMANDE (saltate: {$skipped})");
     }
 }
