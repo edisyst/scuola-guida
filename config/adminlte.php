@@ -349,6 +349,13 @@ return [
             'can'   => 'exam-participant',
         ],
         [
+            'text'  => 'Simulatore esame',
+            'url'   => 'simulator',
+            'icon'  => 'fas fa-stopwatch',
+            'key'   => 'simulator',
+            'can'   => 'exam-participant',
+        ],
+        [
             'text'        => 'Domande salvate',
             'url'         => 'bookmarks',
             'icon'        => 'fas fa-bookmark',

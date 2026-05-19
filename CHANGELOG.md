@@ -5,6 +5,50 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-19] — Simulatore Esame Reale (patente B)
+
+### Added
+
+- **`config/simulator.php`** — formato esame ufficiale vigente dal 20/12/2021 (DM MIT 27/10/2021): `questions = 30`, `time_limit = 20` minuti, `max_errors = 3`. Mappa `distribution`: 12 categorie fondamentali × 2 domande + 6 integrative × 1 = 30 domande. I nomi categoria sono confrontati con `LOWER(name) LIKE '%nome%'` per resistere a piccole differenze ortografiche; categorie mancanti vengono saltate con `Log::warning()`. Eventuale gap rispetto al target di 30 è coperto da domande casuali extra (con log esplicito).
+- **`app/Services/SimulatorService.php`** — `buildQuestionList()` estrae le domande secondo distribuzione + shuffle finale; `startSession()` crea un `QuizAttempt` con `quiz_id = null` e salva `simulator_questions` / `simulator_attempt_id` in sessione; `updateAttempt()` ricostruisce la mappa `question_id => is_true` da `Question::whereIn($ids)` senza dipendere dal `Quiz` (perché `quiz_id` è null); `getResultDetail()` costruisce KPI e righe della view risultato con criterio **promosso se `wrong + not_answered ≤ max_errors`** (criterio reale MIT, non 60%).
+- **`app/Http/Controllers/SimulatorController.php`** — `index`, `start`, `play`, `autosave`, `submit`, `result`, `destroy`. Controllo cross-user esplicito in `autosave` e `result` (`$attempt->user_id !== auth()->id() → 403`).
+- **`GET /simulator`** (`simulator.index`) — pagina introduttiva con tre `info-box` AdminLTE (30 domande / 20 min / 3 errori) e pulsante "Inizia simulazione".
+- **`GET /simulator/play`** (`simulator.play`) — view replicata strutturalmente da `quiz/play.blade.php` (timer JS, navigatore sidebar, error-dots, autosave debounced 1s) con tre differenze: pulsanti **Precedente** / **Prossima** sempre visibili sotto le risposte (navigazione libera tipica esame reale); pulsante **"Abbandona"** in alto a destra (`btn-outline-danger`) che fa `DELETE /simulator/session`; modal Bootstrap di **conferma consegna** con riepilogo risposte date/non date/errori prima del submit definitivo.
+- **`GET /simulator/result/{attempt}`** (`simulator.result`) — view dedicata `simulator/result.blade.php` con badge **PROMOSSO** / **NON SUPERATO** (criterio reale: max errori), 6 KPI, barra di progresso e lista domanda per domanda con risposta utente vs corretta.
+- **`PUT /simulator/{attempt}/autosave`** + **`POST /simulator/submit`** + **`DELETE /simulator/session`** — endpoint dedicati che non passano da `QuizAttemptService` (`updateAttempt` e `getAttemptDetail` dipendono da `$attempt->quiz->questions`, che esplode con `quiz_id = null`).
+- **Voce sidebar "Simulatore esame"** in `config/adminlte.php` — icona `fas fa-stopwatch`, gate `exam-participant`, posizionata sotto "Modalità Studio" nella sezione *STUDIO*.
+- **Migration `make_quiz_id_nullable_in_quiz_attempts_table`** (`2026_05_19_000001`) — `quiz_id` nullable per consentire i tentativi del simulatore non legati a un quiz preesistente.
+- **`tests/Feature/SimulatorTest.php`** — 13 test (49 asserzioni): accesso autenticato/anonimo, start con pool valido e con DB vuoto, play con/senza sessione attiva, autosave con ricalcolo score + protezione cross-user, submit + redirect risultato, destroy sessione, view risultato per owner e blocco cross-user, log warning su categoria inesistente in distribuzione, `withDefault` su `QuizAttempt::quiz` quando `quiz_id` è null.
+
+### Changed
+
+- **`app/Models/QuizAttempt.php`** — `quiz()` ora usa `withDefault(['title' => 'Simulatore Esame'])` per evitare NPE nelle view condivise quando `quiz_id` è null (tentativi del simulatore).
+- **`routes/web.php`** — gruppo `simulator.*` con 7 route (`index`, `start`, `play`, `autosave`, `submit`, `result`, `destroy`) nel middleware `auth`.
+
+### Files
+
+```
+app/
+  Http/Controllers/SimulatorController.php       # nuovo controller
+  Models/QuizAttempt.php                         # quiz()->withDefault()
+  Services/SimulatorService.php                  # nuovo service
+config/
+  adminlte.php                                   # +voce "Simulatore esame"
+  simulator.php                                  # nuovo: parametri esame + distribuzione
+database/migrations/
+  2026_05_19_000001_make_quiz_id_nullable...     # quiz_id nullable
+resources/views/simulator/
+  index.blade.php                                # pagina introduttiva
+  play.blade.php                                 # view di gioco
+  result.blade.php                               # view risultato dedicata
+routes/
+  web.php                                        # +gruppo simulator.*
+tests/Feature/
+  SimulatorTest.php                              # 13 test, 49 asserzioni
+```
+
+---
+
 ## [2026-05-19] — Calendario sessioni d'esame
 
 ### Added

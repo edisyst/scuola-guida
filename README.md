@@ -1,6 +1,6 @@
 # ScuolaGUIDA — Quiz App
 
-Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio, marcando le domande "da ripassare" o **salvandole** in modo persistente con nota personale opzionale.
+Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio, un **Simulatore Esame** che riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori) e la possibilità di **salvare le domande** in modo persistente con nota personale opzionale.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
 
@@ -183,6 +183,7 @@ php artisan route:list              # elenco di tutte le route
 - **Le mie iscrizioni** — traccia lo stato delle richieste (in attesa / approvata / completata)
 - **Gioca quiz** — interfaccia a domande con timer e feedback finale (score, errori, esito). Sui quiz ufficiali ogni iscrizione consente un solo tentativo
 - **Dettaglio tentativo** (`/quiz/attempts/{id}`) — pagina completa di revisione post-quiz: card riepilogo verde/rossa (PROMOSSO/RIMANDATO) con 6 KPI (punteggio, percentuale, errori/max, non risposto, durata, data) e barra di progresso; una card per ogni domanda con bordo colorato (verde = corretta, rosso = errata, arancione = non risposta), categoria, risposta utente vs corretta, tempo speso per domanda e immagine opzionale. Protezione IDOR: ogni viewer vede solo i propri tentativi; admin e utenti con `canEditUser()` possono consultare qualsiasi tentativo (con banner informativo)
+- **Simulatore Esame** (`GET /simulator`) — riproduce il formato ufficiale dell'esame di teoria patente B vigente dal 20 dicembre 2021 (DM MIT 27/10/2021): 30 domande estratte dal database secondo la distribuzione ministeriale per categoria (12 categorie fondamentali × 2 domande + 6 integrative × 1 = 30), timer 20 minuti, max 3 errori (il superamento ferma automaticamente la prova). Navigazione libera tra le domande con pulsanti Precedente/Prossima e navigatore rapido in sidebar; pulsante "Abbandona" sempre disponibile; modal Bootstrap di conferma prima della consegna con riepilogo risposte date/non date/errori. Le risposte non date contano come errori al momento del submit. La pagina di risultato dedicata (`/simulator/result/{attempt}`) mostra l'esito secondo il criterio reale (max errori, non 60%) con badge **PROMOSSO** / **NON SUPERATO** e dettaglio domanda per domanda. Il tentativo è salvato come `QuizAttempt` con `quiz_id = null` per separarlo dai tentativi degli esami ufficiali
 - **Modalità Studio** — allenamento libero senza timer né punteggio. Cinque sorgenti selezionabili:
   - *Da un quiz specifico* — qualsiasi quiz `published` o `confirmed`
   - *Da una categoria* — tutte le domande di una categoria in ordine casuale
@@ -689,12 +690,52 @@ Limite domande casuali: `RANDOM_LIMIT = 30`.
 
 ---
 
+## Simulatore Esame — dettaglio tecnico
+
+Il `SimulatorService` riproduce il formato ufficiale dell'esame teorico patente B vigente dal 20 dicembre 2021 (DM MIT 27/10/2021): **30 domande**, **20 minuti**, **max 3 errori**. I parametri sono configurabili in `config/simulator.php` insieme alla distribuzione per categoria.
+
+### Distribuzione per categoria
+
+Il simulatore costruisce la lista di domande secondo la mappa `distribution` definita in `config/simulator.php`: per ogni categoria fondamentale vengono estratte 2 domande casuali, per ogni integrativa 1 domanda. Il nome della categoria viene confrontato con `LOWER(name) LIKE '%nome%'` per resistere a piccole differenze ortografiche (è comunque consigliato allineare i nomi). Se una categoria della config non esiste nel DB, viene saltata e registrata con `Log::warning()`. Se il totale delle estratte è inferiore al target configurato (`questions = 30`), il pool viene integrato con domande casuali da altre categorie per raggiungere il target.
+
+### Flusso
+
+```
+GET /simulator                  → pagina introduttiva (info-box 30 / 20 min / 3)
+POST /simulator/start           → buildQuestionList() + QuizAttempt(quiz_id=null) + redirect /play
+GET /simulator/play             → renderizza domande in JSON, timer JS, navigatore sidebar
+PUT /simulator/{attempt}/autosave → autosave debounced 1s (jQuery), aggiorna answers+score
+POST /simulator/submit          → finalize + clearSession + redirect /result/{attempt}
+GET /simulator/result/{attempt} → riepilogo dedicato con criterio "max 3 errori"
+DELETE /simulator/session       → abbandono esplicito senza salvare il risultato
+```
+
+### Sessione
+
+Tutto in `$_SESSION` (nessuna tabella dedicata):
+
+| Chiave | Contenuto |
+|---|---|
+| `simulator_questions` | Array degli ID domanda nell'ordine estratto |
+| `simulator_attempt_id` | ID del `QuizAttempt` creato all'avvio |
+
+### Persistenza e separazione dai quiz ufficiali
+
+Il tentativo simulatore è salvato come `QuizAttempt` con **`quiz_id = null`** (migration `make_quiz_id_nullable_in_quiz_attempts_table`). La relazione `QuizAttempt::quiz()` usa `withDefault(['title' => 'Simulatore Esame'])` per evitare NPE nelle view condivise. Il flusso di autosave **non passa** da `QuizAttemptService::updateAttempt()` perché quel metodo dipende da `$attempt->quiz->questions`: il `SimulatorService` ha un proprio `updateAttempt()` che ricostruisce la mappa `question_id => is_true` direttamente da `Question::whereIn($questionIds)`.
+
+### Esito (criterio reale, non 60%)
+
+A differenza dei quiz ufficiali (che valutano in percentuale), la pagina `/simulator/result/{attempt}` calcola l'esito con il criterio del MIT: **promosso se `wrong + not_answered ≤ max_errors`**. La view è dedicata (`simulator/result.blade.php`) per non inquinare la pagina di dettaglio tentativo quiz.
+
+---
+
 ## Test — copertura
 
 La suite attuale copre le funzionalità principali con test di integrazione (Feature tests):
 
 | File | Test | Aree coperte |
 |---|---|---|
+| `SimulatorTest` | 13 | Accesso autenticato/anonimo, start con/senza pool, play con/senza sessione attiva, autosave con score ricalcolato + protezione cross-user, submit + redirect risultato, destroy sessione, result owner/foreign-user, log warning su categoria mancante, `withDefault` su `QuizAttempt::quiz` |
 | `CalendarTest` | 16 | Accesso autenticato/anonimo, quiz nelle sezioni corrette (upcoming/open/closed/senza date), badge "Già iscritto", visibilità pulsante iscrizione, accessor `enrollment_status`, widget dashboard |
 | `BookmarkTest` | 9 | Toggle add/remove, unique constraint, isolamento dati tra utenti, destroy 200/403, studio da bookmarks, redirect warning su lista vuota, cascade delete |
 | `QuizTest` | 3 | Creazione tentativo, tentativo su quiz confermato con iscrizione, aggiornamento score |

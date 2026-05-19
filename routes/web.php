@@ -12,6 +12,7 @@ use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\QuizEnrollmentController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SimulatorController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\RolePermissionController;
@@ -72,6 +73,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/flag/{question}', [StudyController::class, 'flag'])->name('flag');
         Route::get('/summary', [StudyController::class, 'summary'])->name('summary');
         Route::delete('/session', [StudyController::class, 'destroy'])->name('destroy');
+    });
+
+    // Simulatore esame teorico patente B (allenamento individuale)
+    Route::prefix('simulator')->name('simulator.')->group(function () {
+        Route::get('/',                    [SimulatorController::class, 'index'])->name('index');
+        Route::post('/start',              [SimulatorController::class, 'start'])->name('start');
+        Route::get('/play',                [SimulatorController::class, 'play'])->name('play');
+        Route::put('/{attempt}/autosave',  [SimulatorController::class, 'autosave'])->name('autosave');
+        Route::post('/submit',             [SimulatorController::class, 'submit'])->name('submit');
+        Route::get('/result/{attempt}',    [SimulatorController::class, 'result'])->name('result');
+        Route::delete('/session',          [SimulatorController::class, 'destroy'])->name('destroy');
     });
 
     // Domande salvate (bookmark persistenti viewer)

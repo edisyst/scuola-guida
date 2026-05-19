@@ -53,7 +53,11 @@ class QuizAttempt extends Model
 
     public function quiz()
     {
-        return $this->belongsTo(Quiz::class);
+        // withDefault() evita NPE nelle view condivise quando quiz_id è null
+        // (tentativi del simulatore, che non sono legati a un Quiz preesistente).
+        return $this->belongsTo(Quiz::class)->withDefault([
+            'title' => 'Simulatore Esame',
+        ]);
     }
 
     public function enrollment()
