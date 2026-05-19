@@ -257,6 +257,131 @@ class QuizTest extends TestCase
         $this->actingAs($viewer)->get(route('quiz.attempts.show', $attempt))->assertSee('RIMANDATO');
     }
 
+    public function test_admin_banner_appears_when_admin_views_other_attempt(): void
+    {
+        $admin  = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $viewer = $this->approvedViewer();
+        ['quiz' => $quiz] = $this->quizWithQuestions(Quiz::STATUS_PUBLISHED, 2);
+
+        $attempt = QuizAttempt::create([
+            'user_id'         => $viewer->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 1,
+            'total_questions' => 2,
+            'answers'         => [],
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('quiz.attempts.show', $attempt))
+            ->assertOk()
+            ->assertSee('Stai visualizzando il tentativo di')
+            ->assertSee($viewer->name);
+    }
+
+    public function test_admin_banner_does_not_appear_for_own_attempt(): void
+    {
+        $viewer = $this->approvedViewer();
+        ['quiz' => $quiz] = $this->quizWithQuestions(Quiz::STATUS_PUBLISHED, 2);
+
+        $attempt = QuizAttempt::create([
+            'user_id'         => $viewer->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 1,
+            'total_questions' => 2,
+            'answers'         => [],
+        ]);
+
+        $this->actingAs($viewer)
+            ->get(route('quiz.attempts.show', $attempt))
+            ->assertOk()
+            ->assertDontSee('Stai visualizzando il tentativo di');
+    }
+
+    public function test_get_answer_result_handles_flat_format(): void
+    {
+        $attempt = new QuizAttempt(['answers' => ['1' => 1, '2' => 0]]);
+
+        $this->assertSame(1, $attempt->getAnswerResult('1'));
+        $this->assertSame(0, $attempt->getAnswerResult('2'));
+        $this->assertNull($attempt->getAnswerResult('99'));
+    }
+
+    public function test_get_answer_result_handles_extended_format(): void
+    {
+        $attempt = new QuizAttempt([
+            'answers' => [
+                '1' => ['correct' => 1, 'answered_at' => null, 'time_spent_seconds' => 5, 'position' => 1],
+                '2' => ['correct' => 0, 'answered_at' => null, 'time_spent_seconds' => 8, 'position' => 2],
+            ],
+        ]);
+
+        $this->assertSame(1, $attempt->getAnswerResult('1'));
+        $this->assertSame(0, $attempt->getAnswerResult('2'));
+        $this->assertNull($attempt->getAnswerResult('99'));
+    }
+
+    public function test_attempt_detail_shows_not_answered_for_missing_answers(): void
+    {
+        $viewer    = $this->approvedViewer();
+        $quiz      = Quiz::factory()->create(['status' => Quiz::STATUS_PUBLISHED, 'max_questions' => 3, 'max_errors' => 4]);
+        $questions = Question::factory()->count(3)->create(['is_true' => 1]);
+        $quiz->questions()->attach($questions->pluck('id'));
+
+        // Solo la prima domanda risposta, le altre due lasciate senza risposta.
+        $answers = [
+            $questions->first()->id => ['correct' => 1, 'answered_at' => null, 'time_spent_seconds' => null, 'position' => 1],
+        ];
+
+        $attempt = QuizAttempt::create([
+            'user_id'         => $viewer->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 1,
+            'total_questions' => 3,
+            'answers'         => $answers,
+        ]);
+
+        $this->actingAs($viewer)
+            ->get(route('quiz.attempts.show', $attempt))
+            ->assertOk()
+            ->assertSee('Non risposto');
+    }
+
+    public function test_attempt_detail_has_link_back_to_history(): void
+    {
+        $viewer = $this->approvedViewer();
+        ['quiz' => $quiz] = $this->quizWithQuestions(Quiz::STATUS_PUBLISHED, 2);
+
+        $attempt = QuizAttempt::create([
+            'user_id'         => $viewer->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 2,
+            'total_questions' => 2,
+            'answers'         => [],
+        ]);
+
+        $this->actingAs($viewer)
+            ->get(route('quiz.attempts.show', $attempt))
+            ->assertOk()
+            ->assertSee('Torna allo storico');
+    }
+
+    public function test_unauthenticated_user_is_redirected_to_login(): void
+    {
+        $viewer = $this->approvedViewer();
+        ['quiz' => $quiz] = $this->quizWithQuestions(Quiz::STATUS_PUBLISHED, 2);
+
+        $attempt = QuizAttempt::create([
+            'user_id'         => $viewer->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 1,
+            'total_questions' => 2,
+            'answers'         => [],
+        ]);
+
+        $this->get(route('quiz.attempts.show', $attempt))
+            ->assertRedirect(route('login'));
+    }
+
     public function test_update_attempt_recalculates_score_from_answers(): void
     {
         $viewer = $this->approvedViewer();
