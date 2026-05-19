@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\BookmarkButton;
+use App\Models\Category;
 use App\Models\Question;
 use App\Models\User;
 use App\Services\StudyService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class BookmarkTest extends TestCase
@@ -145,5 +148,90 @@ class BookmarkTest extends TestCase
         $viewer->delete();
 
         $this->assertDatabaseMissing('question_user_bookmarks', ['user_id' => $viewer->id]);
+    }
+
+    public function test_bookmarks_index_returns_200_for_authenticated_viewer(): void
+    {
+        $viewer = $this->viewer();
+
+        $this->actingAs($viewer)
+            ->get(route('bookmarks.index'))
+            ->assertOk();
+    }
+
+    public function test_bookmarks_index_redirects_unauthenticated(): void
+    {
+        $this->get(route('bookmarks.index'))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_filter_by_category(): void
+    {
+        $viewer    = $this->viewer();
+        $cat1      = Category::factory()->create();
+        $cat2      = Category::factory()->create();
+        $q1        = Question::factory()->create(['category_id' => $cat1->id]);
+        $q2        = Question::factory()->create(['category_id' => $cat2->id]);
+
+        $viewer->bookmarkedQuestions()->attach([$q1->id, $q2->id]);
+
+        $response = $this->actingAs($viewer)
+            ->get(route('bookmarks.index', ['category_id' => $cat1->id]));
+
+        $response->assertOk();
+        $response->assertSee($q1->question);
+        $response->assertDontSee($q2->question);
+    }
+
+    public function test_filter_by_search(): void
+    {
+        $viewer = $this->viewer();
+        $q1     = Question::factory()->create(['question' => 'La cintura di sicurezza è obbligatoria']);
+        $q2     = Question::factory()->create(['question' => 'Il limite di velocità in autostrada è 130']);
+
+        $viewer->bookmarkedQuestions()->attach([$q1->id, $q2->id]);
+
+        $response = $this->actingAs($viewer)
+            ->get(route('bookmarks.index', ['search' => 'cintura']));
+
+        $response->assertOk();
+        $response->assertSee($q1->question);
+        $response->assertDontSee($q2->question);
+    }
+
+    public function test_save_note_updates_pivot(): void
+    {
+        $viewer   = $this->viewer();
+        $question = Question::factory()->create();
+
+        $viewer->bookmarkedQuestions()->attach($question->id);
+
+        $this->actingAs($viewer);
+
+        Livewire::test(BookmarkButton::class, ['questionId' => $question->id])
+            ->set('noteInput', 'nota di test')
+            ->call('saveNote')
+            ->assertSet('note', 'nota di test');
+
+        $this->assertDatabaseHas('question_user_bookmarks', [
+            'user_id'     => $viewer->id,
+            'question_id' => $question->id,
+            'note'        => 'nota di test',
+        ]);
+    }
+
+    public function test_note_validation_rejects_over_500_chars(): void
+    {
+        $viewer   = $this->viewer();
+        $question = Question::factory()->create();
+
+        $viewer->bookmarkedQuestions()->attach($question->id);
+
+        $this->actingAs($viewer);
+
+        Livewire::test(BookmarkButton::class, ['questionId' => $question->id])
+            ->set('noteInput', str_repeat('a', 501))
+            ->call('saveNote')
+            ->assertHasErrors(['noteInput' => 'max']);
     }
 }
