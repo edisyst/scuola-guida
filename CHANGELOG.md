@@ -5,6 +5,60 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-19] — Segnalazione errori nelle domande
+
+### Added
+
+- **Tabella `question_reports`** (migration `2026_05_19_100000`) — `question_id` + `user_id` con `cascadeOnDelete` (eliminando una domanda o un utente i report relativi spariscono; coerente con `gdpr:anonymize`), `body` (text, max 1000 char), `type` enum (`risposta_errata`, `testo_ambiguo`, `immagine_mancante`, `contenuto_obsoleto`, `altro`), `status` enum (`pending`/`accepted`/`rejected`, default `pending`), `admin_note` (text, nullable), `resolved_by` (FK `users` `nullOnDelete`), `resolved_at` (timestamp nullable). Indici su `(status, created_at)` e `(question_id, status)` per le query del pannello admin.
+- **Model `App\Models\QuestionReport`** — `$fillable` completo, cast `resolved_at => datetime`, costanti `STATUS_*`, helper statici `types()` e `statuses()` per le UI, scope `pending()` / `accepted()` / `rejected()`, relazioni `question()`, `user()`, `resolvedBy()`. Factory `QuestionReportFactory` per i test (default status `pending`).
+- **Relazioni** — `Question::reports()` e `Question::pendingReports()` (scope chained); `User::questionReports()`.
+- **Componente Livewire `ReportButton`** (`app/Http/Livewire/ReportButton.php`) — riceve `$questionId`, due property pubbliche di stato (`open`, `submitted`), `type` + `body` con `#[Validate]` attribute (Livewire 3). Metodi: `toggleForm()` (apre/chiude form con reset stato), `sendReport()` (validazione + anti-spam max 3 pending dello stesso viewer sulla stessa domanda + create + reset), `setCurrentQuestion(int $id)` con `#[On('report-button-set-question')]` per consentire alle view play JS-driven (`quiz/play`, `simulator/play`) di ri-targettare la domanda corrente senza re-mount. Nome metodo `sendReport()` (non `submit`) scelto per evitare collisione con i magic name della Proxy `$wire`.
+- **View `resources/views/livewire/report-button.blade.php`** — pulsante `btn-sm btn-outline-warning` con icona `fas fa-flag`, label "Segnala" nascosta sotto md; form collassabile via Alpine (`x-show="{{ json_encode($open) }}"` + `x-cloak`) con select tipo, textarea `maxlength=1000`, errori inline `@error`, due bottoni "Invia segnalazione" / "Annulla" con `wire:loading` mirato (`wire:target`). Visibile solo `@auth + isViewer()`.
+- **`<livewire:report-button>` inserito in 4 view play**:
+  - `resources/views/study/play.blade.php` — affianco al `BookmarkButton` nel footer navigazione (`ms-2`).
+  - `resources/views/quiz/attempt.blade.php` — in fondo a ogni card domanda, allineato a destra con `d-flex justify-content-end gap-2` insieme al `BookmarkButton`.
+  - `resources/views/quiz/play.blade.php` — dentro la `question-card` dopo il `#feedback`, montato con `:question-id="$questionsJson[0]['id'] ?? 0"`. La funzione `renderQuestion()` dispatcha `Livewire.dispatch('report-button-set-question', { id: q.id })` ad ogni cambio domanda (3 righe aggiunte, autosave/feedback invariati).
+  - `resources/views/simulator/play.blade.php` — stesso pattern del quiz play, posizionato sotto i pulsanti Precedente/Prossima.
+- **`app/Http/Controllers/Admin/QuestionReportController.php`** — 5 metodi (`index`, `show`, `accept`, `reject`, `destroy`), autorizzazione `abort_unless(auth()->user()->canEditQuestion(), 403)` su tutti. `index()` con filtri GET (`status`, `type`, `question_id`), eager-load `with(['question:id,question,category_id', 'user:id,name,email', 'resolvedBy:id,name'])` (no N+1), paginazione 20 con `withQueryString()`, restituisce anche `$stats` con i 3 conteggi pending/accepted/rejected. `accept()` / `reject()` validano `admin_note` (nullable, max 1000), settano `status`, `admin_note`, `resolved_by = auth()->id()`, `resolved_at = now()` e redirigono all'index con flash `success`.
+- **Route admin** in `routes/web.php` — gruppo `admin/question-reports` (dentro il middleware `role:admin,editor,viewer`, l'autorizzazione fine-grained è nel controller): `GET /` (`index`), `GET /{report}` (`show`), `PATCH /{report}/accept` (`accept`), `PATCH /{report}/reject` (`reject`), `DELETE /{report}` (`destroy`). Name prefix `admin.question-reports.*`.
+- **`resources/views/admin/question-reports/index.blade.php`** — 3 `small-box` AdminLTE in cima (pending arancione / accepted verde / rejected grigio) con link "Filtra" che applica `?status=…`; barra filtri form GET con select stato/tipo e input ID domanda; tabella `sg-table` con ID, domanda troncata a 60 char, tipo (badge `bg-info`), segnalante (nome + email), data, stato (badge colorato), pulsante "Dettaglio". Riga con `table-warning` per i pending. Paginazione standard.
+- **`resources/views/admin/question-reports/show.blade.php`** — layout 2 colonne (`col-md-7` / `col-md-5`). Sinistra: card domanda con badge categoria, testo, immagine via `Storage::url()`, badge risposta corretta `VERO`/`FALSO`, link "Modifica domanda" verso `admin.questions.edit`. Destra: card dettagli (segnalante con email, data, tipo, stato) + alert con il testo del report; se già risolto mostra anche risolutore/timestamp/nota. Form di gestione (visibile solo se `status === 'pending'`): textarea Alpine `x-model="note"` con valore propagato a 3 form separati (accept/reject/destroy) tramite `:value="note"`. Pulsanti Bootstrap nativi, `onsubmit="return confirm()"` sul destroy.
+- **Voce sidebar "Segnalazioni"** in `config/adminlte.php` — icona `fas fa-flag`, gate nuovo `view-question-reports`, key `question-reports`, posizionata subito sotto "Domande" nella sezione *CATALOGO*.
+- **Gate `view-question-reports`** in `AppServiceProvider::boot()` — risolve a `$user->canEditQuestion()` (admin via bypass + editor con permesso `edit_question`).
+- **Badge sidebar con contatore report pending** — nel view composer di `AppServiceProvider`: aggiunta chiave `pending_reports` alla cache `admin_badges` (`QuestionReport::pending()->count()`, **senza** filtro temporale `$since` perché i report sono pochi e sempre actionable, non "novità"). Nuovo `case 'question-reports'` nello `switch` del menu: badge colore `warning`, visibile solo se > 0.
+- **`tests/Feature/QuestionReportTest.php`** — 13 test (41 asserzioni): invio Livewire valido con persistenza DB, validazione `body` (min 10) e `type` (enum), anti-spam (4° report pending bloccato), index admin accessibile a admin/editor con `edit_question` e 403 per viewer, accept con `resolved_by`/`resolved_at`/`admin_note` corretti, reject simmetrico, destroy con riga rimossa, KPI `$stats` corretti, cascade delete su `Question`, view show senza form di gestione per report già risolto.
+
+### Files
+
+```
+app/
+  Http/Controllers/Admin/QuestionReportController.php   # nuovo controller (5 action)
+  Http/Livewire/ReportButton.php                        # nuovo componente Livewire
+  Models/QuestionReport.php                             # nuovo model + scope + factory
+  Models/Question.php                                   # +reports(), +pendingReports()
+  Models/User.php                                       # +questionReports()
+  Providers/AppServiceProvider.php                      # +Gate view-question-reports, +badge pending_reports
+config/
+  adminlte.php                                          # +voce sidebar "Segnalazioni"
+database/
+  factories/QuestionReportFactory.php                   # nuovo factory
+  migrations/2026_05_19_100000_create_question_reports_table.php
+resources/views/
+  admin/question-reports/index.blade.php                # KPI + filtri + tabella
+  admin/question-reports/show.blade.php                 # 2 colonne + form gestione
+  livewire/report-button.blade.php                      # pulsante + form Alpine collapse
+  quiz/play.blade.php                                   # +<livewire:report-button> + dispatch JS
+  quiz/attempt.blade.php                                # +<livewire:report-button> per card
+  simulator/play.blade.php                              # +<livewire:report-button> + dispatch JS
+  study/play.blade.php                                  # +<livewire:report-button> in footer
+routes/
+  web.php                                               # +gruppo admin.question-reports.*
+tests/Feature/
+  QuestionReportTest.php                                # 13 test, 41 asserzioni
+```
+
+---
+
 ## [2026-05-19] — Simulatore Esame Reale (patente B)
 
 ### Added

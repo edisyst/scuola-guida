@@ -15,6 +15,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SimulatorController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\UserStatsController;
+use App\Http\Controllers\Admin\QuestionReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -169,6 +170,16 @@ Route::middleware(['auth'])
                 ->name('users.stats');
             Route::resource('users', AdminUserController::class)
                 ->except(['show']);
+
+            // QUESTION REPORTS (segnalazioni domande) — autorizzazione per-azione
+            // tramite canEditQuestion() nel controller (admin/editor passa, viewer 403).
+            Route::prefix('question-reports')->name('question-reports.')->group(function () {
+                Route::get('/',                   [QuestionReportController::class, 'index'])->name('index');
+                Route::get('/{report}',           [QuestionReportController::class, 'show'])->name('show');
+                Route::patch('/{report}/accept',  [QuestionReportController::class, 'accept'])->name('accept');
+                Route::patch('/{report}/reject',  [QuestionReportController::class, 'reject'])->name('reject');
+                Route::delete('/{report}',        [QuestionReportController::class, 'destroy'])->name('destroy');
+            });
         });
 
         /*

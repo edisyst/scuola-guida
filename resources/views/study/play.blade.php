@@ -131,6 +131,10 @@
 
                 @auth @if(auth()->user()->isViewer())
                     <livewire:bookmark-button :question-id="$question->id" :key="'bm-'.$question->id" />
+
+                    <span class="ms-2">
+                        <livewire:report-button :question-id="$question->id" :key="'report-'.$question->id" />
+                    </span>
                 @endif @endauth
 
                 <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-dark">

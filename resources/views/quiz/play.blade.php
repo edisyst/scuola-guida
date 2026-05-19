@@ -53,6 +53,12 @@
                         <span id="feedback"></span>
                     </div>
 
+                    @auth @if(auth()->user()->isViewer())
+                        <div id="report-button-mount" class="mt-3">
+                            <livewire:report-button :question-id="$questionsJson[0]['id'] ?? 0" />
+                        </div>
+                    @endif @endauth
+
                 </div>
             </div>
         </div>
@@ -138,6 +144,10 @@
             $('#question-text').text(q.text);
             $('#q-badge-num').text(num);
             $('#feedback').html('');
+
+            if (window.Livewire) {
+                window.Livewire.dispatch('report-button-set-question', { id: q.id });
+            }
 
             if (q.image) {
                 $('#question-image').html(

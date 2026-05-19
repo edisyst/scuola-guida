@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -141,6 +142,11 @@ class User extends Authenticatable
                     ->withPivot('note')
                     ->withTimestamps()
                     ->orderByPivot('created_at', 'desc');
+    }
+
+    public function questionReports(): HasMany
+    {
+        return $this->hasMany(QuestionReport::class);
     }
 
     /*

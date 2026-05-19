@@ -137,8 +137,9 @@
             @endif
 
             @auth @if(auth()->user()->isViewer())
-            <div class="mt-2 d-flex justify-content-end">
+            <div class="mt-2 d-flex justify-content-end gap-2">
                 <livewire:bookmark-button :question-id="$item['question']->id" :key="'bm-'.$item['question']->id" />
+                <livewire:report-button :question-id="$item['question']->id" :key="'report-'.$item['question']->id" />
             </div>
             @endif @endauth
         </div>

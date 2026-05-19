@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\Category;
 use App\Models\Quiz;
 use App\Models\AuditLog;
+use App\Models\QuestionReport;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 use App\Observers\CategoryObserver;
@@ -80,6 +81,12 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
+        // 🔥 Voce sidebar "Segnalazioni": visibile a chi può moderare le domande
+        // (admin via bypass, editor con permesso edit_question).
+        Gate::define('view-question-reports', function (User $user) {
+            return $user->canEditQuestion();
+        });
+
         // 🔥 Menu Users: visibile se l'utente può fare qualcosa sugli utenti
         Gate::define('manage-users-menu', function (User $user) {
             return $user->isAdmin()
@@ -123,6 +130,9 @@ class AppServiceProvider extends ServiceProvider
                         ->where('registration_status', User::REG_PENDING)
                         ->where('registration_submitted_at', '>=', $since)
                         ->count(),
+                    // Per i report il totale dei "pending" (senza filtro temporale):
+                    // sono pochi e sempre actionable, l'admin deve vederli tutti.
+                    'pending_reports' => QuestionReport::pending()->count(),
                 ];
             });
 
@@ -178,6 +188,13 @@ class AppServiceProvider extends ServiceProvider
                     case 'registrations':
                         if ($counts['pending_registrations'] > 0) {
                             $item['label'] = $counts['pending_registrations'];
+                            $item['label_color'] = 'warning';
+                        }
+                        break;
+
+                    case 'question-reports':
+                        if ($counts['pending_reports'] > 0) {
+                            $item['label'] = $counts['pending_reports'];
                             $item['label_color'] = 'warning';
                         }
                         break;

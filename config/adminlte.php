@@ -411,6 +411,13 @@ return [
             'can'  => 'view-admin',
             'key'  => 'questions',
         ],
+        [
+            'text'        => 'Segnalazioni',
+            'url'         => 'admin/question-reports',
+            'icon'        => 'fas fa-flag',
+            'can'         => 'view-question-reports',
+            'key'         => 'question-reports',
+        ],
 
         // ── QUIZ (admin, editor, viewer) ────────────────────────────────────
         ['header' => 'quiz', 'can' => 'view-admin'],
