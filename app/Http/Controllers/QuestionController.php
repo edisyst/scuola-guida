@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use App\DataTables\QuestionsDataTable;
 use App\Exports\QuestionsExport;
 use App\Http\Requests\BulkDeleteQuestionsRequest;
+use App\Http\Requests\ImportMitQuestionsRequest;
 use App\Http\Requests\ImportQuestionsRequest;
 use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\UpdateQuestionRequest;
 use App\Imports\QuestionsImport;
 use App\Models\Category;
 use App\Models\Question;
+use App\Services\MitImportService;
 use App\Services\QuestionService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -126,5 +131,48 @@ class QuestionController extends Controller
             public function __construct(private array $data) {}
             public function array(): array { return $this->data; }
         }, 'template_questions.xlsx');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMPORT MIT
+    |--------------------------------------------------------------------------
+    */
+
+    public function showMitImport(): View
+    {
+        abort_unless(auth()->user()->canCreateQuestion(), 403);
+
+        return view('admin.questions.mit-import', [
+            'topicMap'   => config('mit_import.topic_map'),
+            'configPath' => config_path('mit_import.php'),
+        ]);
+    }
+
+    public function storeMitImport(ImportMitQuestionsRequest $request, MitImportService $service): RedirectResponse
+    {
+        $stored   = $request->file('file')->store('tmp/mit-import');
+        $filePath = Storage::disk('local')->path($stored);
+
+        try {
+            $result = $service->import(
+                filePath:       $filePath,
+                dryRun:         $request->boolean('dry_run'),
+                updateExisting: $request->boolean('update_existing'),
+                topicFilter:    $request->filled('topic_filter') ? $request->integer('topic_filter') : null,
+                onProgress:     null,
+            );
+        } finally {
+            Storage::delete($stored);
+        }
+
+        $summary = "Importate: {$result->imported} | Aggiornate: {$result->updated} | Saltate: {$result->skipped}";
+
+        if (!empty($result->errors)) {
+            session(['mit_import_errors' => $result->errors]);
+            return redirect()->back()->with('warning', $summary . ' | Errori: ' . count($result->errors));
+        }
+
+        return redirect()->back()->with('success', $summary);
     }
 }

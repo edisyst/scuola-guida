@@ -5,6 +5,54 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-19] — Import listato MIT (patente B)
+
+### Added
+
+- **`config/mit_import.php`** — file di configurazione centrale per l'import: mappatura colonne Excel → campi interni (chiavi stringa per file con header, indici numerici per file senza), mappa argomenti MIT 1-25 → nomi categoria DB (ricerca con `str_contains` case-insensitive), lista `true_values` accettati come risposta vera (`v`, `vero`, `1`, `true`, `s`, `si`, `sì`), `max_rows` (10 000) e `max_file_size_kb` (10 240). Modificare questo file è sufficiente per adattare l'import a qualsiasi variante del listato MIT senza toccare PHP.
+- **Migration `2026_05_19_200001_add_mit_code_to_questions_table`** — aggiunge `mit_code` (`string(20)`, nullable, unique) e `mit_image_code` (`string(50)`, nullable) alla tabella `questions`. `mit_code` è il codice univoco MIT (es. `"B001-001"`) usato per la deduplicazione; `mit_image_code` persiste il nome del file immagine distribuito dal MIT come metadato per la futura associazione tramite Media Manager. `down()` elimina l'indice unique e le due colonne senza toccare i record esistenti.
+- **`app/Services/MitImportService.php`** — service principale con metodo `import(string $filePath, bool $dryRun, bool $updateExisting, ?int $topicFilter, ?callable $onProgress)`. Flusso: lettura sheet con un'istanza anonima `ToArray` (maatwebsite/excel), rimozione header e rimappatura chiavi (opzionale), pre-load in memoria di tutte le categorie e di tutti i `mit_code` esistenti (zero N+1), costruzione `topicMap[topicCode → categoryId]` via `buildTopicMap()`. Per ogni riga: validazione (testo non vuoto, argomento mappato), normalizzazione risposta (case-insensitive, `true_values`), deduplicazione prioritaria per `mit_code` poi per `(question, category_id)`. La flag `updateExisting` controlla se i duplicati vengono aggiornati o saltati; `topicFilter` limita l'import a un singolo argomento. Tutto avviene dentro `DB::beginTransaction()` / `DB::commit()` (rollback su `$dryRun = true`). Restituisce un oggetto con `imported`, `updated`, `skipped`, `errors`.
+- **`app/Console/Commands/ImportMitQuestions.php`** — comando `questions:import-mit {file} {--dry-run} {--update-existing} {--topic=}`. Pre-start: verifica esistenza file, mostra tabella configurazione colonne con `$this->table()`. Esegue il service con progress bar indeterminata (`createProgressBar()`) + callback `onProgress`. A fine import: tabella riepilogo, lista errori riga per riga, durata in secondi, `Log::info()` senza PII. Exit code `SUCCESS` se zero errori, `FAILURE` altrimenti.
+- **`app/Http/Requests/ImportMitQuestionsRequest.php`** — FormRequest per il POST web. `authorize()` → `canCreateQuestion()` (coerente con l'import generico esistente). Regole: `file` required + mimes:`xlsx,xls,csv` + `max:config('mit_import.max_file_size_kb')`, `update_existing` boolean, `topic_filter` nullable integer 1-25, `dry_run` boolean.
+- **`resources/views/admin/questions/mit-import.blade.php`** — pagina admin `sg-wrapper-sm`. Header con breadcrumb "Domande > Import MIT" e pulsante "Indietro". Sezione errori import (da `session('mit_import_errors')`) con lista scrollabile (max 300px). Accordion Alpine `x-data="{ open: false }"` che mostra la configurazione attiva (tabella colonne + tabella topic_map — utile per verificare prima dell'upload). Form upload: input file `.xlsx/.xls/.csv` con feedback errore inline, select argomento MIT (opzionale), checkbox "Aggiorna domande esistenti" e checkbox "Dry run". Pulsante "Avvia import" + link "Annulla" + indicazione `config/mit_import.php` in fondo.
+- **Pulsante "Import MIT"** nella view lista domande admin (`admin/questions/index.blade.php`) — aggiunto accanto agli altri pulsanti header (Nuova, Export, Template) inside il guard `canCreateQuestion()`.
+- **`tests/Feature/MitImportTest.php`** — 23 test (43 asserzioni). Copertura: import valido con persistenza DB, deduplicazione `mit_code` default skip / `--update-existing` update, argomento non mappato saltato con errore, testo vuoto saltato con errore, 6 data provider per normalizzazione risposta vera (`V`/`VERO`/`1`/`TRUE`/`v`/`vero`), 4 data provider per risposta falsa (`F`/`FALSO`/`0`/`FALSE`), dry-run rollback senza record, `--topic` filtra per argomento, POST HTTP con redirect e flash `success`, POST senza file → validazione, POST con file oltre limite → validazione (verifica fix known issue), viewer → 403, invariante `imported + updated + skipped = righe totali`. Fixture Excel create in-memory con `PhpOffice\PhpSpreadsheet` (già dipendenza di maatwebsite/excel).
+
+### Changed
+
+- **`app/Models/Question.php`** — aggiunti `mit_code` e `mit_image_code` a `$fillable`; aggiunto scope `scopeFromMit($query)` che filtra le domande con `mit_code` non nullo.
+- **`app/Http/Controllers/QuestionController.php`** — aggiunti metodi `showMitImport(): View` e `storeMitImport(ImportMitQuestionsRequest, MitImportService): RedirectResponse`. La logica di business è interamente nel service; il controller si occupa solo dello store temporaneo del file (`store('tmp/mit-import')`), del dispatch e della pulizia del file temporaneo (`Storage::delete`). Usa `Storage::disk('local')->path()` invece di `storage_path()` per compatibilità con i test (`Storage::fake('local')`).
+- **`routes/web.php`** — due nuove route nel gruppo `role:admin,editor,viewer`: `GET admin/questions/mit-import` → `showMitImport` (name: `admin.questions.mit-import`) e `POST admin/questions/mit-import` → `storeMitImport` (name: `admin.questions.mit-import.store`), dichiarate prima di `Route::resource('questions')` per evitare conflitti con le rotte resource.
+
+### Fixed
+
+- **`app/Http/Requests/ImportQuestionsRequest.php`** — **fix known issue**: aggiunto `max:5120` alla validazione del file Excel nell'import generico (era assente, segnalato nei Known issues del CHANGELOG precedente). Coperto dal test #13 di `MitImportTest`.
+
+### Files
+
+```
+app/
+  Console/Commands/ImportMitQuestions.php           # nuovo comando artisan
+  Http/Controllers/QuestionController.php           # +showMitImport(), +storeMitImport()
+  Http/Requests/ImportMitQuestionsRequest.php       # nuovo FormRequest
+  Http/Requests/ImportQuestionsRequest.php          # +max:5120 (fix known issue)
+  Models/Question.php                               # +mit_code, +mit_image_code in $fillable, +scopeFromMit
+  Services/MitImportService.php                     # nuovo service (parse, dedup, dry-run)
+config/
+  mit_import.php                                    # nuovo file di configurazione
+database/migrations/
+  2026_05_19_200001_add_mit_code_to_questions_table.php
+resources/views/admin/questions/
+  index.blade.php                                   # +pulsante "Import MIT"
+  mit-import.blade.php                              # nuova pagina
+routes/
+  web.php                                           # +2 route admin.questions.mit-import.*
+tests/Feature/
+  MitImportTest.php                                 # 23 test, 43 asserzioni
+```
+
+---
+
 ## [2026-05-19] — Segnalazione errori nelle domande
 
 ### Added
@@ -260,7 +308,7 @@ tests/Feature/
 
 ### Known issues / Segnalati ma non risolti
 - `View::composer('*', ...)` in `AppServiceProvider` gira su ogni view (anche nested): preferire binding a `layouts.admin`
-- `ImportQuestionsRequest` non valida il limite di dimensione del file Excel (`max:5120`)
+- ~~`ImportQuestionsRequest` non valida il limite di dimensione del file Excel (`max:5120`)~~ — **risolto** in `[2026-05-19] Import listato MIT`
 - `Quiz::hasQuestion()` e `QuizAttemptService::scoreAnswers()` senza type hint
 - `RoleMiddleware::handle()` senza return type `Response`
 - Migration `drop_quiz_results_table` da creare in PR separata per dismettere fisicamente la tabella `quiz_results`

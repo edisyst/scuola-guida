@@ -136,6 +136,10 @@ Route::middleware(['auth'])
                 ->name('questions.template');
             Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDelete'])
                 ->name('questions.bulkDelete');
+            Route::get('questions/mit-import', [QuestionController::class, 'showMitImport'])
+                ->name('questions.mit-import');
+            Route::post('questions/mit-import', [QuestionController::class, 'storeMitImport'])
+                ->name('questions.mit-import.store');
             Route::resource('questions', QuestionController::class)
                 ->except(['show']);
 

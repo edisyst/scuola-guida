@@ -23,6 +23,9 @@
                 <a href="{{ route('admin.questions.template') }}" class="sg-btn sg-btn-light sg-btn-sm">
                     <i class="fas fa-download"></i> Template
                 </a>
+                <a href="{{ route('admin.questions.mit-import') }}" class="sg-btn sg-btn-light sg-btn-sm">
+                    <i class="fas fa-file-import"></i> Import MIT
+                </a>
             </div>
         @endif
     </div>

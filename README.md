@@ -144,9 +144,13 @@ Apri [http://127.0.0.1:8000](http://127.0.0.1:8000), accedi con `admin@test.com`
 ### Comandi utili
 
 ```bash
-php artisan test                    # esegui la test suite
-php artisan migrate:fresh --seed    # reset completo del DB
-php artisan route:list              # elenco di tutte le route
+php artisan test                                    # esegui la test suite
+php artisan migrate:fresh --seed                    # reset completo del DB
+php artisan route:list                              # elenco di tutte le route
+php artisan questions:import-mit /path/file.xlsx   # import listato MIT (vedi config/mit_import.php)
+php artisan questions:import-mit /path/file.xlsx --dry-run        # anteprima senza scrivere
+php artisan questions:import-mit /path/file.xlsx --topic=2        # solo argomento 2
+php artisan questions:import-mit /path/file.xlsx --update-existing # aggiorna i duplicati
 ```
 
 ---
@@ -155,7 +159,7 @@ php artisan route:list              # elenco di tutte le route
 
 ### Area Admin / Editor
 
-- **Domande** — CRUD, upload immagine, import/export Excel, bulk delete, filtro DataTable
+- **Domande** — CRUD, upload immagine, import/export Excel, import listato MIT, bulk delete, filtro DataTable
 - **Categorie** — CRUD con slug auto-generato
 - **Quiz** — creazione manuale o casuale, gestione domande con drag-and-drop reorder, parametri (numero massimo domande, tempo limite, errori massimi tollerati)
 - **Ciclo di vita quiz** — `draft → published → confirmed` (vedi sotto)
@@ -737,6 +741,7 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 
 | File | Test | Aree coperte |
 |---|---|---|
+| `MitImportTest` | 23 | Import valido con persistenza DB, deduplicazione `mit_code` (skip/update), argomento non mappato, testo vuoto, normalizzazione risposta vera/falsa (10 data provider), dry-run rollback, filtro `--topic`, POST HTTP + flash, validazione file (dimensione, assenza), viewer 403, invariante righe totali, fix `ImportQuestionsRequest max:5120` |
 | `SimulatorTest` | 13 | Accesso autenticato/anonimo, start con/senza pool, play con/senza sessione attiva, autosave con score ricalcolato + protezione cross-user, submit + redirect risultato, destroy sessione, result owner/foreign-user, log warning su categoria mancante, `withDefault` su `QuizAttempt::quiz` |
 | `QuestionReportTest` | 13 | Invio Livewire valido + persistenza DB, validazione `body` (min 10) e `type` (enum), anti-spam 3 pending, index admin 200/403, accept/reject con `resolved_by`/`resolved_at`/`admin_note`, destroy, KPI `$stats` corretti, cascade delete su `Question`, view show senza form di gestione per report risolti, editor con `edit_question` può moderare |
 | `CalendarTest` | 16 | Accesso autenticato/anonimo, quiz nelle sezioni corrette (upcoming/open/closed/senza date), badge "Già iscritto", visibilità pulsante iscrizione, accessor `enrollment_status`, widget dashboard |

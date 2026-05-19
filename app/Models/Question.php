@@ -17,6 +17,8 @@ class Question extends Model
         'question',
         'is_true',
         'image',
+        'mit_code',
+        'mit_image_code',
     ];
 
     protected $with = ['category']; // carica sempre category automaticamente (usare solo se serve sempre)
@@ -39,6 +41,11 @@ class Question extends Model
         if ($search) {
             $query->where('question', 'like', "%{$search}%");
         }
+    }
+
+    public function scopeFromMit($query)
+    {
+        return $query->whereNotNull('mit_code');
     }
 
     /*
