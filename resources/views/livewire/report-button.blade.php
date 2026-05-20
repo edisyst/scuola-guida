@@ -17,10 +17,8 @@
                 </span>
             @endif
 
-            <div x-data
-                 x-show="{{ json_encode($open) }}"
-                 x-cloak
-                 class="mt-2 p-3 border rounded bg-light"
+            @if($open)
+            <div class="mt-2 p-3 border rounded bg-light"
                  style="min-width: 280px;">
                 <h6 class="text-warning mb-2">
                     <i class="fas fa-flag"></i> Segnala un problema
@@ -66,6 +64,7 @@
                     </button>
                 </div>
             </div>
+            @endif
         @endif
     @endauth
 </div>
