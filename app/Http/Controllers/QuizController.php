@@ -267,8 +267,8 @@ class QuizController extends Controller
 
     public function exportResults(Quiz $quiz)
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
-        abort_unless($quiz->isConfirmed(), 404);
+        abort_unless(auth()->user()->canEditQuiz(), 403);
+        abort_unless($quiz->isConfirmed(), 403);
 
         $filename = 'risultati-' . Str::slug($quiz->title ?: ('quiz-' . $quiz->id))
             . '-' . now()->format('Y-m-d') . '.xlsx';

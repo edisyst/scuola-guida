@@ -5,12 +5,14 @@ namespace App\Exports;
 use App\Models\Quiz;
 use App\Models\QuizEnrollment;
 use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class QuizResultsExport implements FromQuery, WithHeadings, WithMapping, WithStyles
+class QuizResultsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     public function __construct(private Quiz $quiz) {}
 
@@ -37,10 +39,9 @@ class QuizResultsExport implements FromQuery, WithHeadings, WithMapping, WithSty
             'Email',
             'Data tentativo',
             'Punteggio',
-            'Totale domande',
             'Percentuale',
             'Esito',
-            'Durata (min)',
+            'Durata (minuti)',
         ];
     }
 
@@ -64,7 +65,6 @@ class QuizResultsExport implements FromQuery, WithHeadings, WithMapping, WithSty
                 '',
                 '',
                 '',
-                '',
                 'Non svolto',
                 '',
             ];
@@ -74,11 +74,11 @@ class QuizResultsExport implements FromQuery, WithHeadings, WithMapping, WithSty
         $errors     = $total - (int) $attempt->score;
         $passed     = $total > 0 && $errors <= ($this->quiz->max_errors ?? 0);
         $percentage = $total > 0
-            ? number_format(($attempt->score / $total) * 100, 1, ',', '') . '%'
-            : '0,0%';
+            ? number_format(($attempt->score / $total) * 100, 1) . '%'
+            : '0.0%';
 
         $durationMinutes = $attempt->duration !== null
-            ? number_format($attempt->duration / 60, 1, ',', '')
+            ? (int) round($attempt->duration / 60)
             : '';
 
         return [
@@ -87,7 +87,6 @@ class QuizResultsExport implements FromQuery, WithHeadings, WithMapping, WithSty
             $email,
             $attempt->created_at?->format('d/m/Y H:i') ?? '',
             (int) $attempt->score,
-            $total,
             $percentage,
             $passed ? 'Promosso' : 'Rimandato',
             $durationMinutes,
@@ -97,7 +96,13 @@ class QuizResultsExport implements FromQuery, WithHeadings, WithMapping, WithSty
     public function styles(Worksheet $sheet): array
     {
         return [
-            1 => ['font' => ['bold' => true]],
+            1 => [
+                'font' => ['bold' => true],
+                'fill' => [
+                    'fillType'   => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'D3D3D3'],
+                ],
+            ],
         ];
     }
 }

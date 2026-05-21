@@ -17,10 +17,12 @@
             <a href="{{ route('admin.quizzes.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
                 <i class="fas fa-arrow-left"></i> Indietro
             </a>
+            @if(auth()->user()->canEditQuiz())
             <a href="{{ route('admin.quizzes.export-results', $quiz) }}"
                class="sg-btn sg-btn-success sg-btn-sm">
                 <i class="fas fa-file-excel"></i> Esporta Excel
             </a>
+            @endif
         </div>
     </div>
 

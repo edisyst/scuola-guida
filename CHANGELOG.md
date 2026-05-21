@@ -5,6 +5,35 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 3.3: export Excel risultati quiz confermati
+
+Aggiunto pulsante "Esporta Excel" nella pagina di riepilogo di un quiz confermato. Il download è sincrono e produce un file `.xlsx` con una riga per ogni iscritto approvato/completato al quiz.
+
+### Export (`app/Exports/QuizResultsExport.php`)
+
+Classe `QuizResultsExport` che implementa `FromQuery`, `ShouldAutoSize`, `WithHeadings`, `WithMapping`, `WithStyles`.
+
+- **FromQuery**: query su `QuizEnrollment` filtrando gli stati `approved` e `completed`, con eager loading `['user', 'quizAttempt']`, join su `users` per ordinamento per cognome e nome.
+- **WithHeadings**: otto colonne in italiano — Cognome, Nome, Email, Data tentativo, Punteggio, Percentuale, Esito, Durata (minuti).
+- **WithMapping**: per ogni enrollment calcola punteggio intero, percentuale con 1 decimale e simbolo `%`, esito (`Promosso` / `Rimandato` / `Non svolto`) riutilizzando la stessa logica `max_errors` già presente nel progetto (`errors = total_questions - score; passed = errors <= quiz.max_errors`), durata in minuti interi arrotondati dal campo `duration` in secondi.
+- **WithStyles**: intestazione in grassetto + sfondo grigio chiaro (`#D3D3D3`).
+- **ShouldAutoSize**: larghezza colonne adattata automaticamente al contenuto.
+
+### Controller e route
+
+`QuizController::exportResults(Quiz $quiz)` (già presente, aggiornato):
+- Autorizzazione: `abort_unless(auth()->user()->canEditQuiz(), 403)` — accesso limitato agli utenti con permesso `edit_quiz`.
+- Stato quiz: `abort_unless($quiz->isConfirmed(), 403)` — solo quiz confermati esportabili.
+- Nome file: `risultati-{slug-titolo}-{YYYY-MM-DD}.xlsx`.
+
+Route `GET /admin/quizzes/{quiz}/export-results` → `admin.quizzes.export-results` già presente nel gruppo middleware admin.
+
+### View
+
+Pulsante "Esporta Excel" (`btn-success`, icona `fas fa-file-excel`) nella sezione azioni della pagina `admin.quizzes.summary`, visibile solo agli utenti con `canEditQuiz()`.
+
+---
+
 ## [Unreleased] — Feature 3.2: notifiche in-app con badge navbar
 
 UI in-app per le notifiche database già emesse dalla Feature 3.1: campanella in topbar con badge contatore + dropdown delle ultime 10, pagina dedicata con elenco completo e azioni di pulizia. Chiusura del known issue sul `View::composer('*', ...)` per il contatore notifiche.
