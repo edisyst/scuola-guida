@@ -1,77 +1,140 @@
-# CLAUDE.md — Linee Guida per Progetti Web Laravel
+# CLAUDE.md — Scuola Guida
 
-> Questo file definisce le convenzioni architetturali, stilistiche e di sviluppo per tutti i progetti web basati su **Laravel + Blade + Bootstrap + AdminLTE + Livewire**. Nessun frontend separato (no Vue SPA, no React, no Inertia). Le pagine sono servite direttamente da Blade.
-
----
-
-## 1. Stack Tecnologico
-
-| Layer | Tecnologia |
-|---|---|
-| Framework PHP | Laravel (ultima LTS) |
-| Template engine | Blade |
-| CSS Framework | Bootstrap 5 |
-| Admin theme | AdminLTE 3 |
-| Reattività UI | Livewire 3 |
-| Database | MySQL / PostgreSQL |
-| Asset build | Vite (con `laravel-vite-plugin`) |
-| Auth scaffolding | Laravel Breeze (Blade) oppure manuale |
+> Linee guida operative per Claude Code. Convenzioni architetturali, stilistiche
+> e di sviluppo per il progetto. Fonte di verità insieme a `README.md` e
+> `CHANGELOG.md` su GitHub.
 
 ---
 
-## 2. Struttura delle Directory
+## Stack tecnologico
+
+| Layer            | Tecnologia                                |
+|------------------|-------------------------------------------|
+| Framework PHP    | Laravel 11, PHP 8.3+                      |
+| Template engine  | Blade                                     |
+| Reattività UI    | Livewire 3                                |
+| JS leggero       | Alpine.js + JS vanilla                    |
+| CSS Framework    | Bootstrap 5 (no altri framework)          |
+| Admin theme      | AdminLTE 3                                |
+| Database         | MySQL                                     |
+| Asset build      | Vite (`laravel-vite-plugin`)              |
+| Audit            | Trait `Auditable` + Observer su ogni Model |
+| Ruoli e permessi | Sistema custom (no Spatie)                |
+
+Per i ruoli usare i metodi su `User`: `canEditQuestion()`, `canEditQuiz()`,
+`canEditCategory()`, `canEditUser()`. **Non** usare Spatie gates né
+`$user->hasRole()` di Spatie.
+
+---
+
+## Git Flow
+
+- Branch permanenti: `master` e `develop`
+- Ogni nuova feature: `git flow feature start <nome>` → sviluppa e committa
+- **NON eseguire mai `git flow feature finish` autonomamente**: aspetta il
+  comando esplicito dell'utente. Il finish è il merge, e il merge è una
+  decisione umana.
+- Quando l'utente dà il via al merge: `git flow feature finish <nome>`
+  (merge su develop, cancella il branch locale, no push automatico su remote)
+- Hotfix urgenti su master: `git flow hotfix start <nome>` →
+  `git flow hotfix finish <nome>` (merge su master e develop)
+- Release: `git flow release start <versione>` →
+  `git flow release finish <versione>`
+- Mai committare direttamente su `master` o `develop`
+
+---
+
+## Documentazione
+
+Aggiorna **sempre** entrambi i file a ogni feature, prima del merge:
+
+- `CHANGELOG.md` — segui il formato Keep a Changelog. La voce va scritta
+  come parte della feature stessa, non dopo il merge. Usa le sezioni
+  `Added`, `Changed`, `Fixed`, `Removed`, `Security` solo se pertinenti.
+  La data nella voce è quella del merge previsto, non della scrittura.
+- `README.md` — aggiorna se cambiano: funzionalità esposte all'utente,
+  istruzioni di installazione, dipendenze, struttura del progetto,
+  comandi artisan rilevanti, variabili `.env` richieste.
+
+Entrambi gli aggiornamenti fanno parte della checklist PR: la PR non è
+completa senza di essi.
+
+---
+
+## Struttura directory
 
 ```
 app/
   Http/
-    Controllers/          # Solo controller classici (resource o invokable)
+    Controllers/          # Controller snelli, zero business logic
     Livewire/             # Classi PHP dei componenti Livewire
-  Models/                 # Eloquent models
-  Services/               # Business logic estratta dai controller
-  Policies/               # Autorizzazione per ogni model
-
+    Requests/             # Form Request per validazione
+  Models/                 # Eloquent models con trait Auditable
+  Observers/              # Observer dei model (audit, side effect)
+  Services/               # Business logic (9 service)
 resources/
   views/
-    layouts/
-      app.blade.php        # Layout principale (AdminLTE shell)
-      auth.blade.php       # Layout per le pagine di login/registrazione
-      partials/
-        sidebar.blade.php
-        navbar.blade.php
-        footer.blade.php
-    pages/                 # Viste delle singole pagine (index, show, create, edit)
-    components/            # Blade components riutilizzabili (x-alert, x-card, ecc.)
-    livewire/              # Viste dei componenti Livewire
-
-routes/
-  web.php                  # Tutte le route web
-  auth.php                 # Route di autenticazione
-
+    layouts/              # app.blade.php, partials
+    livewire/             # View dei componenti Livewire
+    components/           # Blade components riutilizzabili
+config/                   # File di config dedicati per feature configurabili
 database/
-  migrations/
+  migrations/             # Sempre con down() reversibile
   seeders/
   factories/
+tests/
+  Feature/                # Test feature (aggiungere ai file esistenti)
 ```
 
 ---
 
-## 3. Convenzioni Laravel
+## Naming conventions
 
-### Controller
-- Usare sempre **Resource Controller** quando si gestisce un CRUD: `php artisan make:controller FooController --resource`.
-- I controller devono essere **snelli**: nessuna business logic al loro interno.
-- La logica complessa va nei **Service** in `app/Services/`.
-- Preferire **Form Request** per la validazione: `php artisan make:request StoreFooRequest`.
+| Cosa                 | Pattern                                                   |
+|----------------------|-----------------------------------------------------------|
+| Livewire class       | `app/Http/Livewire/NomeComponente.php`                    |
+| Livewire view        | `resources/views/livewire/nome-componente.blade.php`      |
+| Service              | `app/Services/NomeEntitàService.php`                      |
+| Form Request         | `app/Http/Requests/NomeAzioneNomeEntitàRequest.php`       |
+| Migration            | `create_tabella_table` o `verb_campo_to_tabella_table`    |
+| Test Feature         | `tests/Feature/NomeEntitàTest.php`                        |
+| Comando artisan      | `entità:azione` (es. `questions:import-mit`)              |
+
+Per i test: aggiungi ai file esistenti prima di crearne di nuovi.
+
+---
+
+## Convenzioni sviluppo (obbligatorie per ogni PR)
+
+### Controller e Service
+
+- Zero logica di business nel controller: tutto nei Service
+- Autorizzazione: `abort_unless(auth()->user()->canEditXxx(), 403)`
+- Validazione: sempre tramite Form Request dedicato, mai `validate()`
+  inline nel controller
+- Flash messages obbligatori su tutti i redirect:
+  `with('success'|'warning'|'error'|'info', '...')`
+- Injection del service nel costruttore o come parametro del metodo,
+  coerente con il pattern già usato nel controller esistente
+
+Pattern corretto:
 
 ```php
-// ✅ Corretto
-public function store(StoreFooRequest $request, FooService $service)
+public function store(StoreQuestionRequest $request, QuestionService $service)
 {
-    $service->create($request->validated());
-    return redirect()->route('foo.index')->with('success', 'Creato con successo.');
-}
+    abort_unless(auth()->user()->canEditQuestion(), 403);
 
-// ❌ Sbagliato — logica nel controller
+    $service->create($request->validated());
+
+    return redirect()
+        ->route('questions.index')
+        ->with('success', 'Domanda creata con successo.');
+}
+```
+
+Pattern sbagliato (validazione inline + logica nel controller):
+
+```php
 public function store(Request $request)
 {
     $request->validate([...]);
@@ -79,337 +142,151 @@ public function store(Request $request)
 }
 ```
 
-### Model
-- Definire sempre `$fillable` o `$guarded`.
-- Usare **scope** per query riutilizzabili.
-- Usare **accessor/mutator** (nuova sintassi `Attribute::make()`) per trasformazioni di dati.
-- Relazioni sempre tipizzate con return type `HasMany`, `BelongsTo`, ecc.
+### Livewire
 
-### Route
-- Usare `Route::resource()` e `Route::apiResource()` dove possibile.
-- Raggruppare le route per middleware e prefisso:
+- I componenti stanno in `app/Http/Livewire/`
+- `wire:model.blur` — mai `.defer`, mai `.live`
+- `#[Validate]` attribute direttamente sulle property (non il metodo `rules()`)
+- `wire:loading` obbligatorio su **tutti** i bottoni che triggerano azioni
+- `wire:confirm="..."` per azioni distruttive (delete, reset)
+- Eventi tra componenti: `$this->dispatch('nome-evento')`
+- Per sincronizzare Alpine con stato Livewire:
+  `x-show="{{ json_encode($prop) }}"` — non `wire:model` su `x-show`
+- Nei componenti viewer: wrappare sempre con `@auth` + controllo ruolo
 
-```php
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('users', UserController::class);
-    Route::resource('posts', PostController::class);
-});
-```
-
-- Niente logica nelle route. Solo invocazione di controller o Livewire.
-
----
-
-## 4. Blade — Template e Layout
-
-### Layout principale (AdminLTE)
-Il layout `layouts/app.blade.php` deve integrare correttamente AdminLTE:
+Pattern corretto del bottone:
 
 ```blade
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', config('app.name'))</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @livewireStyles
-    @stack('styles')
-</head>
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
-    @include('layouts.partials.navbar')
-    @include('layouts.partials.sidebar')
-
-    <div class="content-wrapper">
-        <div class="content-header">
-            <div class="container-fluid">
-                <h1 class="m-0">@yield('page-title')</h1>
-                @yield('breadcrumb')
-            </div>
-        </div>
-        <section class="content">
-            <div class="container-fluid">
-                @yield('content')
-            </div>
-        </section>
-    </div>
-
-    @include('layouts.partials.footer')
-</div>
-@livewireScripts
-@stack('scripts')
-</body>
-</html>
-```
-
-### Blade Components
-Creare componenti riutilizzabili in `resources/views/components/`:
-
-```bash
-php artisan make:component Alert --view   # Solo view, senza classe PHP
-php artisan make:component DataTable      # Con classe PHP
-```
-
-Esempi di componenti da standardizzare nel progetto:
-- `<x-alert type="success" :message="$message" />`
-- `<x-card title="Titolo" footer="..."> ... </x-card>`
-- `<x-form-input name="email" label="Email" :value="old('email')" />`
-- `<x-page-header title="Utenti" :breadcrumbs="[...]" />`
-
-### Convenzioni Blade
-- Usare `@section` / `@yield` per i blocchi del layout.
-- Usare `@push` / `@stack` per CSS e JS specifici di pagina.
-- Evitare logica PHP complessa nelle viste: usare **View Composer** o **Blade Component class** se servono dati.
-- Usare `{{ }}` per output escaped e `{!! !!}` **solo** quando strettamente necessario (contenuto HTML fidato).
-
----
-
-## 5. AdminLTE — Utilizzo e Personalizzazione
-
-### Installazione
-```bash
-composer require jeroennoten/laravel-adminlte
-php artisan adminlte:install
-```
-
-### Configurazione
-Il file `config/adminlte.php` è la fonte di verità per:
-- Voci del menu sidebar
-- Logo e nome dell'applicazione
-- Plugin jQuery/DataTables/Select2 abilitati
-
-### Regole d'uso
-- **Non sovrascrivere** i file vendor di AdminLTE. Usare `@push('styles')` e `@push('scripts')` per personalizzazioni locali.
-- Gli override CSS globali vanno in `resources/css/app.css` (importato via Vite).
-- Usare le classi Bootstrap 5 native — AdminLTE 3 è compatibile con BS5.
-- Usare le **box AdminLTE** (`card`, `info-box`, `small-box`) per i widget della dashboard.
-- I colori di stato seguono la palette AdminLTE: `primary`, `secondary`, `success`, `danger`, `warning`, `info`.
-
----
-
-## 6. Livewire — Quando e Come Usarlo
-
-### Quando usare Livewire
-Livewire è riservato a interazioni UI **localizzate** che richiedono reattività senza ricaricare la pagina:
-
-✅ **Usare Livewire per:**
-- Tabelle con ricerca/filtro/ordinamento in tempo reale
-- Form multi-step
-- Modali di conferma con azioni (es. elimina con conferma)
-- Counter, toggle, switch interattivi
-- Upload file con anteprima
-- Autocomplete / ricerca live
-- Polling di dati (es. notifiche, stato job)
-
-❌ **Non usare Livewire per:**
-- Intere pagine che funzionano bene con un semplice redirect
-- Logica che può essere gestita con un normale form POST
-- Sostituire jQuery per click handler banali
-
-### Struttura di un componente Livewire
-
-```bash
-php artisan make:livewire Users/UserSearch
-```
-
-Genera:
-- `app/Http/Livewire/Users/UserSearch.php`
-- `resources/views/livewire/users/user-search.blade.php`
-
-```php
-// app/Http/Livewire/Users/UserSearch.php
-namespace App\Http\Livewire\Users;
-
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Models\User;
-
-class UserSearch extends Component
-{
-    use WithPagination;
-
-    public string $search = '';
-    public string $sortField = 'name';
-    public string $sortDirection = 'asc';
-
-    protected $queryString = ['search', 'sortField', 'sortDirection'];
-
-    public function updatingSearch(): void
-    {
-        $this->resetPage();
-    }
-
-    public function render()
-    {
-        return view('livewire.users.user-search', [
-            'users' => User::query()
-                ->when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%"))
-                ->orderBy($this->sortField, $this->sortDirection)
-                ->paginate(15),
-        ]);
-    }
-}
-```
-
-### Convenzioni Livewire
-- Un componente = una responsabilità singola.
-- Usare `wire:model.live` con cautela (preferire `wire:model.lazy` o `wire:model.blur` per evitare troppe request).
-- Usare `#[Validate]` attribute (Livewire 3) direttamente sulle property.
-- Emettere eventi con `$this->dispatch('nome-evento')` per comunicare tra componenti.
-- Usare `wire:loading` per feedback visivo durante le operazioni asincrone.
-- Usare `wire:confirm` per conferme distruttive prima di azioni delete.
-
-```blade
-{{-- Esempio: bottone con loading state --}}
-<button wire:click="save" wire:loading.attr="disabled" class="btn btn-primary">
-    <span wire:loading.remove>Salva</span>
-    <span wire:loading><i class="fas fa-spinner fa-spin"></i> Salvataggio...</span>
+<button wire:click="azione" wire:loading.attr="disabled">
+    <span wire:loading.remove wire:target="azione">Testo</span>
+    <span wire:loading wire:target="azione">
+        <i class="fas fa-spinner fa-spin"></i>
+    </span>
 </button>
 ```
 
----
+**Quando usare Livewire** — interazioni UI localizzate che richiedono
+reattività senza ricaricare la pagina: tabelle con ricerca/filtro/ordinamento,
+form multi-step, modali di conferma con azioni, upload con anteprima,
+autocomplete, polling di notifiche o stato job.
 
-## 7. JavaScript — Approccio
+**Quando NON usare Livewire** — intere pagine che funzionano bene con un
+redirect, logica gestibile con un normale form POST, sostituzione di jQuery
+per click handler banali.
 
-Niente framework JS pesanti. Lo stack JS è **minimalista**:
+### View e frontend
 
-- **Alpine.js** (opzionale, consigliato) per comportamenti UI leggeri che non richiedono un round-trip server (toggle menu, dropdown, tabs locali).
-- **jQuery** solo se già richiesto da plugin AdminLTE/DataTables/Select2.
-- **Niente Vue, React, o altri framework SPA.**
+- Nessun `<script>` inline nel body: tutto via `@push('scripts')`
+- Nessun `<style>` inline: solo classi Bootstrap 5 e AdminLTE 3
+- Zero CSS custom
+- Layout: `@extends('layouts.app')`, `@section('page-title', '...')`
+- Empty state: icona `fa-3x text-muted` + testo esplicativo + CTA
+- Non riscrivere le view esistenti: aggiungi solo i blocchi necessari
+  nel punto corretto, identificato leggendo la view prima di modificarla
+- `Storage::url()` per tutti i path file pubblici
+- Output sempre escaped con `{{ }}`. Usare `{!! !!}` solo per HTML fidato
+  generato dal codice, mai per input utente
 
-```bash
-npm install alpinejs
-```
+### Migration
 
-```js
-// resources/js/app.js
-import Alpine from 'alpinejs';
-window.Alpine = Alpine;
-Alpine.start();
-```
+- Sempre includere `down()` implementato e reversibile
+- `cascadeOnDelete()` obbligatorio su tutte le FK verso `users`
+  (requisito GDPR: l'anonimizzazione deve propagarsi automaticamente)
+- Usare `->nullable()->after('campo_esistente')` per colonne aggiunte
+  a tabelle esistenti
+- Non modificare migration già eseguite: creare sempre una nuova migration
 
----
+### Query e performance
 
-## 8. Asset Management con Vite
+- Zero query N+1: eager loading obbligatorio con `with()` o `load()`
+- Pre-caricare in memoria prima dei loop:
+  `Model::whereNotNull('codice')->pluck('id', 'codice')` — non query dentro loop
+- `->lazy()` per loop su dataset grandi (migration dati, import)
+- `->limit()` nei componenti Livewire con polling per non caricare tabelle intere
 
-```js
-// vite.config.js
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
+### Pattern architetturali
 
-export default defineConfig({
-    plugins: [
-        laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
-            refresh: true,
-        }),
-    ],
-});
-```
+- Notifiche: dispatch nei Service, mai nei controller
+- Notifiche: `->onQueue('emails')` (fire-and-forget, non bloccano il workflow)
+- Deduplicazione: pre-caricare i codici esistenti in memoria prima del loop
+- Feature configurabili via file `config/`: zero hardcoding di valori
+  configurabili nel codice (vedi `config/simulator.php`,
+  `config/mit_import.php` come riferimento)
+- Retrocompatibilità formati JSON: usare accessor/metodo dedicato sul model
+  che gestisce entrambi i formati (es. `getAnswerResult()` su `QuizAttempt`)
 
-- Tutti gli asset vengono importati tramite `@vite()` nel layout.
-- AdminLTE e Bootstrap vengono installati via npm e importati in `app.css` / `app.js`.
-- **Non usare** `mix()` o `asset()` per i file compilati da Vite.
+### Testing
 
----
+- Ogni feature deve avere almeno un Feature Test in `tests/Feature/`
+- `RefreshDatabase` nei test che toccano il database
+- Testare i componenti Livewire con `Livewire::test()`
+- Usare factories per generare dati di test
 
-## 9. Autenticazione e Autorizzazione
-
-- Usare **Laravel Breeze** con il preset Blade per lo scaffolding iniziale.
-- Definire una **Policy** per ogni Model: `php artisan make:policy FooPolicy --model=Foo`.
-- Usare `$this->authorize()` nei controller o `@can` nelle viste.
-- Raggruppare le route protette con il middleware `auth`.
-- I ruoli vengono gestiti tramite **Spatie Laravel Permission** (`spatie/laravel-permission`).
-
----
-
-## 10. Convenzioni di Naming
-
-| Cosa | Convenzione | Esempio |
-|---|---|---|
-| Model | PascalCase, singolare | `User`, `BlogPost` |
-| Controller | PascalCase + Controller | `UserController` |
-| Livewire class | PascalCase, nella sottocartella | `Users/UserSearch` |
-| Migration | snake_case, descrittiva | `create_blog_posts_table` |
-| View (pagina) | snake_case | `users/index.blade.php` |
-| View (component) | snake_case | `components/alert.blade.php` |
-| Route name | snake_case con dot notation | `admin.users.index` |
-| CSS class custom | kebab-case | `.user-avatar-lg` |
-
----
-
-## 11. Gestione Errori e Flash Messages
-
-Standardizzare i messaggi flash nel layout:
-
-```blade
-{{-- layouts/partials/flash.blade.php --}}
-@foreach (['success', 'error', 'warning', 'info'] as $type)
-    @if (session($type))
-        <div class="alert alert-{{ $type }} alert-dismissible fade show" role="alert">
-            {{ session($type) }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-@endforeach
-```
-
-Nei controller:
-```php
-return redirect()->route('users.index')->with('success', 'Utente creato con successo.');
-return back()->with('error', 'Si è verificato un errore.')->withInput();
-```
-
----
-
-## 12. Testing
-
-- Ogni feature deve avere almeno un **Feature Test** in `tests/Feature/`.
-- Usare `RefreshDatabase` nei test che toccano il database.
-- Testare le **Livewire component** con `Livewire::test()`.
-- Usare **factories** per generare dati di test.
+Esempio Livewire test:
 
 ```php
-// Esempio test Livewire
-Livewire::test(UserSearch::class)
-    ->set('search', 'Mario')
-    ->assertSee('Mario Rossi')
-    ->assertDontSee('Luigi Verdi');
+Livewire::test(QuestionSearch::class)
+    ->set('search', 'precedenza')
+    ->assertSee('Diritto di precedenza')
+    ->assertDontSee('Distanza di sicurezza');
 ```
 
 ---
 
-## 13. Comandi Artisan Frequenti
+## Comandi artisan frequenti
 
 ```bash
-# Crea lo scaffolding completo per una risorsa
-php artisan make:model Foo -mfsc              # Model, Migration, Factory, Seeder, Controller
+# Suite di test
+php artisan test
+
+# Scaffolding risorsa completo (model + migration + factory + seeder + controller)
+php artisan make:model Foo -mfsc
 
 # Livewire
 php artisan make:livewire NomeComponente
 
-# AdminLTE
-php artisan adminlte:install
-php artisan adminlte:plugins install
-
-# Cache (produzione)
+# Cache produzione
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
+
+# Comandi custom del progetto
+php artisan questions:import-mit
+php artisan enrollments:close-expired
+php artisan gdpr:anonymize
 ```
 
 ---
 
-## 14. Checklist Prima di Ogni PR
+## Checklist PR — obbligatoria prima di ogni merge
 
-- [ ] Nessuna logica di business nel controller (usa Service)
-- [ ] Validazione tramite Form Request
-- [ ] Policy definita e usata per le azioni protette
-- [ ] Nessun `dd()`, `dump()`, `var_dump()` rimasto nel codice
-- [ ] Flash messages impostati dopo ogni redirect
-- [ ] `wire:loading` presente su tutti i bottoni Livewire
-- [ ] Niente query N+1 (usare `with()` per eager loading)
-- [ ] Migrations con `down()` implementato correttamente
+- [ ] `git flow feature finish` **NON** eseguito: aspetto il comando esplicito
+- [ ] Nessuna logica di business nel controller
+- [ ] `#[Validate]` sulle property Livewire (non `rules()`)
+- [ ] `wire:loading` su tutti i bottoni Livewire
+- [ ] `wire:model.blur` (non `.defer`, non `.live`)
+- [ ] Nessun `dd()`, `dump()`, `var_dump()`
+- [ ] Flash messages su tutti i redirect
+- [ ] Nessuna query N+1
+- [ ] Migration con `down()` implementato
+- [ ] `cascadeOnDelete` sulle FK verso `users`
+- [ ] Nessun asset inline nelle view
 - [ ] Almeno un Feature Test per la funzionalità introdotta
-- [ ] Nessun asset inline (`<style>` o `<script>` inline nelle viste, tranne casi eccezionali via `@push`)
+- [ ] `README.md` aggiornato (se pertinente)
+- [ ] `CHANGELOG.md` aggiornato con la voce della feature
+- [ ] `php artisan test` — intera suite verde
+
+---
+
+## Known issues aperti
+
+Non riaprire, non aggiungere workaround che li peggiorano.
+Chiudere nella PR dedicata quando si lavora sull'area coinvolta.
+
+| Issue                                                                                                                                  | Da chiudere in                                |
+|----------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| `View::composer('*', ...)` in `AppServiceProvider` gira su ogni view: usare layout specifici, non aggiungere altri composer su `'*'`   | PR notifiche in-app                           |
+| `ImportQuestionsRequest` non valida `max:5120`                                                                                         | PR Import MIT                                 |
+| Migration `drop_quiz_results_table` da creare                                                                                          | PR dedicata                                   |
+| `Quiz::hasQuestion()` e `QuizAttemptService::scoreAnswers()` senza type hint                                                           | prossima PR che tocca questi metodi           |
+| `RoleMiddleware::handle()` senza return type `Response`                                                                                | prossima PR che tocca il middleware           |

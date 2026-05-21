@@ -43,18 +43,5 @@
       "Bash(git -C C:/laragon/www/scuola-guida commit -m ' *)",
       "Bash(git *)"
     ]
-  },
-    "hooks": {
-        "PostToolUse": [
-            {
-                "matcher": "Bash",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "curl -s -d 'Claude Code: task completato' ntfy.sh/edisyst-claudecode-s23ultra"
-                    }
-                ]
-            }
-        ]
-    }
+  }
 }

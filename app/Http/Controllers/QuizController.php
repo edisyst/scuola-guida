@@ -265,7 +265,7 @@ class QuizController extends Controller
         ]);
     }
 
-    public function exportResults(Quiz $quiz)
+    public function exportResults(Quiz $quiz, QuizSummaryService $summaries)
     {
         abort_unless(auth()->user()->canEditQuiz(), 403);
         abort_unless($quiz->isConfirmed(), 403);
@@ -273,7 +273,7 @@ class QuizController extends Controller
         $filename = 'risultati-' . Str::slug($quiz->title ?: ('quiz-' . $quiz->id))
             . '-' . now()->format('Y-m-d') . '.xlsx';
 
-        return Excel::download(new QuizResultsExport($quiz), $filename);
+        return Excel::download(new QuizResultsExport($quiz, $summaries), $filename);
     }
 
     /*

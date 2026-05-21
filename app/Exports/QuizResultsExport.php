@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Quiz;
 use App\Models\QuizEnrollment;
+use App\Services\QuizSummaryService;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -14,7 +15,10 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class QuizResultsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
-    public function __construct(private Quiz $quiz) {}
+    public function __construct(
+        private Quiz $quiz,
+        private QuizSummaryService $summaryService,
+    ) {}
 
     public function query()
     {
@@ -70,9 +74,8 @@ class QuizResultsExport implements FromQuery, ShouldAutoSize, WithHeadings, With
             ];
         }
 
-        $total      = (int) $attempt->total_questions;
-        $errors     = $total - (int) $attempt->score;
-        $passed     = $total > 0 && $errors <= ($this->quiz->max_errors ?? 0);
+        $total  = (int) $attempt->total_questions;
+        $passed = $this->summaryService->isPassed($attempt, $this->quiz);
         $percentage = $total > 0
             ? number_format(($attempt->score / $total) * 100, 1) . '%'
             : '0.0%';

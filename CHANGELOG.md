@@ -58,7 +58,8 @@ Allineamento delle KPI box allo spec di Feature 3.4:
 
 ```
 app/Services/QuizSummaryService.php                # getSummary() + isPassed()
-app/Http/Controllers/QuizController.php            # summary() method
+app/Http/Controllers/QuizController.php            # summary() + exportResults() con QuizSummaryService
+app/Exports/QuizResultsExport.php                  # isPassed() delegato a QuizSummaryService (DRY)
 resources/views/admin/quizzes/summary.blade.php    # correzioni estetiche KPI box
 routes/web.php                                     # GET /admin/quizzes/{quiz}/summary
 ```
