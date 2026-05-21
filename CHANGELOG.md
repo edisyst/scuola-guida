@@ -5,6 +5,52 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 3.5: schedulazione apertura/chiusura iscrizioni
+
+Aggiunta finestra di schedulazione (`enrollments_open_at` / `enrollments_close_at`) sui quiz confermati
+per controllare quando i viewer possono richiedere l'iscrizione.
+
+### Model Quiz
+
+- `getEnrollmentStatusAttribute()` aggiornato: restituisce `not_scheduled` (invariato rispetto al comportamento precedente) quando entrambi i campi sono `null`. Stati: `not_scheduled` / `open` / `upcoming` / `closed`.
+
+### StoreQuizRequest
+
+Aggiunte regole per i due nuovi campi (coerenti con `UpdateQuizScheduleRequest`):
+- `enrollments_open_at`: `nullable|date`
+- `enrollments_close_at`: `nullable|date|after:enrollments_open_at`
+
+### Form creazione quiz (`partials/form.blade.php`)
+
+Due campi `datetime-local` aggiunti alla fine del form (visibili solo agli admin):
+- *Apertura iscrizioni* (`enrollments_open_at`)
+- *Chiusura iscrizioni* (`enrollments_close_at`)
+
+Valori pre-popolati in edit con `optional(...)->format('Y-m-d\TH:i')`.
+
+### Comando `enrollments:close-expired`
+
+Refactoring del comando `CloseExpiredEnrollments`:
+- Usa `QuizEnrollmentService::reject()` per ogni iscrizione invece del bulk `UPDATE` diretto, in modo da non duplicare la logica di rifiuto e inviare le notifiche agli utenti.
+- `->lazy()` su entrambe le query (quiz e enrollment) per iterare senza caricare tutto in memoria.
+- Trova il primo utente admin come reviewer di sistema; se assente logga errore e restituisce `FAILURE`.
+- Idempotente: seleziona solo iscrizioni `pending` su quiz con `enrollments_close_at <= now()`.
+
+### Files
+
+```
+app/Http/Requests/StoreQuizRequest.php                    # +enrollments_open_at, +enrollments_close_at
+app/Models/Quiz.php                                       # getEnrollmentStatusAttribute: +not_scheduled
+app/Console/Commands/CloseExpiredEnrollments.php          # refactoring: service + lazy()
+resources/views/admin/quizzes/partials/form.blade.php     # +2 campi datetime-local (admin only)
+resources/views/calendar/_quiz-row.blade.php              # +not_scheduled trattato come 'open'
+resources/views/stats/dashboard.blade.php                 # widget nextSession: gestione not_scheduled
+tests/Feature/CalendarTest.php                            # test accessor aggiornato a 'not_scheduled'
+tests/Feature/AdminOperativityTest.php                    # +admin() prima del comando nel test
+```
+
+---
+
 ## [Unreleased] — Feature 3.4: pannello riepilogo quiz confermato
 
 Verifica e consolidamento del pannello `/admin/quizzes/{quiz}/summary`. La feature era già implementata nelle versioni precedenti; questa entry documenta formalmente l'architettura e registra le correzioni estetiche alle KPI box per allinearle allo spec ufficiale.
