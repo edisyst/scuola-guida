@@ -77,7 +77,7 @@
                         @if ($renamingFile === $file['path'])
                             <div>
                                 <input type="text"
-                                       wire:model.defer="newName"
+                                       wire:model.blur="newName"
                                        class="form-control form-control-sm @error('newName') is-invalid @enderror"
                                        wire:keydown.enter="rename"
                                        wire:keydown.escape="cancelRename"

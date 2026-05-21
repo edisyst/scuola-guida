@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Admin;
 
 use App\Models\Question;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -14,29 +15,27 @@ class MediaManager extends Component
     /** Cartella attiva: 'test' o 'production'. */
     public string $folder = 'test';
 
+    #[Validate('required|image|mimes:jpg,jpeg,png,gif,webp|max:2048')]
     public $newImage;
 
     public ?string $renamingFile = null;
-    public string  $newName      = '';
+
+    #[Validate(['required', 'regex:/^[\w\-]+\.[a-zA-Z]{2,5}$/'])]
+    public string $newName = '';
 
     public ?string $deletingFile = null;
     public int     $deletingRefs = 0;
 
-    protected function rules(): array
+    protected function messages(): array
     {
         return [
-            'newImage' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'newName'  => ['required', 'regex:/^[\w\-]+\.[a-zA-Z]{2,5}$/'],
+            'newImage.required' => 'Seleziona un file immagine.',
+            'newImage.image'    => 'Il file deve essere un\'immagine.',
+            'newImage.max'      => 'L\'immagine non può superare 2 MB.',
+            'newName.required'  => 'Il nome non può essere vuoto.',
+            'newName.regex'     => 'Nome non valido (solo lettere, numeri, trattini, underscore e un\'estensione).',
         ];
     }
-
-    protected $messages = [
-        'newImage.required' => 'Seleziona un file immagine.',
-        'newImage.image'    => 'Il file deve essere un\'immagine.',
-        'newImage.max'      => 'L\'immagine non può superare 2 MB.',
-        'newName.required'  => 'Il nome non può essere vuoto.',
-        'newName.regex'     => 'Nome non valido (solo lettere, numeri, trattini, underscore e un\'estensione).',
-    ];
 
     public function mount(): void
     {
