@@ -5,6 +5,66 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 3.4: pannello riepilogo quiz confermato
+
+Verifica e consolidamento del pannello `/admin/quizzes/{quiz}/summary`. La feature era già implementata nelle versioni precedenti; questa entry documenta formalmente l'architettura e registra le correzioni estetiche alle KPI box per allinearle allo spec ufficiale.
+
+### QuizSummaryService (`app/Services/QuizSummaryService.php`)
+
+`getSummary(Quiz $quiz): array` restituisce:
+
+- **`kpi`** — `total` (iscrizioni `approved` + `completed`), `completed` (iscrizioni con tentativo), `pending` (approvati senza tentativo), `average_score` (media % sui completati, `null` se nessuno ha completato), `pass_rate` (% promossi, `null` se nessuno ha completato).
+- **`enrollments`** — `Collection<QuizEnrollment>` con eager loading `user` + `quizAttempt`, ordinata per cognome ASC, senza query N+1.
+
+`isPassed(QuizAttempt $attempt, Quiz $quiz): bool` — "Promosso" se `total_questions - score <= quiz.max_errors`. Logica condivisa con `QuizResultsExport`, nessuna duplicazione.
+
+### Controller e route
+
+`QuizController::summary(Quiz $quiz, QuizSummaryService $summaries)`:
+- Autorizzazione: `abort_unless(auth()->user()->isAdmin(), 403)`.
+- Stato quiz: `abort_unless($quiz->isConfirmed(), 404)`.
+- Tutta la logica di aggregazione delegata a `QuizSummaryService`.
+
+Route `GET /admin/quizzes/{quiz}/summary` → `admin.quizzes.summary`, gruppo `middleware('role:admin')`.
+Pulsante "Riepilogo" (`fas fa-chart-bar`) nella lista quiz admin (`admin.quizzes.index`), visibile solo per quiz in stato `confirmed`.
+
+### View (`resources/views/admin/quizzes/summary.blade.php`)
+
+Quattro `small-box` AdminLTE nella prima riga:
+
+| Box | Colore | Icona |
+|---|---|---|
+| Totale iscritti | `bg-primary` (blu) | `fas fa-users` |
+| Hanno completato | `bg-success` (verde) | `fas fa-check` |
+| Non ancora svolto | `bg-warning` (giallo) | `fas fa-clock` |
+| Punteggio medio | `bg-teal` (verde acqua) | `fas fa-chart-bar` |
+
+Punteggio medio: 1 decimale + `%`, oppure `—` se nessun completato.
+
+Tabella iscritti: Cognome · Nome · Email · Stato iscrizione (badge) · Punteggio · Percentuale · Esito · Data tentativo. Righe `table-success` (Promosso) / `table-danger` (Rimandato) / `table-warning` (Non svolto). Pulsante "Esporta Excel" per gli utenti con `canEditQuiz()`.
+
+### Correzioni estetiche (2026-05-21)
+
+Allineamento delle KPI box allo spec di Feature 3.4:
+
+| Box | Prima | Dopo |
+|---|---|---|
+| Totale iscritti | `bg-info` | `bg-primary` |
+| Hanno completato | `fa-check-circle` | `fa-check` |
+| Non ancora svolto | `fa-hourglass-half` | `fa-clock` |
+| Punteggio medio | `bg-primary` + `fa-star` | `bg-teal` + `fa-chart-bar` |
+
+### Files
+
+```
+app/Services/QuizSummaryService.php                # getSummary() + isPassed()
+app/Http/Controllers/QuizController.php            # summary() method
+resources/views/admin/quizzes/summary.blade.php    # correzioni estetiche KPI box
+routes/web.php                                     # GET /admin/quizzes/{quiz}/summary
+```
+
+---
+
 ## [Unreleased] — Feature 3.3: export Excel risultati quiz confermati
 
 Aggiunto pulsante "Esporta Excel" nella pagina di riepilogo di un quiz confermato. Il download è sincrono e produce un file `.xlsx` con una riga per ogni iscritto approvato/completato al quiz.

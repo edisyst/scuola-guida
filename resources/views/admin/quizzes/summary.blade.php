@@ -28,7 +28,7 @@
 
     <div class="row mb-3">
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
+            <div class="small-box bg-primary">
                 <div class="inner">
                     <h3>{{ $kpi['total'] }}</h3>
                     <p>Totale iscritti</p>
@@ -42,7 +42,7 @@
                     <h3>{{ $kpi['completed'] }}</h3>
                     <p>Hanno completato</p>
                 </div>
-                <div class="icon"><i class="fas fa-check-circle"></i></div>
+                <div class="icon"><i class="fas fa-check"></i></div>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -51,16 +51,16 @@
                     <h3>{{ $kpi['pending'] }}</h3>
                     <p>Non ancora svolto</p>
                 </div>
-                <div class="icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="icon"><i class="fas fa-clock"></i></div>
             </div>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-primary">
+            <div class="small-box bg-teal">
                 <div class="inner">
                     <h3>{{ $kpi['average_score'] !== null ? number_format($kpi['average_score'], 1) . '%' : '—' }}</h3>
                     <p>Punteggio medio</p>
                 </div>
-                <div class="icon"><i class="fas fa-star"></i></div>
+                <div class="icon"><i class="fas fa-chart-bar"></i></div>
             </div>
         </div>
     </div>
