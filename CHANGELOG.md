@@ -5,6 +5,144 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 3.2: notifiche in-app con badge navbar
+
+UI in-app per le notifiche database già emesse dalla Feature 3.1: campanella in topbar con badge contatore + dropdown delle ultime 10, pagina dedicata con elenco completo e azioni di pulizia. Chiusura del known issue sul `View::composer('*', ...)` per il contatore notifiche.
+
+### Canale database (`app/Notifications/`)
+
+Le sette Notification class previste dallo scope 3.2 (`RegistrazioneApprovataNotification`, `RegistrazioneRifiutataNotification`, `AnagraficaModificataNotification`, `NuovaRichiestaAnagraficaNotification`, `IscrizioneQuizApprovataNotification`, `IscrizioneQuizRifiutataNotification`, `IscrizioneQuizRiapertaNotification`, `NuovaIscrizioneQuizNotification`) — più le tre fuori scope ma allineate (`QuizConfermatoNotification`, `QuizEsameCompletatoNotification`, `RuoloAggiornatoNotification`) — dichiarano `['mail', 'database']` in `via()` e implementano `toDatabase()` con payload uniforme `{title, body, url, icon, color}`. Codifica visiva coerente con l'evento: `fas fa-check-circle` + `success` per approvazioni, `fas fa-times-circle` + `danger` per rifiuti, `fas fa-id-card` / `fas fa-user-clock` + `warning` per richieste agli admin, `fas fa-redo` / `fas fa-clipboard-check` / `fas fa-user-tag` + `info` per eventi neutri. Body troncato a ~40–60 caratteri sul titolo del quiz / motivazione per restare leggibile nel dropdown.
+
+Tabella `notifications` (UUID PK, `notifiable` morph, `data` JSON, `read_at` nullable) creata via `php artisan notifications:table` nella migration `2026_05_17_161328_create_notifications_table.php`.
+
+### Componente Livewire `NotificationBell` (`app/Http/Livewire/NotificationBell.php`)
+
+Esposto in topbar AdminLTE tramite `<livewire:notification-bell />` nella section `content_top_nav_right` del layout `resources/views/layouts/admin.blade.php`. Render condizionato da `@auth`.
+
+- Property pubblica `int $unreadCount` aggiornata da `loadNotifications()`. La collection delle ultime 10 notifiche è ricalcolata a ogni `render()` (no property serializzata pesante).
+- `mount()` invoca `loadNotifications()` per evitare il flash a zero del badge al primo paint.
+- `markAsRead(string $notificationId)` recupera la singola notifica via `$user->notifications()->whereKey($id)->first()` (zero possibilità di cross-user via id guess), la segna come letta, ricarica il contatore e — se il payload contiene `url` — restituisce un `$this->redirect($url, navigate: false)` per portare l'utente alla pagina collegata.
+- `markAllAsRead()` invoca `$user->unreadNotifications->markAsRead()` e ricalcola il contatore.
+- Polling: `wire:poll.30s="loadNotifications"` applicato al solo `<li>` del dropdown (non all'intera pagina) per aggiornare badge e dropdown senza riprocessare l'intero layout.
+
+### View Livewire (`resources/views/livewire/notification-bell.blade.php`)
+
+Struttura HTML conforme al pattern AdminLTE 3 (`nav-item dropdown` + `nav-link` + `dropdown-menu-lg dropdown-menu-right`). Badge `badge-warning navbar-badge` visibile solo se `$unreadCount > 0` con cap a `99+`. Header dropdown con conteggio non-lette (singolare/plurale) o "Nessuna notifica non letta". Pulsante "Segna tutte come lette" visibile solo se ci sono non-lette, con `wire:loading` mirato e spinner. Riga notifica con icona (`{{ $data['icon'] }}` colorata via `text-{{ $data['color'] }}`), titolo, body troncato CSS (`text-truncate`), tempo relativo (`diffForHumans()`); non-lette evidenziate con `font-weight-bold`. Footer "Tutte le notifiche" → `route('notifications.index')`.
+
+### Pagina lista (`/notifications` — viewer/editor/admin)
+
+`App\Http\Controllers\NotificationController` con tre action:
+
+- **`index(Request)`** — `markAsRead()` su tutte le non-lette dell'utente all'ingresso pagina, poi `notifications()->paginate(20)` ordinato `created_at desc`. Restituisce `notifications.index`.
+- **`destroy(Request, string $id)`** — recupera il record via `DatabaseNotification::findOrFail($id)`, verifica `notifiable_type` + `notifiable_id` matching l'utente autenticato (`abort 403` altrimenti), `delete()`. Flash `success`.
+- **`destroyAll(Request)`** — `$user->notifications()->delete()` di massa per l'utente. Flash `success`.
+
+Route nel gruppo `auth` (`routes/web.php`): `GET /notifications` → `index` (`notifications.index`), `DELETE /notifications` → `destroyAll` (`notifications.destroyAll`), `DELETE /notifications/{id}` → `destroy` (`notifications.destroy`). Niente policy ad-hoc: il filtro per `auth()->id()` nel controller è autorevole; il route param `{id}` è una UUID e il controllo di ownership previene l'IDOR.
+
+View `resources/views/notifications/index.blade.php` in stile `sg-wrapper`: header con titolo + pulsante "Elimina tutte" (form DELETE con `onsubmit="return confirm()"`), card con tabella `sg-table` (icona colorata, titolo cliccabile sul link contestuale, body, data `d/m/Y H:i`, pulsante elimina per riga con confirm), paginazione standard. Empty state con messaggio dedicato. Le righe non-lette sono `font-weight-bold` ma la pagina chiama già `markAsRead()` all'ingresso: in pratica il bold si vede solo se l'utente arriva sulla pagina senza JS o se nuove notifiche si aggiungono dopo il render (caso polling).
+
+### Sidebar (`config/adminlte.php`)
+
+Voce "Notifiche" già nella sezione *AREA PERSONALE* (visibile a tutti gli autenticati, niente `can`: le notifiche sono personali). Rimosso `label_color => 'warning'` dato che il badge sidebar non viene più popolato: il contatore è ora esposto dalla campanella in topbar.
+
+### Chiusura known issue: `View::composer('*', ...)`
+
+Il known issue documentato nella sezione *Refactor cumulativo* riguardava `View::composer('*', ...)` in `AppServiceProvider` che girava su ogni view (anche nested). La parte relativa al contatore notifiche è stata rimossa:
+
+- Eliminato il blocco `$unreadNotifications = auth()->check() ? auth()->user()->unreadNotifications()->where('created_at', '>=', $since)->count() : 0;` (query non-cacheabile per-utente, una per ogni view renderizzata).
+- Eliminato il `case 'notifications'` nello switch del menu (il badge sidebar non viene più popolato).
+
+Il composer rimane attivo per gli altri badge sidebar (questions, categories, users, quizzes, audit, registrations, question-reports) — sono conteggi globali cacheati 60s e non hanno l'overhead per-utente del contatore notifiche. Il contatore notifiche ora vive nel solo `NotificationBell`, che è renderizzato una volta sola dal layout e si aggiorna via polling.
+
+### Dispatch nei Service
+
+Nessuna modifica: i dispatch nei Service erano già corretti dalla 3.1. Il canale `database` è applicato automaticamente perché incluso in `via()` su ogni Notification.
+
+### Copertura test
+
+`tests/Feature/NotificationsTest.php` — 22 test, 77 asserzioni (tutti verdi). Oltre ai 19 test ereditati dalla 3.1 (dispatch, fan-out admin, motivazione, fire-and-forget, payload `toDatabase()`, pagina `/notifications` index/destroy/destroyAll con 403 cross-user, bell Livewire `unreadCount` + `markAllAsRead`), aggiunti 3 test dedicati al flow campanella e delete singolo:
+
+- `test_notification_bell_mark_as_read_marks_single_and_redirects_to_payload_url` — chiama `markAsRead($id)` su una singola notifica, verifica che venga marcata come letta, che il redirect punti al `url` del payload (es. `dashboard` per `RegistrazioneApprovataNotification`) e che le altre notifiche restino non lette.
+- `test_notification_bell_mark_as_read_ignores_notifications_of_other_users` — un viewer autenticato non può marcare come letta una notifica di un altro viewer (la query `$user->notifications()->whereKey($id)->first()` filtra per `notifiable_id`, restituisce `null`, il metodo esce senza redirect). Verifica `assertNoRedirect()` e che `read_at` rimanga `null`.
+- `test_destroy_removes_a_single_owned_notification` — happy path del `DELETE /notifications/{id}` da parte del proprietario: redirect con flash `success`, record rimosso dalla tabella, le altre notifiche dell'utente restano.
+
+### Files
+
+```
+app/
+  Http/Controllers/NotificationController.php       # index() / destroy() / destroyAll()
+  Http/Livewire/NotificationBell.php                # componente campanella + polling
+  Notifications/*.php                               # toDatabase() su tutte le 11 classi
+  Providers/AppServiceProvider.php                  # rimosso $unreadNotifications + case 'notifications'
+config/
+  adminlte.php                                      # voce sidebar "Notifiche" senza label_color
+database/migrations/
+  2026_05_17_161328_create_notifications_table.php  # UUID PK + morph notifiable
+resources/views/
+  layouts/admin.blade.php                           # <livewire:notification-bell /> in content_top_nav_right
+  livewire/notification-bell.blade.php              # dropdown AdminLTE 3 + polling 30s
+  notifications/index.blade.php                     # lista paginata + delete per riga + delete-all
+routes/
+  web.php                                           # gruppo notifications.* (auth)
+tests/Feature/
+  NotificationsTest.php                             # +3 test (markAsRead singola, cross-user, destroy)
+```
+
+---
+
+## [Unreleased] — Feature 3.1: notifiche email iscrizioni
+
+Stato della feature al 2026-05-20: l'infrastruttura email + queue per il workflow iscrizioni risulta integralmente implementata in iterazioni precedenti. Questa entry documenta retroattivamente lo stato attuale (nessun codice nuovo introdotto da questa task — solo verifica e tracciamento).
+
+### Infrastruttura queue
+
+- **Driver queue**: `database`. Migration `0001_01_01_000002_create_jobs_table.php` crea le tabelle `jobs`, `job_batches`, `failed_jobs`. Le notifiche del workflow iscrizioni sono accodate sulla queue `emails`; il worker locale si lancia con `php artisan queue:work --queue=emails`.
+- **`.env.example`** già contiene `QUEUE_CONNECTION=database` (con commento operativo sul worker) e il blocco SMTP Mailtrap (`MAIL_MAILER`, `MAIL_HOST=sandbox.smtp.mailtrap.io`, `MAIL_PORT=2525`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_ENCRYPTION=tls`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`).
+
+### Notification class (`app/Notifications/`)
+
+Nomenclatura italiana coerente con la convenzione del progetto. Tutte le classi: `implements ShouldQueue`, `use Queueable`, costruttore con `$this->onQueue('emails')`, canali `['mail', 'database']`, template Markdown in `resources/views/emails/`.
+
+Workflow anagrafica viewer:
+
+- **`RegistrazioneApprovataNotification`** — al viewer quando l'admin approva l'anagrafica (mapping spec: `ViewerProfileApproved`).
+- **`RegistrazioneRifiutataNotification(?string $motivazione)`** — al viewer quando l'admin rifiuta, con motivo (mapping spec: `ViewerProfileRejected`).
+- **`AnagraficaModificataNotification(User $viewer)`** — agli admin quando il viewer reinvia l'anagrafica dopo un'approvazione precedente (mapping spec: `ViewerProfileResubmitted`).
+- **`NuovaRichiestaAnagraficaNotification(User $viewer)`** — agli admin al primo invio della richiesta.
+
+Workflow iscrizioni quiz:
+
+- **`IscrizioneQuizApprovataNotification(Quiz $quiz)`** — al viewer quando l'admin approva (mapping spec: `EnrollmentApproved`).
+- **`IscrizioneQuizRifiutataNotification(Quiz $quiz, ?string $motivazione)`** — al viewer quando l'admin rifiuta, con motivo (mapping spec: `EnrollmentRejected`).
+- **`IscrizioneQuizRiapertaNotification(Quiz $quiz)`** — al viewer quando l'admin riapre un'iscrizione (mapping spec: `EnrollmentReopened`).
+- **`NuovaIscrizioneQuizNotification(User $viewer, Quiz $quiz)`** — agli admin quando un viewer richiede l'iscrizione (mapping spec: `NewEnrollmentRequest`).
+
+Notification correlate fuori dallo scope 3.1 ma già presenti: `QuizConfermatoNotification`, `QuizEsameCompletatoNotification`, `RuoloAggiornatoNotification`.
+
+### Template Markdown (`resources/views/emails/`)
+
+`registrazione-approvata`, `registrazione-rifiutata`, `anagrafica-modificata`, `nuova-richiesta-anagrafica`, `iscrizione-quiz-approvata`, `iscrizione-quiz-rifiutata`, `iscrizione-quiz-riaperta`, `nuova-iscrizione-quiz`, `quiz-confermato`, `quiz-esame-completato`, `ruolo-aggiornato`. Contengono saluto col nome anagrafico, descrizione dell'evento, motivo dove pertinente, link contestuale, firma.
+
+### Dispatch nei Service
+
+- **`app/Services/NotificationService.php`** — wrapper fire-and-forget: `send(mixed $notifiables, Notification $notification)` e `sendToAdmins(Notification $notification)` racchiudono `NotificationFacade::send()` in try/catch + `Log::warning()` per evitare che un errore di dispatch propaghi nel workflow utente. `sendToAdmins()` recupera gli utenti con `role = ROLE_ADMIN`.
+- **`app/Services/UserRegistrationService.php`** — `submit()` invia `NuovaRichiestaAnagrafica` (primo invio) o `AnagraficaModificata` (reinvio post-approvazione) agli admin; `approve()` invia `RegistrazioneApprovata` al viewer; `reject($reason)` invia `RegistrazioneRifiutata($reason)` al viewer.
+- **`app/Services/QuizEnrollmentService.php`** — `request()` invia `NuovaIscrizioneQuiz` agli admin; `approve()` invia `IscrizioneQuizApprovata` al viewer; `reject($reason)` invia `IscrizioneQuizRifiutata($reason)` al viewer; `reopen()` invia `IscrizioneQuizRiaperta` al viewer; `markCompleted()` invia `QuizEsameCompletato` agli admin (fuori scope 3.1).
+
+Zero dispatch nei controller, in linea con la convenzione di progetto.
+
+### Copertura test
+
+`tests/Feature/NotificationsTest.php` — 19 test, 67 asserzioni, tutti passanti. Coprono: dispatch su ogni transizione, fan-out agli admin, motivazione preservata, fire-and-forget (la redirect avviene anche se il dispatch lancia), payload del canale database, route name resolvibili.
+
+### Scostamenti rispetto alla spec di Feature 3.1
+
+- **Nomenclatura**: il progetto usa nomi italiani (`Registrazione*`, `Iscrizione*`) anziché inglesi (`ViewerProfile*`, `Enrollment*`). Allineato alla convenzione preesistente delle altre Notification del codebase.
+- **Canale database già attivo**: la spec 3.1 limitava a `mail`, prevedendo `database` per 3.2. Le classi correnti hanno già `['mail', 'database']` con `toDatabase()` implementato — di fatto parte di 3.2 è anticipata qui.
+- **Fan-out limitato agli admin**: `NotificationService::sendToAdmins()` notifica solo `role = admin`, non gli editor. Il test `test_viewer_submitting_registration_notifies_admins` documenta esplicitamente questa scelta. La spec chiedeva admin **+ editor** per `ViewerProfileResubmitted` e `NewEnrollmentRequest`: punto aperto da chiarire prima dell'eventuale estensione.
+
+---
+
 ## [2026-05-19] — Refactoring seeder domande e categorie
 
 ### Changed

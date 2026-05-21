@@ -332,11 +332,10 @@ return [
             'key'   => 'dashboard',
         ],
         [
-            'text'        => 'Notifiche',
-            'url'         => 'notifications',
-            'icon'        => 'far fa-bell',
-            'key'         => 'notifications',
-            'label_color' => 'warning',
+            'text' => 'Notifiche',
+            'url'  => 'notifications',
+            'icon' => 'far fa-bell',
+            'key'  => 'notifications',
         ],
 
         // ── STUDIO (allenamento libero, solo viewer/exam-participant) ────────

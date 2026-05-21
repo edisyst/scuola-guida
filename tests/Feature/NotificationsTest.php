@@ -567,4 +567,63 @@ class NotificationsTest extends TestCase
 
         $this->assertSame(0, $viewer->fresh()->unreadNotifications()->count());
     }
+
+    public function test_notification_bell_mark_as_read_marks_single_and_redirects_to_payload_url(): void
+    {
+        $viewer = User::factory()->create(['role' => User::ROLE_VIEWER]);
+
+        $viewer->notify(new RegistrazioneApprovataNotification());
+        $viewer->notify(new RegistrazioneRifiutataNotification('Doc mancante'));
+
+        $target = $viewer->notifications()
+            ->where('type', RegistrazioneApprovataNotification::class)
+            ->first();
+
+        $this->actingAs($viewer);
+
+        Livewire::test(NotificationBell::class)
+            ->call('markAsRead', $target->id)
+            ->assertRedirect(route('dashboard'));
+
+        $this->assertNotNull($target->fresh()->read_at);
+        // L'altra notifica resta non letta.
+        $this->assertSame(1, $viewer->fresh()->unreadNotifications()->count());
+    }
+
+    public function test_notification_bell_mark_as_read_ignores_notifications_of_other_users(): void
+    {
+        $owner    = User::factory()->create(['role' => User::ROLE_VIEWER]);
+        $attacker = User::factory()->create(['role' => User::ROLE_VIEWER]);
+
+        $owner->notify(new RegistrazioneApprovataNotification());
+        $target = $owner->notifications()->first();
+
+        $this->actingAs($attacker);
+
+        Livewire::test(NotificationBell::class)
+            ->call('markAsRead', $target->id)
+            ->assertNoRedirect();
+
+        $this->assertNull($target->fresh()->read_at);
+    }
+
+    public function test_destroy_removes_a_single_owned_notification(): void
+    {
+        $viewer = User::factory()->create(['role' => User::ROLE_VIEWER]);
+
+        $viewer->notify(new RegistrazioneApprovataNotification());
+        $viewer->notify(new RegistrazioneRifiutataNotification('Doc mancante'));
+
+        $toDelete = $viewer->notifications()
+            ->where('type', RegistrazioneApprovataNotification::class)
+            ->first();
+
+        $this->actingAs($viewer)
+            ->delete(route('notifications.destroy', $toDelete->id))
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('notifications', ['id' => $toDelete->id]);
+        $this->assertSame(1, $viewer->fresh()->notifications()->count());
+    }
 }

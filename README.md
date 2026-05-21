@@ -479,9 +479,9 @@ Componente `App\Http\Livewire\NotificationBell` montato in `layouts/admin.blade.
 
 > ⚠️ Nessun metodo del componente usa nomi riservati di Livewire 3 (`upload`, `set`, `get`, `call`, …): la Proxy `$wire` aliasa quegli identificatori a magic JS e `wire:click` non invocherebbe il metodo PHP.
 
-### Badge in sidebar
+### Voce sidebar (senza badge)
 
-La voce **Notifiche** in `config/adminlte.php` (sezione *AREA PERSONALE*) ha solo `'key' => 'notifications'`. Il badge con il numero di non-lette viene iniettato dal View Composer condiviso descritto in **[Badge della sidebar](#badge-della-sidebar--counter-dellultima-ora)**: il `case 'notifications'` legge `auth()->user()->unreadNotifications()->where('created_at', '>=', $since)->count()`, non cacheato perché per-utente.
+La voce **Notifiche** in `config/adminlte.php` (sezione *AREA PERSONALE*) è una semplice voce di menu senza `label_color`: il contatore non-lette è esposto dalla **campanella in topbar** (`NotificationBell` Livewire), che è renderizzata una volta sola dal layout e si rinfresca via `wire:poll.30s`. Questo evita la query per-utente che il View Composer di sidebar avrebbe dovuto eseguire su ogni view renderizzata (chiusura del known issue documentato in [CHANGELOG](CHANGELOG.md) sotto *Refactor cumulativo*).
 
 ### Pagina "Tutte le notifiche"
 
@@ -579,7 +579,9 @@ Tutto dentro una `DB::transaction()` (rollback in caso di errore):
 
 ## Badge della sidebar — counter dell'ultima ora
 
-I numeri colorati accanto alle voci della sidebar AdminLTE (Domande, Categorie, Quiz, Utenti, Audit Log, Iscrizioni anagrafiche, Notifiche) **non** mostrano il totale assoluto: contano solo gli elementi **aggiunti negli ultimi 60 minuti**. Servono come "novità a colpo d'occhio" per chi entra nel pannello e vuole vedere subito cos'è cambiato di recente.
+I numeri colorati accanto alle voci della sidebar AdminLTE (Domande, Categorie, Quiz, Utenti, Audit Log, Iscrizioni anagrafiche, Segnalazioni) **non** mostrano il totale assoluto: contano solo gli elementi **aggiunti negli ultimi 60 minuti** (eccezione: *Segnalazioni* mostra il totale pending senza filtro temporale). Servono come "novità a colpo d'occhio" per chi entra nel pannello e vuole vedere subito cos'è cambiato di recente.
+
+> Il contatore **Notifiche** non vive qui: è esposto dalla campanella in topbar (componente `NotificationBell`) — vedi sezione [Notifiche in-app](#notifiche-in-app).
 
 ### Dove vive la logica
 
@@ -604,12 +606,8 @@ View::composer('*', …)
   │      'pending_registrations' => User::viewer pending
   │                                   ->where('registration_submitted_at', '>=', $since)
   │                                   ->count(),
+  │      'pending_reports'       => QuestionReport::pending()->count(),  // senza filtro temporale
   │    ]);
-  │
-  ├──► $unreadNotifications = auth()->user()
-  │      ->unreadNotifications()
-  │      ->where('created_at', '>=', $since)
-  │      ->count();          // non cacheato: dipende dall'utente loggato
   │
   ▼
 config(['adminlte.menu' => …])   // inietta label + label_color per ogni voce con 'key'
@@ -617,17 +615,17 @@ config(['adminlte.menu' => …])   // inietta label + label_color per ogni voce 
 
 ### Chiavi e mapping
 
-Ogni voce del menu in `config/adminlte.php` espone una `key` (es. `'questions'`, `'registrations'`, `'notifications'`). Il composer fa uno `switch` su quella `key` e assegna `label` e `label_color`. Le voci senza `key` (es. *Profilo*, *Statistiche*) non ricevono badge.
+Ogni voce del menu in `config/adminlte.php` espone una `key` (es. `'questions'`, `'registrations'`, `'question-reports'`). Il composer fa uno `switch` su quella `key` e assegna `label` e `label_color`. Le voci senza `key` (es. *Profilo*, *Statistiche*, *Notifiche*) non ricevono badge.
 
-| `key`          | Sorgente                                                                             | Colore     | Note |
+| `key`             | Sorgente                                                              | Colore    | Note |
 |---|---|---|---|
-| `questions`    | `Question::where('created_at', '>=', $since)`                                        | `success`  | Sempre visibile (anche con 0) |
-| `categories`   | `Category::where('created_at', '>=', $since)`                                        | `info`     | Sempre visibile |
-| `quizzes`      | `Quiz::where('created_at', '>=', $since)`                                            | `warning`  | Sempre visibile |
-| `users`        | `User::where('created_at', '>=', $since)`                                            | `primary`  | Sempre visibile |
-| `audit`        | `AuditLog::where('created_at', '>=', $since)`                                        | `danger`   | Sempre visibile |
-| `registrations`| viewer + `REG_PENDING` + `registration_submitted_at >= $since`                       | `warning`  | Visibile solo se > 0 |
-| `notifications`| `unreadNotifications()->where('created_at', '>=', $since)`                           | (default)  | Visibile solo se > 0, per-utente |
+| `questions`       | `Question::where('created_at', '>=', $since)`                         | `success` | Visibile solo se > 0 |
+| `categories`      | `Category::where('created_at', '>=', $since)`                         | `info`    | Visibile solo se > 0 |
+| `quizzes`         | `Quiz::where('created_at', '>=', $since)`                             | `warning` | Visibile solo se > 0 |
+| `users`           | `User::where('created_at', '>=', $since)`                             | `primary` | Visibile solo se > 0 |
+| `audit`           | `AuditLog::where('created_at', '>=', $since)`                         | `danger`  | Visibile solo se > 0 |
+| `registrations`   | viewer + `REG_PENDING` + `registration_submitted_at >= $since`        | `warning` | Visibile solo se > 0 |
+| `question-reports`| `QuestionReport::pending()->count()` — senza filtro temporale         | `warning` | Sempre actionable, mostra il totale |
 
 > Per *Iscrizioni anagrafiche* il timestamp di riferimento è `registration_submitted_at` (momento in cui il viewer ha inviato la richiesta), non `created_at` (che è la registrazione dell'account).
 
@@ -640,9 +638,9 @@ Ogni voce del menu in `config/adminlte.php` espone una `key` (es. `'questions'`,
 
 ### Note di performance
 
-- Le 6 query del composer girano solo al **cache miss**: ≤ 1 volta al minuto per processo PHP.
+- Le 7 query del composer girano solo al **cache miss**: ≤ 1 volta al minuto per processo PHP.
 - Tutte le `where('created_at', '>=', …)` sfruttano l'indice di default su `created_at` di Laravel; nessun indice aggiuntivo è necessario.
-- Il counter `unreadNotifications` non è cacheato per costruzione (è per-utente). Se diventasse un collo di bottiglia, si può spostare in cache `admin_badges_user_{id}` con TTL breve.
+- Il contatore notifiche **non passa dal composer**: vive nel componente Livewire `NotificationBell`, renderizzato una volta dal layout e aggiornato via `wire:poll.30s`. Così evitiamo una query per-utente su ogni view renderizzata.
 
 ### Estendere
 
@@ -765,7 +763,7 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 | `BookmarkTest` | 15 | Toggle add/remove, unique constraint, isolamento dati tra utenti, destroy 200/403, studio da bookmarks, redirect warning su lista vuota, cascade delete, accesso/redirect unauthenticated, filtri categoria e testo, saveNote Livewire (verifica pivot), validazione max 500 caratteri |
 | `QuizTest` | 3 | Creazione tentativo, tentativo su quiz confermato con iscrizione, aggiornamento score |
 | `AdminOperativityTest` | 8 | Export Excel, riepilogo KPI, schedulazione iscrizioni, comando `close-expired` |
-| `NotificationsTest` | 19 | Dispatch 11 notifiche, fallback fire-and-forget, payload DB, pagina, bell Livewire |
+| `NotificationsTest` | 22 | Dispatch 11 notifiche, fallback fire-and-forget, payload `toDatabase()`, pagina `/notifications` (index/destroy/destroyAll + 403 cross-user), bell Livewire (unreadCount, markAllAsRead, markAsRead singola + redirect, markAsRead cross-user ignorata) |
 | `GdprTest` | 7 | PII anonimizzata, blocco admin, dry-run, login impossibile, sessioni DB, gdpr:list |
 | `RegistrationFlowTest` | 9 | Workflow iscrizione anagrafica end-to-end |
 | `StudyTest` | 10 | Sessione studio, sorgenti, navigazione, flag, riepilogo |

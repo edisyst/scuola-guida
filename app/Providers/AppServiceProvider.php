@@ -136,15 +136,7 @@ class AppServiceProvider extends ServiceProvider
                 ];
             });
 
-            // Conteggio non-lette per l'utente corrente (non cacheato: per-utente).
-            // Anche qui filtriamo all'ultima ora per coerenza con gli altri badge.
-            $unreadNotifications = auth()->check()
-                ? auth()->user()->unreadNotifications()
-                    ->where('created_at', '>=', $since)
-                    ->count()
-                : 0;
-
-            config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($counts, $unreadNotifications) {
+            config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($counts) {
 
                 if (!isset($item['key']))
                     return $item;
@@ -196,12 +188,6 @@ class AppServiceProvider extends ServiceProvider
                         if ($counts['pending_reports'] > 0) {
                             $item['label'] = $counts['pending_reports'];
                             $item['label_color'] = 'warning';
-                        }
-                        break;
-
-                    case 'notifications':
-                        if ($unreadNotifications > 0) {
-                            $item['label'] = $unreadNotifications;
                         }
                         break;
                 }
