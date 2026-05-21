@@ -195,10 +195,10 @@ class CalendarTest extends TestCase
         $this->assertSame('open', $quiz->enrollment_status);
     }
 
-    public function test_enrollment_status_accessor_returns_open_when_no_dates(): void
+    public function test_enrollment_status_accessor_returns_not_scheduled_when_no_dates(): void
     {
         $quiz = $this->confirmedQuiz(['enrollments_open_at' => null, 'enrollments_close_at' => null]);
-        $this->assertSame('open', $quiz->enrollment_status);
+        $this->assertSame('not_scheduled', $quiz->enrollment_status);
     }
 
     public function test_enrollment_status_accessor_returns_closed(): void

@@ -75,6 +75,31 @@
     <div id="max-warning" class="sg-form-error" style="display:none;"></div>
 </div>
 
+@if(auth()->user()->isAdmin())
+<div class="sg-form-group">
+    <label class="sg-form-label">Apertura iscrizioni</label>
+    <input type="datetime-local"
+           name="enrollments_open_at"
+           class="sg-form-control @error('enrollments_open_at') is-invalid @enderror"
+           value="{{ old('enrollments_open_at', optional($quiz->enrollments_open_at ?? null)->format('Y-m-d\TH:i')) }}">
+    @error('enrollments_open_at')
+        <div class="sg-form-error">{{ $message }}</div>
+    @enderror
+    <small class="sg-form-hint">Prima di questa data il pulsante "Richiedi iscrizione" sarà nascosto.</small>
+</div>
+
+<div class="sg-form-group">
+    <label class="sg-form-label">Chiusura iscrizioni</label>
+    <input type="datetime-local"
+           name="enrollments_close_at"
+           class="sg-form-control @error('enrollments_close_at') is-invalid @enderror"
+           value="{{ old('enrollments_close_at', optional($quiz->enrollments_close_at ?? null)->format('Y-m-d\TH:i')) }}">
+    @error('enrollments_close_at')
+        <div class="sg-form-error">{{ $message }}</div>
+    @enderror
+    <small class="sg-form-hint">Dopo questa data le iscrizioni pending verranno chiuse automaticamente.</small>
+</div>
+@endif
 
 @section('js')
     @parent

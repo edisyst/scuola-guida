@@ -20,9 +20,11 @@ class StoreQuizRequest extends FormRequest
             'max_questions' => 'required|integer|min:1|max:100',
             'time_limit'    => 'nullable|integer|min:0',
             'max_errors'    => 'nullable|integer|min:0',
-            'status'        => ['nullable', Rule::in([Quiz::STATUS_DRAFT, Quiz::STATUS_PUBLISHED])],
-            'questions'     => 'nullable|array',
-            'questions.*'   => 'exists:questions,id',
+            'status'               => ['nullable', Rule::in([Quiz::STATUS_DRAFT, Quiz::STATUS_PUBLISHED])],
+            'questions'            => 'nullable|array',
+            'questions.*'          => 'exists:questions,id',
+            'enrollments_open_at'  => ['nullable', 'date'],
+            'enrollments_close_at' => ['nullable', 'date', 'after:enrollments_open_at'],
         ];
     }
 

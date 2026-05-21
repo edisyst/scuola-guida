@@ -67,7 +67,7 @@
 
     {{-- Colonna destra: azione --}}
     <div class="ms-3 d-flex flex-column align-items-end gap-1">
-        @if($quiz->enrollment_status === 'open' && !in_array($quiz->id, $userEnrollmentQuizIds))
+        @if(in_array($quiz->enrollment_status, ['open', 'not_scheduled']) && !in_array($quiz->id, $userEnrollmentQuizIds))
             @if($canEnroll)
                 <form method="POST" action="{{ route('quiz.enrollments.store', $quiz) }}">
                     @csrf

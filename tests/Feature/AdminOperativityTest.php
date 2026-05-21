@@ -188,6 +188,8 @@ class AdminOperativityTest extends TestCase
 
     public function test_close_expired_command_rejects_only_pending_enrollments(): void
     {
+        $this->admin(); // il comando cerca User::ROLE_ADMIN per il reviewer di sistema
+
         $quiz = $this->confirmedQuiz();
         $quiz->update(['enrollments_close_at' => now()->subHour()]);
 
