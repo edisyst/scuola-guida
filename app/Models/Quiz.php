@@ -152,6 +152,9 @@ class Quiz extends Model
 
     public function getEnrollmentStatusAttribute(): string
     {
+        if ($this->enrollments_open_at === null && $this->enrollments_close_at === null) {
+            return 'not_scheduled';
+        }
         if ($this->enrollments_close_at && $this->enrollments_close_at->isPast()) {
             return 'closed';
         }

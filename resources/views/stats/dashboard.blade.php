@@ -56,12 +56,12 @@
                 <span class="info-box-text">Prossima sessione</span>
                 <span class="info-box-number">{{ $nextSession->title }}</span>
                 <span class="progress-description">
-                    @if($nextSession->enrollment_status === 'open')
+                    @if(in_array($nextSession->enrollment_status, ['open', 'not_scheduled']))
                         Iscrizioni aperte
                         @if($nextSession->enrollments_close_at)
                             fino al {{ $nextSession->enrollments_close_at->format('d/m/Y') }}
                         @endif
-                    @else
+                    @elseif($nextSession->enrollment_status === 'upcoming' && $nextSession->enrollments_open_at)
                         Apre il {{ $nextSession->enrollments_open_at->format('d/m/Y H:i') }}
                     @endif
                     &mdash; <a href="{{ route('calendar.index') }}" class="text-white"><u>Vedi calendario</u></a>
