@@ -540,6 +540,9 @@ Due comandi Artisan dedicati permettono di rispondere alle richieste di cancella
 # Elenco di tutti i viewer con marker "Anonimizzato" (Sì/No)
 php artisan gdpr:list
 
+# Solo i viewer già anonimizzati (filtra per dominio @eliminato.invalid)
+php artisan gdpr:list --anonymized
+
 # Anteprima: mostra cosa verrebbe modificato, NON scrive nulla
 php artisan gdpr:anonymize 42 --dry-run
 
