@@ -125,7 +125,9 @@ class CalendarTest extends TestCase
         $this->actingAs($viewer)
             ->get(route('calendar.index'))
             ->assertOk()
-            ->assertViewHas('userEnrollmentQuizIds', fn ($ids) => in_array($quiz->id, $ids));
+            ->assertViewHas('open', fn ($open) =>
+                $open->where('id', $quiz->id)->first()?->enrollments->isNotEmpty()
+            );
     }
 
     // ── Tests: pulsante iscrizione ────────────────────────────────────────────
