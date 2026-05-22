@@ -5,7 +5,7 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
-## [Unreleased] — Feature 4.2: GDPR anonimizzazione utenti
+## [2026-05-23] — Feature 4.2: GDPR anonimizzazione utenti
 
 ### Changed
 
