@@ -8,6 +8,7 @@ use App\Models\QuizAttempt;
 use App\Models\QuizEnrollment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class QuizTest extends TestCase
@@ -380,6 +381,174 @@ class QuizTest extends TestCase
 
         $this->get(route('quiz.attempts.show', $attempt))
             ->assertRedirect(route('login'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | TESTS — accessor methods (getAnsweredAt, getTimeSpent, getAnswerPosition)
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_get_answered_at_returns_carbon_for_extended_format(): void
+    {
+        $ts      = 1747123456;
+        $attempt = new QuizAttempt([
+            'answers' => ['10' => ['correct' => 1, 'answered_at' => $ts, 'time_spent_seconds' => 5, 'position' => 1]],
+        ]);
+
+        $carbon = $attempt->getAnsweredAt('10');
+
+        $this->assertNotNull($carbon);
+        $this->assertSame($ts, $carbon->timestamp);
+    }
+
+    public function test_get_answered_at_returns_null_for_flat_format(): void
+    {
+        $attempt = new QuizAttempt(['answers' => ['10' => 1]]);
+
+        $this->assertNull($attempt->getAnsweredAt('10'));
+        $this->assertNull($attempt->getAnsweredAt('99'));
+    }
+
+    public function test_get_answered_at_returns_null_when_field_is_null(): void
+    {
+        $attempt = new QuizAttempt([
+            'answers' => ['10' => ['correct' => 1, 'answered_at' => null, 'time_spent_seconds' => null, 'position' => 1]],
+        ]);
+
+        $this->assertNull($attempt->getAnsweredAt('10'));
+    }
+
+    public function test_get_time_spent_returns_int_for_extended_format(): void
+    {
+        $attempt = new QuizAttempt([
+            'answers' => ['10' => ['correct' => 1, 'answered_at' => null, 'time_spent_seconds' => 14, 'position' => 1]],
+        ]);
+
+        $this->assertSame(14, $attempt->getTimeSpent('10'));
+    }
+
+    public function test_get_time_spent_returns_null_for_flat_format(): void
+    {
+        $attempt = new QuizAttempt(['answers' => ['10' => 1]]);
+
+        $this->assertNull($attempt->getTimeSpent('10'));
+        $this->assertNull($attempt->getTimeSpent('99'));
+    }
+
+    public function test_get_answer_position_returns_int_for_extended_format(): void
+    {
+        $attempt = new QuizAttempt([
+            'answers' => [
+                '10' => ['correct' => 1, 'answered_at' => null, 'time_spent_seconds' => null, 'position' => 1],
+                '11' => ['correct' => 0, 'answered_at' => null, 'time_spent_seconds' => null, 'position' => 2],
+            ],
+        ]);
+
+        $this->assertSame(1, $attempt->getAnswerPosition('10'));
+        $this->assertSame(2, $attempt->getAnswerPosition('11'));
+    }
+
+    public function test_get_answer_position_returns_null_for_flat_format(): void
+    {
+        $attempt = new QuizAttempt(['answers' => ['10' => 1]]);
+
+        $this->assertNull($attempt->getAnswerPosition('10'));
+        $this->assertNull($attempt->getAnswerPosition('99'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | TESTS — migration up/down (mixed dataset, idempotency, rollback)
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_migration_up_converts_flat_to_extended_and_is_idempotent(): void
+    {
+        $user = $this->approvedViewer();
+        $quiz = Quiz::factory()->create(['status' => Quiz::STATUS_PUBLISHED]);
+
+        // Flat format record (pre-migration state).
+        $flatId = DB::table('quiz_attempts')->insertGetId([
+            'user_id'         => $user->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 1,
+            'total_questions' => 2,
+            'answers'         => json_encode(['10' => 1, '11' => 0]),
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        // Extended format record (already migrated).
+        $extendedId = DB::table('quiz_attempts')->insertGetId([
+            'user_id'         => $user->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 1,
+            'total_questions' => 1,
+            'answers'         => json_encode([
+                '10' => ['correct' => 1, 'answered_at' => null, 'time_spent_seconds' => 7, 'position' => 1],
+            ]),
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        $migration = include database_path('migrations/2026_05_17_220000_migrate_quiz_attempts_answers_to_extended_format.php');
+        $migration->up();
+
+        // Flat record is now extended.
+        $flat    = json_decode(DB::table('quiz_attempts')->where('id', $flatId)->value('answers'), true);
+        $this->assertIsArray($flat['10']);
+        $this->assertSame(1,  $flat['10']['correct']);
+        $this->assertSame(0,  $flat['11']['correct']);
+        $this->assertSame(1,  $flat['10']['position']); // position assigned progressively
+        $this->assertSame(2,  $flat['11']['position']);
+
+        // Extended record is untouched (idempotency).
+        $extended = json_decode(DB::table('quiz_attempts')->where('id', $extendedId)->value('answers'), true);
+        $this->assertSame(7, $extended['10']['time_spent_seconds']); // original value preserved
+    }
+
+    public function test_migration_down_converts_extended_to_flat_and_skips_flat(): void
+    {
+        $user = $this->approvedViewer();
+        $quiz = Quiz::factory()->create(['status' => Quiz::STATUS_PUBLISHED]);
+
+        // Extended format record.
+        $extendedId = DB::table('quiz_attempts')->insertGetId([
+            'user_id'         => $user->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 2,
+            'total_questions' => 2,
+            'answers'         => json_encode([
+                '10' => ['correct' => 1, 'answered_at' => 1747123456, 'time_spent_seconds' => 5, 'position' => 1],
+                '11' => ['correct' => 0, 'answered_at' => null,       'time_spent_seconds' => 8, 'position' => 2],
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Flat format record (should be skipped by down()).
+        $flatId = DB::table('quiz_attempts')->insertGetId([
+            'user_id'         => $user->id,
+            'quiz_id'         => $quiz->id,
+            'score'           => 1,
+            'total_questions' => 1,
+            'answers'         => json_encode(['10' => 1]),
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        $migration = include database_path('migrations/2026_05_17_220000_migrate_quiz_attempts_answers_to_extended_format.php');
+        $migration->down();
+
+        // Extended → flat.
+        $flat = json_decode(DB::table('quiz_attempts')->where('id', $extendedId)->value('answers'), true);
+        $this->assertSame(1, $flat['10']);
+        $this->assertSame(0, $flat['11']);
+
+        // Already-flat record unchanged.
+        $unchanged = json_decode(DB::table('quiz_attempts')->where('id', $flatId)->value('answers'), true);
+        $this->assertSame(1, $unchanged['10']);
     }
 
     public function test_update_attempt_recalculates_score_from_answers(): void

@@ -5,6 +5,45 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 4.1: evoluzione struttura answers su QuizAttempt
+
+Migrazione non-distruttiva del campo `answers` su `QuizAttempt` da formato flat
+`{"12": 1}` a formato esteso `{"12": {"correct": 1, "answered_at": ..., "time_spent_seconds": ..., "position": ...}}`.
+Tutti i punti di lettura passano ora per i metodi accessori del model.
+
+### Added
+
+- `QuizAttempt::getAnsweredAt(int|string $questionId): ?Carbon` — restituisce il
+  timestamp Carbon della risposta, o `null` per formato flat o campo assente.
+- `QuizAttempt::getTimeSpent(int|string $questionId): ?int` — secondi impiegati
+  sulla domanda, o `null` per formato flat o campo assente.
+- `QuizAttempt::getAnswerPosition(int|string $questionId): ?int` — posizione
+  progressiva nella sessione, o `null` per formato flat.
+- Feature test `tests/Feature/QuizTest.php`: test per i tre nuovi accessori;
+  test idempotenza `up()` su dataset misto (flat + esteso); test `down()` con
+  rollback a flat e skip dei record già flat.
+
+### Changed
+
+- `QuizAttemptService::getAttemptDetail()` — sostituiti gli accessi diretti a
+  `$rawEntry['position']` e `$rawEntry['time_spent_seconds']` con
+  `$attempt->getAnswerPosition()` e `$attempt->getTimeSpent()`.
+- `SimulatorService::getResultDetail()` — stessa sostituzione; l'iterazione passa
+  ora per `collect($answeredQids)` anziché per `collect($answersData)`, con accesso
+  ai valori tramite `$attempt->getAnswerResult()`, `->getAnswerPosition()`,
+  `->getTimeSpent()`.
+
+### Files
+
+```
+app/Models/QuizAttempt.php                                      # tre nuovi accessor
+app/Services/QuizAttemptService.php                             # getAttemptDetail usa accessor
+app/Services/SimulatorService.php                               # getResultDetail usa accessor
+tests/Feature/QuizTest.php                                      # accessor + migration tests
+```
+
+---
+
 ## [Unreleased] — Feature 3.6: calendario sessioni d'esame
 
 Pagina `/calendar` lato viewer con lista cronologica dei quiz confermati divisa
