@@ -84,20 +84,13 @@ class QuizAttemptService
         // Single query; Question::$with = ['category'] triggers a second query for categories
         // (eager load, not N+1).
         $quizQuestions = $quiz->questions()->get();
-        $answersData   = $attempt->answers ?? [];
 
-        $questionsCollection = $quizQuestions->map(function ($question, $pivotIndex) use ($answersData, $attempt) {
-            $qid      = $question->id;
-            $rawEntry = $answersData[$qid] ?? null;
+        $questionsCollection = $quizQuestions->map(function ($question, $pivotIndex) use ($attempt) {
+            $qid = $question->id;
 
-            $userAnswer = $attempt->getAnswerResult($qid);
-            $position   = is_array($rawEntry) && isset($rawEntry['position'])
-                ? (int) $rawEntry['position']
-                : null;
-            $timeSpent  = is_array($rawEntry) && isset($rawEntry['time_spent_seconds'])
-                ? (int) $rawEntry['time_spent_seconds']
-                : null;
-
+            $userAnswer    = $attempt->getAnswerResult($qid);
+            $position      = $attempt->getAnswerPosition($qid);
+            $timeSpent     = $attempt->getTimeSpent($qid);
             $correctAnswer = (int) $question->is_true;
             $isCorrect     = $userAnswer !== null ? ($userAnswer === $correctAnswer) : null;
 

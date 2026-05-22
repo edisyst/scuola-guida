@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Services\UserStatsService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class QuizAttempt extends Model
 {
@@ -83,6 +84,33 @@ class QuizAttempt extends Model
         if (is_null($entry))  return null;
         if (is_array($entry)) return (int) ($entry['correct'] ?? 0);
         return (int) $entry;
+    }
+
+    /** Restituisce il timestamp Carbon di risposta, o null per formato flat o campo assente. */
+    public function getAnsweredAt(int|string $questionId): ?Carbon
+    {
+        $entry = ($this->answers ?? [])[$questionId] ?? null;
+
+        if (!is_array($entry) || empty($entry['answered_at'])) return null;
+        return Carbon::createFromTimestamp((int) $entry['answered_at']);
+    }
+
+    /** Restituisce i secondi impiegati sulla domanda, o null per formato flat o campo assente. */
+    public function getTimeSpent(int|string $questionId): ?int
+    {
+        $entry = ($this->answers ?? [])[$questionId] ?? null;
+
+        if (!is_array($entry) || !array_key_exists('time_spent_seconds', $entry)) return null;
+        return $entry['time_spent_seconds'] !== null ? (int) $entry['time_spent_seconds'] : null;
+    }
+
+    /** Restituisce la posizione progressiva della risposta nella sessione, o null per formato flat. */
+    public function getAnswerPosition(int|string $questionId): ?int
+    {
+        $entry = ($this->answers ?? [])[$questionId] ?? null;
+
+        if (!is_array($entry) || !array_key_exists('position', $entry)) return null;
+        return $entry['position'] !== null ? (int) $entry['position'] : null;
     }
 
     // percentuale risultato

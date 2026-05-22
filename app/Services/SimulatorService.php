@@ -158,35 +158,28 @@ class SimulatorService
     {
         $attempt->loadMissing('user');
 
-        $answersData    = $attempt->answers ?? [];
-        $answeredQids   = array_map('intval', array_keys($answersData));
+        $answeredQids    = array_map('intval', array_keys($attempt->answers ?? []));
         $totalConfigured = (int) ($attempt->total_questions ?: config('simulator.questions'));
 
         // Carica tutte le domande risposte (con relazione category già nel $with del model).
         $questionsById = Question::whereIn('id', $answeredQids)->get()->keyBy('id');
 
-        $rows = collect($answersData)->map(function ($entry, $qid) use ($questionsById) {
-            $question = $questionsById->get((int) $qid);
+        $rows = collect($answeredQids)->map(function ($qid) use ($attempt, $questionsById) {
+            $question = $questionsById->get($qid);
             if (!$question) {
                 return null;
             }
 
-            $userAnswer    = is_array($entry) ? (int) ($entry['correct'] ?? 0) : (int) $entry;
+            $userAnswer    = $attempt->getAnswerResult($qid);
             $correctAnswer = (int) $question->is_true;
-            $position      = is_array($entry) && isset($entry['position'])
-                ? (int) $entry['position']
-                : null;
-            $timeSpent     = is_array($entry) && isset($entry['time_spent_seconds'])
-                ? (int) $entry['time_spent_seconds']
-                : null;
 
             return [
                 'question'       => $question,
                 'user_answer'    => $userAnswer,
                 'correct_answer' => $correctAnswer,
                 'is_correct'     => $userAnswer === $correctAnswer,
-                'position'       => $position,
-                'time_spent'     => $timeSpent,
+                'position'       => $attempt->getAnswerPosition($qid),
+                'time_spent'     => $attempt->getTimeSpent($qid),
             ];
         })->filter()->values();
 
