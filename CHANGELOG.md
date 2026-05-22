@@ -5,6 +5,23 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-23] — Feature 4.2: GDPR anonimizzazione utenti
+
+### Changed
+
+- **`gdpr:list`** — aggiunta opzione `--anonymized`: filtra e mostra solo i viewer il cui indirizzo email termina con `@eliminato.invalid` (cioè già anonimizzati). Senza opzione il comportamento è invariato (tutti i viewer). Messaggio empty-state contestualizzato in base al flag.
+- **Test** (`tests/Feature/GdprTest.php`) — aggiunti 3 nuovi test: filtro `--anonymized` mostra solo gli utenti anonimizzati, utenti attivi esclusi dal filtro, empty-state corretto quando nessun viewer è stato anonimizzato.
+
+### Files
+
+```
+app/Console/Commands/GdprList.php   # +--anonymized option + empty-state contestuale
+tests/Feature/GdprTest.php          # 3 nuovi test per --anonymized
+README.md                           # gdpr:list --anonymized documentato nella sezione GDPR
+```
+
+---
+
 ## [Unreleased] — Feature 4.1: evoluzione struttura answers su QuizAttempt
 
 Migrazione non-distruttiva del campo `answers` su `QuizAttempt` da formato flat

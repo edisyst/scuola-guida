@@ -540,6 +540,9 @@ Due comandi Artisan dedicati permettono di rispondere alle richieste di cancella
 # Elenco di tutti i viewer con marker "Anonimizzato" (Sì/No)
 php artisan gdpr:list
 
+# Solo i viewer già anonimizzati (filtra per dominio @eliminato.invalid)
+php artisan gdpr:list --anonymized
+
 # Anteprima: mostra cosa verrebbe modificato, NON scrive nulla
 php artisan gdpr:anonymize 42 --dry-run
 
@@ -583,7 +586,7 @@ Tutto dentro una `DB::transaction()` (rollback in caso di errore):
 
 - La scrittura su `users` passa da `DB::table('users')->update(...)` invece di `User::save()`: il cast `'hashed'` sul campo `password` (definito in `User::casts()`) rihasherebbe automaticamente un valore già hashato, causando un doppio hash e un login indefinitamente impossibile per altri motivi.
 - Le notifiche sono Database Notifications native di Laravel (`Notifiable` trait) — la cancellazione passa dalla relazione, niente query manuale sulla tabella `notifications`.
-- Test in `tests/Feature/GdprTest.php` (7 test): scenario completo con documento su disk faked, blocco admin, ID inesistente, idempotenza del dry-run su email/fiscal_code/storage/notifiche, login impossibile su entrambe le email, chiusura effettiva delle righe in `sessions` (DB driver), marker corretto in `gdpr:list`.
+- Test in `tests/Feature/GdprTest.php` (9 test): scenario completo con documento su disk faked, blocco admin, ID inesistente, idempotenza del dry-run su email/fiscal_code/storage/notifiche, login impossibile su entrambe le email, chiusura effettiva delle righe in `sessions` (DB driver), marker corretto in `gdpr:list`, filtro `--anonymized` e empty-state contestuale.
 
 ---
 
@@ -776,7 +779,7 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 | `QuizTest` | 3 | Creazione tentativo, tentativo su quiz confermato con iscrizione, aggiornamento score |
 | `AdminOperativityTest` | 8 | Export Excel, riepilogo KPI, schedulazione iscrizioni, comando `close-expired` |
 | `NotificationsTest` | 22 | Dispatch 11 notifiche, fallback fire-and-forget, payload `toDatabase()`, pagina `/notifications` (index/destroy/destroyAll + 403 cross-user), bell Livewire (unreadCount, markAllAsRead, markAsRead singola + redirect, markAsRead cross-user ignorata) |
-| `GdprTest` | 7 | PII anonimizzata, blocco admin, dry-run, login impossibile, sessioni DB, gdpr:list |
+| `GdprTest` | 9 | PII anonimizzata, blocco admin, dry-run, login impossibile, sessioni DB, gdpr:list, --anonymized filter |
 | `RegistrationFlowTest` | 9 | Workflow iscrizione anagrafica end-to-end |
 | `StudyTest` | 10 | Sessione studio, sorgenti, navigazione, flag, riepilogo |
 | `UserStatsTest` | 9 | Dashboard, aggregati, cache, invalidazione, vista admin |
