@@ -1,3 +1,5 @@
+@php $enrollment = $quiz->enrollments->first(); @endphp
+
 <div class="d-flex align-items-start p-3 border-bottom">
 
     {{-- Colonna sinistra: date --}}
@@ -21,6 +23,7 @@
         <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
             <strong>{{ $quiz->title }}</strong>
 
+            {{-- Badge stato iscrizioni quiz --}}
             @switch($quiz->enrollment_status)
                 @case('upcoming')
                     <span class="badge bg-warning text-dark">
@@ -35,10 +38,31 @@
                     @break
             @endswitch
 
-            @if(in_array($quiz->id, $userEnrollmentQuizIds))
-                <span class="badge bg-info">
-                    <i class="fas fa-check me-1"></i>Iscritto
-                </span>
+            {{-- Badge iscrizione personale del viewer --}}
+            @if($enrollment)
+                @if($quiz->enrollment_status === 'closed')
+                    @if($enrollment->isPending())
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-hourglass-half me-1"></i>In attesa
+                        </span>
+                    @elseif($enrollment->isApproved())
+                        <span class="badge bg-success">
+                            <i class="fas fa-check me-1"></i>Approvata
+                        </span>
+                    @elseif($enrollment->isRejected())
+                        <span class="badge bg-danger">
+                            <i class="fas fa-times me-1"></i>Rifiutata
+                        </span>
+                    @elseif($enrollment->isCompleted())
+                        <span class="badge bg-info">
+                            <i class="fas fa-flag-checkered me-1"></i>Completata
+                        </span>
+                    @endif
+                @else
+                    <span class="badge bg-info">
+                        <i class="fas fa-check me-1"></i>Già iscritto
+                    </span>
+                @endif
             @endif
         </div>
 
@@ -56,7 +80,7 @@
         </div>
 
         @if($quiz->enrollment_status === 'upcoming')
-            <div class="mt-1 small text-warning"
+            <div class="mt-1 small text-warning fw-semibold"
                  x-data="countdown({{ $quiz->enrollments_open_at->timestamp }})"
                  x-init="start()">
                 <i class="fas fa-hourglass-half me-1"></i>
@@ -67,7 +91,7 @@
 
     {{-- Colonna destra: azione --}}
     <div class="ms-3 d-flex flex-column align-items-end gap-1">
-        @if(in_array($quiz->enrollment_status, ['open', 'not_scheduled']) && !in_array($quiz->id, $userEnrollmentQuizIds))
+        @if(in_array($quiz->enrollment_status, ['open', 'not_scheduled']) && !$enrollment)
             @if($canEnroll)
                 <form method="POST" action="{{ route('quiz.enrollments.store', $quiz) }}">
                     @csrf

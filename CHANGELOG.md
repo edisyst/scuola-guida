@@ -5,6 +5,48 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 3.6: calendario sessioni d'esame
+
+Pagina `/calendar` lato viewer con lista cronologica dei quiz confermati divisa
+in tre sezioni, widget "Prossima sessione" con countdown Alpine.js nella dashboard
+viewer, voce "Calendario sessioni" già presente nella sidebar.
+
+### Added
+
+- `CalendarController::index()` — tre query distinte con eager loading della
+  relazione `enrollments` filtrata per `user_id` dell'utente autenticato.
+  Sezioni: `upcoming` (orderBy `enrollments_open_at` asc), `open` (orderBy
+  `enrollments_close_at` asc), `closed` (orderBy `enrollments_close_at` desc,
+  limit 10). Variabile `$canEnroll` coerente con il catalogo quiz.
+
+- `resources/views/calendar/index.blade.php` — tre sezioni (Prossime sessioni,
+  Iscrizioni aperte, Sessioni chiuse). Le sezioni 1 e 2 appaiono solo se non
+  vuote; la sezione 3 mostra sempre l'empty state con icona `fa-3x text-muted`.
+  Script Alpine.js `countdown(targetTimestamp)` via `@push('js')`.
+
+- `resources/views/calendar/_quiz-row.blade.php` — partial condiviso tra le
+  tre sezioni. Usa `$quiz->enrollments->first()` dall'eager loading. Badge
+  stato iscrizione personale: per le sessioni chiuse mostra l'esito specifico
+  (In attesa / Approvata / Rifiutata / Completata); per upcoming e open mostra
+  "Già iscritto". Countdown Alpine.js per i quiz upcoming. Pulsante "Richiedi
+  iscrizione" riusa esattamente lo stesso pattern del catalogo quiz confermati.
+
+- Widget "Prossima sessione" nella dashboard viewer (`stats/dashboard.blade.php`)
+  aggiornato con countdown Alpine.js per le sessioni upcoming; colore
+  `bg-gradient-warning` per upcoming, `bg-gradient-success` per open.
+  Funzione `countdown()` aggiunta a `@section('js')`.
+
+### Files
+
+```
+app/Http/Controllers/CalendarController.php        # eager loading + fix ordering $open
+resources/views/calendar/index.blade.php           # tre sezioni, empty state, countdown script
+resources/views/calendar/_quiz-row.blade.php       # enrollment object, badge stato sezione chiusa
+resources/views/stats/dashboard.blade.php          # widget nextSession con countdown Alpine.js
+```
+
+---
+
 ## [Unreleased] — Feature 3.5: schedulazione apertura/chiusura iscrizioni
 
 Aggiunta finestra di schedulazione (`enrollments_open_at` / `enrollments_close_at`) sui quiz confermati

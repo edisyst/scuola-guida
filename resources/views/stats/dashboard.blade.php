@@ -50,8 +50,12 @@
     </div>
 
     @if(!$isAdminView && !empty($nextSession))
-        <div class="info-box bg-gradient-success mb-3">
-            <span class="info-box-icon"><i class="fas fa-calendar-check"></i></span>
+        <div class="info-box {{ $nextSession->enrollment_status === 'upcoming' ? 'bg-gradient-warning' : 'bg-gradient-success' }} mb-3"
+             @if($nextSession->enrollment_status === 'upcoming' && $nextSession->enrollments_open_at)
+             x-data="countdown({{ $nextSession->enrollments_open_at->timestamp }})" x-init="start()"
+             @endif
+        >
+            <span class="info-box-icon"><i class="fas fa-calendar-{{ $nextSession->enrollment_status === 'upcoming' ? 'alt' : 'check' }}"></i></span>
             <div class="info-box-content">
                 <span class="info-box-text">Prossima sessione</span>
                 <span class="info-box-number">{{ $nextSession->title }}</span>
@@ -62,9 +66,9 @@
                             fino al {{ $nextSession->enrollments_close_at->format('d/m/Y') }}
                         @endif
                     @elseif($nextSession->enrollment_status === 'upcoming' && $nextSession->enrollments_open_at)
-                        Apre il {{ $nextSession->enrollments_open_at->format('d/m/Y H:i') }}
+                        Apre tra: <strong x-text="display">{{ $nextSession->enrollments_open_at->format('d/m/Y H:i') }}</strong>
                     @endif
-                    &mdash; <a href="{{ route('calendar.index') }}" class="text-white"><u>Vedi calendario</u></a>
+                    &mdash; <a href="{{ route('calendar.index') }}" class="{{ $nextSession->enrollment_status === 'upcoming' ? 'text-dark' : 'text-white' }}"><u>Vedi calendario</u></a>
                 </span>
             </div>
         </div>
@@ -291,6 +295,31 @@
 
 @section('js')
 @parent
+
+<script>
+function countdown(targetTimestamp) {
+    return {
+        display: '',
+        intervalId: null,
+        start() {
+            this.update();
+            this.intervalId = setInterval(() => this.update(), 1000);
+        },
+        update() {
+            const diff = targetTimestamp - Math.floor(Date.now() / 1000);
+            if (diff <= 0) {
+                this.display = 'Iscrizioni aperte';
+                clearInterval(this.intervalId);
+                return;
+            }
+            const d = Math.floor(diff / 86400);
+            const h = Math.floor((diff % 86400) / 3600);
+            const m = Math.floor((diff % 3600) / 60);
+            this.display = d > 0 ? `${d}g ${h}h ${m}m` : `${h}h ${m}m`;
+        }
+    };
+}
+</script>
 
 @if($stats['total_attempts'] > 0)
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
