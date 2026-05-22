@@ -1,0 +1,69 @@
+<svg width="680" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
+  <title>Scuola Guida — Laravel Request Lifecycle</title>
+  <desc>HTTP request flow from entry point through kernel, middleware, controller, services, and response</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Titolo -->
+  <text x="340" y="35" text-anchor="middle" font-size="18" font-weight="500" fill="#2C2C2A">Laravel Request Lifecycle — scuola-guida</text>
+
+  <!-- HTTP Request -->
+  <rect x="50" y="60" width="160" height="70" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.8"/>
+  <text x="130" y="90" text-anchor="middle" font-size="14" font-weight="500" fill="#0C447C">HTTP Request</text>
+  <text x="130" y="113" text-anchor="middle" font-size="12" fill="#185FA5">Browser → Server</text>
+
+  <line x1="210" y1="95" x2="258" y2="95" stroke="#888780" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- Entry Point -->
+  <rect x="260" y="60" width="160" height="70" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.8"/>
+  <text x="340" y="90" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Entry Point</text>
+  <text x="340" y="113" text-anchor="middle" font-size="12" fill="#5F5E5A">public/index.php</text>
+
+  <line x1="420" y1="95" x2="468" y2="95" stroke="#888780" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- Bootstrap -->
+  <rect x="470" y="60" width="160" height="70" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+  <text x="550" y="90" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">Bootstrap</text>
+  <text x="550" y="113" text-anchor="middle" font-size="12" fill="#534AB7">App::make()</text>
+
+  <line x1="340" y1="130" x2="340" y2="178" stroke="#888780" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- HTTP Kernel -->
+  <rect x="240" y="180" width="200" height="70" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+  <text x="340" y="210" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">HTTP Kernel</text>
+  <text x="340" y="233" text-anchor="middle" font-size="12" fill="#0F6E56">Kernel::handle()</text>
+
+  <line x1="340" y1="250" x2="340" y2="298" stroke="#888780" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- Global Middleware -->
+  <rect x="200" y="300" width="280" height="90" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
+  <text x="340" y="328" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">Global Middleware</text>
+  <text x="340" y="352" text-anchor="middle" font-size="12" fill="#993C1D">auth, throttle, verified, CORS</text>
+  <text x="340" y="373" text-anchor="middle" font-size="12" fill="#993C1D">Pipeline::send()</text>
+
+  <line x1="340" y1="390" x2="340" y2="438" stroke="#888780" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- Route Middleware -->
+  <rect x="200" y="440" width="280" height="90" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
+  <text x="340" y="468" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">Route Middleware</text>
+  <text x="340" y="492" text-anchor="middle" font-size="12" fill="#993C1D">RoleMiddleware (admin / editor)</text>
+  <text x="340" y="513" text-anchor="middle" font-size="12" fill="#993C1D">verified email</text>
+
+  <line x1="280" y1="530" x2="240" y2="568" stroke="#888780" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="530" x2="440" y2="568" stroke="#888780" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- Controller -->
+  <rect x="100" y="570" width="210" height="90" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.8"/>
+  <text x="205" y="598" text-anchor="middle" font-size="14" font-weight="500" fill="#27500A">Controller</text>
+  <text x="205" y="622" text-anchor="middle" font-size="12" fill="#3B6D11">FormRequest validation</text>
+  <text x="205" y="643" text-anchor="middle" font-size="12" fill="#3B6D11">Action::invoke()</text>
+
+  <!-- Service Layer -->
+  <rect x="370" y="570" width="210" height="90" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.8"/>
+  <text x="475" y="598" text-anchor="middle" font-size="14" font-weight="500" fill="#633806">Service Layer</text>
+  <text x="475" y="622" text-anchor="middle" font-size="12" fill="#854F0B">QuestionService, QuizService</text>
+  <text x="475" y="643" text-anchor="middle" font-size="12" fill="#854F0B">Observer + Audit log</text>
+</svg>

@@ -4,6 +4,10 @@ Applicazione web per la gestione di quiz della patente di guida. Gli amministrat
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
 
+## Panoramica Architettura
+
+![](docs/diagrams/mind-map-scuola-guida.svg)
+
 ---
 
 ## Installazione
@@ -247,9 +251,13 @@ Ogni evento del flusso iscrizioni e dell'amministrazione utenti genera una **dop
 
 **Dispatch**: tutto centralizzato nei Service (`UserRegistrationService`, `QuizEnrollmentService`, `QuizService::confirm`, `UserService::update`) tramite l'helper `App\Services\NotificationService`. I controller restano puri.
 
+![](docs/diagrams/02-livewire-flow.svg)
+
 ---
 
 ## Ciclo di vita dell'iscrizione anagrafica (viewer)
+
+![](docs/diagrams/04-quiz-lifecycle.svg)
 
 Solo i viewer hanno un percorso di iscrizione anagrafica con approvazione admin: serve a verificare l'identità prima di consentire la partecipazione agli esami ufficiali. Admin ed editor non sono soggetti a questo flusso (non partecipano agli esami).
 
@@ -354,6 +362,8 @@ La migration `2026_05_17_220000_migrate_quiz_attempts_answers_to_extended_format
 ---
 
 ## Architettura — flusso di una chiamata
+
+![](docs/diagrams/01-request-lifecycle.svg)
 
 Esempio: **aggiornamento di una domanda** (`PUT /admin/questions/{id}`).
 
@@ -662,6 +672,8 @@ Per aggiungere un nuovo badge:
 | `viewer` | Iscrizione ai quiz confermati solo dopo approvazione dei dati anagrafici | **Obbligatoria** per partecipare ai quiz |
 
 I permessi granulari (`edit_questions`, `delete_quiz`, …) sono configurabili per ruolo dalla pagina **Admin → Ruoli & Permessi** e sono salvati come JSON nel campo `permissions` di ogni utente.
+
+![](docs/diagrams/03-roles-pipeline.svg)
 
 ---
 
