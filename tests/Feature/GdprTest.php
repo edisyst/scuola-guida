@@ -167,13 +167,13 @@ class GdprTest extends TestCase
 
     public function test_gdpr_list_marks_anonymized_users(): void
     {
-        $active = User::factory()->create([
+        User::factory()->create([
             'role'  => User::ROLE_VIEWER,
             'name'  => 'Luigi Verdi',
             'email' => 'luigi@example.com',
         ]);
 
-        $anon = User::factory()->create([
+        User::factory()->create([
             'role'  => User::ROLE_VIEWER,
             'name'  => "Utente Anonimo 42",
             'email' => 'anonimo-42@eliminato.invalid',
@@ -183,5 +183,44 @@ class GdprTest extends TestCase
             ->assertExitCode(0)
             ->expectsOutputToContain('luigi@example.com')
             ->expectsOutputToContain('anonimo-42@eliminato.invalid');
+    }
+
+    public function test_gdpr_list_anonymized_flag_filters_only_anonymized_users(): void
+    {
+        User::factory()->create([
+            'role'  => User::ROLE_VIEWER,
+            'name'  => 'Luigi Verdi',
+            'email' => 'luigi@example.com',
+        ]);
+
+        User::factory()->create([
+            'role'  => User::ROLE_VIEWER,
+            'name'  => 'Utente Anonimo 99',
+            'email' => 'anonimo-99@eliminato.invalid',
+        ]);
+
+        // Con --anonymized compare solo il viewer anonimizzato
+        $this->artisan('gdpr:list', ['--anonymized' => true])
+            ->assertExitCode(0)
+            ->expectsOutputToContain('anonimo-99@eliminato.invalid');
+
+        // Senza flag compaiono entrambi
+        $this->artisan('gdpr:list')
+            ->assertExitCode(0)
+            ->expectsOutputToContain('luigi@example.com')
+            ->expectsOutputToContain('anonimo-99@eliminato.invalid');
+    }
+
+    public function test_gdpr_list_anonymized_flag_empty_state_when_none_anonymized(): void
+    {
+        User::factory()->create([
+            'role'  => User::ROLE_VIEWER,
+            'name'  => 'Mario Bianchi',
+            'email' => 'mario@example.com',
+        ]);
+
+        $this->artisan('gdpr:list', ['--anonymized' => true])
+            ->assertExitCode(0)
+            ->expectsOutputToContain('Nessun viewer anonimizzato');
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class GdprList extends Command
 {
-    protected $signature = 'gdpr:list';
+    protected $signature = 'gdpr:list {--anonymized : Mostra solo gli utenti già anonimizzati}';
 
     protected $description = 'Elenca tutti i viewer con visibilità sullo stato di anonimizzazione (GDPR).';
 
@@ -15,14 +15,22 @@ class GdprList extends Command
 
     public function handle(): int
     {
-        $viewers = User::query()
+        $query = User::query()
             ->where('role', User::ROLE_VIEWER)
             ->withCount('quizAttempts')
-            ->orderBy('id')
-            ->get();
+            ->orderBy('id');
+
+        if ($this->option('anonymized')) {
+            $query->where('email', 'like', '%' . self::ANON_EMAIL_DOMAIN);
+        }
+
+        $viewers = $query->get();
 
         if ($viewers->isEmpty()) {
-            $this->warn('Nessun viewer presente nel sistema.');
+            $this->warn($this->option('anonymized')
+                ? 'Nessun viewer anonimizzato presente nel sistema.'
+                : 'Nessun viewer presente nel sistema.'
+            );
 
             return self::SUCCESS;
         }
