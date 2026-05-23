@@ -14,6 +14,12 @@ class QuestionReportTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     private function viewer(): User
     {
         return User::factory()->create(['role' => User::ROLE_VIEWER]);
@@ -131,6 +137,7 @@ class QuestionReportTest extends TestCase
         $admin = $this->admin();
 
         $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
             ->get(route('admin.question-reports.index'))
             ->assertOk();
     }
@@ -150,6 +157,7 @@ class QuestionReportTest extends TestCase
         $report = QuestionReport::factory()->create(['status' => 'pending']);
 
         $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
             ->patch(route('admin.question-reports.accept', $report), [
                 'admin_note' => 'Hai ragione, correggeremo la domanda.',
             ])
@@ -169,6 +177,7 @@ class QuestionReportTest extends TestCase
         $report = QuestionReport::factory()->create(['status' => 'pending']);
 
         $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
             ->patch(route('admin.question-reports.reject', $report))
             ->assertRedirect(route('admin.question-reports.index'));
 
@@ -184,6 +193,7 @@ class QuestionReportTest extends TestCase
         $report = QuestionReport::factory()->create();
 
         $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
             ->delete(route('admin.question-reports.destroy', $report))
             ->assertRedirect();
 
@@ -199,6 +209,7 @@ class QuestionReportTest extends TestCase
         QuestionReport::factory()->count(1)->create(['status' => 'rejected']);
 
         $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
             ->get(route('admin.question-reports.index'))
             ->assertOk()
             ->assertViewHas('stats', fn ($stats) =>
@@ -229,6 +240,7 @@ class QuestionReportTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
             ->get(route('admin.question-reports.show', $report))
             ->assertOk();
 
@@ -244,10 +256,12 @@ class QuestionReportTest extends TestCase
         $report = QuestionReport::factory()->create(['status' => 'pending']);
 
         $this->actingAs($editor)
+            ->withSession(['2fa_verified' => true])
             ->get(route('admin.question-reports.index'))
             ->assertOk();
 
         $this->actingAs($editor)
+            ->withSession(['2fa_verified' => true])
             ->patch(route('admin.question-reports.accept', $report))
             ->assertRedirect();
 

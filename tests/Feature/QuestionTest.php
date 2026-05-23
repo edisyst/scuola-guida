@@ -11,6 +11,12 @@ class QuestionTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     protected function adminUser()
     {
         return \App\Models\User::factory()->create([
@@ -39,7 +45,7 @@ class QuestionTest extends TestCase
 
         $category = \App\Models\Category::factory()->create();
 
-        $response = $this->post(route('admin.questions.store'), [
+        $response = $this->withSession(['2fa_verified' => true])->post(route('admin.questions.store'), [
             'category_id' => $category->id,
             'question' => 'Test domanda',
             'is_true' => true,
@@ -76,7 +82,7 @@ class QuestionTest extends TestCase
 
         $question = \App\Models\Question::factory()->create();
 
-        $response = $this->delete(route('admin.questions.destroy', $question));
+        $response = $this->withSession(['2fa_verified' => true])->delete(route('admin.questions.destroy', $question));
 
         $response->assertRedirect();
 

@@ -21,6 +21,8 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\CommandController as AdminCommandController;
+use App\Http\Controllers\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\Auth\TwoFactorSetupController;
 use App\Models\AuditLog;
 
 Route::get('/', function () {
@@ -106,12 +108,31 @@ Route::middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| 2FA — challenge e setup (autenticati, senza middleware 2fa per evitare loop)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('2fa')->name('2fa.')->group(function () {
+    Route::get('/challenge', [TwoFactorChallengeController::class, 'show'])->name('challenge.show');
+    Route::post('/challenge', [TwoFactorChallengeController::class, 'verify'])->name('challenge.verify');
+
+    Route::get('/setup', [TwoFactorSetupController::class, 'show'])->name('setup.show');
+    Route::post('/setup', [TwoFactorSetupController::class, 'store'])->name('setup.store');
+
+    Route::get('/codes', [TwoFactorSetupController::class, 'showCodes'])->name('codes.show');
+    Route::post('/codes/confirm', [TwoFactorSetupController::class, 'confirmCodes'])->name('codes.confirm');
+
+    Route::post('/disable', [TwoFactorSetupController::class, 'disable'])->name('disable');
+    Route::post('/codes/regenerate', [TwoFactorSetupController::class, 'regenerateCodes'])->name('codes.regenerate');
+});
+
+/*
+|--------------------------------------------------------------------------
 | ADMIN AREA
 |--------------------------------------------------------------------------
 | Tutti i ruoli (admin/editor/viewer) possono accedere al pannello.
 | Le singole azioni sono protette nei controller tramite hasPermission().
 */
-Route::middleware(['auth'])
+Route::middleware(['auth', '2fa'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {

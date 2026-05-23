@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -111,12 +112,15 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'permissions' => 'array',
-            'birth_date' => 'date',
-            'registration_submitted_at' => 'datetime',
-            'registration_reviewed_at' => 'datetime',
+            'email_verified_at'          => 'datetime',
+            'password'                   => 'hashed',
+            'permissions'                => 'array',
+            'birth_date'                 => 'date',
+            'registration_submitted_at'  => 'datetime',
+            'registration_reviewed_at'   => 'datetime',
+            'two_factor_secret'          => 'encrypted',
+            'two_factor_recovery_codes'  => 'encrypted:array',
+            'two_factor_enabled_at'      => 'datetime',
         ];
     }
 
@@ -202,6 +206,29 @@ class User extends Authenticatable
     {
         $parts = array_filter([$this->first_name, $this->last_name]);
         return $parts ? implode(' ', $parts) : $this->name;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | TWO-FACTOR AUTHENTICATION
+    |--------------------------------------------------------------------------
+    */
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return ! is_null($this->two_factor_secret) && ! is_null($this->two_factor_enabled_at);
+    }
+
+    public function requiresTwoFactor(): bool
+    {
+        return $this->isAdmin() || $this->isEditor();
+    }
+
+    public function generateRecoveryCodes(int $count = 8): array
+    {
+        return collect(range(1, $count))
+            ->map(fn () => strtoupper(Str::random(5)) . '-' . strtoupper(Str::random(5)))
+            ->toArray();
     }
 
     /*
