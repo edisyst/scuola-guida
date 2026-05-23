@@ -144,6 +144,9 @@ class GdprAnonymize extends Command
             'registration_reviewed_at'      => null,
             'registration_reviewed_by'      => null,
             'registration_rejection_reason' => null,
+            'two_factor_secret'             => null,
+            'two_factor_enabled_at'         => null,
+            'two_factor_recovery_codes'     => null,
             'updated_at'                    => now(),
         ]);
     }

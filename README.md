@@ -1,6 +1,6 @@
 # ScuolaGUIDA — Quiz App
 
-Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio, un **Simulatore Esame** che riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori), la possibilità di **salvare le domande** in modo persistente con nota personale opzionale e un sistema di **segnalazione errori** che permette al viewer di comunicare problemi sulle domande (risposta errata, testo ambiguo, immagine mancante, contenuto obsoleto) direttamente dalle view di gioco, con workflow di moderazione lato admin.
+Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio, un **Simulatore Esame** che riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori), la possibilità di **salvare le domande** in modo persistente con nota personale opzionale e un sistema di **segnalazione errori** che permette al viewer di comunicare problemi sulle domande (risposta errata, testo ambiguo, immagine mancante, contenuto obsoleto) direttamente dalle view di gioco, con workflow di moderazione lato admin. I ruoli `admin` ed `editor` accedono all'area di gestione tramite **autenticazione a due fattori (TOTP)** obbligatoria, con codici di emergenza one-time e reset via comando Artisan.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
 
@@ -172,6 +172,7 @@ php artisan questions:import-mit /path/file.xlsx   # import listato MIT (vedi co
 php artisan questions:import-mit /path/file.xlsx --dry-run        # anteprima senza scrivere
 php artisan questions:import-mit /path/file.xlsx --topic=2        # solo argomento 2
 php artisan questions:import-mit /path/file.xlsx --update-existing # aggiorna i duplicati
+php artisan 2fa:reset {user_id}                    # azzera il 2FA di un admin/editor (recovery)
 ```
 
 ---
@@ -680,6 +681,61 @@ I permessi granulari (`edit_questions`, `delete_quiz`, …) sono configurabili p
 
 ---
 
+## Autenticazione a due fattori (2FA)
+
+I ruoli `admin` ed `editor` devono obbligatoriamente configurare il 2FA (TOTP compatibile con Google Authenticator, Authy, ecc.) prima di accedere all'area di gestione. I **viewer** non sono mai coinvolti.
+
+### Installazione dipendenze
+
+```bash
+composer require pragmarx/google2fa-laravel bacon/bacon-qr-code
+```
+
+### Flusso di configurazione (primo accesso)
+
+1. L'admin/editor effettua il login.
+2. Il middleware `EnsureTwoFactorAuthenticated` (alias `'2fa'`) rileva che il 2FA non è configurato e redirige a `/2fa/setup`.
+3. La pagina di setup mostra un **QR code SVG inline** (generato server-side, nessuna API esterna) e il secret per inserimento manuale.
+4. L'utente inquadra il QR con la propria app TOTP e inserisce l'OTP corrente per confermare.
+5. Vengono generati **8 codici di emergenza** (formato `XXXXX-XXXXX`) mostrati una sola volta: l'utente deve salvarli in un posto sicuro.
+6. Dopo la conferma, il 2FA è attivo e `2fa_verified = true` viene impostato in sessione.
+
+### Flusso di verifica (login successivi)
+
+1. Dopo il login con email/password, il middleware rileva che il 2FA è attivo ma non verificato (`2fa_verified` assente in sessione).
+2. Redirect a `/2fa/challenge` — form OTP con campo `inputmode="numeric"`.
+3. In alternativa, un link toggle mostra il form per inserire un **codice di emergenza** (one-time: viene rimosso dall'array dopo l'uso).
+4. OTP o codice valido → `2fa_verified = true` in sessione → redirect alla destinazione originale.
+5. Al logout, `2fa_verified` viene cancellato dalla sessione.
+
+### Gestione dal profilo (`/profile`)
+
+Nella scheda "Autenticazione a due fattori" (visibile solo ad admin ed editor):
+
+- **Disabilita 2FA** — richiede la password corrente; azzera i tre campi 2FA.
+- **Rigenera codici di emergenza** — richiede la password corrente; genera 8 nuovi codici (one-time display).
+
+### Struttura dati
+
+I tre campi su `users` sono tutti nullable e criptati a riposo:
+
+| Campo | Cast | Contenuto |
+|---|---|---|
+| `two_factor_secret` | `encrypted` | Secret TOTP (Base32) |
+| `two_factor_enabled_at` | `datetime` | Timestamp di attivazione |
+| `two_factor_recovery_codes` | `encrypted:array` | Array degli 8 codici one-time |
+
+### Recovery (smarrimento dispositivo)
+
+```bash
+# Azzera il 2FA dell'utente — l'utente dovrà riconfigurarlo al prossimo accesso
+php artisan 2fa:reset {user_id}
+```
+
+Il comando logga l'operazione con `Log::info()` e rifiuta di agire se il 2FA non è attivo.
+
+---
+
 ## Statistiche utente — dettaglio tecnico
 
 La dashboard personale (`GET /dashboard`) è servita dal `UserStatsController::me()`:
@@ -771,6 +827,7 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 
 | File | Test | Aree coperte |
 |---|---|---|
+| `TwoFactorTest` | 20 | Viewer senza sezione 2FA, admin/editor vedono la sezione, admin/editor senza 2FA → redirect setup, admin con 2FA senza sessione → redirect challenge, viewer bypassa il middleware, admin con sessione verificata → accesso, pagina setup accessibile, OTP valido abilita il 2FA, OTP non valido non abilita, challenge OTP valido/non valido, codice emergenza valido/consumato/già usato/non valido, disable con password corretta/errata, logout azzera `2fa_verified` |
 | `MitImportTest` | 23 | Import valido con persistenza DB, deduplicazione `mit_code` (skip/update), argomento non mappato, testo vuoto, normalizzazione risposta vera/falsa (10 data provider), dry-run rollback, filtro `--topic`, POST HTTP + flash, validazione file (dimensione, assenza), viewer 403, invariante righe totali, fix `ImportQuestionsRequest max:5120` |
 | `SimulatorTest` | 13 | Accesso autenticato/anonimo, start con/senza pool, play con/senza sessione attiva, autosave con score ricalcolato + protezione cross-user, submit + redirect risultato, destroy sessione, result owner/foreign-user, log warning su categoria mancante, `withDefault` su `QuizAttempt::quiz` |
 | `QuestionReportTest` | 13 | Invio Livewire valido + persistenza DB, validazione `body` (min 10) e `type` (enum), anti-spam 3 pending, index admin 200/403, accept/reject con `resolved_by`/`resolved_at`/`admin_note`, destroy, KPI `$stats` corretti, cascade delete su `Question`, view show senza form di gestione per report risolti, editor con `edit_question` può moderare |
@@ -800,6 +857,8 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 | `livewire/livewire` | Media Manager e NotificationBell (componenti dinamici) |
 | `maatwebsite/excel` | Import/export domande via Excel; export risultati quiz |
 | `yajra/laravel-datatables` | Tabelle con ricerca/ordinamento server-side |
+| `pragmarx/google2fa-laravel` | Autenticazione TOTP (2FA) per admin ed editor |
+| `bacon/bacon-qr-code` | Generazione QR code SVG inline per la pagina di setup 2FA |
 | `laravel/breeze` | Scaffolding autenticazione (Blade preset, dev) |
 | `alpinejs` | Interattività JS leggera (toggle, dropdown, feedback studio) |
 | `barryvdh/laravel-debugbar` | Debug toolbar (solo sviluppo) |

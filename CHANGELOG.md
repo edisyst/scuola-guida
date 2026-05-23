@@ -5,6 +5,87 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 4.3: 2FA per admin e editor
+
+Autenticazione a due fattori (TOTP) obbligatoria per i ruoli `admin` ed `editor`.
+I viewer non sono coinvolti (nessuna UI, nessun middleware sulle route viewer).
+La verifica 2FA si applica a livello di gruppo di route admin tramite un unico alias middleware `'2fa'`.
+Tutti i campi sensibili (`two_factor_secret`, `two_factor_recovery_codes`) sono criptati in DB via cast `encrypted`.
+
+### Added
+
+- **Migration `2026_05_23_084220_add_two_factor_fields_to_users_table`** — aggiunge tre colonne nullable a `users`: `two_factor_secret` (criptata via cast `encrypted`), `two_factor_enabled_at` (timestamp), `two_factor_recovery_codes` (testo criptato, deserializzato come array via cast `encrypted:array`). `down()` elimina le tre colonne senza toccare dati.
+
+- **`App\Models\User`** — tre nuovi cast (`two_factor_secret => 'encrypted'`, `two_factor_enabled_at => 'datetime'`, `two_factor_recovery_codes => 'encrypted:array'`); tre nuovi metodi: `hasTwoFactorEnabled(): bool` (secret + data non nulli), `requiresTwoFactor(): bool` (admin o editor), `generateRecoveryCodes(int $count = 8): array` (8 token `XXXXX-XXXXX` uppercase generati con `Str::random`).
+
+- **`App\Http\Middleware\EnsureTwoFactorAuthenticated`** — registrato come alias `'2fa'` in `bootstrap/app.php`. Logica: viewer → passa; 2FA non configurato → redirect `2fa.setup.show` con flash `warning`; `2fa_verified` assente in sessione → redirect `2fa.challenge.show`.
+
+- **Gruppo route `/2fa/*`** (`routes/web.php`, middleware solo `auth`, fuori dal gruppo con `'2fa'` per evitare redirect loop):
+  `GET /2fa/challenge` (`2fa.challenge.show`), `POST /2fa/challenge` (`2fa.challenge.verify`), `GET /2fa/setup` (`2fa.setup.show`), `POST /2fa/setup` (`2fa.setup.store`), `GET /2fa/codes` (`2fa.codes.show`), `POST /2fa/codes/confirm` (`2fa.codes.confirm`), `POST /2fa/disable` (`2fa.disable`), `POST /2fa/codes/regenerate` (`2fa.codes.regenerate`).
+
+- **`App\Http\Controllers\Auth\TwoFactorChallengeController`** — `show()`: restituisce la view challenge o redirige se già verificato; `verify()`: verifica OTP via `Google2FA::verifyKey()`, imposta `2fa_verified = true`; `verifyRecoveryCode()`: ricerca il codice nell'array, lo rimuove (one-time use), imposta il flag.
+
+- **`App\Http\Controllers\Auth\TwoFactorSetupController`** — `show()`: genera il secret TOTP (salvato in sessione come `2fa_setup_secret`), renderizza QR come SVG inline via `BaconQrCode\Writer` + `SvgImageBackEnd` (200 px, nessuna chiamata a API esterne); `store()`: verifica OTP contro il secret in sessione, salva i tre campi sul model, genera gli 8 recovery codes, li mette in sessione (`2fa_new_codes`); `showCodes()`: legge i codici dalla sessione (one-time display); `confirmCodes()`: svuota i codici, imposta `2fa_verified = true`; `disable()`: `validateWithBag('twoFactorDisable', ['password' => 'current_password'])`, azzera i tre campi; `regenerateCodes()`: `validateWithBag('twoFactorRegenerate', ...)`, genera nuovi codici.
+
+- **Views 2FA** (layout `<x-guest-layout>`):
+  - `resources/views/auth/two-factor-challenge.blade.php` — form OTP con campo `inputmode="numeric"` + toggle JS verso form codice di emergenza.
+  - `resources/views/auth/two-factor-setup.blade.php` — SVG QR inline, secret in `<code>` per inserimento manuale, form verifica OTP.
+  - `resources/views/auth/two-factor-codes.blade.php` — elenco degli 8 codici in `<code>`, avviso one-time display in `alert-warning`, pulsante di conferma.
+
+- **Partial `resources/views/profile/partials/two-factor-form.blade.php`** — se il 2FA è attivo: data abilitazione, modal Disabilita (POST `2fa.disable` con conferma password), modal Rigenera codici (POST `2fa.codes.regenerate` con conferma password). Se non attivo: link a `2fa.setup.show`. Sezione gated su `$user->requiresTwoFactor()`.
+
+- **`resources/views/profile/edit.blade.php`** — sezione "Autenticazione a due fattori" (`@if($user->requiresTwoFactor())`) che include il partial 2FA; toast Bootstrap per flash `success`/`warning`; JS per riaprire i modal disable/regenerate dopo redirect con errori `$errors->twoFactorDisable` / `$errors->twoFactorRegenerate`.
+
+- **`App\Console\Commands\ResetTwoFactor`** (`2fa:reset {user_id}`) — trova l'utente per ID, verifica che il 2FA sia attivo, azzera i tre campi 2FA, logga con `Log::info()`. Utile per supporto o recovery in caso di smarrimento del dispositivo.
+
+- **`tests/Feature/TwoFactorTest.php`** — 20 test (55 asserzioni): viewer senza sezione 2FA nel profilo, admin/editor vedono la sezione 2FA, admin senza 2FA configurato → redirect setup, editor senza 2FA → redirect setup, admin con 2FA ma senza `2fa_verified` → redirect challenge, viewer bypassa il middleware, admin con sessione verificata → accesso admin garantito, pagina setup accessibile, OTP valido abilita il 2FA e genera codici, OTP non valido non abilita, challenge OTP valido concede accesso + imposta `2fa_verified`, challenge OTP non valido nega, codice di emergenza valido concede accesso, codice consumato viene rimosso dall'array, codice già consumato fallisce al secondo uso, codice non valido nega l'accesso, disable con password corretta azzera i campi, disable con password errata non modifica nulla, logout azzera `2fa_verified`.
+
+### Changed
+
+- **`routes/web.php`** — gruppo route admin: da `middleware(['auth'])` a `middleware(['auth', '2fa'])`.
+- **`bootstrap/app.php`** — aggiunto alias `'2fa' => \App\Http\Middleware\EnsureTwoFactorAuthenticated::class`.
+- **`App\Http\Controllers\Auth\AuthenticatedSessionController`** — `destroy()` chiama `$request->session()->forget('2fa_verified')` prima di `invalidate()`.
+- **`App\Console\Commands\GdprAnonymize`** — `anonymizeUserRecord()` include `two_factor_secret`, `two_factor_enabled_at`, `two_factor_recovery_codes => null` nell'UPDATE DB: i dati 2FA sono PII da eliminare insieme agli altri campi sensibili.
+- **9 classi di test esistenti** — aggiunto `$this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class)` nel `setUp()` per isolare i test non-2FA dal middleware aggiunto al gruppo admin: `AuditLogTest`, `QuestionTest`, `AdminOperativityTest`, `QuestionReportTest`, `CategoryTest`, `MitImportTest`, `NotificationsTest`, `RegistrationFlowTest`, `UserStatsTest`.
+
+### Files
+
+```
+app/
+  Console/Commands/ResetTwoFactor.php                            # nuovo: 2fa:reset {user_id}
+  Console/Commands/GdprAnonymize.php                             # +3 campi 2FA nell'anonimizzazione
+  Http/Controllers/Auth/TwoFactorChallengeController.php         # nuovo: show + verify + recovery
+  Http/Controllers/Auth/TwoFactorSetupController.php             # nuovo: setup + codes + disable + regen
+  Http/Controllers/Auth/AuthenticatedSessionController.php       # +forget('2fa_verified') al logout
+  Http/Middleware/EnsureTwoFactorAuthenticated.php               # nuovo middleware
+  Models/User.php                                                # +casts 2FA, +hasTwoFactorEnabled, +requiresTwoFactor, +generateRecoveryCodes
+bootstrap/
+  app.php                                                        # +alias '2fa'
+database/migrations/
+  2026_05_23_084220_add_two_factor_fields_to_users_table.php     # 3 colonne nullable + down()
+resources/views/
+  auth/two-factor-challenge.blade.php                            # pagina OTP + toggle recovery
+  auth/two-factor-setup.blade.php                                # pagina QR SVG inline + verifica OTP
+  auth/two-factor-codes.blade.php                                # pagina one-time display codici
+  profile/edit.blade.php                                         # +sezione 2FA + toast + modal JS
+  profile/partials/two-factor-form.blade.php                     # nuovo partial profilo
+routes/
+  web.php                                                        # +gruppo 2fa.*, +middleware '2fa' su admin
+tests/Feature/
+  TwoFactorTest.php                                              # 20 test, 55 asserzioni
+  AuditLogTest.php                                               # +withoutMiddleware 2FA in setUp
+  QuestionTest.php                                               # +withoutMiddleware 2FA in setUp
+  AdminOperativityTest.php                                       # +withoutMiddleware 2FA in setUp
+  QuestionReportTest.php                                         # +withoutMiddleware 2FA in setUp
+  CategoryTest.php                                               # +withoutMiddleware 2FA in setUp
+  MitImportTest.php                                              # +withoutMiddleware 2FA in setUp
+  NotificationsTest.php                                          # +withoutMiddleware 2FA in setUp
+  RegistrationFlowTest.php                                       # +withoutMiddleware 2FA in setUp
+  UserStatsTest.php                                              # +withoutMiddleware 2FA in setUp
+```
+
+---
+
 ## [2026-05-23] — Feature 4.2: GDPR anonimizzazione utenti
 
 ### Changed

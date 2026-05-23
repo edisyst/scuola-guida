@@ -38,8 +38,8 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
+        $request->session()->forget('2fa_verified');
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

@@ -11,6 +11,12 @@ class CategoryTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     protected function adminUser()
     {
         return \App\Models\User::factory()->create([

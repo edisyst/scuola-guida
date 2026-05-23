@@ -49,6 +49,19 @@
         </div>
     </div>
 
+    @if($user->requiresTwoFactor())
+        <div class="sg-card sg-mb-3">
+            <div class="sg-card-header">
+                <h2 class="sg-card-header-title">
+                    <i class="fas fa-shield-alt mr-2"></i> Autenticazione a due fattori
+                </h2>
+            </div>
+            <div class="sg-card-body">
+                @include('profile.partials.two-factor-form')
+            </div>
+        </div>
+    @endif
+
     <div class="sg-card sg-card-danger">
         <div class="sg-card-header">
             <h2 class="sg-card-header-title sg-text-danger">Elimina account</h2>
@@ -73,8 +86,24 @@
             toastr.success('Password aggiornata con successo.');
         @endif
 
+        @if (session('success'))
+            toastr.success(@json(session('success')));
+        @endif
+
+        @if (session('warning'))
+            toastr.warning(@json(session('warning')));
+        @endif
+
         @if ($errors->userDeletion->isNotEmpty())
             $('#confirmDeletionModal').modal('show');
+        @endif
+
+        @if ($errors->twoFactorDisable->isNotEmpty())
+            $('#disableTwoFactorModal').modal('show');
+        @endif
+
+        @if ($errors->twoFactorRegenerate->isNotEmpty())
+            $('#regenerateCodesModal').modal('show');
         @endif
     </script>
 @stop

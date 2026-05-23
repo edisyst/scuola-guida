@@ -13,6 +13,12 @@ class RegistrationFlowTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     public function test_viewer_sees_registration_form_in_profile(): void
     {
         $viewer = User::factory()->create(['role' => User::ROLE_VIEWER]);
