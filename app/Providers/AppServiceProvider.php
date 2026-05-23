@@ -12,6 +12,7 @@ use App\Models\AuditLog;
 use App\Models\QuestionReport;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use App\Observers\CategoryMaterialObserver;
 use App\Observers\CategoryObserver;
 use App\Observers\QuestionObserver;
 use App\Observers\QuizObserver;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         Question::observe(QuestionObserver::class);
         Category::observe(CategoryObserver::class);
         User::observe(UserObserver::class);
+        \App\Models\CategoryMaterial::observe(CategoryMaterialObserver::class);
 
         /*
         |--------------------------------------------------------------------------

@@ -52,6 +52,9 @@
                         @if(!auth()->user()->isViewer())
                             <td class="sg-actions-cell">
                                 @if(auth()->user()->canEditCategory())
+                                    <a href="{{ route('admin.categories.materials.index', $category) }}" class="sg-btn-icon" title="Materiale didattico" style="color:#6c757d;">
+                                        <i class="fas fa-book-open"></i>
+                                    </a>
                                     <a href="{{ route('admin.categories.edit', $category) }}" class="sg-btn-icon edit" title="Modifica">
                                         <i class="fas fa-edit"></i>
                                     </a>
