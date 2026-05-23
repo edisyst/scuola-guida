@@ -362,6 +362,13 @@ return [
             'can'         => 'exam-participant',
             // TODO: aggiungere label con contatore bookmark dell'utente via View Composer
         ],
+        [
+            'text' => 'Revisione errori',
+            'url'  => 'review-errors',
+            'icon' => 'fas fa-exclamation-triangle',
+            'key'  => 'review-errors',
+            'can'  => 'exam-participant',
+        ],
 
         // ── ESAMI UFFICIALI (viewer partecipa, admin/editor sola lettura) ───
         ['header' => 'esami', 'can' => 'viewer-quiz-area'],

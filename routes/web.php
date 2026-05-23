@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\ReviewErrorsController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
@@ -87,6 +88,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/submit',             [SimulatorController::class, 'submit'])->name('submit');
         Route::get('/result/{attempt}',    [SimulatorController::class, 'result'])->name('result');
         Route::delete('/session',          [SimulatorController::class, 'destroy'])->name('destroy');
+    });
+
+    // Revisione errori aggregata personale (solo viewer)
+    Route::prefix('review-errors')->name('viewer.review-errors.')->group(function () {
+        Route::get('/', [ReviewErrorsController::class, 'index'])->name('index');
+        Route::post('/{question}/learned', [ReviewErrorsController::class, 'markLearned'])->name('learned.store');
+        Route::delete('/{question}/learned', [ReviewErrorsController::class, 'unmarkLearned'])->name('learned.destroy');
     });
 
     // Domande salvate (bookmark persistenti viewer)

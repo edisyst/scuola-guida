@@ -5,6 +5,59 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-23] — Feature 5.1: Revisione errori aggregata personale
+
+Pagina `/review-errors` per i viewer che aggrega tutte le domande sbagliate negli ultimi N tentativi completati,
+con filtro per categoria, conteggio sbagli per domanda e toggle "imparata" per escludere le domande già padroneggiate.
+Differisce dal bookmark (selezione manuale) e dal dettaglio tentativo (vista per-tentativo): aggrega sullo storico.
+
+### Added
+
+- **Migration `2026_05_23_210000_create_learned_questions_table`** — nuova tabella `learned_questions` con colonne `id`, `user_id` (FK con `cascadeOnDelete`), `question_id` (FK con `cascadeOnDelete`), `marked_at` (timestamp); indice unico composito su `(user_id, question_id)` per prevenire duplicati. `down()` implementato e reversibile.
+
+- **`App\Models\LearnedQuestion`** — model Eloquent senza timestamps propri (`$timestamps = false`); fillable: `user_id`, `question_id`, `marked_at`; cast `marked_at => 'datetime'`; relazioni `user()` e `question()`.
+
+- **`App\Models\User`** — aggiunta relazione `learnedQuestions(): HasMany` verso `LearnedQuestion`.
+
+- **`App\Services\ReviewErrorsService`** — tre metodi pubblici:
+  - `getErrors(User, ?int $categoryId, int $lastAttempts = 20): Collection` — carica gli ultimi N tentativi completati (filtrando `answers IS NOT NULL` e `JSON_LENGTH(answers) > 0`), itera le risposte tramite `$attempt->getAnswerResult($questionId)`, aggrega gli sbagli (result === 0) per `question_id`, esclude le domande marcate come imparate, filtra opzionalmente per categoria, ordina per `error_count desc` poi `last_wrong_at desc`. Ritorna `Collection<array{question, error_count, last_wrong_at, category}>`.
+  - `markAsLearned(User, int $questionId): void` — `firstOrCreate` per idempotenza.
+  - `unmarkAsLearned(User, int $questionId): void` — elimina la riga in `learned_questions`.
+  - `getLearned(User, ?int $categoryId): Collection` — restituisce i `Question` marcati come imparati, opzionalmente filtrati per categoria.
+
+- **`App\Http\Controllers\ReviewErrorsController`** — controller thin per l'area viewer:
+  - `index(Request)` — autorizzazione `abort_unless(isViewer(), 403)`; valida `category_id`, `last_attempts` (between:5,50), `show_learned`; delega al service; passa `errors`, `categories`, `learnedCount` alla view.
+  - `markLearned(Question)` — POST, chiama `markAsLearned`, redirect back con flash `success`.
+  - `unmarkLearned(Question)` — DELETE, chiama `unmarkAsLearned`, redirect back con flash `success`.
+
+- **Route** (`routes/web.php`, gruppo `middleware(['auth'])`):
+  - `GET /review-errors` → `ReviewErrorsController@index` (`viewer.review-errors.index`)
+  - `POST /review-errors/{question}/learned` → `ReviewErrorsController@markLearned` (`viewer.review-errors.learned.store`)
+  - `DELETE /review-errors/{question}/learned` → `ReviewErrorsController@unmarkLearned` (`viewer.review-errors.learned.destroy`)
+
+- **`resources/views/review-errors/index.blade.php`** — view viewer che estende `layouts.admin`:
+  - Form filtro: select categoria, select `last_attempts` (10/20/30/50), toggle "Mostra solo le imparate" (auto-submit via `onchange`).
+  - Card per ogni domanda: testo troncato con tooltip jQuery, badge categoria, badge "Sbagliata X volte" (grigio 1-2, giallo 3-5, rosso 6+), data ultimo sbaglio con `diffForHumans`, risposta corretta, pulsante "Studia questa categoria" che linka a `study.index?category_id=X`, pulsante toggle "Marca come imparata" / "Reinserisci negli errori" con conferma Alpine.js (`confirm()`).
+  - Empty state con icona `fa-3x` e CTA contestuale (diversa se `show_learned` o no).
+  - Riepilogo in fondo: conteggio errori da rivedere + domande già imparate con link.
+
+- **Voce sidebar** (`config/adminlte.php`) — aggiunta sotto "Domande salvate" nella sezione STUDIO: `Revisione errori`, icona `fas fa-exclamation-triangle`, `can: 'exam-participant'` (solo viewer).
+
+- **Widget dashboard viewer** (`resources/views/stats/dashboard.blade.php`) — `info-box bg-gradient-warning` visibile solo se `!$isAdminView && reviewErrorsCount > 0`; mostra il conteggio errori con link diretto a `/review-errors`.
+
+- **`App\Http\Controllers\UserStatsController`** — iniettato `ReviewErrorsService`; nel metodo `me()` (solo per il viewer) passa `reviewErrorsCount` = `getErrors($user)->count()` alla view dashboard.
+
+- **`tests/Feature/ReviewErrorsTest.php`** — 12 test feature con `RefreshDatabase`:
+  - Accesso: unauthenticated → redirect login; admin → 403; viewer → 200.
+  - Isolamento: viewer vede solo i propri errori, non quelli di altri viewer.
+  - Logica errori: domanda corretta non appare; domanda sbagliata appare; tentativo con `answers = []` non conta; tentativo con `answers = null` non conta.
+  - Filtri: categoria filtra correttamente; `last_attempts` limita gli attempt considerati.
+  - Toggle imparata: `markAsLearned` esclude la domanda dagli errori; `unmarkAsLearned` la reinserisce; `markAsLearned` è idempotente; il toggle è personale (un viewer non influisce sugli altri).
+  - Cascata: eliminazione utente rimuove le righe `learned_questions`.
+  - Show learned: il toggle `show_learned=1` mostra le domande imparate.
+
+---
+
 ## [2026-05-23] — Feature 4.3: 2FA per admin e editor
 
 Autenticazione a due fattori (TOTP) obbligatoria per i ruoli `admin` ed `editor`.
