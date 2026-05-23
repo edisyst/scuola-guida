@@ -16,6 +16,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SimulatorController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\UserStatsController;
+use App\Http\Controllers\Admin\CategoryMaterialController;
 use App\Http\Controllers\Admin\QuestionReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -152,6 +153,12 @@ Route::middleware(['auth', '2fa'])
 
             // CATEGORIES
             Route::resource('categories', CategoryController::class)
+                ->except(['show']);
+
+            // CATEGORY MATERIALS
+            Route::post('categories/{category}/materials/reorder', [CategoryMaterialController::class, 'reorder'])
+                ->name('categories.materials.reorder');
+            Route::resource('categories.materials', CategoryMaterialController::class)
                 ->except(['show']);
 
             // QUESTIONS

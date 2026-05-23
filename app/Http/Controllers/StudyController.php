@@ -69,6 +69,11 @@ class StudyController extends Controller
                 ->with('error', 'La sessione di studio non contiene domande valide.');
         }
 
+        $question->loadMissing('category');
+        if ($question->category) {
+            $question->category->load(['materials' => fn($q) => $q->ordered()]);
+        }
+
         return view('study.play', [
             'question'   => $question,
             'index'      => $this->service->currentIndex(),
