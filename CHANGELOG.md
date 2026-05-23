@@ -5,7 +5,7 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
-## [Unreleased] — Feature 5.2: Materiale didattico per categoria
+## [2026-05-23] — Feature 5.2: Materiale didattico per categoria
 
 Possibilità per admin/editor di associare materiale didattico a ogni categoria (PDF, link esterni incluso YouTube, note testuali). Il viewer visualizza i materiali nella pagina di studio della categoria, in una card collassabile prima delle domande.
 
