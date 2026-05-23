@@ -153,6 +153,11 @@ class User extends Authenticatable
         return $this->hasMany(QuestionReport::class);
     }
 
+    public function learnedQuestions(): HasMany
+    {
+        return $this->hasMany(LearnedQuestion::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | REGISTRAZIONE DEFINITIVA (viewer)
