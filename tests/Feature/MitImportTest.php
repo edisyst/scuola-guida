@@ -17,6 +17,12 @@ class MitImportTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     private function adminUser(): User
     {
         return User::factory()->create(['role' => 'admin']);

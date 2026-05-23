@@ -14,6 +14,12 @@ class UserStatsTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     private function makeAttempts(User $user, Quiz $quiz, array $rows): void
     {
         foreach ($rows as $row) {

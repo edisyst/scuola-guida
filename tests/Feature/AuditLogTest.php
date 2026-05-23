@@ -14,6 +14,12 @@ class AuditLogTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     protected function adminUser()
     {
         return User::factory()->create(['role' => 'admin']);
@@ -37,7 +43,7 @@ class AuditLogTest extends TestCase
 
         $category = Category::factory()->create();
 
-        $this->post(route('admin.questions.store'), [
+        $this->withSession(['2fa_verified' => true])->post(route('admin.questions.store'), [
             'category_id' => $category->id,
             'question' => 'Domanda test',
             'is_true' => true,
@@ -56,7 +62,7 @@ class AuditLogTest extends TestCase
 
         $question = Question::factory()->create();
 
-        $this->put(route('admin.questions.update', $question), [
+        $this->withSession(['2fa_verified' => true])->put(route('admin.questions.update', $question), [
             'category_id' => $question->category_id,
             'question' => 'Domanda modificata',
             'is_true' => false,
@@ -75,7 +81,7 @@ class AuditLogTest extends TestCase
 
         $question = Question::factory()->create();
 
-        $this->delete(route('admin.questions.destroy', $question));
+        $this->withSession(['2fa_verified' => true])->delete(route('admin.questions.destroy', $question));
 
         $this->assertDatabaseHas('audit_logs', [
             'event' => 'deleted',
@@ -87,7 +93,7 @@ class AuditLogTest extends TestCase
     {
         $this->actingAs($this->editorUser());
 
-        $response = $this->get(route('admin.audit.index'));
+        $response = $this->withSession(['2fa_verified' => true])->get(route('admin.audit.index'));
 
         $response->assertStatus(403);
     }
@@ -96,7 +102,7 @@ class AuditLogTest extends TestCase
     {
         $this->actingAs($this->adminUser());
 
-        $response = $this->get(route('admin.audit.index'));
+        $response = $this->withSession(['2fa_verified' => true])->get(route('admin.audit.index'));
 
         $response->assertStatus(200);
     }
@@ -109,7 +115,7 @@ class AuditLogTest extends TestCase
 
         $category = Category::factory()->create();
 
-        $this->post(route('admin.questions.store'), [
+        $this->withSession(['2fa_verified' => true])->post(route('admin.questions.store'), [
             'category_id' => $category->id,
             'question' => 'Test audit user',
             'is_true' => true,

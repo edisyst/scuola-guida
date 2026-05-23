@@ -19,6 +19,12 @@ class AdminOperativityTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | HELPERS
@@ -70,6 +76,7 @@ class AdminOperativityTest extends TestCase
         $quiz  = $this->confirmedQuiz();
 
         $response = $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
             ->get(route('admin.quizzes.export-results', $quiz));
 
         $response->assertOk();
@@ -163,6 +170,7 @@ class AdminOperativityTest extends TestCase
 
         // La view risponde 200 con l'admin
         $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
             ->get(route('admin.quizzes.summary', $quiz))
             ->assertOk()
             ->assertSee('Bianchi')
@@ -243,13 +251,12 @@ class AdminOperativityTest extends TestCase
         $admin = $this->admin();
         $quiz  = $this->confirmedQuiz();
 
-        $response = $this->actingAs($admin)->put(
-            route('admin.quizzes.schedule.update', $quiz),
-            [
+        $response = $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
+            ->put(route('admin.quizzes.schedule.update', $quiz), [
                 'enrollments_open_at'  => now()->addDay()->format('Y-m-d\TH:i'),
                 'enrollments_close_at' => now()->subDay()->format('Y-m-d\TH:i'),
-            ]
-        );
+            ]);
 
         $response->assertSessionHasErrors('enrollments_close_at');
 
@@ -266,13 +273,12 @@ class AdminOperativityTest extends TestCase
         $open  = now()->addDay();
         $close = now()->addDays(7);
 
-        $response = $this->actingAs($admin)->put(
-            route('admin.quizzes.schedule.update', $quiz),
-            [
+        $response = $this->actingAs($admin)
+            ->withSession(['2fa_verified' => true])
+            ->put(route('admin.quizzes.schedule.update', $quiz), [
                 'enrollments_open_at'  => $open->format('Y-m-d\TH:i'),
                 'enrollments_close_at' => $close->format('Y-m-d\TH:i'),
-            ]
-        );
+            ]);
 
         $response->assertRedirect(route('admin.quizzes.index'));
         $quiz->refresh();
