@@ -5,6 +5,46 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-23] — Feature 5.2: Materiale didattico per categoria
+
+Possibilità per admin/editor di associare materiale didattico a ogni categoria (PDF, link esterni incluso YouTube, note testuali). Il viewer visualizza i materiali nella pagina di studio della categoria, in una card collassabile prima delle domande.
+
+### Added
+
+- **Migration `2026_05_23_213024_create_category_materials_table`** — nuova tabella `category_materials` con colonne `id`, `category_id` (FK con `cascadeOnDelete`), `type` (enum: pdf/link/note), `title` (string 255), `url_or_path` (string 1000 nullable), `content` (text nullable), `position` (integer default 0), `created_by` (FK nullable verso users con `nullOnDelete`), timestamps; indice composito su `(category_id, position)`. `down()` implementato.
+
+- **`App\Models\CategoryMaterial`** — model Eloquent con trait `HasFactory` e `Auditable`; fillable: `category_id`, `type`, `title`, `url_or_path`, `content`, `position`; relazioni `category()` e `creator()`; `scopeOrdered()` per ordinamento per position; accessor `embed_url` che estrae l'ID YouTube da URL `watch?v=` e `youtu.be` e restituisce l'URL embed; accessor `download_url` che restituisce `Storage::url()` per i PDF.
+
+- **`App\Models\Category`** — aggiunta relazione `materials(): HasMany` verso `CategoryMaterial`.
+
+- **`App\Observers\CategoryMaterialObserver`** — `creating`: imposta `created_by` dall'utente autenticato; `deleting`: elimina il file fisico PDF dallo storage (disco `public`).
+
+- **`App\Services\CategoryMaterialService`** — metodi `create()` (salva file PDF in `materials/{category_id}/` su disco `public`, calcola `position` come max+1), `update()` (sostituisce file PDF vecchio con nuovo), `delete()` (delega eliminazione file all'observer), `reorder()` (aggiorna `position` in base all'array di ID ordinati).
+
+- **`App\Http\Requests\StoreCategoryMaterialRequest`** e **`UpdateCategoryMaterialRequest`** — validazione di `type`, `title`, `file` (mimes:pdf, max:10240), `url_or_path` (url), `content`; autorizzazione via `canEditCategory()`.
+
+- **`App\Http\Controllers\Admin\CategoryMaterialController`** — controller thin con metodi `index`, `create`, `store`, `edit`, `update`, `destroy`, `reorder`; autorizzazione `abort_unless(canEditCategory(), 403)`; flash messages su ogni redirect; injection di `CategoryMaterialService`.
+
+- **Route** (`routes/web.php`, gruppo admin `middleware(['auth', '2fa'])`):
+  - `Route::resource('categories.materials', ...)` per CRUD
+  - `POST categories/{category}/materials/reorder` → `admin.categories.materials.reorder`
+
+- **`resources/views/admin/categories/materials/index.blade.php`** — lista materiali con drag handle SortableJS, badge tipo colorato, autore e data; bottoni modifica/elimina; empty state con CTA; aggiornamento ordine via AJAX con feedback toastr.
+
+- **`resources/views/admin/categories/materials/create.blade.php`** e **`edit.blade.php`** — form con campi condizionali via Alpine.js `x-show` in base al tipo selezionato (radio): input file PDF, input URL, textarea nota.
+
+- **`resources/views/admin/categories/index.blade.php`** — aggiunto pulsante "Gestisci materiali" (`fa-book-open`) nella colonna azioni di ogni categoria.
+
+- **`resources/views/study/play.blade.php`** — blocco "Materiale didattico" collassabile (Bootstrap collapse, default chiuso) mostrato prima della card domanda se la categoria ha almeno un materiale: PDF come link download, link YouTube come iframe responsive, link esterni con `target="_blank" rel="noopener"`, note come testo con `white-space:pre-wrap`.
+
+- **`App\Http\Controllers\StudyController`** — `play()` ora eager-load `category` e poi `materials` (ordered) sul modello `Question` corrente, per evitare query N+1 nella view di studio.
+
+- **`database/factories/CategoryMaterialFactory.php`** — factory con stati `pdf()`, `link()`, `youtube()` per i test.
+
+- **`tests/Feature/CategoryMaterialTest.php`** — 13 test: creazione di ogni tipo (note, link, PDF), accesso negato a viewer, cascade delete categoria→materiali, eliminazione file fisico, visibilità materiali nella pagina studio, validazione file e URL, accessors YouTube, reorder.
+
+---
+
 ## [2026-05-23] — Feature 5.1: Revisione errori aggregata personale
 
 Pagina `/review-errors` per i viewer che aggrega tutte le domande sbagliate negli ultimi N tentativi completati,

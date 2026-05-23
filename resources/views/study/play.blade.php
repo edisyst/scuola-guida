@@ -44,6 +44,60 @@
              aria-valuemax="100">{{ $percent }}%</div>
     </div>
 
+    {{-- ── Materiale didattico ─────────────────────────────── --}}
+    @if($question->category && $question->category->materials->isNotEmpty())
+    <div class="card mb-3">
+        <div class="card-header p-0">
+            <button class="btn btn-link w-100 text-left px-3 py-2 text-decoration-none"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#materials-panel"
+                    aria-expanded="false">
+                <i class="fas fa-book-open mr-2"></i>
+                <strong>Materiale didattico</strong>
+                <span class="badge badge-secondary ml-2">{{ $question->category->materials->count() }}</span>
+                <i class="fas fa-chevron-down float-right mt-1" style="font-size:.8rem;"></i>
+            </button>
+        </div>
+        <div id="materials-panel" class="collapse">
+            <div class="card-body p-3">
+                <ul class="list-unstyled m-0">
+                    @foreach($question->category->materials as $mat)
+                    <li class="mb-3">
+                        @if($mat->type === 'pdf')
+                            <a href="{{ $mat->download_url }}" target="_blank" rel="noopener" class="d-flex align-items-center" style="gap:8px;">
+                                <i class="fas fa-file-pdf text-danger"></i>
+                                <span>{{ $mat->title }}</span>
+                            </a>
+
+                        @elseif($mat->type === 'link' && $mat->embed_url)
+                            <p class="mb-1"><strong>{{ $mat->title }}</strong></p>
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <iframe class="embed-responsive-item"
+                                        src="{{ $mat->embed_url }}"
+                                        allowfullscreen
+                                        loading="lazy"></iframe>
+                            </div>
+
+                        @elseif($mat->type === 'link')
+                            <a href="{{ $mat->url_or_path }}" target="_blank" rel="noopener" class="d-flex align-items-center" style="gap:8px;">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>{{ $mat->title }}</span>
+                            </a>
+
+                        @elseif($mat->type === 'note')
+                            <p class="mb-1"><strong>{{ $mat->title }}</strong></p>
+                            <div class="text-muted" style="white-space:pre-wrap;">{{ $mat->content }}</div>
+
+                        @endif
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- ── Card domanda ─────────────────────────────────────── --}}
     <div class="card">
         <div class="card-body p-4">

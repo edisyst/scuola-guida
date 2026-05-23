@@ -45,4 +45,9 @@ class Category extends Model
     {
         return $this->hasMany(Question::class);
     }
+
+    public function materials()
+    {
+        return $this->hasMany(CategoryMaterial::class);
+    }
 }
