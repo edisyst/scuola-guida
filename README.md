@@ -197,6 +197,7 @@ php artisan 2fa:reset {user_id}                    # azzera il 2FA di un admin/e
 - **Media Manager** — gestione file upload (componente Livewire)
 - **Audit Log** — storico di ogni create/update/delete con valori prima/dopo
 - **Comandi utili** (`admin/commands`, solo admin) — pannello con pulsanti per lanciare da web una whitelist di comandi `php artisan` divisa in quattro gruppi: *Code* (queue:work `--stop-when-empty`, queue:failed/retry/flush), *Cache* (cache/config/route/view/optimize:clear), *Sistema* (migrate:status, storage:link, about), *GDPR* (vedi sezione dedicata). Esecuzione sincrona con cattura di exit code, durata e output, mostrati in un pannello in cima alla pagina. I comandi long-running come `queue:work` sono lanciati con `--stop-when-empty` per terminare entro la request — la UI non avvia daemon. I comandi che richiedono argomenti (es. `gdpr:anonymize {id}`) hanno un input dedicato nella tile, validato lato server
+- **Autenticazione a due fattori (2FA)** — i ruoli `admin` ed `editor` devono configurare il 2FA (TOTP) prima di accedere all'area di gestione; la verifica è applicata all'intero gruppo di route admin. Dal profilo è possibile disabilitare il 2FA o rigenerare gli 8 codici di emergenza one-time (entrambi richiedono la password corrente). Il recovery admin/editor avviene tramite `php artisan 2fa:reset {user_id}`. I viewer non sono mai coinvolti
 - **Utenti** — CRUD con assegnazione ruolo
 - **Ruoli & Permessi** — configura i permessi granulari per ogni ruolo dalla UI
 

@@ -5,7 +5,7 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
-## [Unreleased] — Feature 4.3: 2FA per admin e editor
+## [2026-05-23] — Feature 4.3: 2FA per admin e editor
 
 Autenticazione a due fattori (TOTP) obbligatoria per i ruoli `admin` ed `editor`.
 I viewer non sono coinvolti (nessuna UI, nessun middleware sulle route viewer).
