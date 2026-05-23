@@ -74,6 +74,19 @@
         </div>
     @endif
 
+    @if(!$isAdminView && !empty($reviewErrorsCount))
+        <a href="{{ route('viewer.review-errors.index') }}"
+           class="info-box bg-gradient-warning mb-3 text-dark"
+           style="text-decoration:none;">
+            <span class="info-box-icon"><i class="fas fa-exclamation-triangle"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Errori da rivedere</span>
+                <span class="info-box-number">{{ $reviewErrorsCount }}</span>
+                <span class="progress-description">domande con risposte sbagliate &mdash; clicca per rivedere</span>
+            </div>
+        </a>
+    @endif
+
     @if($stats['total_attempts'] === 0)
         <div class="sg-card sg-mt-3">
             <div class="sg-card-body sg-text-center p-5">

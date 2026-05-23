@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Quiz;
 use App\Models\User;
 use App\Services\DashboardStatsService;
+use App\Services\ReviewErrorsService;
 use App\Services\UserStatsService;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,7 @@ class UserStatsController extends Controller
     public function __construct(
         private readonly UserStatsService $service,
         private readonly DashboardStatsService $dashboardStats,
+        private readonly ReviewErrorsService $reviewErrorsService,
     ) {}
 
     /**
@@ -35,10 +37,11 @@ class UserStatsController extends Controller
             ?? Quiz::confirmed()->enrollmentsUpcoming()->orderBy('enrollments_open_at')->first();
 
         return view('stats.dashboard', [
-            'user'        => $user,
-            'stats'       => $this->service->get($user),
-            'isAdminView' => false,
-            'nextSession' => $nextSession,
+            'user'              => $user,
+            'stats'             => $this->service->get($user),
+            'isAdminView'       => false,
+            'nextSession'       => $nextSession,
+            'reviewErrorsCount' => $this->reviewErrorsService->getErrors($user)->count(),
         ]);
     }
 
