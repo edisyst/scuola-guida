@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\CommandController as AdminCommandController;
+use App\Http\Controllers\Viewer\StudyPlanController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\TwoFactorSetupController;
 use App\Models\AuditLog;
@@ -97,6 +98,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{question}/learned', [ReviewErrorsController::class, 'markLearned'])->name('learned.store');
         Route::delete('/{question}/learned', [ReviewErrorsController::class, 'unmarkLearned'])->name('learned.destroy');
     });
+
+    // Test diagnostico e piano di studio (viewer)
+    Route::get('/diagnostic', [StudyPlanController::class, 'startDiagnostic'])
+        ->name('viewer.diagnostic.show');
+    Route::get('/study-plan', [StudyPlanController::class, 'show'])
+        ->name('viewer.study-plan.show');
 
     // Domande salvate (bookmark persistenti viewer)
     Route::prefix('bookmarks')->name('bookmarks.')->group(function () {

@@ -369,6 +369,13 @@ return [
             'key'  => 'review-errors',
             'can'  => 'exam-participant',
         ],
+        [
+            'text' => 'Piano di studio',
+            'url'  => 'study-plan',
+            'icon' => 'fas fa-route',
+            'key'  => 'study-plan',
+            'can'  => 'exam-participant',
+        ],
 
         // ── ESAMI UFFICIALI (viewer partecipa, admin/editor sola lettura) ───
         ['header' => 'esami', 'can' => 'viewer-quiz-area'],

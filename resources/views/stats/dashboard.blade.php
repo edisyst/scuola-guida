@@ -87,6 +87,21 @@
         </a>
     @endif
 
+    @if(!$isAdminView && ($hasDiagnostic ?? false) === false && $stats['total_attempts'] === 0)
+        <a href="{{ route('viewer.diagnostic.show') }}"
+           class="info-box bg-gradient-info mb-3 text-white"
+           style="text-decoration:none;">
+            <span class="info-box-icon"><i class="fas fa-stethoscope"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Punto di partenza</span>
+                <span class="info-box-number" style="font-size:1rem;">Inizia con un test diagnostico</span>
+                <span class="progress-description">
+                    Rispondi a una domanda per categoria e costruiamo il tuo piano di studio — clicca per iniziare
+                </span>
+            </div>
+        </a>
+    @endif
+
     @if($stats['total_attempts'] === 0)
         <div class="sg-card sg-mt-3">
             <div class="sg-card-body sg-text-center p-5">
