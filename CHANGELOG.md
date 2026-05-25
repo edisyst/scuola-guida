@@ -5,6 +5,50 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-25] — Feature 5.3: Test diagnostico iniziale e piano di studio suggerito
+
+Test breve (una domanda per categoria) che il viewer può svolgere al primo accesso o on-demand dalla dashboard. Il risultato alimenta una pagina "Piano di studio" con categorie ordinate per debolezza e azioni raccomandate.
+
+### Added
+
+- **Migration `2026_05_25_100000_create_diagnostic_results_table`** — tabella `diagnostic_results` con colonne `id`, `user_id` (FK cascadeOnDelete), `category_id` (FK cascadeOnDelete), `correct` (boolean), `taken_at` (timestamp), `batch_id` (string 36, index); indice composito su `(user_id, category_id, taken_at)`; `down()` implementato.
+
+- **`App\Models\DiagnosticResult`** — model senza timestamps; fillable: tutti i campi; casts `correct` → boolean, `taken_at` → datetime; relazioni `user()` e `category()`.
+
+- **`Database\Factories\DiagnosticResultFactory`** — factory per i test.
+
+- **`App\Services\DiagnosticService`** — metodi:
+  - `generateQuestions(User): Collection` — una domanda random per ogni categoria attiva, escludendo le domande viste nelle ultime 24h dai `quiz_attempts`;
+  - `saveResults(User, array): void` — persiste i risultati in `diagnostic_results` in una transazione, raggruppati da un `batch_id` UUID univoco per sessione;
+  - `getLatestDiagnostic(User): ?Collection` — recupera l'ultimo batch diagnostico dell'utente;
+  - `hasDiagnostic(User): bool` — helper rapido per il banner dashboard.
+
+- **`App\Services\StudyPlanService`** — metodo `buildPlan(User): Collection` che aggrega i dati storici dai `quiz_attempts` (PHP-side, N+1 free, precarica mappa `question_id → category_id`) e incorpora l'ultimo batch diagnostico (peso 70%/30% se ci sono dati storici, 100% diagnostico altrimenti). Per ogni categoria: `mastery` (int 0–100), `attempts_count`, `recommended_action` (tre livelli: <30 / 30–70 / >70). Ritorna Collection ordinata per mastery ascendente.
+
+- **`App\Http\Livewire\DiagnosticTest`** — componente Livewire 3; properties `$questionIds`, `$currentIndex`, `$answers`, `$completed`; `mount()` carica le domande via `DiagnosticService`; `submitAnswer(int)` avanza la domanda e salva i risultati all'ultima risposta.
+
+- **`resources/views/livewire/diagnostic-test.blade.php`** — progress bar, card domanda con immagine opzionale, bottoni Vero/Falso con `wire:loading`; schermata di completamento con link al piano di studio.
+
+- **`App\Http\Controllers\Viewer\StudyPlanController`** — metodi `show()` (piano di studio, 403 per non-viewer) e `startDiagnostic()` (pagina con il componente Livewire).
+
+- **Route** (`routes/web.php`, middleware `auth`):
+  - `GET /diagnostic` → `viewer.diagnostic.show`
+  - `GET /study-plan` → `viewer.study-plan.show`
+
+- **`resources/views/diagnostic/show.blade.php`** — pagina introduttiva con testo no-penalità e il componente `<livewire:diagnostic-test />`.
+
+- **`resources/views/study-plan/show.blade.php`** — lista categorie in card: progress bar colorata (rosso/giallo/verde), badge mastery, contatore tentativi, `recommended_action`, pulsante "Studia ora" (form POST verso `study.start`); banner diagnostico in header; empty state con CTA.
+
+- **Voce sidebar** `config/adminlte.php` — "Piano di studio" (icon `fas fa-route`, gate `exam-participant`, key `study-plan`) nel blocco STUDIO.
+
+- **Banner dashboard viewer** `stats/dashboard.blade.php` — banner `info-box bg-gradient-info` visibile solo se `!$isAdminView && !$hasDiagnostic && total_attempts === 0`; si nasconde automaticamente dopo il primo tentativo o dopo aver fatto il diagnostico.
+
+- **`tests/Feature/DiagnosticFeatureTest.php`** — 13 test: accesso route (auth, 403 admin), `generateQuestions` (una per categoria, no duplicati, esclude domande recenti), `saveResults` (persistenza, batch_id unico, noop su array vuoto), `hasDiagnostic`, `getLatestDiagnostic` (batch più recente).
+
+- **`tests/Feature/StudyPlanFeatureTest.php`** — 10 test: ordinamento mastery ascendente, solo diagnostico, solo storico, senza dati (empty state, mastery 0), cascata delete user → diagnostic_results, `recommended_action` corretto.
+
+---
+
 ## [2026-05-23] — Feature 5.2: Materiale didattico per categoria
 
 Possibilità per admin/editor di associare materiale didattico a ogni categoria (PDF, link esterni incluso YouTube, note testuali). Il viewer visualizza i materiali nella pagina di studio della categoria, in una card collassabile prima delle domande.

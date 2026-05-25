@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Quiz;
 use App\Models\User;
 use App\Services\DashboardStatsService;
+use App\Services\DiagnosticService;
 use App\Services\ReviewErrorsService;
 use App\Services\UserStatsService;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class UserStatsController extends Controller
         private readonly UserStatsService $service,
         private readonly DashboardStatsService $dashboardStats,
         private readonly ReviewErrorsService $reviewErrorsService,
+        private readonly DiagnosticService $diagnosticService,
     ) {}
 
     /**
@@ -42,6 +44,7 @@ class UserStatsController extends Controller
             'isAdminView'       => false,
             'nextSession'       => $nextSession,
             'reviewErrorsCount' => $this->reviewErrorsService->getErrors($user)->count(),
+            'hasDiagnostic'     => $this->diagnosticService->hasDiagnostic($user),
         ]);
     }
 
