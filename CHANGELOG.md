@@ -5,7 +5,7 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
-## [Unreleased] — Feature 5.5: Gamification leggera — streak e badge
+## [2026-05-27] — Feature 5.5: Gamification leggera — streak e badge
 
 Gamification leggera per il viewer: streak giorni consecutivi di studio, badge per milestone (streak, domande risposte, primo simulatore promosso, completamento categorie), widget streak nella dashboard e notifica in-app al guadagno di un badge.
 
