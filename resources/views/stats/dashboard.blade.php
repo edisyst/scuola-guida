@@ -100,6 +100,43 @@
         </a>
     @endif
 
+    @if(!$isAdminView && isset($currentStreak))
+        @php
+            $hasActivityToday = $currentStreak > 0 && isset($activityToday) && $activityToday;
+            $atRisk = ($currentStreak > 0) && !($activityToday ?? false);
+        @endphp
+        <a href="{{ route('viewer.profile.badges') }}"
+           class="info-box {{ $currentStreak > 0 ? 'bg-gradient-warning' : 'bg-light border' }} mb-3 text-{{ $currentStreak > 0 ? 'dark' : 'muted' }}"
+           style="text-decoration:none;">
+            <span class="info-box-icon">
+                <i class="fas fa-fire{{ $currentStreak === 0 ? '-alt' : '' }}"></i>
+            </span>
+            <div class="info-box-content">
+                <span class="info-box-text">La tua streak</span>
+                <span class="info-box-number">
+                    @if($currentStreak === 0)
+                        0 giorni
+                    @else
+                        {{ $currentStreak }} {{ $currentStreak === 1 ? 'giorno' : 'giorni' }}
+                        @if($atRisk)
+                            <span class="badge badge-danger ml-2" style="font-size:0.7rem;">A rischio</span>
+                        @endif
+                    @endif
+                </span>
+                <span class="progress-description">
+                    @if($currentStreak === 0)
+                        Inizia oggi! Studia qualcosa per avviare la tua streak.
+                    @elseif($atRisk)
+                        Non hai ancora studiato oggi &mdash; studia per non perdere la streak!
+                    @else
+                        Migliore di sempre: {{ $longestStreak }} {{ $longestStreak === 1 ? 'giorno' : 'giorni' }}
+                    @endif
+                    &mdash; <u>Vedi badge</u>
+                </span>
+            </div>
+        </a>
+    @endif
+
     @if(!$isAdminView && ($hasDiagnostic ?? false) === false && $stats['total_attempts'] === 0)
         <a href="{{ route('viewer.diagnostic.show') }}"
            class="info-box bg-gradient-info mb-3 text-white"

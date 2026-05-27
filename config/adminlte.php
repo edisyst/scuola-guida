@@ -529,6 +529,13 @@ return [
             'url'  => 'profile',
             'icon' => 'fas fa-user-circle',
         ],
+        [
+            'text' => 'I miei badge',
+            'url'  => 'profile/badges',
+            'icon' => 'fas fa-award',
+            'key'  => 'profile-badges',
+            'can'  => 'exam-participant',
+        ],
     ],
 
     /*
