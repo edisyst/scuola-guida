@@ -116,6 +116,29 @@ class AppServiceProvider extends ServiceProvider
         |--------------------------------------------------------------------------
         */
 
+        // Composer mirato su layouts.admin per il badge "Ripasso intelligente" in sidebar.
+        // NON aggiunto a '*' per non peggiorare il known issue esistente.
+        View::composer('layouts.admin', function () {
+            if (!auth()->check() || !auth()->user()->isViewer()) {
+                return;
+            }
+
+            $dueToday = app(\App\Services\SpacedRepetitionService::class)
+                ->getUpcomingCount(auth()->user())['due_today'];
+
+            if ($dueToday === 0) {
+                return;
+            }
+
+            config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($dueToday) {
+                if (($item['key'] ?? '') === 'smart-review') {
+                    $item['label']       = $dueToday;
+                    $item['label_color'] = 'danger';
+                }
+                return $item;
+            })->toArray()]);
+        });
+
         View::composer('*', function () {
             // I badge in sidebar mostrano solo gli elementi aggiunti nell'ultima ora.
             $since = now()->subHour();

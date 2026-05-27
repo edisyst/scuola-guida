@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StartStudyRequest;
 use App\Models\Category;
+use App\Models\Question;
 use App\Models\Quiz;
+use App\Services\SpacedRepetitionService;
 use App\Services\StudyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -98,6 +100,12 @@ class StudyController extends Controller
 
             if (array_key_exists('answer', $data) && $data['answer'] !== null) {
                 $this->service->recordAnswer($question, (int) $data['answer']);
+
+                $q = Question::find($question);
+                if ($q && auth()->check()) {
+                    $isCorrect = (int) $data['answer'] === (int) $q->is_true;
+                    app(SpacedRepetitionService::class)->recordAnswer(auth()->user(), $question, $isCorrect);
+                }
             }
         } catch (RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
