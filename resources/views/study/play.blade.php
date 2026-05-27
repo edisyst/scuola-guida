@@ -15,18 +15,39 @@
 
 <div class="sg-wrapper" style="max-width: 800px; margin: 0 auto;"
      x-data="studyPlay({
-        questionId: {{ $question->id }},
-        correct: {{ $correct }},
-        flagged: {{ $isFlagged ? 'true' : 'false' }},
-        flagUrl: '{{ route('study.flag', ['question' => $question->id]) }}',
-        csrf: '{{ csrf_token() }}'
+        questionId:   {{ $question->id }},
+        correct:      {{ $correct }},
+        flagged:      {{ $isFlagged ? 'true' : 'false' }},
+        flagUrl:      '{{ route('study.flag', ['question' => $question->id]) }}',
+        csrf:         '{{ csrf_token() }}',
+        syncUrl:      '{{ route('api.offline.sync-answers') }}',
+        prefetchUrl:  '{{ route('api.offline.questions') }}',
+        questionText: @json($question->question),
+        categoryName: @json($question->category?->name ?? ''),
+        imageUrl:     @json($imageUrl),
+        index:        {{ $index }},
+        total:        {{ $total }},
+        prevUrl:      @json($prevUrl),
+        nextUrl:      @json($nextUrl)
      })">
+
+    {{-- ── Badge offline ──────────────────────────────────────── --}}
+    <div x-show="offlineSyncBadge" x-cloak
+         class="alert alert-warning d-flex align-items-center mb-3" style="gap:.5rem;">
+        <i class="fas fa-wifi" style="opacity:.5;"></i>
+        <span>Sei offline — risposta salvata, sarà sincronizzata al ritorno online.</span>
+    </div>
 
     {{-- ── Header + progress ────────────────────────────────── --}}
     <div class="sg-header sg-flex-between">
         <div>
             <p class="sg-header-subtitle">Modalità Studio</p>
-            <h1 class="sg-header-title">Domanda {{ $index + 1 }} di {{ $total }}</h1>
+            <h1 class="sg-header-title">
+                Domanda
+                <span x-text="offlineMode ? (offlineIndex + 1) : {{ $index + 1 }}">{{ $index + 1 }}</span>
+                di
+                <span x-text="offlineMode ? offlineTotal : {{ $total }}">{{ $total }}</span>
+            </h1>
         </div>
         <div>
             <a href="{{ route('study.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
@@ -102,20 +123,18 @@
     <div class="card">
         <div class="card-body p-4">
 
-            @if($question->category)
-                <span class="badge badge-secondary mb-3">{{ $question->category->name }}</span>
-            @endif
+            <span class="badge badge-secondary mb-3"
+                  x-text="currentCategoryName"
+                  x-show="currentCategoryName"></span>
 
-            <h4 class="mb-4">{{ $question->question }}</h4>
+            <h4 class="mb-4" x-text="currentQuestionText"></h4>
 
-            @if($imageUrl)
-                <div class="text-center mb-4">
-                    <img src="{{ $imageUrl }}"
-                         alt="Immagine domanda"
-                         class="img-fluid rounded shadow-sm"
-                         style="max-height: 280px;">
-                </div>
-            @endif
+            <div class="text-center mb-4" x-show="currentImageUrl">
+                <img :src="currentImageUrl"
+                     alt="Immagine domanda"
+                     class="img-fluid rounded shadow-sm"
+                     style="max-height: 280px;">
+            </div>
 
             <div class="row">
                 <div class="col-12 col-sm-6 mb-2 mb-sm-0">
@@ -163,49 +182,74 @@
              Da sm in su: layout a 3 gruppi (prev / azioni / next) in fila. --}}
         <div class="card-footer sg-study-nav">
             <div class="sg-study-nav-prev">
-                @if($prevUrl)
-                    <a href="{{ $prevUrl }}" class="sg-btn sg-btn-outline">
-                        <i class="fas fa-chevron-left"></i> Precedente
-                    </a>
-                @else
-                    <button class="sg-btn sg-btn-outline" disabled>
+                {{-- Online: server navigation --}}
+                <template x-if="!offlineMode">
+                    @if($prevUrl)
+                        <a href="{{ $prevUrl }}" class="sg-btn sg-btn-outline">
+                            <i class="fas fa-chevron-left"></i> Precedente
+                        </a>
+                    @else
+                        <button class="sg-btn sg-btn-outline" disabled>
+                            <i class="fas fa-chevron-left"></i> Precedente
+                        </button>
+                    @endif
+                </template>
+                {{-- Offline: JS navigation --}}
+                <template x-if="offlineMode">
+                    <button class="sg-btn sg-btn-outline"
+                            :disabled="offlineIndex === 0"
+                            @click="offlinePrev()">
                         <i class="fas fa-chevron-left"></i> Precedente
                     </button>
-                @endif
+                </template>
             </div>
 
             <div class="sg-study-nav-actions">
                 <button type="button"
                         class="sg-btn"
                         :class="flagged ? 'sg-btn-warning' : 'sg-btn-light'"
-                        @click="toggleFlag()">
+                        @click="toggleFlag()"
+                        x-show="!offlineMode">
                     <i class="fas" :class="flagged ? 'fa-bookmark' : 'fa-bookmark'"></i>
                     <span x-text="flagged ? 'Segnata da ripassare' : 'Segna da ripassare'"></span>
                 </button>
 
                 @auth @if(auth()->user()->isViewer())
-                    <livewire:bookmark-button :question-id="$question->id" :key="'bm-'.$question->id" />
+                    <span x-show="!offlineMode">
+                        <livewire:bookmark-button :question-id="$question->id" :key="'bm-'.$question->id" />
+                    </span>
 
-                    <span class="ms-2">
+                    <span class="ms-2" x-show="!offlineMode">
                         <livewire:report-button :question-id="$question->id" :key="'report-'.$question->id" />
                     </span>
                 @endif @endauth
 
-                <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-dark">
+                <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-dark" x-show="!offlineMode">
                     <i class="fas fa-flag-checkered"></i> Termina sessione
                 </a>
             </div>
 
             <div class="sg-study-nav-next">
-                @if($nextUrl)
-                    <a href="{{ $nextUrl }}" class="sg-btn sg-btn-primary">
+                {{-- Online: server navigation --}}
+                <template x-if="!offlineMode">
+                    @if($nextUrl)
+                        <a href="{{ $nextUrl }}" class="sg-btn sg-btn-primary">
+                            Prossima <i class="fas fa-chevron-right"></i>
+                        </a>
+                    @else
+                        <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-primary">
+                            Vai al riepilogo <i class="fas fa-chevron-right"></i>
+                        </a>
+                    @endif
+                </template>
+                {{-- Offline: JS navigation --}}
+                <template x-if="offlineMode">
+                    <button class="sg-btn sg-btn-primary"
+                            :disabled="offlineIndex >= offlineTotal - 1"
+                            @click="offlineNext()">
                         Prossima <i class="fas fa-chevron-right"></i>
-                    </a>
-                @else
-                    <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-primary">
-                        Vai al riepilogo <i class="fas fa-chevron-right"></i>
-                    </a>
-                @endif
+                    </button>
+                </template>
             </div>
         </div>
     </div>
@@ -218,24 +262,69 @@
 
 @section('js')
     @parent
+    @vite(['resources/js/offline-store.js'])
 
     <script>
         function studyPlay(config) {
             return {
-                questionId: config.questionId,
-                correct: config.correct,
-                flagged: config.flagged,
-                flagUrl: config.flagUrl,
-                csrf: config.csrf,
-                selected: null,
-                answered: false,
+                // ── Original state ─────────────────────────────
+                questionId:   config.questionId,
+                correct:      config.correct,
+                flagged:      config.flagged,
+                flagUrl:      config.flagUrl,
+                csrf:         config.csrf,
+                selected:     null,
+                answered:     false,
 
-                answer(value) {
+                // ── Reactive display (supports offline swap) ───
+                currentQuestionText: config.questionText,
+                currentCategoryName: config.categoryName,
+                currentImageUrl:     config.imageUrl,
+
+                // ── Offline state ──────────────────────────────
+                offlineMode:       false,
+                offlineSyncBadge:  false,
+                offlineQuestions:  [],
+                offlineIndex:      0,
+                offlineTotal:      0,
+
+                // ── Lifecycle ──────────────────────────────────
+                async init() {
+                    // Prefetch questions for offline use when online
+                    if (navigator.onLine) {
+                        this._prefetchQuestions(config.prefetchUrl, config.csrf);
+                    }
+
+                    window.addEventListener('offline', () => this._enterOfflineMode());
+                    window.addEventListener('online',  () => this._exitOfflineMode());
+
+                    // SW background sync trigger
+                    window.addEventListener('pwa:sync-answers', () => this._syncPendingAnswers(config.syncUrl, config.csrf));
+                },
+
+                // ── Answer ─────────────────────────────────────
+                async answer(value) {
                     if (this.answered) return;
                     this.selected = value;
                     this.answered = true;
 
-                    // Registra la risposta lato server per il riepilogo.
+                    const isCorrect = value === this.correct;
+
+                    if (!navigator.onLine) {
+                        try {
+                            await window.offlineStore.enqueuePendingAnswer({
+                                question_id: this.questionId,
+                                user_answer: value,
+                                is_correct:  isCorrect,
+                                answered_at: new Date().toISOString(),
+                            });
+                        } catch (e) {
+                            // IndexedDB unavailable (Safari private) — degrade silently
+                        }
+                        this.offlineSyncBadge = true;
+                        return;
+                    }
+
                     fetch(this.flagUrl, {
                         method: 'POST',
                         headers: {
@@ -248,7 +337,9 @@
                     }).catch(() => {});
                 },
 
+                // ── Flag / bookmark ────────────────────────────
                 toggleFlag() {
+                    if (this.offlineMode) return;
                     fetch(this.flagUrl, {
                         method: 'POST',
                         headers: {
@@ -270,21 +361,123 @@
                     });
                 },
 
+                // ── Answer button styling ──────────────────────
                 answerButtonClass(value) {
                     if (!this.answered) {
                         return value === 1 ? 'btn-outline-success' : 'btn-outline-danger';
                     }
-                    // Mostra sempre la corretta in verde
-                    if (value === this.correct) {
-                        return 'btn-success';
-                    }
-                    // Pulsante sbagliato cliccato → rosso
-                    if (value === this.selected) {
-                        return 'btn-danger';
-                    }
+                    if (value === this.correct) return 'btn-success';
+                    if (value === this.selected) return 'btn-danger';
                     return value === 1 ? 'btn-outline-success' : 'btn-outline-danger';
                 },
-            }
+
+                // ── Offline navigation ─────────────────────────
+                offlineNext() {
+                    if (this.offlineIndex < this.offlineTotal - 1) {
+                        this.offlineIndex++;
+                        this._loadOfflineQuestion();
+                    }
+                },
+
+                offlinePrev() {
+                    if (this.offlineIndex > 0) {
+                        this.offlineIndex--;
+                        this._loadOfflineQuestion();
+                    }
+                },
+
+                _loadOfflineQuestion() {
+                    const q = this.offlineQuestions[this.offlineIndex];
+                    if (!q) return;
+
+                    this.questionId          = q.id;
+                    this.correct             = q.is_true;
+                    this.flagged             = false;
+                    this.selected            = null;
+                    this.answered            = false;
+                    this.offlineSyncBadge    = false;
+                    this.currentQuestionText = q.question;
+                    this.currentCategoryName = (q.category && q.category.name) ? q.category.name : '';
+                    this.currentImageUrl     = q.image || null;
+                },
+
+                // ── Internal helpers ───────────────────────────
+
+                async _prefetchQuestions(url, csrf) {
+                    if (!window.offlineStore) return;
+                    try {
+                        const res = await fetch(url, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrf,
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                        });
+                        if (!res.ok) return;
+                        const data = await res.json();
+                        if (data.questions && data.questions.length) {
+                            await window.offlineStore.saveQuestions(data.questions);
+                        }
+                    } catch (e) {
+                        // Silently ignore — throttle hit or network error
+                    }
+                },
+
+                async _enterOfflineMode() {
+                    this.offlineSyncBadge = true;
+                    if (!window.offlineStore) return;
+                    try {
+                        const questions = await window.offlineStore.getAllQuestions(100);
+                        if (!questions.length) return;
+
+                        this.offlineQuestions = questions;
+                        this.offlineTotal     = questions.length;
+                        this.offlineIndex     = 0;
+                        this.offlineMode      = true;
+                        this._loadOfflineQuestion();
+                    } catch (e) {
+                        // IndexedDB unavailable — stay with server-rendered content
+                    }
+                },
+
+                async _exitOfflineMode() {
+                    this.offlineMode      = false;
+                    this.offlineSyncBadge = false;
+                    await this._syncPendingAnswers(config.syncUrl, config.csrf);
+                },
+
+                async _syncPendingAnswers(syncUrl, csrf) {
+                    if (!window.offlineStore) return;
+                    try {
+                        const pending = await window.offlineStore.getPendingAnswers();
+                        if (!pending.length) return;
+
+                        const res = await fetch(syncUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrf,
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: JSON.stringify({ answers: pending }),
+                        });
+
+                        if (!res.ok) return;
+                        const data = await res.json();
+
+                        if (data.synced_ids && data.synced_ids.length) {
+                            await window.offlineStore.markAnswersSynced(data.synced_ids);
+                        }
+
+                        if (data.count > 0 && window.toastr) {
+                            toastr.success(data.count + (data.count === 1 ? ' risposta sincronizzata.' : ' risposte sincronizzate.'));
+                        }
+                    } catch (e) {
+                        // Sync failed — will retry next time online
+                    }
+                },
+            };
         }
     </script>
 @endsection
