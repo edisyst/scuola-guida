@@ -115,6 +115,13 @@
                                         <i class="fas fa-play mr-1"></i> Studia ora
                                     </button>
                                 </form>
+                                @if(($reviewCountByCategory[$item['category']->id] ?? 0) > 0)
+                                    <a href="{{ route('viewer.smart-review.session', ['category_id' => $item['category']->id]) }}"
+                                       class="sg-btn sg-btn-outline sg-btn-sm w-100 mt-2">
+                                        <i class="fas fa-brain mr-1"></i>
+                                        Ripassa ({{ $reviewCountByCategory[$item['category']->id] }})
+                                    </a>
+                                @endif
                             </div>
 
                         </div>

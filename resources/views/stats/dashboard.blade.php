@@ -87,6 +87,19 @@
         </a>
     @endif
 
+    @if(!$isAdminView && ($dueToday ?? 0) > 0)
+        <a href="{{ route('viewer.smart-review.session') }}"
+           class="info-box bg-gradient-primary mb-3 text-white"
+           style="text-decoration:none;">
+            <span class="info-box-icon"><i class="fas fa-brain"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Ripasso intelligente</span>
+                <span class="info-box-number">{{ $dueToday }}</span>
+                <span class="progress-description">domande da ripassare oggi &mdash; clicca per iniziare</span>
+            </div>
+        </a>
+    @endif
+
     @if(!$isAdminView && ($hasDiagnostic ?? false) === false && $stats['total_attempts'] === 0)
         <a href="{{ route('viewer.diagnostic.show') }}"
            class="info-box bg-gradient-info mb-3 text-white"

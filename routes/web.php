@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Viewer\StudyPlanController;
+use App\Http\Controllers\Viewer\SmartReviewController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\TwoFactorSetupController;
 use App\Models\AuditLog;
@@ -104,6 +105,12 @@ Route::middleware(['auth'])->group(function () {
         ->name('viewer.diagnostic.show');
     Route::get('/study-plan', [StudyPlanController::class, 'show'])
         ->name('viewer.study-plan.show');
+
+    // Ripasso intelligente — spaced repetition (viewer)
+    Route::prefix('smart-review')->name('viewer.smart-review.')->group(function () {
+        Route::get('/',        [SmartReviewController::class, 'index'])->name('index');
+        Route::get('/session', [SmartReviewController::class, 'session'])->name('session');
+    });
 
     // Domande salvate (bookmark persistenti viewer)
     Route::prefix('bookmarks')->name('bookmarks.')->group(function () {

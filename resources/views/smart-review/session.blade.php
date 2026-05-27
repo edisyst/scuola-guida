@@ -1,0 +1,26 @@
+@extends('layouts.admin')
+@section('title', 'Sessione ripasso')
+@section('content_header')@endsection
+@section('content')
+<div class="sg-wrapper">
+    <div class="sg-header sg-flex-between">
+        <div>
+            <p class="sg-header-subtitle">Ripeti le domande in scadenza</p>
+            <h1 class="sg-header-title">
+                <i class="fas fa-brain mr-2"></i> Sessione ripasso
+            </h1>
+        </div>
+        <div class="sg-header-actions">
+            <a href="{{ route('viewer.smart-review.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
+                <i class="fas fa-arrow-left mr-1"></i> Panoramica
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <livewire:smart-review :category-id="$categoryId" />
+        </div>
+    </div>
+</div>
+@endsection
