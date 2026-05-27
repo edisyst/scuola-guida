@@ -4,10 +4,15 @@ namespace App\Services;
 
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
+use App\Models\User;
+use App\Services\SpacedRepetitionService;
 
 class QuizAttemptService
 {
-    public function __construct(private QuizEnrollmentService $enrollmentService) {}
+    public function __construct(
+        private QuizEnrollmentService $enrollmentService,
+        private SpacedRepetitionService $spacedRepetitionService,
+    ) {}
 
     /**
      * Crea un nuovo tentativo calcolando lo score.
@@ -47,6 +52,17 @@ class QuizAttemptService
         if ($enrollmentId) {
             // $enrollment è già caricato sopra: evita la lazy query su $attempt->enrollment (W-5).
             $this->enrollmentService->markCompleted($enrollment, $attempt);
+        }
+
+        // Aggiorna spaced repetition per ogni risposta del tentativo.
+        $user = User::find($userId);
+        if ($user) {
+            foreach ($answers as $questionId => $answer) {
+                $result    = is_array($answer) ? (int) ($answer['correct'] ?? 0) : (int) $answer;
+                $isCorrect = isset($correctMap[$questionId])
+                    && $result === (int) $correctMap[$questionId];
+                $this->spacedRepetitionService->recordAnswer($user, (int) $questionId, $isCorrect);
+            }
         }
 
         return $attempt;

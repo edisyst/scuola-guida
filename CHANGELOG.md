@@ -5,6 +5,62 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-27] — Feature 5.4: Spaced repetition delle domande sbagliate
+
+Algoritmo SM-2 che traccia automaticamente ogni risposta data in modalità studio e nei quiz, calcola l'intervallo ottimale di ripasso per ciascuna domanda e propone al viewer una sessione di ripasso ordinata per urgenza.
+
+### Added
+
+- **Migration `2026_05_27_120000_create_question_reviews_table`** — tabella `question_reviews` con colonne `id`, `user_id` (FK cascadeOnDelete), `question_id` (FK cascadeOnDelete), `next_review_at` (timestamp, index), `interval_days` (integer default 1), `ease_factor` (decimal 3,2 default 2.50), `repetitions` (integer default 0), `last_reviewed_at` (timestamp nullable), timestamps; unique composito su `(user_id, question_id)`; indice composito su `(user_id, next_review_at)`. `down()` implementato.
+
+- **`App\Models\QuestionReview`** — model Eloquent con `HasFactory`; fillable: tutti i campi; metodo `casts()` Laravel 11 style; relazioni `user()` e `question()`.
+
+- **`Database\Factories\QuestionReviewFactory`** — factory con stati `due()` (next_review_at = now()-1h) e `future()` (now()+5d).
+
+- **`App\Services\SpacedRepetitionService`** — implementazione algoritmo SM-2 con cap 365 giorni; metodi:
+  - `recordAnswer(User, int, bool): QuestionReview` — `firstOrCreate` + aggiornamento dati SR;
+  - `calculateNextReview(QuestionReview, bool): array` — calcola senza persistere (testabile in isolamento);
+  - `getDueQuestions(User, ?int, int): Collection` — domande in scadenza con eager load `question.category`, escluse le learned, ordinate per urgenza;
+  - `getUpcomingCount(User): array` — contatori `due_today` / `due_tomorrow` / `due_this_week`;
+  - `getStats(User): array` — `total_tracked` / `mastered` (rep≥5) / `learning` / `new`;
+  - `getDueCountByCategory(User): array` — `[category_id => count]` per le domande in scadenza oggi.
+
+- **`App\Http\Livewire\SmartReview`** — componente Livewire 3; properties `$reviewIds`, `$currentIndex`, `$showFeedback`, `$lastAnswerCorrect`, `$sessionStats`, `$lastIntervalDays`, `$categoryId`; `mount()` carica gli ID in scadenza; `answer(int)` registra la risposta e mostra il feedback; `nextQuestion()` avanza; `markCurrentAsLearned()` delega a `ReviewErrorsService`.
+
+- **`resources/views/livewire/smart-review.blade.php`** — progress bar, card domanda con immagine opzionale, bottoni Vero/Falso con `wire:loading`; feedback con badge corretto/sbagliato, risposta attesa, prossima revisione in giorni; schermata di completamento con riepilogo sessione.
+
+- **`App\Http\Controllers\Viewer\SmartReviewController`** — metodi `index()` (panoramica stats/upcoming/categorie) e `session()` (sessione ripasso, filtrabile per categoria); `abort_unless(isViewer(), 403)`.
+
+- **`resources/views/smart-review/index.blade.php`** — 4 stat-card (tracked/mastered/learning/new), 3 info-box upcoming (oggi/domani/settimana), form filtro per categoria, empty state con CTA verso studio.
+
+- **`resources/views/smart-review/session.blade.php`** — pagina contenitore del componente `<livewire:smart-review>` con il `categoryId` passato dalla query string.
+
+- **Route** (`routes/web.php`, middleware `auth`):
+  - `GET /smart-review` → `viewer.smart-review.index`
+  - `GET /smart-review/session` → `viewer.smart-review.session`
+
+- **Voce sidebar** `config/adminlte.php` — "Ripasso intelligente" (icon `fas fa-brain`, gate `exam-participant`, key `smart-review`) dopo "Piano di studio".
+
+- **View Composer** `AppServiceProvider::boot()` — composer mirato su `layouts.admin` (non su `'*'`) che aggiunge il badge `danger` con il conteggio `due_today` sulla voce sidebar `smart-review`; noop se utente non viewer o count zero.
+
+- **Widget dashboard viewer** `stats/dashboard.blade.php` — info-box `bg-gradient-primary` con conteggio `dueToday` visibile solo se > 0; link diretto alla sessione.
+
+- **Pulsante "Ripassa" nel piano di studio** `study-plan/show.blade.php` — per ogni categoria con domande in scadenza mostra il conteggio e link filtrato alla sessione.
+
+### Changed
+
+- **`App\Services\QuizAttemptService`** — aggiunto `SpacedRepetitionService` nel costruttore; al termine di `record()` chiama `recordAnswer()` per ogni risposta del tentativo, aggiornando il tracking SR in modo trasparente.
+
+- **`App\Http\Controllers\StudyController`** — nel metodo `flag()`, dopo `$this->service->recordAnswer()`, chiama `SpacedRepetitionService::recordAnswer()` per tracciare le risposte della modalità studio.
+
+- **`App\Http\Controllers\UserStatsController`** — aggiunto `SpacedRepetitionService` nel costruttore; `me()` passa `dueToday` alla view `stats.dashboard`.
+
+- **`App\Http\Controllers\Viewer\StudyPlanController`** — aggiunto `SpacedRepetitionService` come parametro di `show()`; passa `reviewCountByCategory` alla view del piano.
+
+- **`tests/Feature/SpacedRepetitionTest.php`** — 12 test: 8 sull'algoritmo SM-2 puro (no DB, `calculateNextReview`), 4 di integrazione (learned exclusion, upcoming count, studio crea review, quiz attempt crea review per ogni domanda).
+
+---
+
 ## [2026-05-25] — Feature 5.3: Test diagnostico iniziale e piano di studio suggerito
 
 Test breve (una domanda per categoria) che il viewer può svolgere al primo accesso o on-demand dalla dashboard. Il risultato alimenta una pagina "Piano di studio" con categorie ordinate per debolezza e azioni raccomandate.

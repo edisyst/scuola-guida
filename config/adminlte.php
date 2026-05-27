@@ -376,6 +376,13 @@ return [
             'key'  => 'study-plan',
             'can'  => 'exam-participant',
         ],
+        [
+            'text' => 'Ripasso intelligente',
+            'url'  => 'smart-review',
+            'icon' => 'fas fa-brain',
+            'key'  => 'smart-review',
+            'can'  => 'exam-participant',
+        ],
 
         // ── ESAMI UFFICIALI (viewer partecipa, admin/editor sola lettura) ───
         ['header' => 'esami', 'can' => 'viewer-quiz-area'],
