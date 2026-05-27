@@ -1,6 +1,6 @@
 # ScuolaGUIDA — Quiz App
 
-Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio (con **materiale didattico** per categoria: PDF, video YouTube e note), un **Simulatore Esame** che riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori), la possibilità di **salvare le domande** in modo persistente con nota personale opzionale, un sistema di **segnalazione errori** che permette al viewer di comunicare problemi sulle domande, una pagina di **revisione errori** aggregata che mostra le domande sbagliate nei tentativi recenti con conteggio e toggle "imparata", un **Piano di studio personalizzato** generato a partire da un breve **Test diagnostico** (una domanda per categoria) che ordina le categorie per debolezza e suggerisce le azioni di studio prioritarie, e un sistema di **Ripasso intelligente** (algoritmo SM-2) che traccia automaticamente ogni risposta e propone sessioni di ripasso ordinate per urgenza con intervalli crescenti. I ruoli `admin` ed `editor` accedono all'area di gestione tramite **autenticazione a due fattori (TOTP)** obbligatoria, con codici di emergenza one-time e reset via comando Artisan.
+Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio (con **materiale didattico** per categoria: PDF, video YouTube e note), un **Simulatore Esame** che riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori), la possibilità di **salvare le domande** in modo persistente con nota personale opzionale, un sistema di **segnalazione errori** che permette al viewer di comunicare problemi sulle domande, una pagina di **revisione errori** aggregata che mostra le domande sbagliate nei tentativi recenti con conteggio e toggle "imparata", un **Piano di studio personalizzato** generato a partire da un breve **Test diagnostico** (una domanda per categoria) che ordina le categorie per debolezza e suggerisce le azioni di studio prioritarie, un sistema di **Ripasso intelligente** (algoritmo SM-2) che traccia automaticamente ogni risposta e propone sessioni di ripasso ordinate per urgenza con intervalli crescenti, e un sistema di **Gamification leggera** con streak giorni consecutivi di studio e badge per milestone (streak 7/30/100 giorni, 100/500/1000 domande risposte, primo simulatore promosso, tutte le categorie coperte), con notifica in-app al guadagno di ogni badge. I ruoli `admin` ed `editor` accedono all'area di gestione tramite **autenticazione a due fattori (TOTP)** obbligatoria, con codici di emergenza one-time e reset via comando Artisan.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
 
@@ -226,6 +226,7 @@ php artisan 2fa:reset {user_id}                    # azzera il 2FA di un admin/e
 - **Test diagnostico** (`GET /diagnostic`) — sequenza di domande rapida (una per categoria attiva), svolgibile al primo accesso o on-demand dalla dashboard. Le domande risposte nelle ultime 24h vengono escluse automaticamente (rilevate dai `quiz_attempts`). Ogni sessione è salvata come gruppo (`batch_id`) in `diagnostic_results` per poter essere confrontata con sessioni future
 - **Piano di studio** (`GET /study-plan`) — lista di tutte le categorie ordinata per "debolezza" (mastery ascendente). Per ogni categoria: punteggio di padronanza 0–100 (derivato dai dati storici, dal diagnostico o da entrambi con peso 70%/30%), contatore tentativi e stringa `recommended_action` con tre livelli ("Inizia con questa categoria" / "Continua a esercitarti" / "Padronanza buona, ripassa occasionalmente"). Pulsante "Studia ora" che avvia direttamente la modalità studio sulla categoria. La dashboard mostra un banner di invito al test diagnostico ai nuovi viewer senza tentativi
 - **Ripasso intelligente** (`GET /smart-review`) — sessioni di ripasso basate sull'algoritmo SM-2 semplificato. Ogni risposta data in modalità studio o in un quiz aggiorna automaticamente l'intervallo di revisione della domanda (cap 365 giorni). La pagina panoramica mostra 4 statistiche (tracciate/padroneggiata/in apprendimento/da iniziare) e il numero di domande in scadenza oggi/domani/settimana. La sessione propone le domande in ordine di urgenza, mostra il feedback immediato con badge corretto/sbagliato e "prossima revisione tra X giorni", e permette di marcare la domanda come imparata (escludendola dal ripasso). Le domande già in `learned_questions` (dalla revisione errori) sono automaticamente escluse. Il badge nella sidebar mostra il numero di domande in scadenza oggi.
+- **Gamification — Streak e Badge** (`GET /profile/badges`) — sistema di riconoscimenti personali: la **streak** conta i giorni consecutivi di studio (aggiornata automaticamente ad ogni risposta in modalità studio, quiz o simulatore) ed è visibile nella dashboard con avviso "A rischio" se non si è ancora studiato oggi. I **badge** vengono assegnati automaticamente al raggiungimento di milestone: `streak_7/30/100` (giorni consecutivi), `questions_100/500/1000` (domande totali risposte), `first_pass` (primo simulatore completato con esito Promosso), `all_categories` (almeno una domanda risposta in ogni categoria). La pagina "I miei badge" mostra tutti i badge disponibili (ottenuti in card colorata con data, non ottenuti in grigio), le stat-card streak e una barra di progresso. Al guadagno di ogni badge viene inviata una **notifica in-app** (`BadgeEarned`, canale solo `database`). Tutte le definizioni badge sono in `config/badges.php` — nessun valore hardcoded nel codice.
 - **Storico tentativi** — elenco paginato di tutti i quiz svolti con link al dettaglio
 - **Ricerca** — cerca domande per testo o categoria dalla barra della navbar; i risultati si aprono in una nuova scheda
 
@@ -246,6 +247,7 @@ Ogni evento del flusso iscrizioni e dell'amministrazione utenti genera una **dop
 | Viewer completa l'esame | admin | `QuizEsameCompletato` |
 | Admin conferma un quiz ufficiale | tutti i viewer approvati | `QuizConfermato` |
 | Admin cambia il ruolo di un utente | utente | `RuoloAggiornato` |
+| Viewer guadagna un badge | viewer | `BadgeEarned` |
 
 **Caratteristiche:**
 
@@ -440,7 +442,7 @@ Browser
 |---|---|
 | **FormRequest** | Autorizzazione + validazione. Il controller non vede dati non validati. |
 | **Controller** | Orchestrazione pura: chiama il service, ritorna la risposta. Nessuna logica. |
-| **Service** | Tutta la business logic (18 service: Quiz, QuizAttempt, QuizEnrollment, QuizSummary, Question, User, UserRegistration, UserStats, DashboardStats, RolePermission, Search, Study, Notification, ReviewErrors, CategoryMaterial, DiagnosticService, StudyPlanService, SpacedRepetitionService). |
+| **Service** | Tutta la business logic (20 service: Quiz, QuizAttempt, QuizEnrollment, QuizSummary, Question, User, UserRegistration, UserStats, DashboardStats, RolePermission, Search, Study, Notification, ReviewErrors, CategoryMaterial, DiagnosticService, StudyPlanService, SpacedRepetitionService, StreakService, BadgeService). |
 | **Trait Auditable** | Logging automatico di ogni create/update/delete su tutti i modelli che lo usano. |
 | **Observer** | Effetti collaterali post-salvataggio (invalidazione cache, ecc.) tenuti fuori dal service. |
 
@@ -521,6 +523,7 @@ app/
     Iscrizione{Quiz*}Notification.php
     Registrazione{Approvata|Rifiutata}Notification.php
     Nuova{IscrizioneQuiz|RichiestaAnagrafica}Notification.php
+    BadgeEarned.php                         # guadagno badge — solo canale database
   Http/
     Livewire/NotificationBell.php         # campanella navbar (Livewire 3)
     Controllers/NotificationController.php
@@ -846,6 +849,7 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 | `QuizTest` | 3 | Creazione tentativo, tentativo su quiz confermato con iscrizione, aggiornamento score |
 | `AdminOperativityTest` | 8 | Export Excel, riepilogo KPI, schedulazione iscrizioni, comando `close-expired` |
 | `NotificationsTest` | 22 | Dispatch 11 notifiche, fallback fire-and-forget, payload `toDatabase()`, pagina `/notifications` (index/destroy/destroyAll + 403 cross-user), bell Livewire (unreadCount, markAllAsRead, markAsRead singola + redirect, markAsRead cross-user ignorata) |
+| `GamificationTest` | 23 | `recordActivity` crea/incrementa il log giornaliero, `getCurrentStreak` con gap e senza attività oggi, `awardIfEligible` idempotenza + notifica, `checkAllBadges` per tutti i tipi di badge (streak, questions, first_pass, all_categories), widget streak dashboard, pagina badge accessibile/bloccata per ruolo |
 | `GdprTest` | 9 | PII anonimizzata, blocco admin, dry-run, login impossibile, sessioni DB, gdpr:list, --anonymized filter |
 | `RegistrationFlowTest` | 9 | Workflow iscrizione anagrafica end-to-end |
 | `StudyTest` | 10 | Sessione studio, sorgenti, navigazione, flag, riepilogo |
