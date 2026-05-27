@@ -6,7 +6,9 @@ use App\Http\Requests\StartStudyRequest;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Services\BadgeService;
 use App\Services\SpacedRepetitionService;
+use App\Services\StreakService;
 use App\Services\StudyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -103,8 +105,11 @@ class StudyController extends Controller
 
                 $q = Question::find($question);
                 if ($q && auth()->check()) {
+                    $user      = auth()->user();
                     $isCorrect = (int) $data['answer'] === (int) $q->is_true;
-                    app(SpacedRepetitionService::class)->recordAnswer(auth()->user(), $question, $isCorrect);
+                    app(SpacedRepetitionService::class)->recordAnswer($user, $question, $isCorrect);
+                    app(StreakService::class)->recordActivity($user);
+                    app(BadgeService::class)->checkAllBadges($user);
                 }
             }
         } catch (RuntimeException $e) {

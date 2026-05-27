@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\CommandController as AdminCommandController;
+use App\Http\Controllers\Viewer\ProfileBadgesController;
 use App\Http\Controllers\Viewer\StudyPlanController;
 use App\Http\Controllers\Viewer\SmartReviewController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
@@ -105,6 +106,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('viewer.diagnostic.show');
     Route::get('/study-plan', [StudyPlanController::class, 'show'])
         ->name('viewer.study-plan.show');
+
+    // Badge e streak personali (viewer)
+    Route::get('/profile/badges', [ProfileBadgesController::class, 'index'])
+        ->name('viewer.profile.badges');
 
     // Ripasso intelligente — spaced repetition (viewer)
     Route::prefix('smart-review')->name('viewer.smart-review.')->group(function () {

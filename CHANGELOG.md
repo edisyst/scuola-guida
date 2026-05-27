@@ -5,6 +5,48 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-27] — Feature 5.5: Gamification leggera — streak e badge
+
+Gamification leggera per il viewer: streak giorni consecutivi di studio, badge per milestone (streak, domande risposte, primo simulatore promosso, completamento categorie), widget streak nella dashboard e notifica in-app al guadagno di un badge.
+
+### Added
+
+- **Migration `2026_05_27_130000_create_user_badges_table`** — tabella `user_badges` con `id`, `user_id` (FK cascadeOnDelete), `badge_code` (string 64), `earned_at` (timestamp), `metadata` (json nullable), timestamps; unique composito su `(user_id, badge_code)`. `down()` implementato.
+
+- **Migration `2026_05_27_130001_create_user_activity_log_table`** — tabella `user_activity_log` con `id`, `user_id` (FK cascadeOnDelete), `activity_date` (date), `actions_count` (integer, default 1), timestamps; unique composito su `(user_id, activity_date)`. `down()` implementato.
+
+- **`App\Models\UserBadge`** — model Eloquent con `HasFactory`; fillable: tutti i campi; cast `earned_at` → datetime, `metadata` → array; metodo `config()` per accedere al config del badge; relazione `user()`.
+
+- **`App\Models\UserActivityLog`** — model Eloquent con `HasFactory`; fillable: `user_id`, `activity_date`, `actions_count`; relazione `user()`. Date memorizzate come stringhe `Y-m-d` (senza cast Eloquent per compatibilità SQLite).
+
+- **`config/badges.php`** — mappa di 8 badge: `streak_7`, `streak_30`, `streak_100`, `questions_100`, `questions_500`, `questions_1000`, `first_pass`, `all_categories`; ogni voce ha `name`, `description`, `icon`, `color`. Nessun valore hardcoded nel codice.
+
+- **`App\Services\StreakService`** — metodi: `recordActivity(User)` crea o incrementa il record giornaliero in `user_activity_log`; `getCurrentStreak(User): int` calcola la streak corrente (considera anche solo ieri se oggi assente); `getLongestStreak(User): int` calcola la streak storica massima.
+
+- **`App\Services\BadgeService`** — iniezione di `StreakService`; metodi: `awardIfEligible(User, string, array): ?UserBadge` assegna il badge con idempotenza e dispatcha `BadgeEarned`; `checkAllBadges(User): array` controlla ed assegna tutti i badge eligibili con short-circuit sui già ottenuti.
+
+- **`App\Notifications\BadgeEarned`** — canale solo `database`; payload `toDatabase()` con `title`, `body`, `url` → `viewer.profile.badges`, `icon`, `color` letti da `config('badges')`. Queued su `emails`.
+
+- **`App\Http\Controllers\Viewer\ProfileBadgesController`** — metodo `index()` con `abort_unless(isViewer(), 403)`; recupera badge guadagnati + tutti i badge configurati; passa `currentStreak` e `longestStreak` alla view.
+
+- **`resources/views/viewer/badges.blade.php`** — pagina "I miei badge": stat-card streak corrente/record/badge guadagnati, progress bar completamento, grid card badge (colorata se ottenuta, grigia se non ancora), counter "X / Y badge", empty state con CTA.
+
+- **Widget streak dashboard** (`resources/views/stats/dashboard.blade.php`) — info-box `La tua streak` con icona fiamma, count giorni, migliore di sempre; warning "A rischio" se l'utente non ha ancora registrato attività oggi ma era attivo ieri; stato vuoto con messaggio motivazionale.
+
+- **Route** (`routes/web.php`, middleware `auth`): `GET /profile/badges` → `viewer.profile.badges` → `ProfileBadgesController@index`.
+
+- **Sidebar** (`config/adminlte.php`) — voce "I miei badge" (fas fa-award) nella sezione ACCOUNT, con gate `exam-participant`.
+
+- **Hook `QuizAttemptService::record()`** — dopo ogni tentativo ufficiale (quiz confermato): chiama `StreakService::recordActivity` e `BadgeService::checkAllBadges`.
+
+- **Hook `StudyController::flag()`** — dopo ogni risposta in modalità studio: chiama `StreakService::recordActivity` e `BadgeService::checkAllBadges`.
+
+- **Hook `SimulatorController::submit()`** — dopo ogni simulatore: chiama `StreakService::recordActivity`; se promosso (`total_questions - score <= max_errors`) chiama `BadgeService::awardIfEligible(..., 'first_pass', ...)`; poi `BadgeService::checkAllBadges`.
+
+- **`tests/Feature/GamificationTest`** — 23 test: `recordActivity` crea/incrementa il log, `getCurrentStreak` con/senza gap e senza attività oggi, `awardIfEligible` idempotenza + notifica, `checkAllBadges` per ogni tipo di badge, widget streak dashboard, pagina badge accessibile/bloccata.
+
+---
+
 ## [2026-05-27] — Feature 5.4: Spaced repetition delle domande sbagliate
 
 Algoritmo SM-2 che traccia automaticamente ogni risposta data in modalità studio e nei quiz, calcola l'intervallo ottimale di ripasso per ciascuna domanda e propone al viewer una sessione di ripasso ordinata per urgenza.

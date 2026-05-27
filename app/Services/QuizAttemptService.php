@@ -5,13 +5,17 @@ namespace App\Services;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\User;
+use App\Services\BadgeService;
 use App\Services\SpacedRepetitionService;
+use App\Services\StreakService;
 
 class QuizAttemptService
 {
     public function __construct(
         private QuizEnrollmentService $enrollmentService,
         private SpacedRepetitionService $spacedRepetitionService,
+        private StreakService $streakService,
+        private BadgeService $badgeService,
     ) {}
 
     /**
@@ -63,6 +67,9 @@ class QuizAttemptService
                     && $result === (int) $correctMap[$questionId];
                 $this->spacedRepetitionService->recordAnswer($user, (int) $questionId, $isCorrect);
             }
+
+            $this->streakService->recordActivity($user);
+            $this->badgeService->checkAllBadges($user);
         }
 
         return $attempt;

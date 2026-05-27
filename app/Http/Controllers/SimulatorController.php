@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\QuizAttempt;
+use App\Services\BadgeService;
 use App\Services\SimulatorService;
+use App\Services\StreakService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -11,7 +13,11 @@ use Illuminate\Http\Request;
 
 class SimulatorController extends Controller
 {
-    public function __construct(private SimulatorService $service) {}
+    public function __construct(
+        private SimulatorService $service,
+        private StreakService $streakService,
+        private BadgeService $badgeService,
+    ) {}
 
     public function index(): View
     {
@@ -109,13 +115,29 @@ class SimulatorController extends Controller
             'duration' => 'nullable|integer|min:0',
         ]);
 
-        $this->service->updateAttempt(
+        $attempt = $this->service->updateAttempt(
             $attempt,
             $data['answers'] ?? [],
             $data['duration'] ?? 0,
         );
 
         $this->service->clearSession();
+
+        $user      = auth()->user();
+        $maxErrors = (int) config('simulator.max_errors', 4);
+        $passed    = ($attempt->total_questions - $attempt->score) <= $maxErrors;
+
+        $this->streakService->recordActivity($user);
+
+        if ($passed) {
+            $this->badgeService->awardIfEligible($user, 'first_pass', [
+                'score'           => $attempt->score,
+                'total_questions' => $attempt->total_questions,
+                'date'            => now()->toDateString(),
+            ]);
+        }
+
+        $this->badgeService->checkAllBadges($user);
 
         return redirect()->route('simulator.result', $attempt)
             ->with('success', 'Simulazione completata. Ecco il tuo risultato.');
