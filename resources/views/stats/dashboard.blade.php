@@ -368,6 +368,56 @@
 
     @endif
 
+    @auth
+    @if(!$isAdminView && auth()->user()->isViewer())
+    {{-- PWA install banner (viewer only, non standalone) --}}
+    <div x-data="{
+            show: false,
+            init() {
+                if (window.matchMedia('(display-mode: standalone)').matches) return;
+                const dismissed = parseInt(localStorage.getItem('pwa-dismiss') || '0', 10);
+                if (dismissed > Date.now()) return;
+                if (window.__pwaInstallPrompt) { this.show = true; return; }
+                document.addEventListener('pwa:installable', () => { this.show = true; });
+            },
+            install() {
+                const prompt = window.__pwaInstallPrompt;
+                if (!prompt) return;
+                prompt.prompt();
+                prompt.userChoice.then(() => { window.__pwaInstallPrompt = null; this.show = false; });
+            },
+            dismiss() {
+                this.show = false;
+                localStorage.setItem('pwa-dismiss', Date.now() + 7 * 24 * 60 * 60 * 1000);
+            }
+         }"
+         x-show="show"
+         x-cloak
+         x-transition
+         class="card mt-3" style="border-left: 4px solid var(--sg-primary);">
+        <div class="card-body d-flex align-items-center justify-content-between flex-wrap" style="gap:.75rem;">
+            <div class="d-flex align-items-center" style="gap:.75rem;">
+                <div style="width:40px;height:40px;background:var(--sg-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <img src="{{ asset('icons/icon.svg') }}" alt="ScuolaGUIDA" style="width:28px;height:28px;filter:brightness(10);">
+                </div>
+                <div>
+                    <div style="font-weight:600;">Installa l'app sul tuo dispositivo</div>
+                    <div class="text-muted" style="font-size:.85rem;">Accesso rapido, studio offline, nessun browser necessario.</div>
+                </div>
+            </div>
+            <div class="d-flex" style="gap:.5rem;">
+                <button class="sg-btn sg-btn-primary sg-btn-sm" @click="install()">
+                    <i class="fas fa-download"></i> Installa
+                </button>
+                <button class="sg-btn sg-btn-light sg-btn-sm" @click="dismiss()">
+                    Non ora
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+    @endauth
+
 </div>
 @endsection
 
