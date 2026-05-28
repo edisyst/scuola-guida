@@ -226,6 +226,8 @@ php artisan 2fa:reset {user_id}                    # azzera il 2FA di un admin/e
 - **Test diagnostico** (`GET /diagnostic`) — sequenza di domande rapida (una per categoria attiva), svolgibile al primo accesso o on-demand dalla dashboard. Le domande risposte nelle ultime 24h vengono escluse automaticamente (rilevate dai `quiz_attempts`). Ogni sessione è salvata come gruppo (`batch_id`) in `diagnostic_results` per poter essere confrontata con sessioni future
 - **Piano di studio** (`GET /study-plan`) — lista di tutte le categorie ordinata per "debolezza" (mastery ascendente). Per ogni categoria: punteggio di padronanza 0–100 (derivato dai dati storici, dal diagnostico o da entrambi con peso 70%/30%), contatore tentativi e stringa `recommended_action` con tre livelli ("Inizia con questa categoria" / "Continua a esercitarti" / "Padronanza buona, ripassa occasionalmente"). Pulsante "Studia ora" che avvia direttamente la modalità studio sulla categoria. La dashboard mostra un banner di invito al test diagnostico ai nuovi viewer senza tentativi
 - **Ripasso intelligente** (`GET /smart-review`) — sessioni di ripasso basate sull'algoritmo SM-2 semplificato. Ogni risposta data in modalità studio o in un quiz aggiorna automaticamente l'intervallo di revisione della domanda (cap 365 giorni). La pagina panoramica mostra 4 statistiche (tracciate/padroneggiata/in apprendimento/da iniziare) e il numero di domande in scadenza oggi/domani/settimana. La sessione propone le domande in ordine di urgenza, mostra il feedback immediato con badge corretto/sbagliato e "prossima revisione tra X giorni", e permette di marcare la domanda come imparata (escludendola dal ripasso). Le domande già in `learned_questions` (dalla revisione errori) sono automaticamente escluse. Il badge nella sidebar mostra il numero di domande in scadenza oggi.
+- **Progressive Web App (PWA)** — l'applicazione è installabile come app nativa sul dispositivo e supporta la modalità studio offline. Vedi [sezione tecnica PWA](#progressive-web-app-pwa-1) per i dettagli di implementazione.
+
 - **Gamification — Streak e Badge** (`GET /profile/badges`) — sistema di riconoscimenti personali: la **streak** conta i giorni consecutivi di studio (aggiornata automaticamente ad ogni risposta in modalità studio, quiz o simulatore) ed è visibile nella dashboard con avviso "A rischio" se non si è ancora studiato oggi. I **badge** vengono assegnati automaticamente al raggiungimento di milestone: `streak_7/30/100` (giorni consecutivi), `questions_100/500/1000` (domande totali risposte), `first_pass` (primo simulatore completato con esito Promosso), `all_categories` (almeno una domanda risposta in ogni categoria). La pagina "I miei badge" mostra tutti i badge disponibili (ottenuti in card colorata con data, non ottenuti in grigio), le stat-card streak e una barra di progresso. Al guadagno di ogni badge viene inviata una **notifica in-app** (`BadgeEarned`, canale solo `database`). Tutte le definizioni badge sono in `config/badges.php` — nessun valore hardcoded nel codice.
 - **Storico tentativi** — elenco paginato di tutti i quiz svolti con link al dettaglio
 - **Ricerca** — cerca domande per testo o categoria dalla barra della navbar; i risultati si aprono in una nuova scheda
@@ -877,3 +879,96 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 | `alpinejs` | Interattività JS leggera (toggle, dropdown, feedback studio) |
 | `barryvdh/laravel-debugbar` | Debug toolbar (solo sviluppo) |
 | `laravel/pint` | Code style (solo sviluppo) |
+
+---
+
+## Progressive Web App (PWA)
+
+### Cosa funziona offline
+
+- **Modalità studio** — le ultime domande revisionate (fino a 100, pre-caricate via `/api/offline/questions` all'avvio di ogni sessione) sono disponibili in IndexedDB. Quando la connessione cade, il componente Alpine entra in "offline mode": le risposte vengono accodate localmente e sincronizzate automaticamente al ritorno online via `POST /api/offline/sync-answers`.
+- **App shell** — la UI viene servita dalla cache del service worker. I Vite asset sono immutabili (content hash), quindi restano validi fino al prossimo deploy.
+
+### Cosa NON funziona offline
+
+| Funzione | Motivo |
+|---|---|
+| Simulatore esame | Richiede estrazione casuale server-side + integrità tentativo |
+| Quiz ufficiali e iscrizioni | Integrità in tempo reale su dati condivisi |
+| 2FA | Verifica TOTP sincrona |
+| Area admin/editor | Scritture DB che richiedono integrità |
+| Navigazione generica | Le pagine non visitate non sono in cache |
+
+Tutte le rotte non in cache mostrano la pagina `/offline` (no dipendenze esterne).
+
+### Come si installa l'app
+
+**Android / Chrome desktop:**  
+Al primo accesso al sito dopo alcuni utilizzi, il browser mostra il banner "Installa l'app" in dashboard (solo viewer). In alternativa: barra degli indirizzi → icona installa (⊕). L'app si apre in modalità standalone senza chrome del browser.
+
+**iOS Safari:**  
+Apri il sito in Safari → pulsante Condividi → "Aggiungi alla schermata Home". Non è disponibile il prompt automatico (limitazione Safari / iOS < 16.4 per PWA).
+
+### Test manuali
+
+| Scenario | Passaggi |
+|---|---|
+| Installazione Chrome desktop | Visita `/dashboard` → aspetta il banner → "Installa" → verifica standalone |
+| Installazione Android Chrome | Stesso flusso da mobile |
+| Installazione iOS Safari | Condividi → "Aggiungi alla schermata Home" |
+| Offline modalità studio | Avvia sessione studio → DevTools Network → Offline → rispondi alle domande → torna Online → verifica toast sincronizzazione |
+| Sincronizzazione al ritorno online | Rispondi offline → torna online → controlla `question_reviews` + `user_activity_log` aggiornati |
+
+### Note tecniche per sviluppatori
+
+**Versionamento service worker**
+
+Ogni release che modifica asset compilati deve bumpare la costante in `public/sw.js`:
+
+```javascript
+const CACHE_VERSION = 'sg-v2'; // incrementa ad ogni deploy con asset cambiati
+```
+
+L'evento `activate` del SW cancella automaticamente le cache vecchie.
+
+**Generazione icone PNG**
+
+Le icone SVG in `public/icons/icon.svg` sono la sorgente. Genera le PNG prima di ogni deploy:
+
+```bash
+# Con Inkscape (CLI)
+inkscape public/icons/icon.svg --export-width=192 --export-filename=public/icons/icon-192.png
+inkscape public/icons/icon.svg --export-width=256 --export-filename=public/icons/icon-256.png
+inkscape public/icons/icon.svg --export-width=384 --export-filename=public/icons/icon-384.png
+inkscape public/icons/icon.svg --export-width=512 --export-filename=public/icons/icon-512.png
+inkscape public/icons/icon.svg --export-width=180 --export-filename=public/icons/apple-touch-icon.png
+
+# Oppure online: https://realfavicongenerator.net
+```
+
+**Testare PWA in sviluppo**
+
+Il service worker richiede HTTPS (o `localhost`). Con Laragon, `localhost` funziona nativamente. Per testare su dispositivo mobile nella stessa rete LAN:
+
+```bash
+# Genera un certificato locale con mkcert e configura Laragon su HTTPS
+mkcert scuola-guida.test
+# oppure usa ngrok per un tunnel HTTPS temporaneo
+ngrok http 80
+```
+
+**Ispezionare IndexedDB**
+
+Chrome DevTools → Application → Storage → IndexedDB → `scuolaguida_offline`:
+- `questions`: domande pre-caricate
+- `pending_answers`: risposte in attesa di sync (campo `synced: 0` = non ancora sincronizzate)
+- `categories`: categorie associate alle domande
+
+**Throttle endpoint questions**
+
+`GET /api/offline/questions` è limitato a 1 request ogni 5 minuti per utente (Laravel rate limiter `throttle:1,5`). In sviluppo, svuota il rate limiter con:
+
+```bash
+php artisan cache:clear
+```
+

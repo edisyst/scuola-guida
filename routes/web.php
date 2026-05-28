@@ -28,7 +28,11 @@ use App\Http\Controllers\Viewer\StudyPlanController;
 use App\Http\Controllers\Viewer\SmartReviewController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\TwoFactorSetupController;
+use App\Http\Controllers\Api\OfflineController;
 use App\Models\AuditLog;
+
+// PWA offline fallback — no auth required (served from SW cache)
+Route::get('/offline', fn() => view('offline'))->name('offline');
 
 Route::get('/', function () {
     return view('welcome');
@@ -131,6 +135,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/',        [NotificationController::class, 'index'])->name('index');
         Route::delete('/',     [NotificationController::class, 'destroyAll'])->name('destroyAll');
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+    });
+
+    // PWA offline sync API (viewer only, JSON)
+    Route::prefix('api/offline')->name('api.offline.')->group(function () {
+        Route::get('/questions',    [OfflineController::class, 'questions'])
+            ->middleware('throttle:1,5')
+            ->name('questions');
+        Route::post('/sync-answers', [OfflineController::class, 'syncAnswers'])
+            ->name('sync-answers');
     });
 });
 

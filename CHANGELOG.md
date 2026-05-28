@@ -5,6 +5,46 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-28] — Feature 5.6: PWA installabile e modalità offline-light
+
+Trasforma l'applicazione in una PWA installabile (manifest + service worker) con supporto offline limitato alla modalità studio: domande pre-caricate in IndexedDB, risposte accodate localmente e sincronizzate al ritorno online, add-to-home-screen prompt discreto in dashboard, pagina offline elegante per tutte le altre rotte.
+
+### Added
+
+- **`public/manifest.json`** — Web App Manifest: `name` "ScuolaGUIDA — Quiz Patente", `short_name` "ScuolaGUIDA", `display: standalone`, `start_url: /dashboard`, `theme_color: #4361ee`, `orientation: portrait-primary`, icone SVG + PNG in multipli formati (192, 256, 384, 512 px) in `public/icons/`.
+
+- **`public/icons/icon.svg`** — Icona vettoriale del volante su sfondo blu primario; sorgente da convertire in PNG con ImageMagick o Inkscape (istruzioni nel README).
+
+- **`public/sw.js`** — Service worker con `CACHE_VERSION = 'sg-v1'`: install event pre-caching (`/offline`, manifest, icone), cache-first per asset Vite content-hashed (`/build/assets/**`), network-first con fallback `/offline` per navigazioni HTML, cache-first per altri asset statici. Non cachea mai POST/PUT/DELETE/PATCH, `/livewire/update`, `/admin/*`, `/2fa/*`. Cleanup vecchie cache nell'evento `activate`. Background sync handler che delega ai client via `postMessage`.
+
+- **`resources/js/pwa.js`** — Registrazione del service worker su `DOMContentLoaded`; listener `beforeinstallprompt` che salva il prompt in `window.__pwaInstallPrompt` e dispatcha `CustomEvent('pwa:installable')`; listener `appinstalled` che pulisce il prompt.
+
+- **`resources/js/offline-store.js`** — IndexedDB `scuolaguida_offline` v1: object store `questions` (keyPath `id`, indici su `category_id`, `last_fetched_at`), `categories` (keyPath `id`), `pending_answers` (autoIncrement, indice su `synced`). API esposta su `window.offlineStore`: `saveQuestions()`, `getAllQuestions()`, `getQuestionsByCategory()`, `getQuestionsCount()`, `enqueuePendingAnswer()`, `getPendingAnswers()`, `markAnswersSynced()`. Tutte le operazioni async/Promise; grazie alla guardia `if (!window.offlineStore)` l'app degrada silenziosamente se IndexedDB non è disponibile (Safari private).
+
+- **`resources/views/offline.blade.php`** — Pagina offline standalone (no `@extends`, no CDN), CSS inline, icona WiFi-off SVG, bottone Riprova (`location.reload()`) e link "Vai alla modalità studio".
+
+- **Route `GET /offline`** — Pubblica (no `auth`), cacheable dal SW, serve `offline.blade.php`.
+
+- **`App\Http\Controllers\Api\OfflineController`** — Due endpoint JSON viewer-only: `GET /api/offline/questions` (ultime 100 domande revisionate via `question_reviews`, throttle `1,5`; eager load category) e `POST /api/offline/sync-answers` (itera array di risposte offline, chiama `SpacedRepetitionService::recordAnswer()` per ciascuna e `StreakService::recordActivity()` + `BadgeService::checkAllBadges()` una sola volta per sync, in DB transaction; restituisce `synced_ids`).
+
+- **`App\Http\Requests\SyncAnswersRequest`** — Valida `answers[].id`, `answers[].question_id` (exists:questions), `answers[].user_answer` (in:0,1), `answers[].is_correct` (boolean), `answers[].answered_at` (date).
+
+- **Vite entries** (`vite.config.js`) — Aggiunti `resources/js/pwa.js` e `resources/js/offline-store.js` come entry point separati; entrambi caricati via `@vite()` nelle view che ne hanno bisogno.
+
+- **Meta tag PWA** (`layouts/admin.blade.php`) — `<link rel="manifest">`, `<meta name="theme-color">`, meta Apple (`apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`, `apple-touch-icon`), `@vite(['resources/js/pwa.js'])` per la registrazione del SW su tutte le pagine admin.
+
+- **Integrazione offline nella modalità studio** (`study/play.blade.php`) — Il componente Alpine `studyPlay()` viene esteso con: `init()` che prefetch via `/api/offline/questions` al caricamento online; `answer()` che, se `!navigator.onLine`, salva in `pending_answers` IndexedDB e mostra badge "Sei offline — risposta salvata"; `_enterOfflineMode()` che carica le domande dall'IDB e abilita la navigazione JS (`offlineNext()` / `offlinePrev()`); `_exitOfflineMode()` che on-reconnect chiama `_syncPendingAnswers()` e mostra toast con il conteggio sincronizzato. Il testo della domanda, il badge categoria e l'immagine sono resi reattivi ad Alpine per supportare lo swap offline. Il `@section('js')` include `@vite(['resources/js/offline-store.js'])`.
+
+- **Banner add-to-home-screen** (`stats/dashboard.blade.php`) — Card Alpine.js visibile solo ai viewer non in standalone mode, con dismissal in `localStorage` per 7 giorni; pulsanti "Installa" (chiama `window.__pwaInstallPrompt.prompt()`) e "Non ora".
+
+- **`tests/Feature/OfflineApiTest`** — 18 test: autenticazione e autorizzazione viewer-only su entrambi gli endpoint, throttle (200 poi 429), validazione question_id, mock di SpacedRepetitionService (chiamato per ogni risposta) e StreakService (chiamato una volta per sync), verifica scrittura in `question_reviews` e `user_activity_log`, test `synced_ids` nel response body, accessibilità pubblica di `/offline`.
+
+### Changed
+
+- **`resources/js/app.js`** — Aggiunto `import './pwa'` (per il bundle guest/auth; nel layout admin il caricamento avviene via `@vite` separato).
+
+---
+
 ## [2026-05-27] — Feature 5.5: Gamification leggera — streak e badge
 
 Gamification leggera per il viewer: streak giorni consecutivi di studio, badge per milestone (streak, domande risposte, primo simulatore promosso, completamento categorie), widget streak nella dashboard e notifica in-app al guadagno di un badge.
