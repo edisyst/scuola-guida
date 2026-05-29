@@ -21,6 +21,10 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
   `dailyCreated()` cached (TTL 900s, time-based). Invalidazione KPI in tutti e 4
   gli Observer (User/Question/Category/Quiz). Fix preesistente: `QuestionService::bulkDelete()`
   ora invalida esplicitamente entrambe le cache (il `whereIn()->delete()` bypassa gli Observer).
+- PR-C4: `StreakService::getStats()` nuovo metodo cached (TTL dinamico fino a mezzanotte,
+  chiave `streak_{user_id}`) che ritorna `{current, longest, has_today}` in un'unica voce;
+  `recordActivity()` invalida la chiave. `UserStatsController::me()` usa `getStats()`
+  al posto di 3 chiamate separate — elimina 3 query per ogni dashboard viewer.
 
 ---
 
