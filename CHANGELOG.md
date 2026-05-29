@@ -38,6 +38,10 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
   StudyService×2, SimulatorService::getResultDetail, QuizAttemptService::getAttemptDetail,
   DiagnosticTest::render). Gli altri 8 punti avevano già eager load esplicito o non
   accedono a category; non sono stati modificati.
+- PR-C8: `BadgeService::checkAllBadges()` carica i badge guadagnati da cache (TTL
+  1800s, chiave `earned_badges_{user_id}`, plain PHP array per serializzazione Redis
+  affidabile). `awardIfEligible()` invalida la chiave ad ogni award. Salva 1–4 query
+  ad ogni risposta durante lo studio per utenti che hanno già tutti i badge.
 
 ---
 
