@@ -5,6 +5,16 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- Aggiunto `REPORT_CACHING_REVIEW.md` nella root: analisi sistematica di query globali, service
+  candidati a cache, N+1 residui, contatori always-on (sidebar/topbar), infrastruttura cache e
+  piano di 10 PR di ottimizzazione ordinate per ROI. Nessuna modifica al codice in questa fase.
+
+---
+
 ## [2026-05-28] — Feature 5.6: PWA installabile e modalità offline-light
 
 Trasforma l'applicazione in una PWA installabile (manifest + service worker) con supporto offline limitato alla modalità studio: domande pre-caricate in IndexedDB, risposte accodate localmente e sincronizzate al ritorno online, add-to-home-screen prompt discreto in dashboard, pagina offline elegante per tutte le altre rotte.
