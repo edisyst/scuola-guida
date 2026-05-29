@@ -5,6 +5,66 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [2026-05-29] — Refactor 5.7: Caching e ottimizzazione query
+
+Sprint di ottimizzazione sistematica basato su `REPORT_CACHING_REVIEW.md`: migrazione
+a Redis, caching su tutti i service computazionalmente costosi, rimozione di query N+1
+e eager load implicito globale. Le query per page load dei viewer passano da ~20 a ~6–8.
+357/357 test verdi.
+
+### Changed
+
+- Aggiunto `REPORT_CACHING_REVIEW.md` nella root: analisi sistematica di query globali,
+  service candidati a cache, N+1 residui, contatori always-on (sidebar/topbar), infrastruttura
+  cache e piano di 10 PR di ottimizzazione ordinate per ROI.
+- PR-C1: migrato cache driver da `database` a `redis` (`predis/predis`); ogni cache hit
+  non emette più query SQL sulla tabella `cache`. Aggiunto `REDIS_CACHE_DB=1` in `.env`.
+- PR-C2: `SpacedRepetitionService::getUpcomingCount()` cached (TTL 300s, chiave
+  `sr_upcoming_{user_id}`); invalidazione in `recordAnswer()`, `markAsLearned()`,
+  `unmarkAsLearned()` — salva 4 query per ogni page load dei viewer sul layout admin.
+- PR-C3: `DashboardStatsService::kpi()` cached (TTL 300s, chiave `dashboard_kpi`);
+  `dailyCreated()` cached (TTL 900s, time-based). Invalidazione KPI in tutti e 4
+  gli Observer (User/Question/Category/Quiz). Fix preesistente: `QuestionService::bulkDelete()`
+  ora invalida esplicitamente entrambe le cache (il `whereIn()->delete()` bypassa gli Observer).
+- PR-C4: `StreakService::getStats()` nuovo metodo cached (TTL dinamico fino a mezzanotte,
+  chiave `streak_{user_id}`) che ritorna `{current, longest, has_today}` in un'unica voce;
+  `recordActivity()` invalida la chiave. `UserStatsController::me()` usa `getStats()`
+  al posto di 3 chiamate separate — elimina 3 query per ogni dashboard viewer.
+- PR-C5: `ReviewErrorsService::getErrorCount()` cached (TTL 600s, chiave
+  `review_errors_count_{user_id}`); invalida in `QuizAttemptService::record()`,
+  `markAsLearned()`, `unmarkAsLearned()`. `UserStatsController::me()` usa `getErrorCount()`
+  invece di `getErrors()->count()` — evita di caricare 20 QuizAttempt JSON per un solo intero.
+- PR-C6: `SimulatorService::buildQuestionList()` pre-carica tutte le categorie con una query
+  (`Category::select('id','name')->get()`) e risolve il lookup per nome in PHP con
+  `str_contains` (stessa semantica del `LOWER(name) LIKE` originale). Da 18 query
+  `Category::whereRaw` per ciclo a 1 query totale; risparmio ~17 query per ogni avvio simulatore.
+- PR-C7: rimosso `Question::$with = ['category']`; aggiunto `->with('category')`
+  esplicito nei 7 punti che usano `$question->category` (ReviewErrorsService×2,
+  StudyService×2, SimulatorService::getResultDetail, QuizAttemptService::getAttemptDetail,
+  DiagnosticTest::render). Gli altri 8 punti avevano già eager load esplicito o non
+  accedono a category; non sono stati modificati.
+- PR-C8: `BadgeService::checkAllBadges()` carica i badge guadagnati da cache (TTL
+  1800s, chiave `earned_badges_{user_id}`, plain PHP array per serializzazione Redis
+  affidabile). `awardIfEligible()` invalida la chiave ad ogni award. Salva 1–4 query
+  ad ogni risposta durante lo studio per utenti che hanno già tutti i badge.
+- PR-C9: `ReviewErrorsService::getLearnedCount()` conta direttamente su
+  `learned_questions` con `COUNT(*)`. `ReviewErrorsController::index()` usa
+  `getLearnedCount()` invece di `getLearned()->count()`, evitando di caricare
+  tutti i Question model solo per ottenere un intero.
+- PR-C10: `NotificationBell::loadNotifications()` cacha il conteggio non lette
+  (TTL 30s, chiave `notif_unread_{user_id}`). `markAsRead()` e `markAllAsRead()`
+  cancellano la chiave prima di ricaricare, garantendo freschezza immediata dopo
+  azioni esplicite dell'utente.
+
+### Fixed
+
+- `DiagnosticFeatureTest::test_generate_questions_excludes_recently_seen_when_alternatives_exist`:
+  test flaky perché `QuizAttemptFactory` imposta `created_at` a `now()->subDays(rand(0,30))`,
+  portando il tentativo fuori dalla finestra di 24h di `recentlySeenQuestionIds()`. Aggiunto
+  `created_at => now()` esplicito nel factory call del test.
+
+---
+
 ## [2026-05-28] — Feature 5.6: PWA installabile e modalità offline-light
 
 Trasforma l'applicazione in una PWA installabile (manifest + service worker) con supporto offline limitato alla modalità studio: domande pre-caricate in IndexedDB, risposte accodate localmente e sincronizzate al ritorno online, add-to-home-screen prompt discreto in dashboard, pagina offline elegante per tutte le altre rotte.

@@ -6,13 +6,20 @@ use App\Models\LearnedQuestion;
 use App\Models\QuestionReview;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class SpacedRepetitionService
 {
-    private const MAX_INTERVAL = 365;
-    private const MAX_EASE     = 2.80;
-    private const MIN_EASE     = 1.30;
-    private const MASTERED_REP = 5;
+    private const MAX_INTERVAL       = 365;
+    private const MAX_EASE           = 2.80;
+    private const MIN_EASE           = 1.30;
+    private const MASTERED_REP       = 5;
+    private const UPCOMING_CACHE_TTL = 300;
+
+    public static function upcomingCacheKey(int $userId): string
+    {
+        return "sr_upcoming_{$userId}";
+    }
 
     public function recordAnswer(User $user, int $questionId, bool $correct): QuestionReview
     {
@@ -28,6 +35,8 @@ class SpacedRepetitionService
 
         $updated = $this->calculateNextReview($review, $correct);
         $review->fill($updated)->save();
+
+        Cache::forget(self::upcomingCacheKey($user->id));
 
         return $review->fresh();
     }
@@ -91,24 +100,27 @@ class SpacedRepetitionService
 
     /**
      * Contatori per la sidebar / dashboard: domande in scadenza oggi, domani, questa settimana.
+     * Cached per UPCOMING_CACHE_TTL secondi; invalidata da recordAnswer() e da markAsLearned/unmarkAsLearned.
      *
      * @return array{due_today: int, due_tomorrow: int, due_this_week: int}
      */
     public function getUpcomingCount(User $user): array
     {
-        $learnedIds = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
+        return Cache::remember(self::upcomingCacheKey($user->id), self::UPCOMING_CACHE_TTL, function () use ($user) {
+            $learnedIds = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
 
-        $base = QuestionReview::where('user_id', $user->id)
-            ->whereNotIn('question_id', $learnedIds);
+            $base = QuestionReview::where('user_id', $user->id)
+                ->whereNotIn('question_id', $learnedIds);
 
-        return [
-            'due_today'     => (clone $base)->where('next_review_at', '<=', now()->endOfDay())->count(),
-            'due_tomorrow'  => (clone $base)->whereBetween('next_review_at', [
-                now()->startOfDay()->addDay(),
-                now()->endOfDay()->addDay(),
-            ])->count(),
-            'due_this_week' => (clone $base)->where('next_review_at', '<=', now()->endOfWeek())->count(),
-        ];
+            return [
+                'due_today'     => (clone $base)->where('next_review_at', '<=', now()->endOfDay())->count(),
+                'due_tomorrow'  => (clone $base)->whereBetween('next_review_at', [
+                    now()->startOfDay()->addDay(),
+                    now()->endOfDay()->addDay(),
+                ])->count(),
+                'due_this_week' => (clone $base)->where('next_review_at', '<=', now()->endOfWeek())->count(),
+            ];
+        });
     }
 
     /**

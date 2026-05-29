@@ -14,7 +14,7 @@ Funzionalità principali:
 - **[PWA installabile](docs/07-pwa.md)** — la modalità studio funziona anche offline.
 - **[2FA obbligatoria](docs/05-security.md#autenticazione-a-due-fattori-2fa)** per admin/editor (TOTP) con codici di emergenza.
 
-**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
+**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis
 
 ## Panoramica architettura
 
@@ -31,7 +31,7 @@ composer install
 npm install
 cp .env.example .env
 php artisan key:generate
-# imposta DB_* in .env, poi:
+# imposta DB_* in .env; avvia Redis (Laragon: tray → Redis → Start), poi:
 php artisan migrate:fresh --seed
 php artisan storage:link
 npm run dev          # terminale 1
@@ -92,6 +92,7 @@ Per la mappa completa dei file di test e i pattern ricorrenti (Livewire, fake no
 | `yajra/laravel-datatables` | Tabelle con ricerca/ordinamento server-side | — |
 | `pragmarx/google2fa-laravel` | Autenticazione TOTP (2FA) per admin ed editor | [security](docs/05-security.md#autenticazione-a-due-fattori-2fa) |
 | `bacon/bacon-qr-code` | Generazione QR code SVG inline per la pagina di setup 2FA | [security](docs/05-security.md#flusso-di-configurazione-primo-accesso) |
+| `predis/predis` | Client Redis PHP puro — cache driver (nessuna estensione C richiesta) | — |
 | `laravel/breeze` | Scaffolding autenticazione (Blade preset, dev) | — |
 | `alpinejs` | Interattività JS leggera (toggle, dropdown, feedback studio) | [ui-patterns](docs/08-ui-patterns.md) |
 | `barryvdh/laravel-debugbar` | Debug toolbar (solo sviluppo) | — |

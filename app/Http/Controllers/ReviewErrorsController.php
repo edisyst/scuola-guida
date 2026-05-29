@@ -40,7 +40,7 @@ class ReviewErrorsController extends Controller
             $errors = $this->service->getErrors($user, $categoryId, $lastAttempts);
         }
 
-        $learnedCount = $this->service->getLearned($user)->count();
+        $learnedCount = $this->service->getLearnedCount($user);
         $categories   = Category::orderBy('name')->get();
 
         return view('review-errors.index', compact(

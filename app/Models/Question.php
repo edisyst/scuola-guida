@@ -21,8 +21,6 @@ class Question extends Model
         'mit_image_code',
     ];
 
-    protected $with = ['category']; // carica sempre category automaticamente (usare solo se serve sempre)
-
     /*
     |--------------------------------------------------------------------------
     | SCOPES

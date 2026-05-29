@@ -11,11 +11,13 @@ class CategoryObserver
     {
         Cache::forget('categories_list');
         clearAdminBadgesCache();
+        clearDashboardKpiCache();
     }
 
     public function deleted(Category $category): void
     {
         Cache::forget('categories_list');
         clearAdminBadgesCache();
+        clearDashboardKpiCache();
     }
 }

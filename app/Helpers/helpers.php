@@ -9,3 +9,11 @@ if (!function_exists('clearAdminBadgesCache')) {
         Cache::forget('admin_badges');
     }
 }
+
+if (!function_exists('clearDashboardKpiCache')) {
+
+    function clearDashboardKpiCache(): void
+    {
+        Cache::forget('dashboard_kpi');
+    }
+}

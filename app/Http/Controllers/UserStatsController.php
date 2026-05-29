@@ -42,23 +42,19 @@ class UserStatsController extends Controller
         $nextSession = Quiz::confirmed()->enrollmentsOpen()->first()
             ?? Quiz::confirmed()->enrollmentsUpcoming()->orderBy('enrollments_open_at')->first();
 
-        $currentStreak  = $this->streakService->getCurrentStreak($user);
-        $longestStreak  = $this->streakService->getLongestStreak($user);
-        $activityToday  = \App\Models\UserActivityLog::where('user_id', $user->id)
-            ->where('activity_date', \Carbon\Carbon::today()->toDateString())
-            ->exists();
+        $streakStats = $this->streakService->getStats($user);
 
         return view('stats.dashboard', [
             'user'              => $user,
             'stats'             => $this->service->get($user),
             'isAdminView'       => false,
             'nextSession'       => $nextSession,
-            'reviewErrorsCount' => $this->reviewErrorsService->getErrors($user)->count(),
+            'reviewErrorsCount' => $this->reviewErrorsService->getErrorCount($user),
             'hasDiagnostic'     => $this->diagnosticService->hasDiagnostic($user),
             'dueToday'          => $this->spacedRepetitionService->getUpcomingCount($user)['due_today'],
-            'currentStreak'     => $currentStreak,
-            'longestStreak'     => $longestStreak,
-            'activityToday'     => $activityToday,
+            'currentStreak'     => $streakStats['current'],
+            'longestStreak'     => $streakStats['longest'],
+            'activityToday'     => $streakStats['has_today'],
         ]);
     }
 

@@ -3,11 +3,19 @@
 namespace App\Http\Livewire;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class NotificationBell extends Component
 {
+    private const UNREAD_CACHE_TTL = 30;
+
     public int $unreadCount = 0;
+
+    public static function unreadCountCacheKey(int $userId): string
+    {
+        return "notif_unread_{$userId}";
+    }
 
     public function mount(): void
     {
@@ -19,7 +27,9 @@ class NotificationBell extends Component
         $user = auth()->user();
 
         $this->unreadCount = $user
-            ? $user->unreadNotifications()->count()
+            ? Cache::remember(self::unreadCountCacheKey($user->id), self::UNREAD_CACHE_TTL, fn () =>
+                $user->unreadNotifications()->count()
+              )
             : 0;
     }
 
@@ -39,6 +49,7 @@ class NotificationBell extends Component
 
         $notification->markAsRead();
 
+        Cache::forget(self::unreadCountCacheKey($user->id));
         $this->loadNotifications();
 
         $url = $notification->data['url'] ?? null;
@@ -56,6 +67,7 @@ class NotificationBell extends Component
 
         if ($user) {
             $user->unreadNotifications->markAsRead();
+            Cache::forget(self::unreadCountCacheKey($user->id));
         }
 
         $this->loadNotifications();

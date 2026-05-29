@@ -6,6 +6,7 @@ use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\User;
 use App\Services\BadgeService;
+use App\Services\ReviewErrorsService;
 use App\Services\SpacedRepetitionService;
 use App\Services\StreakService;
 
@@ -70,6 +71,7 @@ class QuizAttemptService
 
             $this->streakService->recordActivity($user);
             $this->badgeService->checkAllBadges($user);
+            ReviewErrorsService::forgetErrorCountCache($user->id);
         }
 
         return $attempt;
@@ -104,9 +106,7 @@ class QuizAttemptService
         $attempt->loadMissing(['quiz', 'user']);
         $quiz = $attempt->quiz;
 
-        // Single query; Question::$with = ['category'] triggers a second query for categories
-        // (eager load, not N+1).
-        $quizQuestions = $quiz->questions()->get();
+        $quizQuestions = $quiz->questions()->with('category')->get();
 
         $questionsCollection = $quizQuestions->map(function ($question, $pivotIndex) use ($attempt) {
             $qid = $question->id;
