@@ -12,6 +12,11 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 - Aggiunto `REPORT_CACHING_REVIEW.md` nella root: analisi sistematica di query globali, service
   candidati a cache, N+1 residui, contatori always-on (sidebar/topbar), infrastruttura cache e
   piano di 10 PR di ottimizzazione ordinate per ROI. Nessuna modifica al codice in questa fase.
+- PR-C1: migrato cache driver da `database` a `redis` (`predis/predis`); ogni cache hit
+  non emette più query SQL sulla tabella `cache`.
+- PR-C2: `SpacedRepetitionService::getUpcomingCount()` cached (TTL 300s, chiave
+  `sr_upcoming_{user_id}`); invalidazione in `recordAnswer()`, `markAsLearned()`,
+  `unmarkAsLearned()` — salva 4 query per ogni page load dei viewer sul layout admin.
 
 ---
 

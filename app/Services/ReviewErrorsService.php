@@ -6,6 +6,8 @@ use App\Models\LearnedQuestion;
 use App\Models\Question;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use App\Services\SpacedRepetitionService;
 
 class ReviewErrorsService
 {
@@ -86,6 +88,8 @@ class ReviewErrorsService
             ['user_id' => $user->id, 'question_id' => $questionId],
             ['marked_at' => now()]
         );
+
+        Cache::forget(SpacedRepetitionService::upcomingCacheKey($user->id));
     }
 
     public function unmarkAsLearned(User $user, int $questionId): void
@@ -93,6 +97,8 @@ class ReviewErrorsService
         LearnedQuestion::where('user_id', $user->id)
             ->where('question_id', $questionId)
             ->delete();
+
+        Cache::forget(SpacedRepetitionService::upcomingCacheKey($user->id));
     }
 
     /**
