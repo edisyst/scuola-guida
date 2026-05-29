@@ -128,6 +128,15 @@ class ReviewErrorsService
     }
 
     /**
+     * Conteggio diretto su learned_questions — evita di caricare i Question model
+     * solo per un intero (usato nella sidebar del controller).
+     */
+    public function getLearnedCount(User $user): int
+    {
+        return LearnedQuestion::where('user_id', $user->id)->count();
+    }
+
+    /**
      * Restituisce le domande marcate come imparate, opzionalmente filtrate per categoria.
      */
     public function getLearned(User $user, ?int $categoryId = null): Collection

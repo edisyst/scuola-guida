@@ -42,6 +42,14 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
   1800s, chiave `earned_badges_{user_id}`, plain PHP array per serializzazione Redis
   affidabile). `awardIfEligible()` invalida la chiave ad ogni award. Salva 1–4 query
   ad ogni risposta durante lo studio per utenti che hanno già tutti i badge.
+- PR-C9: `ReviewErrorsService::getLearnedCount()` conta direttamente su
+  `learned_questions` con `COUNT(*)`. `ReviewErrorsController::index()` usa
+  `getLearnedCount()` invece di `getLearned()->count()`, evitando di caricare
+  tutti i Question model solo per ottenere un intero.
+- PR-C10: `NotificationBell::loadNotifications()` cacha il conteggio non lette
+  (TTL 30s, chiave `notif_unread_{user_id}`). `markAsRead()` e `markAllAsRead()`
+  cancellano la chiave prima di ricaricare, garantendo freschezza immediata dopo
+  azioni esplicite dell'utente.
 
 ---
 
