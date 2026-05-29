@@ -2,7 +2,7 @@
 
 Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio (con **materiale didattico** per categoria: PDF, video YouTube e note), un **Simulatore Esame** che riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori), la possibilità di **salvare le domande** in modo persistente con nota personale opzionale, un sistema di **segnalazione errori** che permette al viewer di comunicare problemi sulle domande, una pagina di **revisione errori** aggregata che mostra le domande sbagliate nei tentativi recenti con conteggio e toggle "imparata", un **Piano di studio personalizzato** generato a partire da un breve **Test diagnostico** (una domanda per categoria) che ordina le categorie per debolezza e suggerisce le azioni di studio prioritarie, un sistema di **Ripasso intelligente** (algoritmo SM-2) che traccia automaticamente ogni risposta e propone sessioni di ripasso ordinate per urgenza con intervalli crescenti, e un sistema di **Gamification leggera** con streak giorni consecutivi di studio e badge per milestone (streak 7/30/100 giorni, 100/500/1000 domande risposte, primo simulatore promosso, tutte le categorie coperte), con notifica in-app al guadagno di ogni badge. I ruoli `admin` ed `editor` accedono all'area di gestione tramite **autenticazione a due fattori (TOTP)** obbligatoria, con codici di emergenza one-time e reset via comando Artisan.
 
-**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL
+**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis
 
 ## Panoramica Architettura
 
@@ -20,8 +20,11 @@ Applicazione web per la gestione di quiz della patente di guida. Gli amministrat
 | Composer | 2.x |
 | Node.js | 18.x |
 | MySQL | 8.x (o MariaDB 10.6+) |
+| Redis | 5.x+ (cache driver) |
 
 > Con [Laragon](https://laragon.org/) su Windows tutti i prerequisiti sono già inclusi.
+> Redis è incluso in Laragon ma va avviato manualmente: clic destro sull'icona in tray
+> → **Redis → Start**. Per avvio automatico: stessa voce → **Avvia automaticamente**.
 
 ### 1. Clona il repository
 
@@ -54,6 +57,20 @@ DB_DATABASE=scuola_guida
 DB_USERNAME=root
 DB_PASSWORD=
 ```
+
+La cache è su Redis (già configurato in `.env.example`). Verifica che le variabili
+siano presenti e che il server Redis sia in esecuzione:
+
+```env
+CACHE_STORE=redis
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_CACHE_DB=1
+```
+
+> Senza Redis attivo l'applicazione lancia un'eccezione al primo accesso alla cache.
+> In alternativa temporanea imposta `CACHE_STORE=file` nel `.env` locale.
 
 ### 4. Database e dati iniziali
 
@@ -875,6 +892,7 @@ La suite attuale copre le funzionalità principali con test di integrazione (Fea
 | `yajra/laravel-datatables` | Tabelle con ricerca/ordinamento server-side |
 | `pragmarx/google2fa-laravel` | Autenticazione TOTP (2FA) per admin ed editor |
 | `bacon/bacon-qr-code` | Generazione QR code SVG inline per la pagina di setup 2FA |
+| `predis/predis` | Client Redis PHP puro (nessuna estensione C richiesta) — cache driver |
 | `laravel/breeze` | Scaffolding autenticazione (Blade preset, dev) |
 | `alpinejs` | Interattività JS leggera (toggle, dropdown, feedback studio) |
 | `barryvdh/laravel-debugbar` | Debug toolbar (solo sviluppo) |

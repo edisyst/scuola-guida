@@ -124,7 +124,7 @@ class StudyService
 
         $id = $ids[$this->currentIndex()] ?? null;
 
-        return $id ? Question::find($id) : null;
+        return $id ? Question::with('category')->find($id) : null;
     }
 
     /*
@@ -213,7 +213,7 @@ class StudyService
 
         $flagged = empty($flaggedIds)
             ? new Collection()
-            : Question::whereIn('id', $flaggedIds)->get();
+            : Question::with('category')->whereIn('id', $flaggedIds)->get();
 
         return [
             'total'         => $this->count(),

@@ -6,9 +6,35 @@ use App\Models\LearnedQuestion;
 use App\Models\Question;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use App\Services\SpacedRepetitionService;
 
 class ReviewErrorsService
 {
+    private const ERROR_COUNT_CACHE_TTL = 600;
+
+    public static function errorCountCacheKey(int $userId): string
+    {
+        return "review_errors_count_{$userId}";
+    }
+
+    public static function forgetErrorCountCache(int $userId): void
+    {
+        Cache::forget(self::errorCountCacheKey($userId));
+    }
+
+    /**
+     * Conteggio cached delle domande sbagliate per la dashboard.
+     * Evita di caricare tutti i QuizAttempt JSON solo per restituire un intero.
+     * TTL 600s; invalidata da record() su QuizAttempt e da markAsLearned/unmarkAsLearned.
+     */
+    public function getErrorCount(User $user): int
+    {
+        return Cache::remember(self::errorCountCacheKey($user->id), self::ERROR_COUNT_CACHE_TTL, function () use ($user) {
+            return $this->getErrors($user)->count();
+        });
+    }
+
     /**
      * Aggrega le domande sbagliate dell'utente negli ultimi $lastAttempts tentativi completati.
      * Esclude le domande già marcate come "imparate".
@@ -55,11 +81,11 @@ class ReviewErrorsService
             return collect();
         }
 
-        $query = Question::whereIn('id', array_keys($errors));
+        $query = Question::with('category')->whereIn('id', array_keys($errors));
         if ($categoryId !== null) {
             $query->where('category_id', $categoryId);
         }
-        $questions = $query->get(); // category già in $with del model
+        $questions = $query->get();
 
         $result = collect();
         foreach ($questions as $question) {
@@ -86,6 +112,9 @@ class ReviewErrorsService
             ['user_id' => $user->id, 'question_id' => $questionId],
             ['marked_at' => now()]
         );
+
+        Cache::forget(SpacedRepetitionService::upcomingCacheKey($user->id));
+        self::forgetErrorCountCache($user->id);
     }
 
     public function unmarkAsLearned(User $user, int $questionId): void
@@ -93,6 +122,18 @@ class ReviewErrorsService
         LearnedQuestion::where('user_id', $user->id)
             ->where('question_id', $questionId)
             ->delete();
+
+        Cache::forget(SpacedRepetitionService::upcomingCacheKey($user->id));
+        self::forgetErrorCountCache($user->id);
+    }
+
+    /**
+     * Conteggio diretto su learned_questions — evita di caricare i Question model
+     * solo per un intero (usato nella sidebar del controller).
+     */
+    public function getLearnedCount(User $user): int
+    {
+        return LearnedQuestion::where('user_id', $user->id)->count();
     }
 
     /**
@@ -102,11 +143,11 @@ class ReviewErrorsService
     {
         $learnedIds = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
 
-        $query = Question::whereIn('id', $learnedIds);
+        $query = Question::with('category')->whereIn('id', $learnedIds);
         if ($categoryId !== null) {
             $query->where('category_id', $categoryId);
         }
 
-        return $query->get(); // category già in $with del model
+        return $query->get();
     }
 }

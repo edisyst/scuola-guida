@@ -12,6 +12,7 @@
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
         "pragmarx/google2fa-laravel": "^3.0",
+        "predis/predis": "^3.4",
         "yajra/laravel-datatables": "^11.0"
     },
     "require-dev": {

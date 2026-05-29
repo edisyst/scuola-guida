@@ -7,11 +7,19 @@ use App\Models\QuizAttempt;
 use App\Models\User;
 use App\Models\UserBadge;
 use App\Notifications\BadgeEarned;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class BadgeService
 {
+    private const EARNED_BADGES_CACHE_TTL = 1800;
+
     public function __construct(private StreakService $streakService) {}
+
+    public static function earnedBadgesCacheKey(int $userId): string
+    {
+        return "earned_badges_{$userId}";
+    }
 
     public function awardIfEligible(User $user, string $badgeCode, array $metadata = []): ?UserBadge
     {
@@ -32,14 +40,21 @@ class BadgeService
 
         $user->notify(new BadgeEarned($badgeCode, $metadata));
 
+        Cache::forget(self::earnedBadgesCacheKey($user->id));
+
         return $badge;
     }
 
     public function checkAllBadges(User $user): array
     {
-        $earned = UserBadge::where('user_id', $user->id)
-            ->pluck('badge_code')
-            ->flip();
+        // Cached come plain array per serializzazione affidabile su Redis.
+        // Invalidata da awardIfEligible() ad ogni nuovo badge guadagnato.
+        $earned = Cache::remember(self::earnedBadgesCacheKey($user->id), self::EARNED_BADGES_CACHE_TTL, function () use ($user) {
+            return UserBadge::where('user_id', $user->id)
+                ->pluck('badge_code')
+                ->flip()
+                ->all();
+        });
 
         $newBadges = [];
 

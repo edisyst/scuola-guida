@@ -44,7 +44,7 @@ class DiagnosticTest extends Component
         $currentQuestion = null;
 
         if (!$this->completed && isset($this->questionIds[$this->currentIndex])) {
-            $currentQuestion = Question::find($this->questionIds[$this->currentIndex]);
+            $currentQuestion = Question::with('category')->find($this->questionIds[$this->currentIndex]);
         }
 
         return view('livewire.diagnostic-test', [

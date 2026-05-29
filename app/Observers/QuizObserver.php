@@ -20,6 +20,7 @@ class QuizObserver
         }
 
         clearAdminBadgesCache();
+        clearDashboardKpiCache();
     }
 
     public function updating(Quiz $quiz): void
@@ -42,5 +43,6 @@ class QuizObserver
     {
         // Nota: fired solo su Model::delete(). Le bulk delete chiamano clearAdminBadgesCache() manualmente.
         clearAdminBadgesCache();
+        clearDashboardKpiCache();
     }
 }

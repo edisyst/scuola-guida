@@ -16,6 +16,9 @@ class SimulatorService
     /**
      * Costruisce la lista di domande per una sessione simulatore
      * secondo la distribuzione configurata in config/simulator.php.
+     *
+     * Pre-carica tutte le categorie in memoria con una singola query ed esegue
+     * il lookup per nome in PHP, evitando N query Category nel ciclo.
      */
     public function buildQuestionList(): Collection
     {
@@ -23,10 +26,14 @@ class SimulatorService
         $target       = (int) config('simulator.questions', 30);
         $questions    = collect();
 
+        // 1 query invece di N: recupera tutte le categorie e filtra in memoria.
+        $allCategories = Category::select('id', 'name')->get();
+
         foreach ($distribution as $categoryName => $count) {
-            $category = Category::whereRaw('LOWER(name) LIKE ?', [
-                '%' . strtolower($categoryName) . '%',
-            ])->first();
+            $needle   = strtolower($categoryName);
+            $category = $allCategories->first(
+                fn ($c) => str_contains(strtolower($c->name), $needle)
+            );
 
             if (!$category) {
                 Log::warning("SimulatorService: categoria non trovata nel DB: {$categoryName}");
@@ -162,7 +169,7 @@ class SimulatorService
         $totalConfigured = (int) ($attempt->total_questions ?: config('simulator.questions'));
 
         // Carica tutte le domande risposte (con relazione category già nel $with del model).
-        $questionsById = Question::whereIn('id', $answeredQids)->get()->keyBy('id');
+        $questionsById = Question::with('category')->whereIn('id', $answeredQids)->get()->keyBy('id');
 
         $rows = collect($answeredQids)->map(function ($qid) use ($attempt, $questionsById) {
             $question = $questionsById->get($qid);
