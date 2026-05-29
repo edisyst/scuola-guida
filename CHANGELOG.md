@@ -25,6 +25,10 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
   chiave `streak_{user_id}`) che ritorna `{current, longest, has_today}` in un'unica voce;
   `recordActivity()` invalida la chiave. `UserStatsController::me()` usa `getStats()`
   al posto di 3 chiamate separate — elimina 3 query per ogni dashboard viewer.
+- PR-C5: `ReviewErrorsService::getErrorCount()` cached (TTL 600s, chiave
+  `review_errors_count_{user_id}`); invalida in `QuizAttemptService::record()`,
+  `markAsLearned()`, `unmarkAsLearned()`. `UserStatsController::me()` usa `getErrorCount()`
+  invece di `getErrors()->count()` — evita di caricare 20 QuizAttempt JSON per un solo intero.
 
 ---
 

@@ -11,6 +11,30 @@ use App\Services\SpacedRepetitionService;
 
 class ReviewErrorsService
 {
+    private const ERROR_COUNT_CACHE_TTL = 600;
+
+    public static function errorCountCacheKey(int $userId): string
+    {
+        return "review_errors_count_{$userId}";
+    }
+
+    public static function forgetErrorCountCache(int $userId): void
+    {
+        Cache::forget(self::errorCountCacheKey($userId));
+    }
+
+    /**
+     * Conteggio cached delle domande sbagliate per la dashboard.
+     * Evita di caricare tutti i QuizAttempt JSON solo per restituire un intero.
+     * TTL 600s; invalidata da record() su QuizAttempt e da markAsLearned/unmarkAsLearned.
+     */
+    public function getErrorCount(User $user): int
+    {
+        return Cache::remember(self::errorCountCacheKey($user->id), self::ERROR_COUNT_CACHE_TTL, function () use ($user) {
+            return $this->getErrors($user)->count();
+        });
+    }
+
     /**
      * Aggrega le domande sbagliate dell'utente negli ultimi $lastAttempts tentativi completati.
      * Esclude le domande già marcate come "imparate".
@@ -90,6 +114,7 @@ class ReviewErrorsService
         );
 
         Cache::forget(SpacedRepetitionService::upcomingCacheKey($user->id));
+        self::forgetErrorCountCache($user->id);
     }
 
     public function unmarkAsLearned(User $user, int $questionId): void
@@ -99,6 +124,7 @@ class ReviewErrorsService
             ->delete();
 
         Cache::forget(SpacedRepetitionService::upcomingCacheKey($user->id));
+        self::forgetErrorCountCache($user->id);
     }
 
     /**

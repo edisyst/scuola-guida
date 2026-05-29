@@ -6,6 +6,7 @@ use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\User;
 use App\Services\BadgeService;
+use App\Services\ReviewErrorsService;
 use App\Services\SpacedRepetitionService;
 use App\Services\StreakService;
 
@@ -70,6 +71,7 @@ class QuizAttemptService
 
             $this->streakService->recordActivity($user);
             $this->badgeService->checkAllBadges($user);
+            ReviewErrorsService::forgetErrorCountCache($user->id);
         }
 
         return $attempt;

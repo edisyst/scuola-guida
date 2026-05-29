@@ -49,7 +49,7 @@ class UserStatsController extends Controller
             'stats'             => $this->service->get($user),
             'isAdminView'       => false,
             'nextSession'       => $nextSession,
-            'reviewErrorsCount' => $this->reviewErrorsService->getErrors($user)->count(),
+            'reviewErrorsCount' => $this->reviewErrorsService->getErrorCount($user),
             'hasDiagnostic'     => $this->diagnosticService->hasDiagnostic($user),
             'dueToday'          => $this->spacedRepetitionService->getUpcomingCount($user)['due_today'],
             'currentStreak'     => $streakStats['current'],
