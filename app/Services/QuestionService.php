@@ -49,7 +49,13 @@ class QuestionService
 
     public function bulkDelete(array $ids): int
     {
-        return Question::whereIn('id', $ids)->delete();
+        $deleted = Question::whereIn('id', $ids)->delete();
+
+        // whereIn()->delete() bypassa l'Observer: invalidiamo le cache manualmente.
+        clearAdminBadgesCache();
+        clearDashboardKpiCache();
+
+        return $deleted;
     }
 
     private function storeImage(UploadedFile $file): string

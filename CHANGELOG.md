@@ -17,6 +17,10 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 - PR-C2: `SpacedRepetitionService::getUpcomingCount()` cached (TTL 300s, chiave
   `sr_upcoming_{user_id}`); invalidazione in `recordAnswer()`, `markAsLearned()`,
   `unmarkAsLearned()` — salva 4 query per ogni page load dei viewer sul layout admin.
+- PR-C3: `DashboardStatsService::kpi()` cached (TTL 300s, chiave `dashboard_kpi`);
+  `dailyCreated()` cached (TTL 900s, time-based). Invalidazione KPI in tutti e 4
+  gli Observer (User/Question/Category/Quiz). Fix preesistente: `QuestionService::bulkDelete()`
+  ora invalida esplicitamente entrambe le cache (il `whereIn()->delete()` bypassa gli Observer).
 
 ---
 

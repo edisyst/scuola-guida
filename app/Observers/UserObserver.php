@@ -9,10 +9,12 @@ class UserObserver
     public function saved(User $user): void
     {
         clearAdminBadgesCache();
+        clearDashboardKpiCache();
     }
 
     public function deleted(User $user): void
     {
         clearAdminBadgesCache();
+        clearDashboardKpiCache();
     }
 }
