@@ -137,10 +137,13 @@ class DiagnosticFeatureTest extends TestCase
         $q1 = Question::factory()->create(['category_id' => $category->id]);
         $q2 = Question::factory()->create(['category_id' => $category->id]);
 
-        // Simula un tentativo recente con q1
+        // Simula un tentativo recente con q1.
+        // created_at esplicito: la factory usa rand(0,30) giorni fa, il che
+        // porterebbe il tentativo fuori dalla finestra di 24h di recentlySeenQuestionIds().
         QuizAttempt::factory()->create([
-            'user_id' => $viewer->id,
-            'answers' => [
+            'user_id'    => $viewer->id,
+            'created_at' => now(),
+            'answers'    => [
                 (string) $q1->id => ['correct' => 1, 'answered_at' => now()->timestamp],
             ],
         ]);
