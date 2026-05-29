@@ -106,9 +106,7 @@ class QuizAttemptService
         $attempt->loadMissing(['quiz', 'user']);
         $quiz = $attempt->quiz;
 
-        // Single query; Question::$with = ['category'] triggers a second query for categories
-        // (eager load, not N+1).
-        $quizQuestions = $quiz->questions()->get();
+        $quizQuestions = $quiz->questions()->with('category')->get();
 
         $questionsCollection = $quizQuestions->map(function ($question, $pivotIndex) use ($attempt) {
             $qid = $question->id;

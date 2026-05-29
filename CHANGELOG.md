@@ -33,6 +33,11 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
   (`Category::select('id','name')->get()`) e risolve il lookup per nome in PHP con
   `str_contains` (stessa semantica del `LOWER(name) LIKE` originale). Da 18 query
   `Category::whereRaw` per ciclo a 1 query totale; risparmio ~17 query per ogni avvio simulatore.
+- PR-C7: rimosso `Question::$with = ['category']`; aggiunto `->with('category')`
+  esplicito nei 7 punti che usano `$question->category` (ReviewErrorsService×2,
+  StudyService×2, SimulatorService::getResultDetail, QuizAttemptService::getAttemptDetail,
+  DiagnosticTest::render). Gli altri 8 punti avevano già eager load esplicito o non
+  accedono a category; non sono stati modificati.
 
 ---
 

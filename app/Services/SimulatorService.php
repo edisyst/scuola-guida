@@ -169,7 +169,7 @@ class SimulatorService
         $totalConfigured = (int) ($attempt->total_questions ?: config('simulator.questions'));
 
         // Carica tutte le domande risposte (con relazione category già nel $with del model).
-        $questionsById = Question::whereIn('id', $answeredQids)->get()->keyBy('id');
+        $questionsById = Question::with('category')->whereIn('id', $answeredQids)->get()->keyBy('id');
 
         $rows = collect($answeredQids)->map(function ($qid) use ($attempt, $questionsById) {
             $question = $questionsById->get($qid);

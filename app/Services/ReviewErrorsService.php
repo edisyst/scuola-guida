@@ -81,11 +81,11 @@ class ReviewErrorsService
             return collect();
         }
 
-        $query = Question::whereIn('id', array_keys($errors));
+        $query = Question::with('category')->whereIn('id', array_keys($errors));
         if ($categoryId !== null) {
             $query->where('category_id', $categoryId);
         }
-        $questions = $query->get(); // category già in $with del model
+        $questions = $query->get();
 
         $result = collect();
         foreach ($questions as $question) {
@@ -134,11 +134,11 @@ class ReviewErrorsService
     {
         $learnedIds = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
 
-        $query = Question::whereIn('id', $learnedIds);
+        $query = Question::with('category')->whereIn('id', $learnedIds);
         if ($categoryId !== null) {
             $query->where('category_id', $categoryId);
         }
 
-        return $query->get(); // category già in $with del model
+        return $query->get();
     }
 }
