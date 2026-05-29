@@ -29,6 +29,10 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
   `review_errors_count_{user_id}`); invalida in `QuizAttemptService::record()`,
   `markAsLearned()`, `unmarkAsLearned()`. `UserStatsController::me()` usa `getErrorCount()`
   invece di `getErrors()->count()` — evita di caricare 20 QuizAttempt JSON per un solo intero.
+- PR-C6: `SimulatorService::buildQuestionList()` pre-carica tutte le categorie con una query
+  (`Category::select('id','name')->get()`) e risolve il lookup per nome in PHP con
+  `str_contains` (stessa semantica del `LOWER(name) LIKE` originale). Da 18 query
+  `Category::whereRaw` per ciclo a 1 query totale; risparmio ~17 query per ogni avvio simulatore.
 
 ---
 
