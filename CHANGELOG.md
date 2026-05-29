@@ -5,15 +5,20 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
-## [Unreleased]
+## [2026-05-29] — Refactor 5.7: Caching e ottimizzazione query
+
+Sprint di ottimizzazione sistematica basato su `REPORT_CACHING_REVIEW.md`: migrazione
+a Redis, caching su tutti i service computazionalmente costosi, rimozione di query N+1
+e eager load implicito globale. Le query per page load dei viewer passano da ~20 a ~6–8.
+357/357 test verdi.
 
 ### Changed
 
-- Aggiunto `REPORT_CACHING_REVIEW.md` nella root: analisi sistematica di query globali, service
-  candidati a cache, N+1 residui, contatori always-on (sidebar/topbar), infrastruttura cache e
-  piano di 10 PR di ottimizzazione ordinate per ROI. Nessuna modifica al codice in questa fase.
+- Aggiunto `REPORT_CACHING_REVIEW.md` nella root: analisi sistematica di query globali,
+  service candidati a cache, N+1 residui, contatori always-on (sidebar/topbar), infrastruttura
+  cache e piano di 10 PR di ottimizzazione ordinate per ROI.
 - PR-C1: migrato cache driver da `database` a `redis` (`predis/predis`); ogni cache hit
-  non emette più query SQL sulla tabella `cache`.
+  non emette più query SQL sulla tabella `cache`. Aggiunto `REDIS_CACHE_DB=1` in `.env`.
 - PR-C2: `SpacedRepetitionService::getUpcomingCount()` cached (TTL 300s, chiave
   `sr_upcoming_{user_id}`); invalidazione in `recordAnswer()`, `markAsLearned()`,
   `unmarkAsLearned()` — salva 4 query per ogni page load dei viewer sul layout admin.
@@ -50,6 +55,13 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
   (TTL 30s, chiave `notif_unread_{user_id}`). `markAsRead()` e `markAllAsRead()`
   cancellano la chiave prima di ricaricare, garantendo freschezza immediata dopo
   azioni esplicite dell'utente.
+
+### Fixed
+
+- `DiagnosticFeatureTest::test_generate_questions_excludes_recently_seen_when_alternatives_exist`:
+  test flaky perché `QuizAttemptFactory` imposta `created_at` a `now()->subDays(rand(0,30))`,
+  portando il tentativo fuori dalla finestra di 24h di `recentlySeenQuestionIds()`. Aggiunto
+  `created_at => now()` esplicito nel factory call del test.
 
 ---
 
