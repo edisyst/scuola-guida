@@ -17,6 +17,7 @@ class QuizAttemptService
         private SpacedRepetitionService $spacedRepetitionService,
         private StreakService $streakService,
         private BadgeService $badgeService,
+        private QuestionVersionService $versionService,
     ) {}
 
     /**
@@ -43,6 +44,7 @@ class QuizAttemptService
         }
 
         $normalized = $this->normalizeAnswers($answers);
+        $normalized = $this->injectVersionIds($normalized);
 
         $attempt = QuizAttempt::create([
             'user_id'            => $userId,
@@ -87,6 +89,9 @@ class QuizAttemptService
 
         $normalized = $this->normalizeAnswers($answers);
 
+        // Preserva i question_version_id già registrati; aggiunge quelli mancanti.
+        $normalized = $this->injectVersionIds($normalized, $attempt->answers ?? []);
+
         $attempt->update([
             'answers'         => $normalized,
             'score'           => $this->scoreAnswers($answers, $correctMap),
@@ -99,7 +104,9 @@ class QuizAttemptService
 
     /**
      * Prepara tutti i dati necessari per la view di dettaglio di un tentativo.
-     * Nessuna query N+1: le domande sono caricate con una singola query via relationship.
+     * Per ogni domanda usa la QuestionVersion referenziata nel tentativo (se
+     * disponibile) per mostrare testo e risposta corretta come il viewer li ha
+     * effettivamente visti, anche dopo modifiche successive alla domanda.
      */
     public function getAttemptDetail(QuizAttempt $attempt): array
     {
@@ -108,17 +115,31 @@ class QuizAttemptService
 
         $quizQuestions = $quiz->questions()->with('category')->get();
 
-        $questionsCollection = $quizQuestions->map(function ($question, $pivotIndex) use ($attempt) {
-            $qid = $question->id;
+        // Carica le versioni storiche referenziate dal tentativo in una singola query.
+        $versionMap = $this->versionService->buildVersionMapForAttempt(
+            $attempt,
+            $quizQuestions->pluck('id')->all()
+        );
+
+        $questionsCollection = $quizQuestions->map(function ($question, $pivotIndex) use ($attempt, $versionMap) {
+            $qid     = $question->id;
+            $version = $versionMap[$qid] ?? null;
 
             $userAnswer    = $attempt->getAnswerResult($qid);
             $position      = $attempt->getAnswerPosition($qid);
             $timeSpent     = $attempt->getTimeSpent($qid);
-            $correctAnswer = (int) $question->is_true;
+
+            // Risposta corretta e testo provengono dalla versione storica se disponibile.
+            $correctAnswer = $version !== null ? (int) $version->is_true : (int) $question->is_true;
             $isCorrect     = $userAnswer !== null ? ($userAnswer === $correctAnswer) : null;
+
+            $isHistorical = $version !== null
+                && $this->versionService->isHistoricalVersion($version, $question);
 
             return [
                 'question'       => $question,
+                'version'        => $version,
+                'is_historical'  => $isHistorical,
                 'user_answer'    => $userAnswer,
                 'correct_answer' => $correctAnswer,
                 'is_correct'     => $isCorrect,
@@ -225,6 +246,48 @@ class QuizAttemptService
                     'position'           => null,
                 ];
             }
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Inietta il question_version_id nelle risposte normalizzate.
+     *
+     * Se $existingAnswers (le risposte già salvate sul tentativo) contengono già
+     * un question_version_id per una domanda, viene preservato — così si registra
+     * la versione che il viewer ha effettivamente visto alla prima risposta, non
+     * quella al momento dell'autosave successivo.
+     *
+     * Per le domande senza version_id precedente si esegue una singola query batch.
+     *
+     * @param  array  $normalized     [question_id => {correct, answered_at, ...}]
+     * @param  array  $existingAnswers [question_id => {correct, ..., question_version_id?}]
+     * @return array
+     */
+    private function injectVersionIds(array $normalized, array $existingAnswers = []): array
+    {
+        $needLookup = [];
+
+        foreach (array_keys($normalized) as $qid) {
+            $existing = $existingAnswers[$qid] ?? null;
+            if (is_array($existing) && !empty($existing['question_version_id'])) {
+                // Già presente: preserva senza query.
+                $normalized[$qid]['question_version_id'] = (int) $existing['question_version_id'];
+            } else {
+                $needLookup[] = (int) $qid;
+                $normalized[$qid]['question_version_id'] = null; // placeholder
+            }
+        }
+
+        if (empty($needLookup)) {
+            return $normalized;
+        }
+
+        $versionMap = $this->versionService->latestVersionIdMap($needLookup);
+
+        foreach ($needLookup as $qid) {
+            $normalized[$qid]['question_version_id'] = $versionMap[$qid] ?? null;
         }
 
         return $normalized;

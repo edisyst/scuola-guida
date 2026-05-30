@@ -104,6 +104,15 @@ class QuizAttempt extends Model
         return $entry['time_spent_seconds'] !== null ? (int) $entry['time_spent_seconds'] : null;
     }
 
+    /** Restituisce il question_version_id registrato per la risposta, o null se assente. */
+    public function getAnswerVersionId(int|string $questionId): ?int
+    {
+        $entry = ($this->answers ?? [])[$questionId] ?? null;
+
+        if (!is_array($entry) || !array_key_exists('question_version_id', $entry)) return null;
+        return $entry['question_version_id'] !== null ? (int) $entry['question_version_id'] : null;
+    }
+
     /** Restituisce la posizione progressiva della risposta nella sessione, o null per formato flat. */
     public function getAnswerPosition(int|string $questionId): ?int
     {

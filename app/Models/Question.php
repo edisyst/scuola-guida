@@ -78,4 +78,34 @@ class Question extends Model
     {
         return $this->hasMany(QuestionReport::class)->pending();
     }
+
+    public function versions(): HasMany
+    {
+        return $this->hasMany(QuestionVersion::class)->orderByDesc('version_number');
+    }
+
+    public function currentVersion(): ?QuestionVersion
+    {
+        return $this->versions()->first();
+    }
+
+    /**
+     * Crea uno snapshot della domanda nel suo stato attuale (semantica "after":
+     * la versione rappresenta lo stato corrente, non quello precedente).
+     * Calcola version_number come max esistente + 1, o 1 se è la prima.
+     */
+    public function createVersion(): QuestionVersion
+    {
+        $maxVersion = $this->versions()->max('version_number') ?? 0;
+
+        return $this->versions()->create([
+            'version_number' => $maxVersion + 1,
+            'question'       => $this->question,
+            'is_true'        => $this->is_true,
+            'image'          => $this->image,
+            'category_id'    => $this->category_id,
+            'created_by'     => auth()->check() ? auth()->id() : null,
+            'created_at'     => now(),
+        ]);
+    }
 }

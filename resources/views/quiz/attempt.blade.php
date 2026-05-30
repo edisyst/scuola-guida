@@ -106,11 +106,24 @@
             @endif
         </div>
         <div class="card-body">
-            <p class="font-weight-bold mb-3">{{ $item['question']->question }}</p>
+            @php
+                $displayQuestion = $item['version'] ?? $item['question'];
+                $displayImage    = $displayQuestion->image ?? null;
+            @endphp
+            <p class="font-weight-bold mb-3">
+                {{ $displayQuestion->question }}
+                @if($item['is_historical'])
+                    <span class="badge badge-secondary ml-1"
+                          data-toggle="tooltip"
+                          title="Questa domanda è stata modificata dopo questo tentativo. Stai vedendo il testo originale che hai risposto.">
+                        <i class="fas fa-history mr-1"></i>Versione storica
+                    </span>
+                @endif
+            </p>
 
-            @if($item['question']->image)
+            @if($displayImage)
             <div class="mb-3">
-                <img src="{{ Storage::url($item['question']->image) }}"
+                <img src="{{ Storage::url($displayImage) }}"
                      alt="Immagine domanda"
                      class="img-fluid rounded shadow-sm"
                      style="max-width:100%;">
@@ -154,3 +167,11 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+@endpush
