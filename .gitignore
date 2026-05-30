@@ -20,6 +20,9 @@ yarn-error.log
 /.idea
 /.vscode
 /.claude/agents/*.md
+/.claude/agents-disabled/
+/.claude/settings.local.json
+/.claude/worktrees/
 REFACTOR_REPORT_*.md
 TEST_*.md
 /domande-e-categorie.xlsx
