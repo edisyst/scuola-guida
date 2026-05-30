@@ -5,6 +5,41 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.1: Reportistica avanzata con export PDF e confronto periodi
+
+Sezione di reportistica aggregata admin con report mensili/trimestrali, export PDF tramite
+`barryvdh/laravel-dompdf` e confronto con il periodo precedente. Aggregazioni scalari lato
+DB (COUNT/AVG), lazy-loading delle risposte per metriche su domande, caching 24h su
+periodi passati e 5 min su periodi correnti. 369/369 test verdi.
+
+### Added
+
+- `app/Services/ReportingService.php` — `buildPeriodReport()`: dataset aggregato su quiz
+  confermati (total_attempts, active_students, pass_rate, average_score, outcomes_by_category,
+  most_failed_questions, enrollments_count, attempts_per_day). `buildComparisonReport()`:
+  calcola il periodo precedente di pari durata e i delta percentuali delle 4 metriche chiave.
+  Cache 24h per periodi passati, 5 min per il periodo corrente.
+- `app/Http/Controllers/Admin/ReportController.php` — metodi `index`, `show`, `exportPdf`.
+  Autorizzazione `canEditQuiz()`, route sotto middleware `role:admin`.
+- `app/Http/Requests/ReportFilterRequest.php` — validazione `from`, `to`, `preset`, `compare`.
+- Route `GET /admin/reports`, `/admin/reports/show`, `/admin/reports/export-pdf` (nome
+  `admin.reports.*`, gruppo `role:admin`).
+- View `resources/views/admin/reports/index.blade.php` — form con preset rapidi
+  (mese corrente/scorso, trimestre, anno), date picker, toggle confronto, export PDF.
+- View `resources/views/admin/reports/show.blade.php` — small-box KPI, tabella confronto
+  con frecce delta colorate, grafici Chart.js (trend lineare + bar orizzontale per categoria),
+  tabella distribuzione esiti per categoria, tabella top 20 domande più sbagliate.
+- Template PDF `resources/views/admin/reports/pdf/period.blade.php` — CSS inline
+  compatibile dompdf, table-based layout, header/footer, metriche con delta, tabelle dati.
+- Voce sidebar "Report" (`fas fa-chart-pie`, `can: admin-only`) nella sezione Esiti &
+  Statistiche di `config/adminlte.php`.
+- Dipendenza `barryvdh/laravel-dompdf ^3.1` aggiunta a `composer.json`.
+- `tests/Feature/ReportingTest.php` — 12 test: calcolo pass_rate/average_score, conteggio
+  studenti distinti, periodo precedente + delta, ordinamento top domande, caching, accessi
+  403 viewer, HTTP admin (index/show/export-pdf), validazione date.
+
+---
+
 ## [2026-05-29] — Refactor 5.7: Caching e ottimizzazione query
 
 Sprint di ottimizzazione sistematica basato su `REPORT_CACHING_REVIEW.md`: migrazione

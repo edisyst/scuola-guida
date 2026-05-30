@@ -1,6 +1,19 @@
 # ScuolaGUIDA — Quiz App
 
-Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche. È disponibile anche una **Modalità Studio** per esercitarsi liberamente senza timer né punteggio (con **materiale didattico** per categoria: PDF, video YouTube e note), un **Simulatore Esame** che riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori), la possibilità di **salvare le domande** in modo persistente con nota personale opzionale, un sistema di **segnalazione errori** che permette al viewer di comunicare problemi sulle domande, una pagina di **revisione errori** aggregata che mostra le domande sbagliate nei tentativi recenti con conteggio e toggle "imparata", un **Piano di studio personalizzato** generato a partire da un breve **Test diagnostico** (una domanda per categoria) che ordina le categorie per debolezza e suggerisce le azioni di studio prioritarie, un sistema di **Ripasso intelligente** (algoritmo SM-2) che traccia automaticamente ogni risposta e propone sessioni di ripasso ordinate per urgenza con intervalli crescenti, e un sistema di **Gamification leggera** con streak giorni consecutivi di studio e badge per milestone (streak 7/30/100 giorni, 100/500/1000 domande risposte, primo simulatore promosso, tutte le categorie coperte), con notifica in-app al guadagno di ogni badge. I ruoli `admin` ed `editor` accedono all'area di gestione tramite **autenticazione a due fattori (TOTP)** obbligatoria, con codici di emergenza one-time e reset via comando Artisan.
+Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche.
+
+Funzionalità principali:
+- **[Modalità Studio](docs/06-study-and-simulator.md#modalità-studio)** — esercitazione libera senza timer né punteggio, con materiale didattico per categoria (PDF, video YouTube, note).
+- **[Simulatore Esame](docs/06-study-and-simulator.md#simulatore-esame)** — riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori).
+- **[Domande salvate](docs/03-features.md#area-utente-viewer)** — bookmark persistente con nota personale opzionale.
+- **[Segnalazione errori](docs/03-features.md#area-utente-viewer)** — il viewer può segnalare problemi sulle domande; l'admin modera.
+- **[Revisione errori](docs/03-features.md#area-utente-viewer)** — aggregato delle domande sbagliate con toggle "imparata".
+- **[Test diagnostico + Piano di studio](docs/03-features.md#area-utente-viewer)** — una domanda per categoria; le categorie vengono ordinate per debolezza con azioni di studio consigliate.
+- **[Ripasso intelligente](docs/03-features.md#area-utente-viewer)** — algoritmo SM-2 che traccia ogni risposta e propone sessioni di ripasso ordinate per urgenza.
+- **[Gamification](docs/03-features.md#area-utente-viewer)** — streak giorni consecutivi e badge per milestone, con notifica in-app al guadagno.
+- **[PWA installabile](docs/07-pwa.md)** — la modalità studio funziona anche offline.
+- **[2FA obbligatoria](docs/05-security.md#autenticazione-a-due-fattori-2fa)** per admin/editor (TOTP) con codici di emergenza.
+- **Report periodici** (admin) — aggregati mensili/trimestrali su tutti i quiz confermati: tentativi, studenti attivi, tasso di promozione, punteggio medio, distribuzione per categoria, top domande più sbagliate. Export PDF e confronto con il periodo precedente.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis
 

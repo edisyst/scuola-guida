@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\CommandController as AdminCommandController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Viewer\ProfileBadgesController;
 use App\Http\Controllers\Viewer\StudyPlanController;
 use App\Http\Controllers\Viewer\SmartReviewController;
@@ -264,6 +265,13 @@ Route::middleware(['auth', '2fa'])
 
             Route::get('stats', [DashboardController::class, 'index'])
                 ->name('stats');
+
+            // REPORT PERIODICI
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/',           [ReportController::class, 'index'])->name('index');
+                Route::get('/show',       [ReportController::class, 'show'])->name('show');
+                Route::get('/export-pdf', [ReportController::class, 'exportPdf'])->name('export-pdf');
+            });
 
             Route::get('audit-logs', function () {
                 $logs = AuditLog::with('user')->latest()->paginate(20);
