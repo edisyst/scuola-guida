@@ -5,6 +5,70 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.3: Backup automatico DB + media e Health dashboard
+
+Backup giornaliero di database e media storage tramite `spatie/laravel-backup` con
+retention configurabile via `.env`. Health dashboard admin-only che mostra stato
+backup, dimensioni DB e storage, code pendenti/fallite, spazio disco libero e
+ultimi errori dal log. Notifica in caso di fallimento via i canali mail + database
+del sistema notifiche del progetto (Release 3.2). Comando `backup:check` per
+verifiche di integrità da CI/CD.
+
+### Added
+
+- `composer require spatie/laravel-backup ^9.3` — installato come dipendenza.
+- `config/backup.php` — configurazione pubblicata e personalizzata: source DB MySQL +
+  `storage/app/public`; destination disco `backups`; retention da variabili `.env`
+  (`BACKUP_KEEP_ALL_DAYS`, `BACKUP_KEEP_DAILY`, `BACKUP_KEEP_WEEKLY`,
+  `BACKUP_KEEP_MONTHLY`); notifiche native di spatie disabilitate (gestite dal
+  listener del progetto).
+- `config/filesystems.php` — disco `backups` locale (`storage/app/backups`).
+- `.env.example` — sezione `# Backup` con tutte le variabili rilevanti
+  (`BACKUP_DISK`, retention, `BACKUP_ARCHIVE_PASSWORD`, `BACKUP_NOTIFY_ON_SUCCESS`,
+  `BACKUP_NOTIFICATION_EMAIL`) e commenti per configurazione disco S3 opzionale.
+- `routes/console.php` — `backup:clean` alle 01:30 e `backup:run` alle 02:00 ogni notte.
+- `app/Notifications/BackupFailed.php` — notifica `mail + database`, queued su `emails`.
+  Sanitizza i path filesystem nel messaggio. `toDatabase()` con `title`, `body`, `url`,
+  `icon=fas fa-exclamation-triangle`, `color=danger`.
+- `app/Listeners/SendBackupFailedNotification.php` — listener per
+  `Spatie\Backup\Events\BackupHasFailed`; inietta `NotificationService` e chiama
+  `sendToAdmins()` con `BackupFailed`.
+- `app/Providers/AppServiceProvider.php` — registrazione
+  `Event::listen(BackupHasFailed::class, SendBackupFailedNotification::class)`.
+- `app/Services/HealthService.php` — 6 metodi difensivi (try/catch con fallback):
+  `getBackupStatus()`, `getDatabaseSize()` (query su `information_schema.tables`),
+  `getStorageSize()` (RecursiveIterator su `storage/app/public`),
+  `getQueueStatus()` (tabelle `jobs` + `failed_jobs`), `getDiskSpace()`
+  (`disk_free_space`/`disk_total_space`), `getRecentErrors()` (tail log + regex).
+  Helper statico `formatBytes()`.
+- `app/Console/Commands/BackupCheck.php` — comando `backup:check`: verifica freschezza
+  (< 26h) e integrità zip (`ZipArchive::RDONLY`); exit code 0 ok, 1 problema.
+- `app/Http/Controllers/Admin/HealthController.php` — `index()` admin-only con
+  iniezione `HealthService`; `runBackupNow()` che dispatcha `backup:run` su queue.
+- Route `GET /admin/health` → `admin.health.index` e
+  `POST /admin/health/backup-now` → `admin.health.backup-now` nel gruppo `role:admin`.
+- `resources/views/admin/health/index.blade.php` — 4 small-box AdminLTE (ultimo backup
+  con colore salute, dimensione DB, media storage, spazio disco con progress bar
+  + colore semaforo); card code con job pendenti per queue e failed_jobs espandibili;
+  card lista backup con pulsante "Esegui ora"; card top 5 tabelle DB; card errori
+  recenti con empty state verde. Refresh automatico JS ogni 60s.
+- `config/adminlte.php` — voce "Stato sistema" (`fas fa-heartbeat`,
+  `url=admin/health`, `can=admin-only`) nella sezione `sistema`.
+- `tests/Feature/HealthTest.php` — 16 test: accesso admin/editor/viewer,
+  `getDatabaseSize` coerente, `getQueueStatus` conta pending e failed,
+  resilienza su disco mancante, `backup:check` exit code 1 senza backup,
+  `BackupFailed` inviata agli admin all'evento, canali corretti, payload
+  `toDatabase` con chiavi richieste, sanitizzazione path, `formatBytes`.
+- `docs/10-backup-health.md` — documentazione cron produzione, configurazione
+  S3 opzionale, procedura di ripristino backup.
+
+### Changed
+
+- `README.md` — aggiunta funzionalità backup/health, dipendenza `spatie/laravel-backup`,
+  link a `docs/10-backup-health.md`, conteggio test aggiornato a ~396.
+
+---
+
 ## [Unreleased] — Feature 6.2: Versionamento domande e integrità storica dei tentativi
 
 Snapshot immutabili di ogni domanda ad ogni modifica; i tentativi storici referenziano

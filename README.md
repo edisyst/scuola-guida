@@ -15,6 +15,7 @@ Funzionalità principali:
 - **[2FA obbligatoria](docs/05-security.md#autenticazione-a-due-fattori-2fa)** per admin/editor (TOTP) con codici di emergenza.
 - **Report periodici** (admin) — aggregati mensili/trimestrali su tutti i quiz confermati: tentativi, studenti attivi, tasso di promozione, punteggio medio, distribuzione per categoria, top domande più sbagliate. Export PDF e confronto con il periodo precedente.
 - **Versionamento domande** — ogni modifica ai campi versionabili crea uno snapshot immutabile; la revisione storica di un tentativo mostra sempre il testo e la risposta che il viewer ha effettivamente visto, anche dopo modifiche successive alla domanda.
+- **[Backup automatico + Health dashboard](docs/10-backup-health.md)** — backup giornaliero di DB e media tramite `spatie/laravel-backup`, retention configurabile, notifica agli admin in caso di fallimento; dashboard admin con stato backup, code, spazio disco e ultimi errori di log.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis
 
@@ -66,7 +67,8 @@ Per il setup completo vedi:
 | [docs/06-study-and-simulator.md](docs/06-study-and-simulator.md) | Modalità studio, simulatore esame, struttura `QuizAttempt.answers` |
 | [docs/07-pwa.md](docs/07-pwa.md) | PWA: cosa funziona offline, installazione, versionamento service worker |
 | [docs/08-ui-patterns.md](docs/08-ui-patterns.md) | Convenzioni UI/Livewire per chi sviluppa (design system `sg-*`) |
-| [docs/09-testing.md](docs/09-testing.md) | Copertura test (~290 test in ~24 classi Feature) e pattern ricorrenti |
+| [docs/09-testing.md](docs/09-testing.md) | Copertura test (~380 test in ~34 classi Feature) e pattern ricorrenti |
+| [docs/10-backup-health.md](docs/10-backup-health.md) | Backup automatico, scheduler, cron produzione, Health dashboard, ripristino |
 | [CHANGELOG.md](CHANGELOG.md) | Storico modifiche per feature/release (Keep a Changelog) |
 | [CLAUDE.md](CLAUDE.md) | Convenzioni operative e architetturali del progetto |
 
@@ -74,7 +76,7 @@ Per il setup completo vedi:
 
 ## Test
 
-Suite con ~380 Feature test in ~25 classi (Laravel TestCase + `RefreshDatabase`):
+Suite con ~396 Feature test in ~35 classi (Laravel TestCase + `RefreshDatabase`):
 
 ```bash
 php artisan test
@@ -99,3 +101,4 @@ Per la mappa completa dei file di test e i pattern ricorrenti (Livewire, fake no
 | `alpinejs` | Interattività JS leggera (toggle, dropdown, feedback studio) | [ui-patterns](docs/08-ui-patterns.md) |
 | `barryvdh/laravel-debugbar` | Debug toolbar (solo sviluppo) | — |
 | `laravel/pint` | Code style (solo sviluppo) | — |
+| `spatie/laravel-backup` | Backup automatico DB + media, retention policy, notifica fallimento | [backup-health](docs/10-backup-health.md) |

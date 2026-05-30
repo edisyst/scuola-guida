@@ -512,6 +512,13 @@ return [
             'can'  => 'admin-only',
             'key'  => 'commands',
         ],
+        [
+            'text' => 'Stato sistema',
+            'url'  => 'admin/health',
+            'icon' => 'fas fa-heartbeat',
+            'can'  => 'admin-only',
+            'key'  => 'health',
+        ],
 
         // ── UTENTI & RUOLI (solo admin) ─────────────────────────────────────
         ['header' => 'utenti_ruoli', 'can' => 'admin-only'],
