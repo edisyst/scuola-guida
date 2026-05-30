@@ -14,6 +14,8 @@ class QuestionService
     | image della domanda (puntatore al path).
     */
 
+    public function __construct(private QuestionVersionService $versionService) {}
+
     public function create(array $data, ?UploadedFile $image = null): Question
     {
         // validated() include l'UploadedFile sotto 'image'; va rimosso prima di create().
@@ -23,11 +25,18 @@ class QuestionService
             $data['image'] = $this->storeImage($image);
         }
 
-        return Question::create($data);
+        $question = Question::create($data);
+
+        // Crea V1 immediatamente così ogni domanda ha sempre almeno una versione.
+        $question->createVersion();
+
+        return $question;
     }
 
     public function update(Question $question, array $data, ?UploadedFile $image = null): Question
     {
+        $originalAttributes = $question->only(['question', 'is_true', 'image', 'category_id']);
+
         $removeImage = (bool) ($data['remove_image'] ?? false);
         unset($data['image'], $data['remove_image']);
 
@@ -38,6 +47,9 @@ class QuestionService
         }
 
         $question->update($data);
+
+        // Crea una nuova versione con il nuovo stato se almeno un campo è cambiato.
+        $this->versionService->snapshotIfChanged($question, $originalAttributes);
 
         return $question;
     }

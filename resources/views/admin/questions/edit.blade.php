@@ -32,5 +32,10 @@
             </button>
         </div>
     </form>
+
+    @auth @if(auth()->user()->canEditQuestion())
+    <livewire:question-version-history :question-id="$question->id" :key="'qvh-'.$question->id" />
+    @endif @endauth
+
 </div>
 @endsection

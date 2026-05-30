@@ -14,6 +14,7 @@ Funzionalità principali:
 - **[PWA installabile](docs/07-pwa.md)** — la modalità studio funziona anche offline.
 - **[2FA obbligatoria](docs/05-security.md#autenticazione-a-due-fattori-2fa)** per admin/editor (TOTP) con codici di emergenza.
 - **Report periodici** (admin) — aggregati mensili/trimestrali su tutti i quiz confermati: tentativi, studenti attivi, tasso di promozione, punteggio medio, distribuzione per categoria, top domande più sbagliate. Export PDF e confronto con il periodo precedente.
+- **Versionamento domande** — ogni modifica ai campi versionabili crea uno snapshot immutabile; la revisione storica di un tentativo mostra sempre il testo e la risposta che il viewer ha effettivamente visto, anche dopo modifiche successive alla domanda.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis
 
@@ -73,7 +74,7 @@ Per il setup completo vedi:
 
 ## Test
 
-Suite con ~290 Feature test in ~24 classi (Laravel TestCase + `RefreshDatabase`):
+Suite con ~380 Feature test in ~25 classi (Laravel TestCase + `RefreshDatabase`):
 
 ```bash
 php artisan test
