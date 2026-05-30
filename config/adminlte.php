@@ -481,6 +481,13 @@ return [
             'icon' => 'fas fa-chart-bar',
             'can'  => 'admin-only',
         ],
+        [
+            'text' => 'Report',
+            'url'  => 'admin/reports',
+            'icon' => 'fas fa-chart-pie',
+            'can'  => 'admin-only',
+            'key'  => 'reports',
+        ],
 
         // ── SISTEMA (media + audit, solo admin) ─────────────────────────────
         ['header' => 'sistema', 'can' => 'admin-only'],

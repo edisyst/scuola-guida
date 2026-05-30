@@ -13,6 +13,7 @@ Funzionalità principali:
 - **[Gamification](docs/03-features.md#area-utente-viewer)** — streak giorni consecutivi e badge per milestone, con notifica in-app al guadagno.
 - **[PWA installabile](docs/07-pwa.md)** — la modalità studio funziona anche offline.
 - **[2FA obbligatoria](docs/05-security.md#autenticazione-a-due-fattori-2fa)** per admin/editor (TOTP) con codici di emergenza.
+- **Report periodici** (admin) — aggregati mensili/trimestrali su tutti i quiz confermati: tentativi, studenti attivi, tasso di promozione, punteggio medio, distribuzione per categoria, top domande più sbagliate. Export PDF e confronto con il periodo precedente.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis
 
