@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Question;
@@ -17,6 +18,8 @@ use App\Observers\CategoryObserver;
 use App\Observers\QuestionObserver;
 use App\Observers\QuizObserver;
 use App\Observers\UserObserver;
+use App\Listeners\SendBackupFailedNotification;
+use Spatie\Backup\Events\BackupHasFailed;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
         | OBSERVERS
         |--------------------------------------------------------------------------
         */
+
+        Event::listen(BackupHasFailed::class, SendBackupFailedNotification::class);
 
         Quiz::observe(QuizObserver::class);
         Question::observe(QuestionObserver::class);

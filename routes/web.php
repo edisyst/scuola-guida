@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\HealthController;
 use App\Http\Controllers\Viewer\ProfileBadgesController;
 use App\Http\Controllers\Viewer\StudyPlanController;
 use App\Http\Controllers\Viewer\SmartReviewController;
@@ -335,6 +336,12 @@ Route::middleware(['auth', '2fa'])
                 ->name('registrations.approve');
             Route::post('registrations/{user}/reject', [AdminRegistrationController::class, 'reject'])
                 ->name('registrations.reject');
+
+            // HEALTH DASHBOARD (stato sistema, backup, code, disco)
+            Route::get('health', [HealthController::class, 'index'])
+                ->name('health.index');
+            Route::post('health/backup-now', [HealthController::class, 'runBackupNow'])
+                ->name('health.backup-now');
         });
     });
 
