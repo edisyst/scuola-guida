@@ -43,6 +43,7 @@ php artisan test --filter test_viewer_can_submit_anagrafica
 | `BookmarkTest` | 15 | Toggle add/remove, unique constraint, isolamento dati tra utenti, destroy 200/403, studio da bookmarks, redirect warning su lista vuota, cascade delete, accesso/redirect unauthenticated, filtri categoria e testo, saveNote Livewire (verifica pivot), validazione max 500 caratteri |
 | `OfflineApiTest` | 18 | Auth viewer-only su `/api/offline/questions` e `/sync-answers`, throttle (200 → 429), validazione question_id, mock `SpacedRepetitionService` (per ogni risposta) e `StreakService` (una volta per sync), scritture in `question_reviews` e `user_activity_log`, `synced_ids` nel body, accessibilità pubblica di `/offline` |
 | `GamificationTest` | 23 | `recordActivity` crea/incrementa il log giornaliero, `getCurrentStreak` con gap e senza attività oggi, `awardIfEligible` idempotenza + notifica, `checkAllBadges` per tutti i tipi di badge (streak, questions, first_pass, all_categories), widget streak dashboard, pagina badge accessibile/bloccata per ruolo |
+| `QuestionVersionTest` | 11 | Modifica testo crea versione, modifica campo non versionabile non crea versione, `question_version_id` registrato nel tentativo, dettaglio tentativo mostra testo storico dopo modifica, revisione errori mostra testo storico, tentativo legacy (senza version_id) fallback senza errori, ripristino crea V(n+1) senza cancellare V1/V2, data-migration idempotente V1 per domande esistenti, Livewire `QuestionVersionHistory::restoreVersion`, accessori `getAnswerVersionId` su formato flat e esteso |
 | `QuizTest` | 3 | Creazione tentativo, tentativo su quiz confermato con iscrizione, aggiornamento score; accessori `getAnsweredAt`/`getTimeSpent`/`getAnswerPosition`; idempotenza migration `up()`/`down()` |
 | `AdminOperativityTest` | 8 | Export Excel, riepilogo KPI, schedulazione iscrizioni, comando `close-expired` |
 | `NotificationsTest` | 22 | Dispatch 11 notifiche, fallback fire-and-forget, payload `toDatabase()`, pagina `/notifications` (index/destroy/destroyAll + 403 cross-user), bell Livewire (unreadCount, markAllAsRead, markAsRead singola + redirect, markAsRead cross-user ignorata) |
@@ -57,7 +58,7 @@ php artisan test --filter test_viewer_can_submit_anagrafica
 | `ProfileTest` | 4 | Profilo, aggiornamento, cancellazione account |
 | `Auth/*` | 13 | Login, logout, registrazione, reset password, verifica email |
 
-**Totale stimato**: ~290 test in ~24 classi Feature.
+**Totale stimato**: ~380 test in ~25 classi Feature.
 
 ---
 

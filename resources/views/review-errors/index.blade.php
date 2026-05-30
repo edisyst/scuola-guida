@@ -108,11 +108,19 @@
         {{-- Lista domande --}}
         @foreach($errors as $item)
         @php
-            $question = $item['question'];
-            $errorCount = $item['error_count'];
+            $question    = $item['question'];
+            $version     = $item['version'] ?? null;
+            $errorCount  = $item['error_count'];
             $lastWrongAt = $item['last_wrong_at'];
-            $category = $item['category'];
-            $isLearned = $showLearned;
+            $category    = $item['category'];
+            $isLearned   = $showLearned;
+            $isHistorical = $version !== null && (
+                $version->question   !== $question->question   ||
+                (bool) $version->is_true !== (bool) $question->is_true ||
+                $version->image      !== $question->image      ||
+                $version->category_id !== $question->category_id
+            );
+            $displayVersion = $isHistorical ? $version : $question;
 
             if ($errorCount !== null) {
                 $badgeClass = match(true) {
@@ -137,6 +145,13 @@
                             <i class="fas fa-graduation-cap"></i> Imparata
                         </span>
                     @endif
+                    @if($isHistorical)
+                        <span class="badge badge-secondary ml-1"
+                              data-toggle="tooltip"
+                              title="La domanda è stata modificata dopo il tuo ultimo errore. Stai vedendo il testo originale che hai risposto.">
+                            <i class="fas fa-history"></i> Versione storica
+                        </span>
+                    @endif
                 </div>
                 @if($lastWrongAt)
                     <small class="text-muted">Ultimo sbaglio: {{ $lastWrongAt->diffForHumans() }}</small>
@@ -145,13 +160,13 @@
             <div class="card-body py-2">
                 <p class="mb-1"
                    data-toggle="tooltip"
-                   title="{{ $question->question }}"
+                   title="{{ $displayVersion->question }}"
                    style="cursor:default; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                    {{ Str::limit($question->question, 120) }}
+                    {{ Str::limit($displayVersion->question, 120) }}
                 </p>
                 <small class="text-muted">
                     Risposta corretta:
-                    @if($question->is_true)
+                    @if($displayVersion->is_true)
                         <strong class="text-success"><i class="fas fa-check"></i> Vero</strong>
                     @else
                         <strong class="text-danger"><i class="fas fa-times"></i> Falso</strong>

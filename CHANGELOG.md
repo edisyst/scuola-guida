@@ -5,6 +5,70 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.2: Versionamento domande e integrità storica dei tentativi
+
+Snapshot immutabili di ogni domanda ad ogni modifica; i tentativi storici referenziano
+la versione vista al momento della risposta e ne mostrano sempre il testo originale.
+Semantica "snapshot del dopo": ogni versione conserva lo stato CORRENTE al momento
+della creazione, così i tentativi puntano a ciò che il viewer ha effettivamente visto.
+Data-migration idempotente crea la V1 per tutte le domande esistenti. Retrocompatibilità
+completa: i tentativi pre-versionamento (senza question_version_id) fanno fallback al
+Question corrente senza errori. Chiude il rischio di integrità storica aperto.
+
+### Added
+
+- `database/migrations/2026_05_30_100001_create_question_versions_table.php` — tabella
+  `question_versions` con snapshot di `question`, `is_true`, `image`, `category_id`,
+  `created_by` (nullable FK → users nullOnDelete), `created_at`; indice unico
+  `(question_id, version_number)`; `cascadeOnDelete` su `question_id`.
+- `database/migrations/2026_05_30_100002_seed_initial_question_versions.php` — data-migration
+  idempotente che crea la V1 per tutte le domande esistenti senza versioni. `down()`
+  rimuove solo le versioni `version_number=1, created_by=null` generate da questo script.
+- `app/Models/QuestionVersion.php` — model immutabile (`UPDATED_AT = null`), relazioni
+  `question()` e `creator()`, `scopeLatestVersion()`.
+- `app/Services/QuestionVersionService.php` — `snapshotIfChanged()`: crea versione con
+  stato corrente se almeno un campo versionabile è cambiato; `buildVersionMapForAttempt()`:
+  carica in batch le versioni referenziate da un tentativo; `latestVersionIdMap()`: mappa
+  `question_id → latest_version_id` per iniezione al momento della risposta;
+  `restoreVersion()`: ripristina una versione storica creando un nuovo snapshot in cima;
+  `isHistoricalVersion()`: confronto per il badge UI.
+- `app/Http/Livewire/QuestionVersionHistory.php` — componente Livewire per lo storico
+  versioni nella pagina edit admin: timeline con diff sintetico, modale read-only,
+  ripristino con `wire:confirm`.
+- `resources/views/livewire/question-version-history.blade.php` — view del componente.
+- `tests/Feature/QuestionVersionTest.php` — 10 test: modifica testo crea versione,
+  modifica campo non versionabile non crea versione, versione_id registrata nel tentativo,
+  dettaglio tentativo mostra testo storico, revisione errori mostra testo storico,
+  tentativo legacy (senza version_id) fallback senza errori, ripristino crea V3 senza
+  cancellare V1/V2, data-migration idempotente, Livewire ripristino, accessori model.
+
+### Changed
+
+- `app/Models/Question.php` — aggiunte relazioni `versions()` (hasMany, desc), accessor
+  `currentVersion()`, metodo `createVersion()` (snapshot del nuovo stato).
+- `app/Models/QuizAttempt.php` — aggiunto `getAnswerVersionId(int|string): ?int`; il
+  formato JSON `answers` è esteso con il campo `question_version_id` per ogni risposta.
+- `app/Services/QuestionService.php` — inietta `QuestionVersionService`; `create()`
+  crea V1 immediatamente; `update()` cattura gli attributi originali e chiama
+  `snapshotIfChanged()` dopo l'aggiornamento.
+- `app/Services/QuizAttemptService.php` — inietta `QuestionVersionService`; nuovo metodo
+  privato `injectVersionIds()` che aggiunge `question_version_id` alle risposte normalizzate
+  preservando i version_id già registrati (autosave idempotente); `getAttemptDetail()`
+  usa `buildVersionMapForAttempt()` per fornire testo/risposta storica alle view con flag
+  `is_historical`.
+- `app/Services/ReviewErrorsService.php` — `getErrors()` traccia il `last_version_id`
+  dall'ultimo tentativo sbagliato e carica le versioni in batch; la collection restituita
+  include il campo `version` per ogni errore.
+- `resources/views/quiz/attempt.blade.php` — usa `$item['version']` per testo e immagine;
+  mostra badge "Versione storica" con tooltip quando la versione referenziata differisce
+  dallo stato corrente.
+- `resources/views/review-errors/index.blade.php` — mostra testo e risposta dalla versione
+  storica quando disponibile; badge "Versione storica" con tooltip.
+- `resources/views/admin/questions/edit.blade.php` — aggiunto componente
+  `<livewire:question-version-history>` con card collassabile "Storico versioni".
+
+---
+
 ## [Unreleased] — Feature 6.1: Reportistica avanzata con export PDF e confronto periodi
 
 Sezione di reportistica aggregata admin con report mensili/trimestrali, export PDF tramite

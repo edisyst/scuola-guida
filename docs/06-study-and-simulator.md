@@ -118,8 +118,8 @@ Il campo `answers` su `quiz_attempts` è un JSON indicizzato per `question_id`. 
 
 ```json
 {
-  "12": { "correct": 1, "answered_at": 1747123456, "time_spent_seconds": null, "position": 1 },
-  "15": { "correct": 0, "answered_at": 1747123470, "time_spent_seconds": null, "position": 2 }
+  "12": { "correct": 1, "answered_at": 1747123456, "time_spent_seconds": null, "position": 1, "question_version_id": 7 },
+  "15": { "correct": 0, "answered_at": 1747123470, "time_spent_seconds": null, "position": 2, "question_version_id": 12 }
 }
 ```
 
@@ -129,6 +129,7 @@ Il campo `answers` su `quiz_attempts` è un JSON indicizzato per `question_id`. 
 | `answered_at` | `int` Unix | Momento della risposta. Obbligatorio per le nuove risposte. |
 | `time_spent_seconds` | `int\|null` | Secondi sulla domanda (opzionale). |
 | `position` | `int\|null` | Posizione nella sequenza mostrata all'utente (utile dopo shuffle). |
+| `question_version_id` | `int\|null` | FK verso `question_versions.id` — versione della domanda attiva al momento della risposta. `null` per tentativi pre-versionamento: in quel caso le view fanno fallback al `Question` corrente. |
 
 ### Compatibilità legacy
 
@@ -138,7 +139,17 @@ Il formato flat (`{ "12": 1 }`) è ancora accettato dal service durante la trans
 - `QuizAttempt::getAnsweredAt($questionId): ?Carbon` — timestamp della risposta o `null` per formato flat.
 - `QuizAttempt::getTimeSpent($questionId): ?int` — secondi sulla domanda o `null` per formato flat.
 - `QuizAttempt::getAnswerPosition($questionId): ?int` — posizione progressiva o `null` per formato flat.
+- `QuizAttempt::getAnswerVersionId($questionId): ?int` — `question_version_id` della risposta o `null` per formato flat/legacy.
 - `QuizAttemptService::normalizeAnswers()` — converte flat → esteso prima di ogni scrittura su DB.
 - `QuizAttemptService::scoreAnswers()` — calcola lo score leggendo `$answer['correct']` se array, `(int) $answer` se scalare.
 
 La migration `2026_05_17_220000_migrate_quiz_attempts_answers_to_extended_format` ha convertito i record storici in modo non-distruttivo (con `down()` di rollback). Usare sempre gli accessori del model, mai accedere direttamente alle chiavi `$rawEntry['position']` o `$rawEntry['time_spent_seconds']`.
+
+### Versionamento domande e integrità storica
+
+`QuizAttemptService::injectVersionIds()` inietta automaticamente il `question_version_id` nelle risposte al momento della registrazione (singola query batch). Su autosave, i version_id già presenti vengono preservati: si registra la versione attiva alla **prima** risposta, non all'ultimo salvataggio.
+
+Per le view che mostrano il dettaglio di un tentativo usare `QuizAttemptService::getAttemptDetail()`, che restituisce per ogni domanda i campi:
+- `version` — `QuestionVersion|null` (la versione storica referenziata)
+- `is_historical` — `bool` — `true` se la versione storica differisce dallo stato corrente della domanda
+- `correct_answer` — viene dalla versione storica se disponibile (risposta corretta al momento del tentativo)

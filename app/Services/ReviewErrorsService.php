@@ -49,7 +49,8 @@ class ReviewErrorsService
             ->limit($lastAttempts)
             ->get();
 
-        $errors = []; // question_id => ['count' => int, 'last_wrong_at' => Carbon|null]
+        // question_id => ['count', 'last_wrong_at', 'last_version_id']
+        $errors = [];
 
         foreach ($attempts as $attempt) {
             foreach (array_keys($attempt->answers ?? []) as $rawId) {
@@ -58,12 +59,13 @@ class ReviewErrorsService
                 }
                 $qid = (int) $rawId;
                 if (!isset($errors[$qid])) {
-                    $errors[$qid] = ['count' => 0, 'last_wrong_at' => null];
+                    $errors[$qid] = ['count' => 0, 'last_wrong_at' => null, 'last_version_id' => null];
                 }
                 $errors[$qid]['count']++;
                 $wrongAt = $attempt->getAnsweredAt($rawId) ?? $attempt->updated_at;
                 if ($errors[$qid]['last_wrong_at'] === null || $wrongAt > $errors[$qid]['last_wrong_at']) {
-                    $errors[$qid]['last_wrong_at'] = $wrongAt;
+                    $errors[$qid]['last_wrong_at']  = $wrongAt;
+                    $errors[$qid]['last_version_id'] = $attempt->getAnswerVersionId($rawId);
                 }
             }
         }
@@ -87,11 +89,20 @@ class ReviewErrorsService
         }
         $questions = $query->get();
 
+        // Carica in batch le versioni storiche per le domande che hanno un version_id.
+        $versionIds = array_filter(array_column($errors, 'last_version_id'));
+        $versions   = !empty($versionIds)
+            ? \App\Models\QuestionVersion::whereIn('id', $versionIds)->get()->keyBy('id')
+            : collect();
+
         $result = collect();
         foreach ($questions as $question) {
-            $data = $errors[$question->id];
+            $data    = $errors[$question->id];
+            $version = $data['last_version_id'] ? ($versions[$data['last_version_id']] ?? null) : null;
+
             $result->push([
                 'question'      => $question,
+                'version'       => $version,
                 'error_count'   => $data['count'],
                 'last_wrong_at' => $data['last_wrong_at'],
                 'category'      => $question->category,
