@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\HealthController;
 use App\Http\Controllers\Viewer\ProfileBadgesController;
 use App\Http\Controllers\Viewer\StudyPlanController;
@@ -31,8 +32,6 @@ use App\Http\Controllers\Viewer\SmartReviewController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\TwoFactorSetupController;
 use App\Http\Controllers\Api\OfflineController;
-use App\Models\AuditLog;
-
 // PWA offline fallback — no auth required (served from SW cache)
 Route::get('/offline', fn() => view('offline'))->name('offline');
 
@@ -274,10 +273,9 @@ Route::middleware(['auth', '2fa'])
                 Route::get('/export-pdf', [ReportController::class, 'exportPdf'])->name('export-pdf');
             });
 
-            Route::get('audit-logs', function () {
-                $logs = AuditLog::with('user')->latest()->paginate(20);
-                return view('admin.audit.index', compact('logs'));
-            })->name('audit.index');
+            Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit.index');
+            Route::get('audit-logs/export', [AuditLogController::class, 'export'])->name('audit.export');
+            Route::get('audit-logs/{log}', [AuditLogController::class, 'show'])->name('audit.show');
 
             Route::get('quiz-attempts', [QuizAttemptController::class, 'adminIndex'])
                 ->name('quiz.attempts.all');
