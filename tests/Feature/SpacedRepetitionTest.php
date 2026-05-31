@@ -153,6 +153,9 @@ class SpacedRepetitionTest extends TestCase
 
     public function test_get_upcoming_count_returns_correct_counts(): void
     {
+        // Pin to mid-week so "tomorrow" always falls within the same ISO week.
+        $this->travelTo(now()->startOfWeek()->addDays(2));
+
         $user = $this->viewer();
 
         // 2 domande scadute oggi
