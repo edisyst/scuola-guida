@@ -418,6 +418,13 @@ return [
         // ── CATALOGO (admin, editor, viewer) ────────────────────────────────
         ['header' => 'catalogo', 'can' => 'view-admin'],
         [
+            'text' => 'Produzione contenuti',
+            'url'  => 'editor/dashboard',
+            'icon' => 'fas fa-pen-fancy',
+            'can'  => 'content-editor',
+            'key'  => 'editor-dashboard',
+        ],
+        [
             'text' => 'Categorie',
             'url'  => 'admin/categories',
             'icon' => 'fas fa-tags',

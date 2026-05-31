@@ -5,6 +5,53 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.5: Dashboard editor con metriche di produzione contenuti
+
+Dashboard dedicata all'editor (e all'admin) per misurare la produzione di
+contenuti nel periodo: domande create/modificate, quiz pubblicati/confermati,
+attività giornaliera con grafico trend. Vista globale sullo stato dei contenuti:
+categorie per numero domande, top domande più segnalate, distribuzione quiz
+per stato, domande senza immagine, ultime segnalazioni da gestire.
+L'admin può selezionare un editor specifico o visualizzare l'aggregato.
+Metriche basate sull'audit log (source-of-truth per produzione per-autore) e
+su campi dedicated del model Quiz (confirmed_by/confirmed_at).
+
+### Added
+
+- `app/Services/EditorMetricsService.php` — service con due metodi pubblici:
+  `getProductionMetrics(?User $editor, Carbon $from, Carbon $to)` (domande
+  create/modificate, quiz pubblicati/confermati, activity_by_day) e
+  `getGlobalContentMetrics()` (categorie per domande, top segnalate, quiz
+  per stato, domande senza immagine, ultime segnalazioni). Cache con TTL 86400
+  per periodi passati, 300 per il corrente. Zero N+1: aggregazioni lato DB.
+- `app/Http/Controllers/Editor/EditorDashboardController.php` — controller con
+  metodo `index()`: autorizzazione editor+admin, selezione periodo (mese/
+  trimestre/anno/custom), editor selector per admin con vista aggregata quando
+  nessun editor è selezionato.
+- Route `GET /editor/dashboard` → `editor.dashboard` (middleware auth + 2fa +
+  role:admin,editor).
+- `resources/views/editor/dashboard.blade.php` — layout AdminLTE: selettore
+  periodo con preset rapidi, select editor per admin; sezione "Produzione" con
+  4 small-box KPI + grafico trend attività/giorno (Chart.js line); sezione
+  "Stato dei contenuti" con 4 small-box quiz per stato + domande senza immagine,
+  bar chart orizzontale categorie per domande (top 15), tabella top domande
+  segnalate, tabella ultime segnalazioni con CTA "Gestisci". Empty state coerente.
+- Voce sidebar "Produzione contenuti" (icona `fas fa-pen-fancy`) nella sezione
+  CATALOGO, visibile solo a admin e editor (gate `content-editor`).
+- Gate `content-editor` in `AppServiceProvider`: `isAdmin() || isEditor()`.
+- `tests/Feature/EditorDashboardTest.php` — 15 test: conteggio domande create/
+  modificate, quiz pubblicati/confermati, filtro per periodo, cache su periodi
+  passati, accesso editor/admin/viewer, selezione editor da admin.
+
+### Changed
+
+- `app/Models/Quiz.php` — aggiunto trait `Auditable` (allineamento con
+  architettura "Auditable + Observer su ogni Model" da CLAUDE.md): da ora le
+  transizioni di stato dei quiz (draft→published, published→confirmed) sono
+  tracciate nell'audit log e disponibili come metrica di produzione.
+
+---
+
 ## [Unreleased] — Feature 6.4: UI audit log ricca con filtri
 
 Trasformazione dell'audit log da elenco grezzo a strumento di indagine: filtri

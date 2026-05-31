@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\HealthController;
+use App\Http\Controllers\Editor\EditorDashboardController;
 use App\Http\Controllers\Viewer\ProfileBadgesController;
 use App\Http\Controllers\Viewer\StudyPlanController;
 use App\Http\Controllers\Viewer\SmartReviewController;
@@ -341,6 +342,17 @@ Route::middleware(['auth', '2fa'])
             Route::post('health/backup-now', [HealthController::class, 'runBackupNow'])
                 ->name('health.backup-now');
         });
+    });
+
+/*
+|--------------------------------------------------------------------------
+| EDITOR AREA
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', '2fa', 'role:admin,editor'])
+    ->group(function () {
+        Route::get('editor/dashboard', [EditorDashboardController::class, 'index'])
+            ->name('editor.dashboard');
     });
 
 require __DIR__.'/auth.php';

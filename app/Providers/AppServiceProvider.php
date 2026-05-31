@@ -60,6 +60,10 @@ class AppServiceProvider extends ServiceProvider
             return $user->isAdmin();
         });
 
+        Gate::define('content-editor', function (User $user) {
+            return $user->isAdmin() || $user->isEditor();
+        });
+
         Gate::define('view-admin', function (User $user) {
             return in_array($user->role, ['admin', 'editor', 'viewer']);
         });
