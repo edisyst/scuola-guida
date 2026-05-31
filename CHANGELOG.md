@@ -5,6 +5,44 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.4: UI audit log ricca con filtri
+
+Trasformazione dell'audit log da elenco grezzo a strumento di indagine: filtri
+per utente, modello, tipo azione e range date con ricerca testuale; diff
+before/after leggibile per ogni voce; export Excel con i filtri attivi.
+Gestione corretta degli utenti anonimizzati (GDPR 4.2) e delle azioni di sistema.
+
+### Added
+
+- `app/Services/AuditLogService.php` — service con tre metodi: `query()` (costruisce
+  il Builder filtrato), `getAuditableTypes()` (tipi distinti con label italiane),
+  `getDiff()` (diff leggibile old/new per ogni evento), più helper `formatUser()`,
+  `typeLabel()` e `diffSummary()` condivisi da view ed export.
+- `app/Http/Controllers/Admin/AuditLogController.php` — controller admin-only con
+  `index()` (lista paginata 50 righe), `show()` (dettaglio con diff), `export()`
+  (download Excel filtrato).
+- `app/Http/Requests/AuditLogFilterRequest.php` — validazione filtri (user_id,
+  auditable_type, event, from, to, search) con autorizzazione admin-only.
+- `app/Exports/AuditLogExport.php` — export Excel (FromQuery + WithHeadings +
+  WithMapping + ShouldAutoSize + WithStyles); colonne: Data, Utente, Azione,
+  Tipo oggetto, ID oggetto, Riepilogo modifiche.
+- Route `GET /admin/audit-logs` → `admin.audit.index` (sostituisce la closure).
+- Route `GET /admin/audit-logs/export` → `admin.audit.export`.
+- Route `GET /admin/audit-logs/{log}` → `admin.audit.show`.
+- `resources/views/admin/audit-log/index.blade.php` — pannello filtri collassabile,
+  tabella con badge azione colorati, gestione utenti anonimizzati e di sistema,
+  pulsante export che mantiene i filtri attivi, empty state.
+- `resources/views/admin/audit-log/show.blade.php` — header metadata (chi/quando/cosa),
+  tabella diff a due colonne Prima/Dopo con evidenziazione rosso/verde, link
+  "Torna all'elenco" che preserva i filtri precedenti via HTTP referer.
+
+### Changed
+
+- `routes/web.php` — la route `audit-logs` (era closure) è sostituita da
+  `AuditLogController`; aggiunte `audit-logs/export` e `audit-logs/{log}`.
+
+---
+
 ## [Unreleased] — Feature 6.3: Backup automatico DB + media e Health dashboard
 
 Backup giornaliero di database e media storage tramite `spatie/laravel-backup` con
