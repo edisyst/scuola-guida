@@ -40,6 +40,15 @@ class AdminUserSeeder extends Seeder
             'permissions' => [],
         ]);
 
+        // Instructor
+        User::create([
+            'name' => 'Istruttore',
+            'email' => 'instructor@instructor.instructor',
+            'password' => Hash::make('instructor'),
+            'role' => User::ROLE_INSTRUCTOR,
+            'permissions' => [],
+        ]);
+
         $this->command->info("CREATI UTENTI BASE");
     }
 }
