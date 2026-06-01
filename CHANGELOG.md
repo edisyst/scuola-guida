@@ -5,6 +5,59 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.6: Ruolo "istruttore" read-only e assegnazione studenti
+
+Quarto ruolo `instructor` in sola lettura: vede i progressi degli studenti
+assegnati (statistiche, esiti, streak, badge) ma non modifica nulla.
+Sistema di assegnazione admin per associare studenti agli istruttori.
+
+### Added
+
+- `ROLE_INSTRUCTOR = 'instructor'` sul model `User` con `isInstructor()`, aggiunto
+  al catalogo `ROLES`. I metodi `canEditXxx()` ritornano automaticamente `false`
+  per instructor (nessun permesso in DB per default).
+- Relazioni `students()` / `instructors()` su `User` (BelongsToMany tramite
+  pivot `instructor_student`) e helper `hasStudent(User $student): bool`.
+- Migration `create_instructor_student_table`: colonne `instructor_id`,
+  `student_id`, `assigned_at`, `assigned_by` (nullable, nullOnDelete).
+  Entrambe le FK verso `users` con `cascadeOnDelete` (requisito GDPR). Indice
+  unico composito `(instructor_id, student_id)`.
+- `app/Services/InstructorService.php` — `assignStudent()` (idempotente via
+  `insertOrIgnore`), `unassignStudent()`, `getStudentProgress()` (aggrega stats,
+  streak e badge), `getInstructorOverview()` (riepilogo studenti, zero N+1).
+- `app/Http/Controllers/Instructor/InstructorController.php` — `index()` e
+  `showStudent()`: istruttore vede solo i propri studenti assegnati, admin può
+  vedere qualsiasi studente per supervisione.
+- `app/Http/Controllers/Admin/InstructorAssignmentController.php` — `index()`,
+  `edit()`, `assign()`, `unassign()`: solo chi ha `canEditUser()`.
+- `app/Http/Requests/AssignStudentRequest.php` — validazione `student_ids` array.
+- Route instructor (`/instructor/students`, `/instructor/students/{student}`)
+  con middleware `role:admin,instructor`.
+- Route admin gestione istruttori (`/admin/instructors`, `/admin/instructors/
+  {instructor}/assignments`, assign POST, unassign DELETE) nel gruppo `role:admin`.
+- Gate `is-instructor` e `instructor-area` in `AppServiceProvider`.
+- Voci sidebar: "I miei studenti" (`instructor-area`) e "Gestione istruttori"
+  (`admin-only`) in `config/adminlte.php`.
+- View `resources/views/instructor/index.blade.php` — tabella studenti con KPI
+  sintetici e link a dettaglio.
+- View `resources/views/instructor/student.blade.php` — progressi completi in
+  sola lettura con banner informativo, small-box KPI, tabella tentativi, badge.
+- View `resources/views/admin/instructors/index.blade.php` — lista istruttori.
+- View `resources/views/admin/instructors/edit.blade.php` — gestione assegnazioni
+  con select multipla per aggiungere studenti.
+- Utente di test instructor (`instructor@instructor.instructor`) nel
+  `AdminUserSeeder`.
+- `tests/Feature/InstructorTest.php` — 22 test: autorizzazione per ruolo,
+  idempotenza assign, cascadeOnDelete, canEditXxx() false per instructor,
+  getStudentProgress() chiavi corrette.
+
+### Changed
+
+- `app/Http/Middleware/RoleMiddleware.php` — aggiunto return type `Response`
+  (chiusura known issue: "RoleMiddleware::handle() senza return type Response").
+
+---
+
 ## [Unreleased] — Feature 6.5: Dashboard editor con metriche di produzione contenuti
 
 Dashboard dedicata all'editor (e all'admin) per misurare la produzione di
