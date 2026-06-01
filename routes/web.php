@@ -26,7 +26,9 @@ use App\Http\Controllers\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\HealthController;
+use App\Http\Controllers\Admin\InstructorAssignmentController;
 use App\Http\Controllers\Editor\EditorDashboardController;
+use App\Http\Controllers\Instructor\InstructorController;
 use App\Http\Controllers\Viewer\ProfileBadgesController;
 use App\Http\Controllers\Viewer\StudyPlanController;
 use App\Http\Controllers\Viewer\SmartReviewController;
@@ -341,7 +343,32 @@ Route::middleware(['auth', '2fa'])
                 ->name('health.index');
             Route::post('health/backup-now', [HealthController::class, 'runBackupNow'])
                 ->name('health.backup-now');
+
+            // GESTIONE ISTRUTTORI (assegnazione studenti)
+            Route::get('instructors', [InstructorAssignmentController::class, 'index'])
+                ->name('instructors.index');
+            Route::get('instructors/{instructor}/assignments', [InstructorAssignmentController::class, 'edit'])
+                ->name('instructors.edit');
+            Route::post('instructors/{instructor}/assign', [InstructorAssignmentController::class, 'assign'])
+                ->name('instructors.assign');
+            Route::delete('instructors/{instructor}/students/{student}', [InstructorAssignmentController::class, 'unassign'])
+                ->name('instructors.unassign');
         });
+    });
+
+/*
+|--------------------------------------------------------------------------
+| INSTRUCTOR AREA — sola lettura progressi studenti assegnati
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', '2fa', 'role:admin,instructor'])
+    ->prefix('instructor')
+    ->name('instructor.')
+    ->group(function () {
+        Route::get('students', [InstructorController::class, 'index'])
+            ->name('students.index');
+        Route::get('students/{student}', [InstructorController::class, 'showStudent'])
+            ->name('students.show');
     });
 
 /*

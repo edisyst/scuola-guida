@@ -119,6 +119,15 @@ class AppServiceProvider extends ServiceProvider
             return $user->isViewer();
         });
 
+        Gate::define('is-instructor', function (User $user) {
+            return $user->isInstructor();
+        });
+
+        // Visibile sia all'istruttore che all'admin (supervisione)
+        Gate::define('instructor-area', function (User $user) {
+            return $user->isInstructor() || $user->isAdmin();
+        });
+
         /*
         |--------------------------------------------------------------------------
         | VIEW COMPOSER ADMINLTE

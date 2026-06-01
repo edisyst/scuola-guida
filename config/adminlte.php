@@ -543,6 +543,25 @@ return [
             'can'  => 'admin-only',
         ],
 
+        // ── ISTRUTTORE (istruttore + admin per supervisione) ─────────────────
+        ['header' => 'istruttore', 'can' => 'instructor-area'],
+        [
+            'text' => 'I miei studenti',
+            'url'  => 'instructor/students',
+            'icon' => 'fas fa-user-graduate',
+            'can'  => 'instructor-area',
+            'key'  => 'instructor-students',
+        ],
+
+        // ── GESTIONE ISTRUTTORI (solo admin) ────────────────────────────────
+        [
+            'text' => 'Gestione istruttori',
+            'url'  => 'admin/instructors',
+            'icon' => 'fas fa-chalkboard-teacher',
+            'can'  => 'admin-only',
+            'key'  => 'instructors',
+        ],
+
         // ── ACCOUNT (tutti i ruoli) ──────────────────────────────────────────
         ['header' => 'account'],
         [

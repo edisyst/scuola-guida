@@ -15,9 +15,10 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    const ROLE_ADMIN = 'admin';
-    const ROLE_EDITOR = 'editor';
-    const ROLE_VIEWER = 'viewer';
+    const ROLE_ADMIN      = 'admin';
+    const ROLE_EDITOR     = 'editor';
+    const ROLE_VIEWER     = 'viewer';
+    const ROLE_INSTRUCTOR = 'instructor';
 
     /*
     |--------------------------------------------------------------------------
@@ -78,9 +79,10 @@ class User extends Authenticatable
     public const MANAGED_ACTION_LABELS = self::ACTION_LABELS;
 
     public const ROLES = [
-        self::ROLE_ADMIN  => 'Admin',
-        self::ROLE_EDITOR => 'Editor',
-        self::ROLE_VIEWER => 'Viewer',
+        self::ROLE_ADMIN       => 'Admin',
+        self::ROLE_EDITOR      => 'Editor',
+        self::ROLE_VIEWER      => 'Viewer',
+        self::ROLE_INSTRUCTOR  => 'Istruttore',
     ];
 
     protected $fillable = [
@@ -156,6 +158,31 @@ class User extends Authenticatable
     public function learnedQuestions(): HasMany
     {
         return $this->hasMany(LearnedQuestion::class);
+    }
+
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'instructor_student',
+            'instructor_id',
+            'student_id'
+        )->withPivot(['assigned_at', 'assigned_by'])->withTimestamps();
+    }
+
+    public function instructors(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'instructor_student',
+            'student_id',
+            'instructor_id'
+        )->withPivot(['assigned_at', 'assigned_by'])->withTimestamps();
+    }
+
+    public function hasStudent(User $student): bool
+    {
+        return $this->students()->where('student_id', $student->id)->exists();
     }
 
     /*
@@ -255,6 +282,11 @@ class User extends Authenticatable
     public function isViewer(): bool
     {
         return $this->role === self::ROLE_VIEWER;
+    }
+
+    public function isInstructor(): bool
+    {
+        return $this->role === self::ROLE_INSTRUCTOR;
     }
 
     /*

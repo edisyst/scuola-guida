@@ -21,9 +21,11 @@
 | Audit            | Trait `Auditable` + Observer su ogni Model |
 | Ruoli e permessi | Sistema custom (no Spatie)                |
 
-Per i ruoli usare i metodi su `User`: `canEditQuestion()`, `canEditQuiz()`,
+Per i ruoli usare i metodi su `User`: `isAdmin()`, `isEditor()`, `isViewer()`,
+`isInstructor()`. Per i permessi: `canEditQuestion()`, `canEditQuiz()`,
 `canEditCategory()`, `canEditUser()`. **Non** usare Spatie gates né
 `$user->hasRole()` di Spatie.
+Il ruolo `instructor` è read-only: `canEditXxx()` ritorna sempre `false`.
 
 ---
 
@@ -289,4 +291,4 @@ Chiudere nella PR dedicata quando si lavora sull'area coinvolta.
 | `ImportQuestionsRequest` non valida `max:5120`                                                                                         | PR Import MIT                                 |
 | Migration `drop_quiz_results_table` da creare                                                                                          | PR dedicata                                   |
 | `Quiz::hasQuestion()` e `QuizAttemptService::scoreAnswers()` senza type hint                                                           | prossima PR che tocca questi metodi           |
-| `RoleMiddleware::handle()` senza return type `Response`                                                                                | prossima PR che tocca il middleware           |
+| ~~`RoleMiddleware::handle()` senza return type `Response`~~ — **CHIUSO in Feature 6.6**                                                | ~~prossima PR che tocca il middleware~~       |
