@@ -5,6 +5,52 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.7: Web Push Notifications
+
+Quarto canale di notifica nativo (browser chiuso / dispositivo bloccato). Il viewer
+si iscrive volontariamente dal profilo; le push affiancano mail e database senza
+sostituirli. Chiude contestualmente il known issue `View::composer('*')`.
+
+### Added
+
+- Package `laravel-notification-channels/webpush` v10 (`minishlink/web-push` v10).
+- Trait `HasPushSubscriptions` su `User`.
+- Tabella `push_subscriptions` (migration pubblicata dal package) con FK aggiuntiva
+  `subscribable_id → users.id cascadeOnDelete` (migration di adeguamento GDPR separata).
+- `config/webpush.php` pubblicato; chiavi VAPID via variabili `.env` (`VAPID_PUBLIC_KEY`,
+  `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`).
+- Meta tag `<meta name="vapid-public-key">` nel layout `layouts.admin`.
+- `toWebPush()` aggiunto a `RegistrazioneApprovataNotification` e `BadgeEarned`
+  (canali esistenti invariati).
+- `app/Notifications/SpacedRepetitionReminderNotification.php` — solo `WebPushChannel`,
+  queued su `emails`, invia promemoria SM-2 con contatore domande in scadenza.
+- `app/Console/Commands/SendSpacedRepetitionReminders.php` — `push:send-review-reminders`:
+  recupera viewer con review SM-2 in scadenza oggi e almeno una subscription push,
+  invia la notification. Usa `->lazy()` (zero N+1).
+- Schedulazione `push:send-review-reminders` alle 08:00 in `routes/console.php`.
+- Handler `push` e `notificationclick` in `public/sw.js`.
+- Blocco Alpine subscribe/unsubscribe in `/profile` (viewer only, degradazione
+  silente se `PushManager` non disponibile).
+- Route `POST /push-subscriptions` e `DELETE /push-subscriptions` con middleware `auth`
+  e `abort_unless(isViewer(), 403)`.
+- `PushSubscriptionController` con validazione via `validate()` inline (boundary HTTP).
+- `tests/Feature/WebPushTest.php` — 12 test.
+
+### Fixed
+
+- **Known issue chiuso**: `View::composer('*', ...)` in `AppServiceProvider` spostato
+  su `View::composer('layouts.admin', ...)`. I badge sidebar continuano a funzionare
+  ma il composer non gira più su ogni view dell'applicazione.
+
+### Changed
+
+- `public/sw.js`: `CACHE_VERSION` bumpato da `sg-v1` a `sg-v2` per forzare il ciclo
+  activate e il cleanup della vecchia cache nei browser già installati.
+- `docs/07-pwa.md`: sezione Web Push con istruzioni VAPID, flusso subscribe, comando
+  promemoria, note sul versionamento.
+
+---
+
 ## [Unreleased] — Feature 6.6: Ruolo "istruttore" read-only e assegnazione studenti
 
 Quarto ruolo `instructor` in sola lettura: vede i progressi degli studenti

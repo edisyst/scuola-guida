@@ -147,6 +147,80 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 ## Note tecniche per sviluppatori
 
+---
+
+## Web Push Notifications (Feature 6.7)
+
+Le notifiche push permettono al browser di notificare il viewer anche quando l'app è chiusa o il dispositivo è bloccato.
+
+### Architettura
+
+- **Package**: `laravel-notification-channels/webpush` v10 + `minishlink/web-push` v10.
+- **Tabella**: `push_subscriptions` (morphs, FK `subscribable_id → users.id` con cascade per GDPR).
+- **Trait**: `HasPushSubscriptions` su `User`.
+- **Canale**: `WebPushChannel::class` aggiunto a `via()` delle Notification candidate.
+
+### Notification con push attivo
+
+| Notification | Canali |
+|---|---|
+| `RegistrazioneApprovataNotification` | mail, database, WebPush |
+| `BadgeEarned` | database, WebPush |
+| `SpacedRepetitionReminderNotification` | WebPush only |
+
+### VAPID keys
+
+Generare **una volta sola** in produzione. Le chiavi non devono mai cambiare (invalidano tutte le subscription esistenti).
+
+```bash
+# Con OpenSSL EC disponibile (Linux/Mac/Windows con OpenSSL correttamente configurato):
+php artisan webpush:vapid
+
+# In alternativa, con Node.js (es. Laragon Windows):
+node -e "
+const crypto = require('crypto');
+(async () => {
+    const kp  = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey']);
+    const pub  = await crypto.subtle.exportKey('raw', kp.publicKey);
+    const jwk  = await crypto.subtle.exportKey('jwk', kp.privateKey);
+    const b64  = b => Buffer.from(b).toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+    console.log('VAPID_PUBLIC_KEY=' + b64(pub));
+    console.log('VAPID_PRIVATE_KEY=' + Buffer.from(jwk.d,'base64').toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,''));
+})();
+"
+```
+
+Aggiungere al `.env`:
+```
+VAPID_PUBLIC_KEY=<chiave pubblica base64url>
+VAPID_PRIVATE_KEY=<chiave privata base64url>
+VAPID_SUBJECT=mailto:admin@scuolaguida.example.com
+```
+
+### Service Worker
+
+Il SW ora gestisce gli eventi `push` e `notificationclick`. Quando arriva una push, il browser mostra la notifica nativa anche con l'app chiusa.
+
+### Flusso subscribe/unsubscribe
+
+1. Viewer apre `/profile`.
+2. Clicca "Attiva notifiche push" — il browser chiede il permesso.
+3. Il browser crea una `PushSubscription` con `applicationServerKey = VAPID_PUBLIC_KEY`.
+4. La subscription viene salvata via `POST /push-subscriptions`.
+5. Per disattivarle: "Disattiva notifiche push" → `DELETE /push-subscriptions`.
+
+Il blocco è nascosto se `'PushManager' in window` è falso (HTTP, Firefox senza HTTPS, Safari < 16).
+
+### Comando promemoria
+
+```bash
+php artisan push:send-review-reminders
+```
+
+Schedulato alle 08:00 ogni giorno. Invia una push silenziosa (solo WebPush, niente email) ai viewer con domande SM-2 in scadenza oggi che hanno almeno una subscription attiva.
+
+---
+
 ### Versionamento service worker
 
 Ogni release che modifica asset compilati **deve** bumpare la costante in `public/sw.js`:

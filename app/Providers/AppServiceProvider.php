@@ -160,11 +160,15 @@ class AppServiceProvider extends ServiceProvider
             })->toArray()]);
         });
 
-        View::composer('*', function () {
-            // I badge in sidebar mostrano solo gli elementi aggiunti nell'ultima ora.
+        // Badge sidebar: mirato su layouts.admin (non più su '*').
+        // Chiude il known issue "View::composer('*') gira su ogni view".
+        View::composer('layouts.admin', function () {
+            if (!auth()->check()) {
+                return;
+            }
+
             $since = now()->subHour();
 
-            // 🔥 cache unica per tutti i badge (più efficiente)
             $counts = Cache::remember('admin_badges', 60, function () use ($since) {
                 return [
                     'users'      => User::where('created_at', '>=', $since)->count(),
@@ -176,71 +180,62 @@ class AppServiceProvider extends ServiceProvider
                         ->where('registration_status', User::REG_PENDING)
                         ->where('registration_submitted_at', '>=', $since)
                         ->count(),
-                    // Per i report il totale dei "pending" (senza filtro temporale):
-                    // sono pochi e sempre actionable, l'admin deve vederli tutti.
                     'pending_reports' => QuestionReport::pending()->count(),
                 ];
             });
 
             config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($counts) {
-
-                if (!isset($item['key']))
+                if (!isset($item['key'])) {
                     return $item;
+                }
 
                 switch ($item['key']) {
                     case 'questions':
                         if ($counts['questions'] > 0) {
-                            $item['label'] = $counts['questions'];
+                            $item['label']       = $counts['questions'];
                             $item['label_color'] = 'success';
                         }
                         break;
-
                     case 'categories':
                         if ($counts['categories'] > 0) {
-                            $item['label'] = $counts['categories'];
+                            $item['label']       = $counts['categories'];
                             $item['label_color'] = 'info';
                         }
                         break;
-
                     case 'users':
                         if ($counts['users'] > 0) {
-                            $item['label'] = $counts['users'];
+                            $item['label']       = $counts['users'];
                             $item['label_color'] = 'primary';
                         }
                         break;
-
                     case 'quizzes':
                         if ($counts['quizzes'] > 0) {
-                            $item['label'] = $counts['quizzes'];
+                            $item['label']       = $counts['quizzes'];
                             $item['label_color'] = 'warning';
                         }
                         break;
-
                     case 'audit':
                         if ($counts['audit'] > 0) {
-                            $item['label'] = $counts['audit'];
+                            $item['label']       = $counts['audit'];
                             $item['label_color'] = 'danger';
                         }
                         break;
-
                     case 'registrations':
                         if ($counts['pending_registrations'] > 0) {
-                            $item['label'] = $counts['pending_registrations'];
+                            $item['label']       = $counts['pending_registrations'];
                             $item['label_color'] = 'warning';
                         }
                         break;
-
                     case 'question-reports':
                         if ($counts['pending_reports'] > 0) {
-                            $item['label'] = $counts['pending_reports'];
+                            $item['label']       = $counts['pending_reports'];
                             $item['label_color'] = 'warning';
                         }
                         break;
                 }
 
-                    return $item;
-                })->toArray()
-            ]);
+                return $item;
+            })->toArray()]);
         });
     }
 }

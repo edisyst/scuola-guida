@@ -12,3 +12,5 @@ Schedule::command('enrollments:close-expired')->dailyAt('00:05');
 
 Schedule::command('backup:clean')->dailyAt('01:30');
 Schedule::command('backup:run')->dailyAt('02:00');
+
+Schedule::command('push:send-review-reminders')->dailyAt('08:00');

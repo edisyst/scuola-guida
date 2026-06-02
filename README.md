@@ -18,8 +18,9 @@ Funzionalità principali:
 - **[Backup automatico + Health dashboard](docs/10-backup-health.md)** — backup giornaliero di DB e media tramite `spatie/laravel-backup`, retention configurabile, notifica agli admin in caso di fallimento; dashboard admin con stato backup, code, spazio disco e ultimi errori di log.
 - **Audit log con filtri e diff** — ogni modifica al sistema è tracciata e consultabile da admin con filtri per utente, modello, tipo azione e range date; pannello diff Prima/Dopo per ogni voce; export Excel con i filtri attivi. Gestione corretta degli utenti anonimizzati (GDPR).
 - **Ruolo istruttore** — quarto ruolo `instructor` in sola lettura: vede i progressi degli studenti assegnati (statistiche, esiti, streak, badge) senza poter modificare nulla. Gli admin assegnano gli studenti agli istruttori tramite il pannello `Gestione istruttori`.
+- **[Web Push Notifications](docs/07-pwa.md#web-push-notifications-feature-67)** — quarto canale di notifica nativo (browser chiuso / dispositivo bloccato). Il viewer si iscrive dal profilo; le push affiancano mail e database per approvazione iscrizione, badge guadagnati e promemoria ripasso SM-2 (schedulato alle 08:00).
 
-**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis
+**Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis · `laravel-notification-channels/webpush`
 
 ## Panoramica architettura
 
