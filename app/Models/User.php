@@ -253,7 +253,7 @@ class User extends Authenticatable
 
     public function requiresTwoFactor(): bool
     {
-        return $this->isAdmin() || $this->isEditor();
+        return config('two_factor.enabled') && ($this->isAdmin() || $this->isEditor());
     }
 
     public function generateRecoveryCodes(int $count = 8): array
