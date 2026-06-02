@@ -122,11 +122,11 @@
             </p>
 
             @if($displayImage)
-            <div class="mb-3">
+            <div class="mb-3 text-center">
                 <img src="{{ Storage::url($displayImage) }}"
                      alt="Immagine domanda"
                      class="img-fluid rounded shadow-sm"
-                     style="max-width:100%;">
+                     style="width:500px;max-width:100%;">
             </div>
             @endif
 
