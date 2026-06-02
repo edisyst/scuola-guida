@@ -1,3 +1,4 @@
+@if(config('two_factor.enabled'))
 @if($user->hasTwoFactorEnabled())
 
     {{-- 2FA ABILITATO --}}
@@ -103,4 +104,10 @@
         <i class="fas fa-shield-alt mr-1"></i> Abilita 2FA
     </a>
 
+@endif
+@else
+    <p class="sg-text-muted">
+        <i class="fas fa-info-circle mr-1"></i>
+        Il 2FA è attualmente disabilitato sulla piattaforma.
+    </p>
 @endif

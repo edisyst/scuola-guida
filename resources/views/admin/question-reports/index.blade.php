@@ -65,7 +65,7 @@
                   class="row g-2 align-items-end">
                 <div class="col-12 col-md-3">
                     <label class="form-label form-label-sm mb-1">Stato</label>
-                    <select name="status" class="sg-form-control form-control-sm">
+                    <select name="status" class="sg-form-control form-control">
                         <option value="">Tutti</option>
                         @foreach(\App\Models\QuestionReport::statuses() as $key => $label)
                             <option value="{{ $key }}" @selected(request('status') === $key)>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-12 col-md-4">
                     <label class="form-label form-label-sm mb-1">Tipo</label>
-                    <select name="type" class="sg-form-control form-control-sm">
+                    <select name="type" class="sg-form-control form-control">
                         <option value="">Tutti</option>
                         @foreach($types as $key => $label)
                             <option value="{{ $key }}" @selected(request('type') === $key)>
@@ -89,7 +89,7 @@
                     <label class="form-label form-label-sm mb-1">Domanda (ID)</label>
                     <input type="number" name="question_id" min="1"
                            value="{{ request('question_id') }}"
-                           class="sg-form-control form-control-sm"
+                           class="sg-form-control form-control"
                            placeholder="Es. 1234">
                 </div>
                 <div class="col-12 col-md-2 d-flex gap-2">

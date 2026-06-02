@@ -135,6 +135,12 @@ class QuizAttempt extends Model
     // esito (pass/fail)
     public function getIsPassedAttribute(): bool
     {
+        $maxErrors = $this->relationLoaded('quiz') ? ($this->quiz?->max_errors) : null;
+
+        if ($maxErrors !== null) {
+            return ($this->total_questions - $this->score) < $maxErrors;
+        }
+
         return $this->percentage >= 60;
     }
 }

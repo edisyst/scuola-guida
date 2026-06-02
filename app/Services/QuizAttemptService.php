@@ -166,7 +166,9 @@ class QuizAttemptService
         $notAnswered = $questions->filter(fn ($i) => $i['user_answer'] === null)->count();
         $answered    = $total - $notAnswered;
         $percentage  = $total > 0 ? round($correct / $total * 100, 1) : 0.0;
-        $passed      = $wrong <= ($quiz->max_errors ?? $total);
+        $passed      = $quiz->max_errors !== null
+            ? $wrong < $quiz->max_errors
+            : $percentage >= 60.0;
 
         $durationHuman = null;
         if ($attempt->duration) {
