@@ -317,6 +317,144 @@ return [
             'topnav_right' => true,
         ],
 
+        // ── MENU UTENTE (dropdown sotto il nome, in alto a destra) ───────────
+        // Voci personali/account spostate qui dalla sidebar per alleggerirla.
+        // I gate 'can' restano invariati: cambia solo il contenitore, non la
+        // visibilità né le funzionalità.
+        [
+            'text'         => 'Profilo',
+            'url'          => 'profile',
+            'icon'         => 'fas fa-user-circle',
+            'topnav_user'  => true,
+        ],
+        [
+            'text'         => 'I miei badge',
+            'url'          => 'profile/badges',
+            'icon'         => 'fas fa-award',
+            'key'          => 'profile-badges',
+            'can'          => 'exam-participant',
+            'topnav_user'  => true,
+        ],
+        [
+            'text'         => 'Notifiche',
+            'url'          => 'notifications',
+            'icon'         => 'far fa-bell',
+            'key'          => 'notifications',
+            'topnav_user'  => true,
+        ],
+
+        // ── DROPDOWN BARRA IN ALTO (sinistra) ────────────────────────────────
+        // Sezioni admin-only spostate dalla sidebar alla navbar come menu a
+        // tendina. Rotte, key e gate 'can' restano invariati: cambia solo il
+        // contenitore, non la visibilità né le funzionalità.
+        [
+            'text'    => 'Iscrizioni',
+            'icon'    => 'fas fa-id-card',
+            'topnav'  => true,
+            'can'     => 'admin-only',
+            'submenu' => [
+                [
+                    'text' => 'Iscrizioni anagrafiche',
+                    'url'  => 'admin/registrations',
+                    'icon' => 'fas fa-id-card',
+                    'can'  => 'admin-only',
+                    'key'  => 'registrations',
+                ],
+                [
+                    'text' => 'Iscrizioni quiz',
+                    'url'  => 'admin/enrollments',
+                    'icon' => 'fas fa-user-check',
+                    'can'  => 'admin-only',
+                    'key'  => 'enrollments',
+                ],
+            ],
+        ],
+        [
+            'text'    => 'Esiti & Statistiche',
+            'icon'    => 'fas fa-chart-bar',
+            'topnav'  => true,
+            'can'     => 'admin-only',
+            'submenu' => [
+                [
+                    'text' => 'Esiti confermati',
+                    'url'  => 'admin/confirmed-results',
+                    'icon' => 'fas fa-trophy',
+                    'can'  => 'admin-only',
+                    'key'  => 'confirmed-results',
+                ],
+                [
+                    'text' => 'Statistiche',
+                    'url'  => 'admin/stats',
+                    'icon' => 'fas fa-chart-bar',
+                    'can'  => 'admin-only',
+                ],
+                [
+                    'text' => 'Report',
+                    'url'  => 'admin/reports',
+                    'icon' => 'fas fa-chart-pie',
+                    'can'  => 'admin-only',
+                    'key'  => 'reports',
+                ],
+            ],
+        ],
+        [
+            'text'    => 'Sistema',
+            'icon'    => 'fas fa-server',
+            'topnav'  => true,
+            'can'     => 'admin-only',
+            'submenu' => [
+                [
+                    'text' => 'Media Manager',
+                    'url'  => 'admin/media',
+                    'icon' => 'fas fa-images',
+                    'can'  => 'admin-only',
+                    'key'  => 'media',
+                ],
+                [
+                    'text' => 'Audit Log',
+                    'url'  => 'admin/audit-logs',
+                    'icon' => 'fas fa-history',
+                    'can'  => 'admin-only',
+                    'key'  => 'audit',
+                ],
+                [
+                    'text' => 'Comandi utili',
+                    'url'  => 'admin/commands',
+                    'icon' => 'fas fa-terminal',
+                    'can'  => 'admin-only',
+                    'key'  => 'commands',
+                ],
+                [
+                    'text' => 'Stato sistema',
+                    'url'  => 'admin/health',
+                    'icon' => 'fas fa-heartbeat',
+                    'can'  => 'admin-only',
+                    'key'  => 'health',
+                ],
+            ],
+        ],
+        [
+            'text'    => 'Utenti & Ruoli',
+            'icon'    => 'fas fa-users-cog',
+            'topnav'  => true,
+            'can'     => 'admin-only',
+            'submenu' => [
+                [
+                    'text' => 'Utenti',
+                    'url'  => 'admin/users',
+                    'icon' => 'fas fa-users',
+                    'can'  => 'manage-users-menu',
+                    'key'  => 'users',
+                ],
+                [
+                    'text' => 'Ruoli & Permessi',
+                    'url'  => 'admin/roles',
+                    'icon' => 'fas fa-user-shield',
+                    'can'  => 'admin-only',
+                ],
+            ],
+        ],
+
         // Sidebar items:
         [
             'type' => 'sidebar-menu-search',
@@ -330,12 +468,6 @@ return [
             'url'   => 'dashboard',
             'icon'  => 'fas fa-tachometer-alt',
             'key'   => 'dashboard',
-        ],
-        [
-            'text' => 'Notifiche',
-            'url'  => 'notifications',
-            'icon' => 'far fa-bell',
-            'key'  => 'notifications',
         ],
 
         // ── STUDIO (allenamento libero, solo viewer/exam-participant) ────────
@@ -456,92 +588,9 @@ return [
             'key'  => 'quizzes',
         ],
 
-        // ── ISCRIZIONI (solo admin) ─────────────────────────────────────────
-        ['header' => 'iscrizioni', 'can' => 'admin-only'],
-        [
-            'text' => 'Iscrizioni anagrafiche',
-            'url'  => 'admin/registrations',
-            'icon' => 'fas fa-id-card',
-            'can'  => 'admin-only',
-            'key'  => 'registrations',
-        ],
-        [
-            'text' => 'Iscrizioni quiz',
-            'url'  => 'admin/enrollments',
-            'icon' => 'fas fa-user-check',
-            'can'  => 'admin-only',
-            'key'  => 'enrollments',
-        ],
-
-        // ── ESITI & STATISTICHE (solo admin) ────────────────────────────────
-        ['header' => 'esiti', 'can' => 'admin-only'],
-        [
-            'text' => 'Esiti confermati',
-            'url'  => 'admin/confirmed-results',
-            'icon' => 'fas fa-trophy',
-            'can'  => 'admin-only',
-            'key'  => 'confirmed-results',
-        ],
-        [
-            'text' => 'Statistiche',
-            'url'  => 'admin/stats',
-            'icon' => 'fas fa-chart-bar',
-            'can'  => 'admin-only',
-        ],
-        [
-            'text' => 'Report',
-            'url'  => 'admin/reports',
-            'icon' => 'fas fa-chart-pie',
-            'can'  => 'admin-only',
-            'key'  => 'reports',
-        ],
-
-        // ── SISTEMA (media + audit, solo admin) ─────────────────────────────
-        ['header' => 'sistema', 'can' => 'admin-only'],
-        [
-            'text' => 'Media Manager',
-            'url'  => 'admin/media',
-            'icon' => 'fas fa-images',
-            'can'  => 'admin-only',
-            'key'  => 'media',
-        ],
-        [
-            'text' => 'Audit Log',
-            'url'  => 'admin/audit-logs',
-            'icon' => 'fas fa-history',
-            'can'  => 'admin-only',
-            'key'  => 'audit',
-        ],
-        [
-            'text' => 'Comandi utili',
-            'url'  => 'admin/commands',
-            'icon' => 'fas fa-terminal',
-            'can'  => 'admin-only',
-            'key'  => 'commands',
-        ],
-        [
-            'text' => 'Stato sistema',
-            'url'  => 'admin/health',
-            'icon' => 'fas fa-heartbeat',
-            'can'  => 'admin-only',
-            'key'  => 'health',
-        ],
-
-        // ── UTENTI & RUOLI (solo admin) ─────────────────────────────────────
-        ['header' => 'utenti_ruoli', 'can' => 'admin-only'],
-        [
-            'text' => 'Utenti',
-            'url'  => 'admin/users',
-            'icon' => 'fas fa-users',
-            'can'  => 'manage-users-menu',
-            'key'  => 'users',
-        ],
-        [
-            'text' => 'Ruoli & Permessi',
-            'url'  => 'admin/roles',
-            'icon' => 'fas fa-user-shield',
-            'can'  => 'admin-only',
-        ],
+        // ── ISCRIZIONI · ESITI & STATISTICHE · SISTEMA · UTENTI & RUOLI ──────
+        // Spostate nella barra in alto come dropdown (vedi 'topnav' all'inizio
+        // dell'array 'menu'). Rotte e gate invariati.
 
         // ── ISTRUTTORE (istruttore + admin per supervisione) ─────────────────
         ['header' => 'istruttore', 'can' => 'instructor-area'],
@@ -562,20 +611,9 @@ return [
             'key'  => 'instructors',
         ],
 
-        // ── ACCOUNT (tutti i ruoli) ──────────────────────────────────────────
-        ['header' => 'account'],
-        [
-            'text' => 'Profilo',
-            'url'  => 'profile',
-            'icon' => 'fas fa-user-circle',
-        ],
-        [
-            'text' => 'I miei badge',
-            'url'  => 'profile/badges',
-            'icon' => 'fas fa-award',
-            'key'  => 'profile-badges',
-            'can'  => 'exam-participant',
-        ],
+        // ── ACCOUNT ──────────────────────────────────────────────────────────
+        // Le voci personali (Profilo, I miei badge, Notifiche) sono ora nel
+        // menu a tendina sotto il nome utente (vedi 'topnav_user' in alto).
     ],
 
     /*

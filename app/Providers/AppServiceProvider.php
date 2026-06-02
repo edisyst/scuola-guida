@@ -157,7 +157,7 @@ class AppServiceProvider extends ServiceProvider
             config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($dueToday) {
                 if (($item['key'] ?? '') === 'smart-review') {
                     $item['label']       = $dueToday;
-                    $item['label_color'] = 'danger';
+                    $item['label_color'] = 'light';
                 }
                 return $item;
             })->toArray()]);
@@ -187,57 +187,55 @@ class AppServiceProvider extends ServiceProvider
                 ];
             });
 
-            config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($counts) {
-                if (!isset($item['key'])) {
+            // Conta gli elementi recenti per una voce in base al suo 'key'.
+            $badgeCount = function (array $item) use ($counts) {
+                return match ($item['key'] ?? null) {
+                    'questions'        => $counts['questions'],
+                    'categories'       => $counts['categories'],
+                    'users'            => $counts['users'],
+                    'quizzes'          => $counts['quizzes'],
+                    'audit'            => $counts['audit'],
+                    'registrations'    => $counts['pending_registrations'],
+                    'question-reports' => $counts['pending_reports'],
+                    default            => 0,
+                };
+            };
+
+            // Applica il badge a una voce con il colore indicato (se conteggio > 0).
+            $applyBadge = function (array $item, string $color) use ($badgeCount) {
+                $count = $badgeCount($item);
+                if ($count > 0) {
+                    $item['label']       = $count;
+                    $item['label_color'] = $color;
+                }
+                return $item;
+            };
+
+            // Mappa il menu:
+            //  - dropdown della barra superiore → badge sempre ROSSI sulle voci
+            //    figlie + counter aggregato (rosso) sul toggle, visibile col
+            //    dropdown chiuso;
+            //  - voci della sidebar → badge BIANCHI ('light').
+            config(['adminlte.menu' => collect(config('adminlte.menu'))->map(function ($item) use ($applyBadge) {
+                if (!empty($item['submenu'])) {
+                    $sum = 0;
+                    $item['submenu'] = array_map(function ($child) use ($applyBadge, &$sum) {
+                        $child = $applyBadge($child, 'danger');
+                        if (isset($child['label'])) {
+                            $sum += (int) $child['label'];
+                        }
+                        return $child;
+                    }, $item['submenu']);
+
+                    if ($sum > 0) {
+                        $item['label']       = $sum;
+                        $item['label_color'] = 'danger';
+                    }
+
                     return $item;
                 }
 
-                switch ($item['key']) {
-                    case 'questions':
-                        if ($counts['questions'] > 0) {
-                            $item['label']       = $counts['questions'];
-                            $item['label_color'] = 'success';
-                        }
-                        break;
-                    case 'categories':
-                        if ($counts['categories'] > 0) {
-                            $item['label']       = $counts['categories'];
-                            $item['label_color'] = 'info';
-                        }
-                        break;
-                    case 'users':
-                        if ($counts['users'] > 0) {
-                            $item['label']       = $counts['users'];
-                            $item['label_color'] = 'primary';
-                        }
-                        break;
-                    case 'quizzes':
-                        if ($counts['quizzes'] > 0) {
-                            $item['label']       = $counts['quizzes'];
-                            $item['label_color'] = 'warning';
-                        }
-                        break;
-                    case 'audit':
-                        if ($counts['audit'] > 0) {
-                            $item['label']       = $counts['audit'];
-                            $item['label_color'] = 'danger';
-                        }
-                        break;
-                    case 'registrations':
-                        if ($counts['pending_registrations'] > 0) {
-                            $item['label']       = $counts['pending_registrations'];
-                            $item['label_color'] = 'warning';
-                        }
-                        break;
-                    case 'question-reports':
-                        if ($counts['pending_reports'] > 0) {
-                            $item['label']       = $counts['pending_reports'];
-                            $item['label_color'] = 'warning';
-                        }
-                        break;
-                }
-
-                return $item;
+                return $applyBadge($item, 'light');
             })->toArray()]);
         });
     }
