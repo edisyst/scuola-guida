@@ -5,6 +5,30 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Alleggerimento menu laterale (navbar dropdown + menu utente)
+
+Riorganizzazione della disposizione delle voci di menu per alleggerire la sidebar,
+senza modificare funzionalità né visibilità per ruolo (i gate `can` restano invariati:
+cambia solo il contenitore).
+
+### Changed
+
+- Voci personali **Profilo**, **I miei badge** e **Notifiche** spostate dalla sidebar
+  al menu a tendina sotto il nome utente (in alto a destra), via `topnav_user`.
+- Sezioni admin **Iscrizioni**, **Esiti & Statistiche**, **Sistema** e **Utenti & Ruoli**
+  spostate dalla sidebar alla barra in alto come menu a tendina (`topnav` + `submenu`).
+- Colori dei badge counter uniformati: **rossi** (`danger`) sui dropdown della barra
+  superiore (toggle + voci figlie), **bianchi** (`light`) sulle voci della sidebar.
+  La campanella notifiche resta gialla.
+- `AppServiceProvider`: il View Composer dei badge ora scende ricorsivamente nei
+  `submenu` e aggrega il counter sul toggle del dropdown, così resta visibile a
+  colpo d'occhio anche col menu chiuso.
+- Aggiunta la chiave di traduzione `istruttore` (`ISTRUTTORE`) in
+  `lang/vendor/adminlte/it/menu.php`: l'header della sezione istruttore in sidebar
+  ora è in MAIUSCOLO, coerente con le altre sezioni.
+
+---
+
 ## [Unreleased] — Feature 6.8: Area istruttore evoluta (note, notifiche, export PDF)
 
 Evoluzione dell'area istruttore da sola lettura a relazione attiva con i propri studenti.

@@ -28,6 +28,7 @@ return [
     'esiti'           => 'ESITI & STATISTICHE',
     'sistema'         => 'SISTEMA',
     'utenti_ruoli'    => 'UTENTI & RUOLI',
+    'istruttore'      => 'ISTRUTTORE',
     'account'         => 'ACCOUNT',
 
     // Deprecati (lasciati per retrocompatibilità con eventuali override esterni)
