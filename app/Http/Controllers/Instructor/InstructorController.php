@@ -3,9 +3,15 @@
 namespace App\Http\Controllers\Instructor;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreInstructorNoteRequest;
+use App\Models\InstructorNote;
 use App\Models\User;
 use App\Services\InstructorService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 class InstructorController extends Controller
 {
@@ -35,7 +41,53 @@ class InstructorController extends Controller
         }
 
         $progress = $this->instructorService->getStudentProgress($student);
+        $notes    = $this->instructorService->getNotesForStudent($user, $student);
 
-        return view('instructor.student', compact('student', 'progress'));
+        return view('instructor.student', compact('student', 'progress', 'notes'));
+    }
+
+    public function storeNote(StoreInstructorNoteRequest $request, User $student): RedirectResponse
+    {
+        $instructor = $request->user();
+
+        abort_unless($instructor->isInstructor() || $instructor->isAdmin(), 403);
+        abort_unless($instructor->hasStudent($student), 403, 'Studente non assegnato a questo istruttore.');
+
+        $this->instructorService->addNote($instructor, $student, $request->validated()['body']);
+
+        return redirect()
+            ->route('instructor.students.show', $student)
+            ->with('success', 'Nota aggiunta con successo.');
+    }
+
+    public function destroyNote(Request $request, User $student, InstructorNote $note): RedirectResponse
+    {
+        $instructor = $request->user();
+
+        abort_unless($instructor->isInstructor() || $instructor->isAdmin(), 403);
+        abort_unless($note->instructor_id === $instructor->id, 403, 'Non puoi eliminare questa nota.');
+
+        $this->instructorService->deleteNote($instructor, $note);
+
+        return redirect()
+            ->route('instructor.students.show', $student)
+            ->with('success', 'Nota eliminata con successo.');
+    }
+
+    public function exportStudentPdf(Request $request, User $student): Response
+    {
+        $instructor = $request->user();
+
+        abort_unless($instructor->isInstructor() || $instructor->isAdmin(), 403);
+        abort_unless($instructor->hasStudent($student) || $instructor->canEditUser(), 403);
+
+        $data = $this->instructorService->prepareStudentExportData($instructor, $student);
+
+        $pdf = Pdf::loadView('instructor.pdf.student-progress', $data)
+            ->setPaper('a4', 'portrait');
+
+        $filename = 'progressi-' . Str::slug($student->name) . '-' . now()->format('Y-m-d') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

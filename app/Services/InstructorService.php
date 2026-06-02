@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\InstructorNote;
 use App\Models\User;
 use App\Models\UserBadge;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class InstructorService
@@ -69,6 +71,56 @@ class InstructorService
         ];
     }
 
+    public function addNote(User $instructor, User $student, string $body): InstructorNote
+    {
+        if (!$instructor->hasStudent($student)) {
+            throw new \InvalidArgumentException('Studente non assegnato a questo istruttore.');
+        }
+
+        return InstructorNote::create([
+            'instructor_id' => $instructor->id,
+            'student_id'    => $student->id,
+            'body'          => $body,
+        ]);
+    }
+
+    public function deleteNote(User $instructor, InstructorNote $note): void
+    {
+        if ($note->instructor_id !== $instructor->id) {
+            throw new \InvalidArgumentException('Non puoi eliminare la nota di un altro istruttore.');
+        }
+
+        $note->delete();
+    }
+
+    public function getNotesForStudent(User $instructor, User $student): Collection
+    {
+        return InstructorNote::where('instructor_id', $instructor->id)
+            ->where('student_id', $student->id)
+            ->latest()
+            ->get();
+    }
+
+    public function prepareStudentExportData(User $instructor, User $student): array
+    {
+        $progress = $this->getStudentProgress($student);
+        $notes    = $this->getNotesForStudent($instructor, $student);
+
+        return [
+            'instructor'   => [
+                'id'    => $instructor->id,
+                'name'  => $instructor->name,
+                'email' => $instructor->email,
+            ],
+            'student'      => $progress['student'],
+            'stats'        => $progress['stats'],
+            'streak'       => $progress['streak'],
+            'badges'       => $progress['badges'],
+            'notes'        => $notes->toArray(),
+            'generated_at' => now(),
+        ];
+    }
+
     public function getInstructorOverview(User $instructor): array
     {
         $students = $instructor->students()
@@ -97,7 +149,8 @@ class InstructorService
                 fn ($join) => $join->on('qa.id', '=', 'latest.max_id')
             )
             ->select('qa.user_id', 'qa.score', 'qa.total_questions')
-            ->pluck(null, 'user_id')
+            ->get()
+            ->keyBy('user_id')
             ->map(fn ($row) => [
                 'score'           => $row->score,
                 'total_questions' => $row->total_questions,

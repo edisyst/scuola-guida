@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\User;
+use App\Notifications\InstructorStudentOutcome;
 use App\Services\BadgeService;
+use App\Services\NotificationService;
 use App\Services\ReviewErrorsService;
 use App\Services\SpacedRepetitionService;
 use App\Services\StreakService;
@@ -18,6 +20,7 @@ class QuizAttemptService
         private StreakService $streakService,
         private BadgeService $badgeService,
         private QuestionVersionService $versionService,
+        private NotificationService $notificationService,
     ) {}
 
     /**
@@ -74,6 +77,14 @@ class QuizAttemptService
             $this->streakService->recordActivity($user);
             $this->badgeService->checkAllBadges($user);
             ReviewErrorsService::forgetErrorCountCache($user->id);
+
+            $instructors = $user->instructors()->get();
+            foreach ($instructors as $instructor) {
+                $this->notificationService->send(
+                    $instructor,
+                    new InstructorStudentOutcome($user, $quiz, $attempt)
+                );
+            }
         }
 
         return $attempt;

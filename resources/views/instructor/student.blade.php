@@ -22,6 +22,10 @@
             <p class="sg-header-subtitle sg-mt-1">{{ $student->email }}</p>
         </div>
         <div class="sg-header-actions">
+            <a href="{{ route('instructor.students.export-pdf', $student) }}"
+               class="sg-btn sg-btn-secondary sg-btn-sm mr-2">
+                <i class="fas fa-file-pdf"></i> Esporta PDF
+            </a>
             <a href="{{ route('instructor.students.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
                 <i class="fas fa-arrow-left"></i> Torna ai miei studenti
             </a>
@@ -172,6 +176,68 @@
                         </table>
                     </div>
                 @endif
+            </div>
+        </div>
+    </div>
+
+    {{-- Note dell'istruttore --}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="sg-card mt-3">
+                <div class="sg-card-header">
+                    <h3 class="sg-card-title">
+                        <i class="fas fa-sticky-note mr-1"></i> Note dell'istruttore
+                    </h3>
+                </div>
+                <div class="p-3">
+                    {{-- Lista note esistenti --}}
+                    @if($notes->isEmpty())
+                        <p class="text-muted mb-3">Nessuna nota ancora aggiunta per questo studente.</p>
+                    @else
+                        @foreach($notes as $note)
+                            <div class="card card-outline card-info mb-2">
+                                <div class="card-body py-2 px-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <p class="mb-1" style="white-space: pre-wrap">{{ $note->body }}</p>
+                                        <form method="POST"
+                                              action="{{ route('instructor.students.notes.destroy', [$student, $note]) }}"
+                                              onsubmit="return confirm('Eliminare questa nota?')"
+                                              class="ml-3 flex-shrink-0">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="sg-btn sg-btn-danger sg-btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ $note->created_at->format('d/m/Y H:i') }}
+                                    </small>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+
+                    {{-- Form nuova nota --}}
+                    <form method="POST" action="{{ route('instructor.students.notes.store', $student) }}" class="mt-3">
+                        @csrf
+                        <div class="form-group mb-2">
+                            <label for="note-body" class="sr-only">Nuova nota</label>
+                            <textarea id="note-body"
+                                      name="body"
+                                      rows="3"
+                                      maxlength="2000"
+                                      class="form-control @error('body') is-invalid @enderror"
+                                      placeholder="Aggiungi una nota su questo studente...">{{ old('body') }}</textarea>
+                            @error('body')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm">
+                            <i class="fas fa-save mr-1"></i> Salva nota
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

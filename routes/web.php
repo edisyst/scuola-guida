@@ -376,6 +376,12 @@ Route::middleware(['auth', '2fa', 'role:admin,instructor'])
             ->name('students.index');
         Route::get('students/{student}', [InstructorController::class, 'showStudent'])
             ->name('students.show');
+        Route::post('students/{student}/notes', [InstructorController::class, 'storeNote'])
+            ->name('students.notes.store');
+        Route::delete('students/{student}/notes/{note}', [InstructorController::class, 'destroyNote'])
+            ->name('students.notes.destroy');
+        Route::get('students/{student}/export-pdf', [InstructorController::class, 'exportStudentPdf'])
+            ->name('students.export-pdf');
     });
 
 /*

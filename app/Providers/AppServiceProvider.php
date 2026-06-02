@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Pagination\Paginator;
+use App\Models\InstructorNote;
 use App\Models\User;
 use App\Models\Question;
 use App\Models\Category;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 use App\Observers\CategoryMaterialObserver;
 use App\Observers\CategoryObserver;
+use App\Observers\InstructorNoteObserver;
 use App\Observers\QuestionObserver;
 use App\Observers\QuizObserver;
 use App\Observers\UserObserver;
@@ -52,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
         Category::observe(CategoryObserver::class);
         User::observe(UserObserver::class);
         \App\Models\CategoryMaterial::observe(CategoryMaterialObserver::class);
+        InstructorNote::observe(InstructorNoteObserver::class);
 
         /*
         |--------------------------------------------------------------------------

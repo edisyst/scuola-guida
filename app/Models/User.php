@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\InstructorNote;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class User extends Authenticatable
@@ -184,6 +185,11 @@ class User extends Authenticatable
     public function hasStudent(User $student): bool
     {
         return $this->students()->where('student_id', $student->id)->exists();
+    }
+
+    public function instructorNotes(): HasMany
+    {
+        return $this->hasMany(InstructorNote::class, 'instructor_id');
     }
 
     /*
