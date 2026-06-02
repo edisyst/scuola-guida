@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class RegistrazioneApprovataNotification extends Notification implements ShouldQueue
 {
@@ -19,7 +21,7 @@ class RegistrazioneApprovataNotification extends Notification implements ShouldQ
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', WebPushChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -44,5 +46,14 @@ class RegistrazioneApprovataNotification extends Notification implements ShouldQ
             'icon'  => 'fas fa-check-circle',
             'color' => 'success',
         ];
+    }
+
+    public function toWebPush(object $notifiable, object $notification): WebPushMessage
+    {
+        return (new WebPushMessage())
+            ->title('Iscrizione approvata')
+            ->body('La tua iscrizione è stata approvata: ora puoi iscriverti agli esami ufficiali.')
+            ->icon('/icons/icon-192.png')
+            ->action('Apri dashboard', route('dashboard'));
     }
 }

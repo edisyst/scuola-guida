@@ -26,7 +26,7 @@
 
                 <div class="mb-2">
                     <label class="form-label form-label-sm mb-1">Tipo di problema</label>
-                    <select wire:model.blur="type" class="form-control form-control-sm">
+                    <select wire:model.blur="type" class="sg-form-control form-control form-control-sm">
                         @foreach(\App\Models\QuestionReport::types() as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach

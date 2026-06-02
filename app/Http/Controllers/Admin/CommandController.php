@@ -130,6 +130,44 @@ class CommandController extends Controller
             'icon'        => 'fas fa-info-circle',
         ],
 
+        // ── MANUTENZIONE ────────────────────────────────────────────────────
+        'enrollments-close-expired' => [
+            'group'       => 'Manutenzione',
+            'label'       => 'Chiudi iscrizioni scadute',
+            'description' => "Rifiuta le iscrizioni pending ai quiz con data di chiusura passata.\nphp artisan enrollments:close-expired",
+            'command'     => 'enrollments:close-expired',
+            'args'        => [],
+            'icon'        => 'fas fa-calendar-times',
+        ],
+
+        // ── NOTIFICHE PUSH ──────────────────────────────────────────────────
+        'push-send-review-reminders' => [
+            'group'       => 'Notifiche push',
+            'label'       => 'Invia promemoria ripasso SM-2',
+            'description' => "Invia una notifica push ai viewer con domande in scadenza oggi (lo scheduler lo esegue automaticamente alle 08:00).\nphp artisan push:send-review-reminders",
+            'command'     => 'push:send-review-reminders',
+            'args'        => [],
+            'icon'        => 'fas fa-bell',
+        ],
+
+        // ── BACKUP ──────────────────────────────────────────────────────────
+        'backup-run' => [
+            'group'       => 'Backup',
+            'label'       => 'Esegui backup ora',
+            'description' => "Avvia immediatamente il backup di DB e media (lo scheduler lo esegue alle 02:00).\nphp artisan backup:run",
+            'command'     => 'backup:run',
+            'args'        => [],
+            'icon'        => 'fas fa-download',
+        ],
+        'backup-clean' => [
+            'group'       => 'Backup',
+            'label'       => 'Pulisci backup obsoleti',
+            'description' => "Elimina i backup fuori dalla retention policy (lo scheduler lo esegue alle 01:30).\nphp artisan backup:clean",
+            'command'     => 'backup:clean',
+            'args'        => [],
+            'icon'        => 'fas fa-archive',
+        ],
+
         // ── GDPR ────────────────────────────────────────────────────────────
         'gdpr-list' => [
             'group'       => 'GDPR',

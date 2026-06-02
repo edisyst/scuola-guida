@@ -35,6 +35,7 @@ use App\Http\Controllers\Viewer\SmartReviewController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\TwoFactorSetupController;
 use App\Http\Controllers\Api\OfflineController;
+use App\Http\Controllers\PushSubscriptionController;
 // PWA offline fallback — no auth required (served from SW cache)
 Route::get('/offline', fn() => view('offline'))->name('offline');
 
@@ -50,6 +51,12 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+    // Web Push subscriptions (viewer only — autorizzazione nel controller)
+    Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store'])
+        ->name('push-subscriptions.store');
+    Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy'])
+        ->name('push-subscriptions.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
