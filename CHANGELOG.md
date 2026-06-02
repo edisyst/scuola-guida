@@ -5,6 +5,43 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.8: Area istruttore evoluta (note, notifiche, export PDF)
+
+Evoluzione dell'area istruttore da sola lettura a relazione attiva con i propri studenti.
+L'istruttore può annotare osservazioni sul percorso dello studente, riceve una notifica
+automatica al completamento di ogni quiz e può esportare un PDF riassuntivo dei progressi
+da condividere con la scuola guida. I permessi di edit sui contenuti restano invariati
+(canEditXxx() = false per il ruolo instructor).
+
+### Added
+
+- Tabella `instructor_notes` (migration `2026_06_02_200001_create_instructor_notes_table`):
+  `instructor_id`, `student_id`, `body`, `created_by`, `timestamps`. Indice composito
+  `(instructor_id, student_id)`. FK verso `users` con `cascadeOnDelete` su entrambi
+  (requisito GDPR). `created_by` nullable con `nullOnDelete`.
+- `app/Models/InstructorNote.php` — trait `HasFactory` e `Auditable`, relazioni
+  `instructor()`, `student()`, `author()`.
+- `app/Observers/InstructorNoteObserver.php` — `creating()` popola `created_by`
+  dall'utente autenticato.
+- Relazione `instructorNotes(): HasMany` su `User`.
+- `InstructorService`: 4 nuovi metodi: `addNote()`, `deleteNote()`,
+  `getNotesForStudent()`, `prepareStudentExportData()`.
+- `InstructorController`: 3 nuovi metodi: `storeNote()`, `destroyNote()`,
+  `exportStudentPdf()`.
+- `app/Http/Requests/StoreInstructorNoteRequest.php` — validazione `body` max 2000.
+- 3 nuove route nel gruppo `instructor.`: `students.notes.store`,
+  `students.notes.destroy`, `students.export-pdf`.
+- `app/Notifications/InstructorStudentOutcome.php` — canali `mail`, `database`,
+  `WebPushChannel`. Inviata all'istruttore al completamento di un quiz dello studente.
+- Dispatch `InstructorStudentOutcome` in `QuizAttemptService::record()` per ogni
+  istruttore assegnato allo studente. Zero side effect se nessun istruttore.
+- Template PDF `resources/views/instructor/pdf/student-progress.blade.php` — CSS
+  inline dompdf-compatibile, KPI, ultimi tentativi, statistiche per quiz, badge, note.
+- Pulsante "Esporta PDF" e card note istruttore in `instructor/student.blade.php`.
+- 8 nuovi test in `tests/Feature/InstructorTest.php` (note CRUD, cascade, PDF, notifiche).
+
+---
+
 ## [Unreleased] — Feature 6.7: Web Push Notifications
 
 Quarto canale di notifica nativo (browser chiuso / dispositivo bloccato). Il viewer
