@@ -62,6 +62,51 @@
         </div>
     @endif
 
+    @if($user->isViewer())
+    <div class="sg-card sg-mb-3" x-data="pushSubscription()" x-init="init()" x-cloak>
+        <div class="sg-card-header sg-flex-between">
+            <h2 class="sg-card-header-title">
+                <i class="fas fa-bell mr-2"></i> Notifiche push
+            </h2>
+            <span x-show="subscribed" class="badge badge-success">Attive</span>
+            <span x-show="!subscribed" class="badge badge-secondary">Non attive</span>
+        </div>
+        <div class="sg-card-body">
+            <p class="text-muted mb-3">
+                Ricevi notifiche native anche a app chiusa (badge guadagnati, approvazione iscrizione,
+                promemoria ripasso SM-2).
+            </p>
+
+            <div x-show="!supported" class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                Il tuo browser non supporta le notifiche push oppure il sito non è servito via HTTPS.
+            </div>
+
+            <div x-show="supported">
+                <button
+                    x-show="!subscribed"
+                    x-bind:disabled="loading"
+                    @click="subscribe()"
+                    class="btn btn-primary">
+                    <span x-show="!loading"><i class="fas fa-bell mr-1"></i> Attiva notifiche push</span>
+                    <span x-show="loading"><i class="fas fa-spinner fa-spin mr-1"></i> Attivazione…</span>
+                </button>
+
+                <button
+                    x-show="subscribed"
+                    x-bind:disabled="loading"
+                    @click="unsubscribe()"
+                    class="btn btn-outline-secondary">
+                    <span x-show="!loading"><i class="fas fa-bell-slash mr-1"></i> Disattiva notifiche push</span>
+                    <span x-show="loading"><i class="fas fa-spinner fa-spin mr-1"></i> Disattivazione…</span>
+                </button>
+
+                <div x-show="error" class="alert alert-danger mt-2" x-text="error"></div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="sg-card sg-card-danger">
         <div class="sg-card-header">
             <h2 class="sg-card-header-title sg-text-danger">Elimina account</h2>
@@ -76,6 +121,92 @@
 
 @section('js')
     @parent
+
+    <script>
+        function pushSubscription() {
+            return {
+                supported:   ('serviceWorker' in navigator) && ('PushManager' in window),
+                subscribed:  false,
+                loading:     false,
+                error:       null,
+                _sub:        null,
+
+                async init() {
+                    if (!this.supported) return;
+                    try {
+                        const reg = await navigator.serviceWorker.ready;
+                        this._sub = await reg.pushManager.getSubscription();
+                        this.subscribed = !!this._sub;
+                    } catch {}
+                },
+
+                async subscribe() {
+                    this.loading = true;
+                    this.error   = null;
+                    try {
+                        const permission = await Notification.requestPermission();
+                        if (permission !== 'granted') {
+                            this.error = 'Permesso negato. Abilita le notifiche nelle impostazioni del browser.';
+                            return;
+                        }
+                        const reg    = await navigator.serviceWorker.ready;
+                        const vapid  = document.querySelector('meta[name="vapid-public-key"]').content;
+                        const appKey = Uint8Array.from(atob(vapid.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+
+                        this._sub = await reg.pushManager.subscribe({
+                            userVisibleOnly:      true,
+                            applicationServerKey: appKey,
+                        });
+
+                        const subJson = this._sub.toJSON();
+                        await fetch('{{ route('push-subscriptions.store') }}', {
+                            method:  'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            },
+                            body: JSON.stringify({
+                                endpoint:        subJson.endpoint,
+                                keys:            subJson.keys,
+                                contentEncoding: 'aesgcm',
+                            }),
+                        });
+
+                        this.subscribed = true;
+                    } catch (e) {
+                        this.error = 'Errore durante l\'attivazione: ' + (e.message || e);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async unsubscribe() {
+                    this.loading = true;
+                    this.error   = null;
+                    try {
+                        const endpoint = this._sub?.endpoint;
+                        await this._sub?.unsubscribe();
+
+                        await fetch('{{ route('push-subscriptions.destroy') }}', {
+                            method:  'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            },
+                            body: JSON.stringify({ endpoint }),
+                        });
+
+                        this._sub      = null;
+                        this.subscribed = false;
+                    } catch (e) {
+                        this.error = 'Errore durante la disattivazione: ' + (e.message || e);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+            };
+        }
+    </script>
 
     <script>
         @if (session('status') === 'profile-updated')
