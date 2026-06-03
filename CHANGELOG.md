@@ -5,6 +5,37 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.9: GDPR data portability (export dati personali)
+
+Implementazione del diritto alla portabilità dei dati (GDPR art. 20): il viewer può scaricare
+un archivio ZIP con tutti i propri dati personali in formato JSON leggibile da macchina,
+incluso l'eventuale documento d'identità caricato. L'admin/editor può esportare i dati di
+qualsiasi utente su richiesta scritta dell'interessato.
+
+### Added
+
+- `GdprExportService` con metodi `buildExport(User)`, `generateZip(User)` e `cleanupOldExports()`.
+  Zero N+1: eager load completo prima della costruzione dell'array. Gestione esplicita degli
+  utenti anonimizzati (`'[anonimizzato]'` invece di `null` per i campi PII).
+- Comando artisan `gdpr:export {user?} {--cleanup-only}` per esportazione da CLI e per il
+  cleanup schedulato. Accetta ID o email utente.
+- Route `GET /profile/download-data` → `ProfileController::downloadPersonalData()` (viewer:
+  solo i propri dati).
+- Route `GET /admin/users/{user}/download-data` → `Admin\UserController::downloadPersonalData()`
+  (admin/editor con `canEditUser()`).
+- Pulsante "Scarica i miei dati" nella pagina profilo viewer con testo esplicativo GDPR art. 20.
+- Pulsante "Esporta dati utente (GDPR art. 20)" nella pagina admin edit utente.
+- Audit log (`gdpr_export`) creato ad ogni esportazione: registra chi ha esportato, per quale
+  utente e il timestamp.
+- Schedulazione cleanup `gdpr:export --cleanup-only` alle 03:00 in `routes/console.php`.
+- ZIP generato in `storage/app/private/gdpr-exports/` (mai pubblicamente accessibile),
+  rimosso automaticamente dopo l'invio via `deleteFileAfterSend(true)`.
+- `tests/Feature/GdprExportTest.php` (8 test): struttura array, utente anonimizzato,
+  download viewer proprio, 403 su utente altrui, download admin, audit log profile,
+  audit log admin, cleanup file vecchi, redirect guest.
+
+---
+
 ## [Unreleased] — Alleggerimento menu laterale (navbar dropdown + menu utente)
 
 Riorganizzazione della disposizione delle voci di menu per alleggerire la sidebar,

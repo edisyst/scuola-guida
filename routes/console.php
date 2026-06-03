@@ -14,3 +14,5 @@ Schedule::command('backup:clean')->dailyAt('01:30');
 Schedule::command('backup:run')->dailyAt('02:00');
 
 Schedule::command('push:send-review-reminders')->dailyAt('08:00');
+
+Schedule::command('gdpr:export --cleanup-only')->dailyAt('03:00');
