@@ -28,5 +28,11 @@
             </button>
         </div>
     </form>
+
+    <div class="sg-text-center sg-mt-2 sg-mb-3">
+        <a href="{{ route('admin.users.download-data', $user) }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-download mr-1"></i> Esporta dati utente (GDPR art. 20)
+        </a>
+    </div>
 </div>
 @endsection

@@ -107,6 +107,24 @@
     </div>
     @endif
 
+    <div class="sg-card sg-mb-3">
+        <div class="sg-card-header">
+            <h2 class="sg-card-header-title">
+                <i class="fas fa-file-archive mr-2"></i> Portabilità dei dati
+            </h2>
+        </div>
+        <div class="sg-card-body">
+            <p class="text-muted mb-3">
+                Scarica un archivio ZIP con tutti i tuoi dati personali in formato JSON
+                (GDPR art. 20 — diritto alla portabilità). Il file include quiz, bookmark,
+                badge, attività e, se caricato, il documento d'identità.
+            </p>
+            <a href="{{ route('profile.download-data') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-download mr-1"></i> Scarica i miei dati
+            </a>
+        </div>
+    </div>
+
     <div class="sg-card sg-card-danger">
         <div class="sg-card-header">
             <h2 class="sg-card-header-title sg-text-danger">Elimina account</h2>

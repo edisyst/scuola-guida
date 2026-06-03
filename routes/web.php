@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile/download-data', [ProfileController::class, 'downloadPersonalData'])->name('profile.download-data');
 
     // Iscrizione anagrafica viewer (invio dati per esami ufficiali)
     Route::post('/profile/registration', [RegistrationController::class, 'submit'])
@@ -251,6 +252,8 @@ Route::middleware(['auth', '2fa'])
             // USERS
             Route::get('users/{user}/stats', [UserStatsController::class, 'show'])
                 ->name('users.stats');
+            Route::get('users/{user}/download-data', [AdminUserController::class, 'downloadPersonalData'])
+                ->name('users.download-data');
             Route::resource('users', AdminUserController::class)
                 ->except(['show']);
 
