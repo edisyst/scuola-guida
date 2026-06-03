@@ -1,5 +1,16 @@
 # Backup automatico e Health dashboard
 
+## Indice
+
+1. [Panoramica](#panoramica)
+2. [Configurazione produzione](#configurazione-produzione)
+3. [Ripristino da backup](#ripristino-da-backup)
+4. [Health dashboard](#health-dashboard)
+5. [Verifica integrità da CI/CD](#verifica-integrità-da-cicd)
+6. [Notifica fallimento](#notifica-fallimento)
+
+---
+
 ## Panoramica
 
 Il backup automatico usa `spatie/laravel-backup` (v9). Ogni notte vengono eseguiti:

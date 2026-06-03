@@ -8,6 +8,15 @@ Documento di riferimento per i meccanismi di sicurezza/compliance del progetto:
 
 ---
 
+## Indice
+
+1. [Ruoli e permessi](#ruoli-e-permessi)
+2. [Autenticazione a due fattori (2FA)](#autenticazione-a-due-fattori-2fa)
+3. [GDPR — anonimizzazione dati personali](#gdpr--anonimizzazione-dati-personali)
+4. [GDPR — portabilità dati personali (art. 20)](#gdpr--portabilità-dati-personali-art-20)
+
+---
+
 ## Ruoli e permessi
 
 | Ruolo | Accesso | Iscrizione anagrafica |

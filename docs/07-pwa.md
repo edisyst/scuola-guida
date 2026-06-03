@@ -4,6 +4,18 @@ ScuolaGUIDA è installabile come app nativa sul dispositivo dell'utente (Android
 
 ---
 
+## Indice
+
+1. [Cosa funziona offline](#cosa-funziona-offline)
+2. [Cosa NON funziona offline](#cosa-non-funziona-offline)
+3. [Installazione dell'app](#installazione-dellapp)
+4. [Architettura](#architettura)
+5. [Test manuali](#test-manuali)
+6. [Note tecniche per sviluppatori](#note-tecniche-per-sviluppatori)
+7. [Web Push Notifications (Feature 6.7)](#web-push-notifications-feature-67)
+
+---
+
 ## Cosa funziona offline
 
 - **Modalità studio** — le ultime domande revisionate (fino a 100, pre-caricate via `/api/offline/questions` all'avvio di ogni sessione) sono disponibili in IndexedDB. Quando la connessione cade, il componente Alpine entra in "offline mode": le risposte vengono accodate localmente e sincronizzate automaticamente al ritorno online via `POST /api/offline/sync-answers`.

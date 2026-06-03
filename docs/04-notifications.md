@@ -6,6 +6,19 @@ Ogni classe `App\Notifications\*` è un canale doppio (`via()` ritorna `['mail',
 
 ---
 
+## Indice
+
+1. [Eventi tracciati](#eventi-tracciati)
+2. [Caratteristiche](#caratteristiche)
+3. [Payload `toDatabase` — contratto unico](#payload-todatabase--contratto-unico)
+4. [Campanella in navbar (Livewire)](#campanella-in-navbar-livewire)
+5. [Voce sidebar (senza badge)](#voce-sidebar-senza-badge)
+6. [Pagina "Tutte le notifiche"](#pagina-tutte-le-notifiche)
+7. [File chiave](#file-chiave)
+8. [Aggiungere una nuova notifica](#aggiungere-una-nuova-notifica)
+
+---
+
 ## Eventi tracciati
 
 | Evento | Destinatario | Notification | Canali |

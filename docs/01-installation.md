@@ -4,6 +4,24 @@ Guida operativa per installare e configurare ScuolaGUIDA in ambiente di sviluppo
 
 ---
 
+## Indice
+
+1. [Prerequisiti](#prerequisiti)
+2. [1. Clona il repository](#1-clona-il-repository)
+3. [2. Dipendenze PHP e Node](#2-dipendenze-php-e-node)
+4. [3. Configurazione ambiente](#3-configurazione-ambiente)
+5. [4. Database e dati iniziali](#4-database-e-dati-iniziali)
+6. [5. Storage pubblico](#5-storage-pubblico)
+7. [6. Email di notifica (Mailtrap)](#6-email-di-notifica-mailtrap)
+8. [7. Worker della coda email](#7-worker-della-coda-email)
+9. [8. Scheduler](#8-scheduler-chiusura-automatica-iscrizioni-scadute)
+10. [9. Avvia il server di sviluppo](#9-avvia-il-server-di-sviluppo)
+11. [Comandi artisan utili](#comandi-artisan-utili)
+12. [Variabili `.env` rilevanti](#variabili-env-rilevanti)
+13. [Risoluzione problemi comuni](#risoluzione-problemi-comuni)
+
+---
+
 ## Prerequisiti
 
 | Tool | Versione minima |
