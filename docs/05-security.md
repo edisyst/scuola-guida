@@ -1,9 +1,10 @@
 # Sicurezza
 
-Documento di riferimento per i tre meccanismi di sicurezza/compliance del progetto:
+Documento di riferimento per i meccanismi di sicurezza/compliance del progetto:
 - **Ruoli e permessi** — sistema custom (no Spatie)
 - **Autenticazione a due fattori (2FA)** — obbligatoria per admin/editor
-- **GDPR** — anonimizzazione dati personali (art. 17 GDPR)
+- **GDPR art. 17** — anonimizzazione dati personali (diritto all'oblio)
+- **GDPR art. 20** — portabilità dati personali (export ZIP)
 
 ---
 
@@ -150,6 +151,101 @@ Tutto dentro una `DB::transaction()` (rollback in caso di errore):
 - **`--dry-run`** → elenca i campi/contatori/sessioni che verrebbero toccati, zero scritture sul DB.
 - **Logging** → `Log::info()` finale con `user_id` / `executor` / `timestamp` / contatori notifiche e documento. **Non** logga la PII originale.
 - **Login post-anonimizzazione** → impossibile: la password è hash di stringa random, e l'email originale non esiste più (il record è raggiungibile solo via nuovo dominio `@eliminato.invalid`).
+
+---
+
+## GDPR — portabilità dati personali (art. 20)
+
+### Descrizione
+
+Il viewer può richiedere e scaricare tutti i propri dati personali in un archivio ZIP
+contenente un file `export.json` (formato JSON leggibile da macchina) e, se presente,
+una cartella `files/` con il documento d'identità caricato.
+
+L'admin o un editor con permesso `canEditUser()` può esportare i dati di qualsiasi
+utente (es. su richiesta scritta dell'interessato).
+
+### Flusso
+
+**Viewer (profilo):**
+1. `/profile` → pulsante "Scarica i miei dati" (sezione "Portabilità dei dati").
+2. `GET /profile/download-data` → `ProfileController::downloadPersonalData()`.
+3. Il controller chiama `GdprExportService::generateZip()`, registra l'audit log
+   (`event = gdpr_export`) e invia il file con `deleteFileAfterSend(true)`.
+
+**Admin/editor:**
+1. `/admin/users/{id}/edit` → pulsante "Esporta dati utente (GDPR art. 20)".
+2. `GET /admin/users/{user}/download-data` → `Admin\UserController::downloadPersonalData()`.
+3. Stessa logica del flusso viewer, ma `exported_by` nell'audit log è l'admin.
+
+**CLI (su richiesta scritta / schedulazione):**
+```bash
+# Esporta e stampa il path del file ZIP
+php artisan gdpr:export 42
+php artisan gdpr:export mario.rossi@example.com
+
+# Solo cleanup file vecchi (> 24h) — eseguito anche internamente ad ogni export
+php artisan gdpr:export --cleanup-only
+```
+
+### Struttura del file `export.json`
+
+| Chiave | Contenuto |
+|---|---|
+| `meta` | Data export, versione app, email utente |
+| `anagrafica` | Campi `users`: nome, email, ruolo, PII anagrafica, stato iscrizione |
+| `quiz_attempts` | Tentativi quiz: score, durata, esito |
+| `saved_questions` | Bookmark con testo domanda, categoria e nota personale |
+| `learned_questions` | Domande marcate come imparate con timestamp |
+| `question_flags` | Segnalazioni errori inviate, tipo e stato |
+| `diagnostic` | Risultati del test diagnostico per categoria |
+| `spaced_repetition` | Parametri SM-2 per ogni domanda in ripasso (ease, interval, next_review_at) |
+| `activity` | Log attività giornaliera (per streak) |
+| `badges` | Badge guadagnati con timestamp |
+
+### Storage e sicurezza
+
+- I file ZIP vengono creati in `storage/app/private/gdpr-exports/` (disco `local`, mai
+  accessibile via URL pubblico).
+- `deleteFileAfterSend(true)` garantisce la rimozione immediata dopo l'invio HTTP.
+- Ogni notte alle 03:00 il comando `gdpr:export --cleanup-only` rimuove i file più
+  vecchi di 24h (fallback per file non rimossi, es. errori di rete).
+
+### Audit
+
+Ogni esportazione scrive un record in `audit_logs`:
+- `event`: `gdpr_export`
+- `user_id`: chi ha eseguito l'export (il viewer o l'admin)
+- `model_type`: `App\Models\User`
+- `model_id`: ID dell'utente i cui dati sono stati esportati
+- `new_values`: `{ exported_by, exported_at }`
+
+### File chiave
+
+```
+app/
+  Services/GdprExportService.php           # buildExport, generateZip, cleanupOldExports
+  Console/Commands/GdprExport.php          # gdpr:export {user?} {--cleanup-only}
+  Http/Controllers/ProfileController.php   # downloadPersonalData() (viewer self)
+  Http/Controllers/Admin/UserController.php # downloadPersonalData(User) (admin)
+routes/
+  web.php                                  # GET /profile/download-data + /admin/users/{user}/download-data
+  console.php                              # Schedule gdpr:export --cleanup-only @03:00
+resources/views/
+  profile/edit.blade.php                   # Sezione "Portabilità dei dati"
+  admin/users/edit.blade.php               # Bottone "Esporta dati utente"
+tests/Feature/GdprExportTest.php           # 8 test di copertura
+```
+
+### Note implementative
+
+- `buildExport()` usa eager loading completo prima dei map: zero N+1.
+- Gli utenti anonimizzati (PII null) ricevono `'[anonimizzato]'` invece di null per
+  i campi semanticamente significativi — il service non lancia eccezioni su null.
+- La tabella `learned_questions` non ha timestamps standard: usa `marked_at`.
+- La tabella `user_activity_log` usa il nome esplicito (`protected $table`).
+
+---
 
 ### Note implementative
 

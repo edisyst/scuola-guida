@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\AuditLog;
+use App\Models\User;
+use App\Services\GdprExportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,6 +38,26 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    public function downloadPersonalData(GdprExportService $service): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $user = auth()->user();
+
+        $zipPath = $service->generateZip($user);
+
+        AuditLog::create([
+            'user_id'    => $user->id,
+            'event'      => 'gdpr_export',
+            'model_type' => User::class,
+            'model_id'   => $user->id,
+            'old_values' => [],
+            'new_values' => ['exported_by' => $user->id, 'exported_at' => now()->toIso8601String()],
+        ]);
+
+        return response()
+            ->download($zipPath, "miei-dati-{$user->id}.zip")
+            ->deleteFileAfterSend(true);
     }
 
     /**

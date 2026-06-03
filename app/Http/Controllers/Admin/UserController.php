@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\AuditLog;
 use App\Models\User;
+use App\Services\GdprExportService;
 use App\Services\UserService;
 
 class UserController extends Controller
@@ -50,6 +52,26 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Utente aggiornato');
+    }
+
+    public function downloadPersonalData(User $user, GdprExportService $service): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        abort_unless(auth()->user()->canEditUser(), 403);
+
+        $zipPath = $service->generateZip($user);
+
+        AuditLog::create([
+            'user_id'    => auth()->id(),
+            'event'      => 'gdpr_export',
+            'model_type' => User::class,
+            'model_id'   => $user->id,
+            'old_values' => [],
+            'new_values' => ['exported_by' => auth()->id(), 'exported_at' => now()->toIso8601String()],
+        ]);
+
+        return response()
+            ->download($zipPath, "dati-utente-{$user->id}.zip")
+            ->deleteFileAfterSend(true);
     }
 
     public function destroy(User $user)

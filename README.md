@@ -19,6 +19,7 @@ Funzionalità principali:
 - **Audit log con filtri e diff** — ogni modifica al sistema è tracciata e consultabile da admin con filtri per utente, modello, tipo azione e range date; pannello diff Prima/Dopo per ogni voce; export Excel con i filtri attivi. Gestione corretta degli utenti anonimizzati (GDPR).
 - **Area istruttore evoluta** — il ruolo `instructor` può aggiungere note testuali sui propri studenti assegnati, riceve una notifica automatica (mail + in-app + push) al completamento di ogni quiz e può esportare un PDF riassuntivo dei progressi (KPI, tentativi, badge, note) da condividere con la scuola guida. I permessi di edit sui contenuti restano invariati. Gli admin assegnano gli studenti tramite il pannello `Gestione istruttori` e possono esportare il PDF per qualsiasi studente.
 - **[Web Push Notifications](docs/07-pwa.md#web-push-notifications-feature-67)** — quarto canale di notifica nativo (browser chiuso / dispositivo bloccato). Il viewer si iscrive dal profilo; le push affiancano mail e database per approvazione iscrizione, badge guadagnati e promemoria ripasso SM-2 (schedulato alle 08:00).
+- **GDPR portabilità dati (art. 20)** — il viewer scarica un archivio ZIP con tutti i propri dati personali in formato JSON (quiz, bookmark, badge, attività, SM-2, documento d'identità). L'admin/editor può esportare i dati di qualsiasi utente da `/admin/users/{id}/edit`. Ogni export è tracciato nell'audit log; il file ZIP viene eliminato subito dopo l'invio (`deleteFileAfterSend`). Cleanup notturno automatico alle 03:00 via `gdpr:export --cleanup-only`.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis · `laravel-notification-channels/webpush`
 
@@ -66,7 +67,7 @@ Per il setup completo vedi:
 | [docs/02-architecture.md](docs/02-architecture.md) | Flusso request, Livewire 3, ruoli, cicli di vita (con diagrammi SVG) |
 | [docs/03-features.md](docs/03-features.md) | Catalogo funzionalità admin/editor e viewer, badge sidebar, dashboard utente |
 | [docs/04-notifications.md](docs/04-notifications.md) | Sistema notifiche email + in-app, bell Livewire, payload contract |
-| [docs/05-security.md](docs/05-security.md) | Ruoli & permessi, 2FA, GDPR anonimizzazione |
+| [docs/05-security.md](docs/05-security.md) | Ruoli & permessi, 2FA, GDPR anonimizzazione (art. 17) e portabilità (art. 20) |
 | [docs/06-study-and-simulator.md](docs/06-study-and-simulator.md) | Modalità studio, simulatore esame, struttura `QuizAttempt.answers` |
 | [docs/07-pwa.md](docs/07-pwa.md) | PWA: cosa funziona offline, installazione, versionamento service worker |
 | [docs/08-ui-patterns.md](docs/08-ui-patterns.md) | Convenzioni UI/Livewire per chi sviluppa (design system `sg-*`) |
