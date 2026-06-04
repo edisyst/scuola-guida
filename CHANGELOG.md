@@ -23,6 +23,18 @@ per popolare automaticamente le traduzioni EN dai due file Excel durante il `db:
 - `QuestionSeeder` aggiornato: legge `file_con_category_id_EN.xlsx` (foglio "Domande")
   e inserisce le traduzioni EN matchemate per posizione riga (stesso ordine dei due file).
   Usa `DB::getPdo()->lastInsertId()` per recuperare gli ID assegnati dopo bulk insert.
+- `CategoryTranslationObserver` imposta `created_by` in `creating()`.
+- `CategoryTranslationService` (`upsert` idempotente, `delete`, `getForCategory`).
+- `Admin\CategoryTranslationController` (store/update/destroy) protetto da `canEditCategory()`.
+- Form Request `StoreCategoryTranslationRequest`, `UpdateCategoryTranslationRequest`.
+  La locale 'it' è esclusa a livello di validazione (fonte di verità, non traducibile).
+- Route `POST/PUT/DELETE /admin/categories/{category}/translations/{locale?}`.
+- Sezione "Traduzioni" embedded nella pagina `/admin/categories/{id}/edit`: mostra
+  traduzioni esistenti con form modifica/elimina e form aggiunta (locale select +
+  input nome). Visibile a admin/editor con `canEditCategory()`.
+- Feature test `CategoryTranslationTest` (15 test): `getLocalizedName()` + fallback,
+  service upsert idempotente, autorizzazione admin/editor/viewer, `created_by`,
+  update/delete, validazione locale, pagina edit, cascade delete.
 
 ---
 

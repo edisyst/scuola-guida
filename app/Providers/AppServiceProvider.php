@@ -19,6 +19,7 @@ use App\Observers\CategoryMaterialObserver;
 use App\Observers\CategoryObserver;
 use App\Observers\InstructorNoteObserver;
 use App\Observers\QuestionObserver;
+use App\Observers\CategoryTranslationObserver;
 use App\Observers\QuestionTranslationObserver;
 use App\Observers\QuizObserver;
 use App\Observers\UserObserver;
@@ -57,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\CategoryMaterial::observe(CategoryMaterialObserver::class);
         InstructorNote::observe(InstructorNoteObserver::class);
         \App\Models\QuestionTranslation::observe(QuestionTranslationObserver::class);
+        \App\Models\CategoryTranslation::observe(CategoryTranslationObserver::class);
 
         /*
         |--------------------------------------------------------------------------
