@@ -14,7 +14,7 @@ class BookmarkController extends Controller
     {
         $query = auth()->user()
             ->bookmarkedQuestions()
-            ->with('category');
+            ->with('category.translations');
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
@@ -25,7 +25,7 @@ class BookmarkController extends Controller
         }
 
         $bookmarks = $query->paginate(20)->withQueryString();
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::with('translations')->orderBy('name')->get();
 
         return view('bookmarks.index', compact('bookmarks', 'categories'));
     }

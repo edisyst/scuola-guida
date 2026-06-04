@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Category extends Model
@@ -41,13 +42,32 @@ class Category extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function questions()
+    public function questions(): HasMany
     {
         return $this->hasMany(Question::class);
     }
 
-    public function materials()
+    public function materials(): HasMany
     {
         return $this->hasMany(CategoryMaterial::class);
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(CategoryTranslation::class);
+    }
+
+    public function getLocalizedName(?string $locale = null): string
+    {
+        $locale ??= app()->getLocale();
+
+        if ($locale === config('locales.default', 'it')) {
+            return $this->name;
+        }
+
+        /** @var CategoryTranslation|null $translation */
+        $translation = $this->translations->firstWhere('locale', $locale);
+
+        return $translation?->name ?? $this->name;
     }
 }

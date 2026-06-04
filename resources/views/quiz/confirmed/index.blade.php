@@ -7,45 +7,45 @@
 <div class="sg-wrapper">
 
     <div class="sg-header">
-        <p class="sg-header-subtitle">Quiz ufficiali</p>
-        <h1 class="sg-header-title"><i class="fas fa-clipboard-check mr-2"></i> Quiz disponibili</h1>
+        <p class="sg-header-subtitle">{{ __('viewer.quiz.official') }}</p>
+        <h1 class="sg-header-title"><i class="fas fa-clipboard-check mr-2"></i> {{ __('viewer.quiz.available') }}</h1>
     </div>
 
     @if($user->isViewer() && !$canEnroll)
         <div class="alert alert-warning sg-mb-3">
             <i class="fas fa-exclamation-triangle"></i>
-            <strong>Iscrizione anagrafica necessaria.</strong>
+            <strong>{{ __('viewer.quiz.registration_required') }}</strong>
             Per iscriverti agli esami ufficiali devi prima inviare i tuoi dati anagrafici dal
             <a href="{{ route('profile.edit') }}">tuo profilo</a> ed essere approvato dall'amministratore.
             @if($user->isRegistrationPending())
-                La tua richiesta è in attesa di revisione.
+                {{ __('viewer.quiz.registration_pending') }}
             @elseif($user->isRegistrationRejected())
-                La tua precedente richiesta è stata rifiutata: correggi i dati e reinviala.
+                {{ __('viewer.quiz.registration_rejected') }}
             @endif
-            Nel frattempo puoi sempre <strong>esercitarti con i quiz casuali</strong>.
+            {!! __('viewer.quiz.practice_meanwhile') !!}
         </div>
     @elseif(!$user->isViewer())
         <div class="alert alert-info sg-mb-3">
             <i class="fas fa-eye"></i>
-            <strong>Visualizzazione in sola lettura.</strong>
-            Gli utenti {{ $user->isAdmin() ? 'amministratori' : 'editor' }} non partecipano agli esami ufficiali.
+            <strong>{{ __('viewer.quiz.readonly_admin') }}</strong>
+            {{ $user->isAdmin() ? __('viewer.quiz.readonly_note_admin') : __('viewer.quiz.readonly_note_editor') }}
         </div>
     @endif
 
     <div class="sg-card">
         @if($quizzes->isEmpty())
-            <div class="sg-table-empty">Nessun quiz confermato disponibile al momento.</div>
+            <div class="sg-table-empty">{{ __('viewer.quiz.no_quizzes') }}</div>
         @else
             <div class="table-responsive">
                 <table class="sg-table">
                     <thead>
                         <tr>
-                            <th>Titolo</th>
-                            <th>Domande</th>
-                            <th>Tempo</th>
+                            <th>{{ __('viewer.quiz.title_col') }}</th>
+                            <th>{{ __('viewer.quiz.questions_col') }}</th>
+                            <th>{{ __('viewer.quiz.time_col') }}</th>
                             @if($user->isViewer())
-                                <th>Stato iscrizione</th>
-                                <th class="text-right">Azioni</th>
+                                <th>{{ __('viewer.quiz.enrollment_status') }}</th>
+                                <th class="text-right">{{ __('viewer.quiz.actions') }}</th>
                             @endif
                         </tr>
                     </thead>
@@ -68,13 +68,13 @@
                                 @if($user->isViewer())
                                     <td>
                                         @if($active && $active->isPending())
-                                            <span class="sg-badge sg-badge-warning">In attesa</span>
+                                            <span class="sg-badge sg-badge-warning">{{ __('viewer.quiz.status_pending') }}</span>
                                         @elseif($active && $active->isApproved())
-                                            <span class="sg-badge sg-badge-success">Approvata</span>
+                                            <span class="sg-badge sg-badge-success">{{ __('viewer.quiz.status_approved') }}</span>
                                         @elseif($latest && $latest->isCompleted())
-                                            <span class="sg-badge sg-badge-info">Già svolto</span>
+                                            <span class="sg-badge sg-badge-info">{{ __('viewer.quiz.status_completed') }}</span>
                                         @elseif($latest && $latest->isRejected())
-                                            <span class="sg-badge sg-badge-danger">Rifiutata</span>
+                                            <span class="sg-badge sg-badge-danger">{{ __('viewer.quiz.status_rejected') }}</span>
                                         @else
                                             <span class="sg-text-muted">—</span>
                                         @endif
@@ -83,13 +83,13 @@
                                         @if($active && $active->isApproved())
                                             <a href="{{ route('quiz.play', $quiz) }}"
                                                class="sg-btn sg-btn-primary sg-btn-sm"
-                                               onclick="return confirm('Puoi svolgere questo quiz una sola volta. Procedere?');">
-                                                <i class="fas fa-play"></i> Svolgi
+                                               onclick="return confirm('{{ __('viewer.quiz.play_confirm') }}');">
+                                                <i class="fas fa-play"></i> {{ __('viewer.quiz.play_btn') }}
                                             </a>
                                         @elseif($active && $active->isPending())
-                                            <span class="sg-text-muted"><i class="fas fa-hourglass-half"></i> Attendi approvazione</span>
+                                            <span class="sg-text-muted"><i class="fas fa-hourglass-half"></i> {{ __('viewer.quiz.wait_approval') }}</span>
                                         @elseif($latest && $latest->isCompleted())
-                                            <span class="sg-text-muted">Tentativo già usato</span>
+                                            <span class="sg-text-muted">{{ __('viewer.quiz.already_used') }}</span>
                                         @elseif($quiz->enrollmentsNotYetOpen())
                                             <span class="sg-text-muted">
                                                 <i class="fas fa-clock"></i>
@@ -97,17 +97,17 @@
                                             </span>
                                         @elseif($quiz->enrollmentsClosed())
                                             <span class="sg-text-muted">
-                                                <i class="fas fa-lock"></i> Iscrizioni chiuse
+                                                <i class="fas fa-lock"></i> {{ __('viewer.quiz.enrollments_closed') }}
                                             </span>
                                         @elseif(!$canEnroll)
                                             <a href="{{ route('profile.edit') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                                                <i class="fas fa-id-card"></i> Completa profilo
+                                                <i class="fas fa-id-card"></i> {{ __('viewer.quiz.complete_profile') }}
                                             </a>
                                         @else
                                             <form method="POST" action="{{ route('quiz.enrollments.store', $quiz) }}" class="d-inline">
                                                 @csrf
                                                 <button class="sg-btn sg-btn-outline sg-btn-sm">
-                                                    <i class="fas fa-paper-plane"></i> Richiedi iscrizione
+                                                    <i class="fas fa-paper-plane"></i> {{ __('viewer.quiz.request_enrollment') }}
                                                 </button>
                                             </form>
                                         @endif

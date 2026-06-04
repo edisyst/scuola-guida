@@ -77,7 +77,7 @@
                             {{-- Header categoria --}}
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h6 class="font-weight-bold mb-0" style="line-height:1.3;">
-                                    {{ $item['category']->name }}
+                                    {{ $item['category']->getLocalizedName() }}
                                 </h6>
                                 <span class="sg-badge {{ $badgeClass }} ml-2" style="white-space:nowrap;">
                                     {{ $mastery }}%

@@ -66,4 +66,21 @@ class LocaleTest extends TestCase
         $response->assertSessionHas('info');
         $response->assertRedirect();
     }
+
+    public function test_switch_locale_to_spanish(): void
+    {
+        $response = $this->post(route('locale.switch'), ['locale' => 'es']);
+
+        $response->assertSessionHas('app_locale', 'es');
+        $response->assertRedirect();
+    }
+
+    public function test_menu_string_translated_to_spanish(): void
+    {
+        app()->setLocale('es');
+
+        $this->assertEquals('Panel', __('menu.dashboard'));
+        $this->assertEquals('Preguntas', __('menu.domande'));
+        $this->assertEquals('Idioma actualizado.', __('menu.locale_changed'));
+    }
 }

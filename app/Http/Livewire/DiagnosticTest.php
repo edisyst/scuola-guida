@@ -46,7 +46,7 @@ class DiagnosticTest extends Component
 
         if (!$this->completed && isset($this->questionIds[$this->currentIndex])) {
             // Eager-load translations (Feature 7.1): localizzazione testo senza N+1.
-            $currentQuestion = Question::with(['category', 'translations'])
+            $currentQuestion = Question::with(['category.translations', 'translations'])
                 ->find($this->questionIds[$this->currentIndex]);
 
             if ($currentQuestion) {

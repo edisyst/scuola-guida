@@ -121,7 +121,7 @@ class QuestionTranslationTest extends TestCase
                 'text'   => 'Original text',
             ]);
 
-        $response->assertRedirect(route('admin.questions.translations.index', $question));
+        $response->assertRedirect(route('admin.questions.edit', $question));
         $this->assertDatabaseHas('question_translations', [
             'question_id' => $question->id,
             'locale'      => 'en',
@@ -230,6 +230,49 @@ class QuestionTranslationTest extends TestCase
         $response->assertOk();
         $response->assertSee('TestoItalianoUnivoco');
         $response->assertDontSee('EnglishUniqueText');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT PAGE — sezione traduzioni integrata
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_edit_page_shows_existing_translations(): void
+    {
+        $question = Question::factory()->create(['question' => 'Testo italiano']);
+        QuestionTranslation::factory()->locale('en')->create([
+            'question_id' => $question->id,
+            'text'        => 'English text',
+        ]);
+
+        $this->actingAs($this->adminUser())
+            ->withSession(['2fa_verified' => true])
+            ->get(route('admin.questions.edit', $question))
+            ->assertOk()
+            ->assertSee('English text');
+    }
+
+    public function test_edit_page_shows_add_translation_form_for_available_locales(): void
+    {
+        $question = Question::factory()->create();
+
+        $this->actingAs($this->adminUser())
+            ->withSession(['2fa_verified' => true])
+            ->get(route('admin.questions.edit', $question))
+            ->assertOk()
+            ->assertSee('Aggiungi traduzione');
+    }
+
+    public function test_edit_page_hides_translation_form_for_viewer(): void
+    {
+        $question = Question::factory()->create();
+
+        $this->actingAs($this->viewerUser())
+            ->withSession(['2fa_verified' => true])
+            ->get(route('admin.questions.edit', $question))
+            ->assertOk()
+            ->assertDontSee('Aggiungi traduzione');
     }
 
     /*

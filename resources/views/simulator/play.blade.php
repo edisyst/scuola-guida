@@ -13,8 +13,8 @@
 
     <div class="quiz-header d-flex flex-wrap justify-content-between align-items-end">
         <div class="quiz-header-info">
-            <p class="progress-label">Domanda <span id="current-num">1</span> di <span id="total-num"></span></p>
-            <h1 class="quiz-title">Simulatore Esame Patente B</h1>
+            <p class="progress-label">{{ __('viewer.question_label') }} <span id="current-num">1</span> {{ __('viewer.of') }} <span id="total-num"></span></p>
+            <h1 class="quiz-title">{{ __('viewer.simulator.title_full') }}</h1>
         </div>
 
         <div class="d-flex align-items-end gap-3">
@@ -29,8 +29,8 @@
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-sm btn-outline-danger"
-                        onclick="return confirm('Vuoi davvero annullare la simulazione? I dati andranno persi.');">
-                    <i class="fas fa-times me-1"></i> Abbandona
+                        onclick="return confirm('{{ __('viewer.simulator.abandon_confirm') }}');">
+                    <i class="fas fa-times me-1"></i> {{ __('viewer.simulator.abandon') }}
                 </button>
             </form>
         </div>
@@ -43,7 +43,7 @@
             <div class="card question-card h-100">
                 <div class="card-body p-4">
 
-                    <span class="question-badge">Domanda <span id="q-badge-num">1</span></span>
+                    <span class="question-badge">{{ __('viewer.question_label') }} <span id="q-badge-num">1</span></span>
 
                     <div id="question-text"></div>
 
@@ -97,10 +97,10 @@
 
                     <div class="answer-area">
                         <button class="btn btn-answer" data-value="1">
-                            <i class="fas fa-check"></i> VERO
+                            <i class="fas fa-check"></i> {{ __('viewer.answer_true') }}
                         </button>
                         <button class="btn btn-answer" data-value="0">
-                            <i class="fas fa-times"></i> FALSO
+                            <i class="fas fa-times"></i> {{ __('viewer.answer_false') }}
                         </button>
                     </div>
 
@@ -110,10 +110,10 @@
 
                     <div class="d-flex justify-content-between mt-4">
                         <button id="prev-question" class="btn btn-outline-secondary">
-                            <i class="fas fa-chevron-left me-1"></i> Precedente
+                            <i class="fas fa-chevron-left me-1"></i> {{ __('viewer.prev') }}
                         </button>
                         <button id="next-question" class="btn btn-outline-primary">
-                            Prossima <i class="fas fa-chevron-right ms-1"></i>
+                            {{ __('viewer.next') }} <i class="fas fa-chevron-right ms-1"></i>
                         </button>
                     </div>
 
@@ -132,23 +132,23 @@
             <div class="card sidebar-card h-100 d-flex flex-column">
 
                 <div class="sidebar-section text-center">
-                    <p class="sidebar-label mb-1">Tempo rimasto</p>
+                    <p class="sidebar-label mb-1">{{ __('viewer.time_remaining') }}</p>
                     <span id="timer">00:00</span>
                 </div>
 
                 <div class="sidebar-section">
-                    <p class="sidebar-label">Errori <span id="errors-count">0</span> / {{ $maxErrors }}</p>
+                    <p class="sidebar-label">{{ __('viewer.errors') }} <span id="errors-count">0</span> / {{ $maxErrors }}</p>
                     <div class="error-dots" id="error-dots"></div>
                 </div>
 
                 <div class="sidebar-section flex-grow-1">
-                    <p class="sidebar-label">Navigazione rapida</p>
+                    <p class="sidebar-label">{{ __('viewer.quick_nav') }}</p>
                     <div id="navigator"></div>
                 </div>
 
                 <div class="sidebar-section">
                     <button id="finish-quiz" class="btn btn-dark w-100">
-                        <i class="fas fa-flag-checkered me-1"></i> Consegna
+                        <i class="fas fa-flag-checkered me-1"></i> {{ __('viewer.simulator.submit') }}
                     </button>
                 </div>
 
@@ -162,28 +162,28 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-flag-checkered me-1"></i> Conferma consegna</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                    <h5 class="modal-title"><i class="fas fa-flag-checkered me-1"></i> {{ __('viewer.simulator.confirm_submit_title') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('viewer.simulator.back_to_sim') }}"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Stai per consegnare la simulazione. Verifica il riepilogo:</p>
+                    <p>{{ __('viewer.simulator.confirm_submit_text') }}</p>
                     <ul class="list-unstyled mb-3">
                         <li><i class="fas fa-check-circle text-success me-1"></i>
-                            Risposte date: <strong id="summary-answered">0</strong> / <strong id="summary-total">0</strong></li>
+                            {{ __('viewer.simulator.answers_given') }}: <strong id="summary-answered">0</strong> / <strong id="summary-total">0</strong></li>
                         <li><i class="fas fa-question-circle text-muted me-1"></i>
-                            Non risposte: <strong id="summary-skipped">0</strong></li>
+                            {{ __('viewer.simulator.unanswered') }}: <strong id="summary-skipped">0</strong></li>
                         <li><i class="fas fa-times-circle text-danger me-1"></i>
-                            Errori commessi: <strong id="summary-errors">0</strong></li>
+                            {{ __('viewer.simulator.errors_made') }}: <strong id="summary-errors">0</strong></li>
                     </ul>
                     <div class="alert alert-warning small mb-0">
                         <i class="fas fa-info-circle me-1"></i>
-                        Le domande non risposte vengono conteggiate come errori.
+                        {{ __('viewer.simulator.unanswered_error_note') }}
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Torna alla simulazione</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('viewer.simulator.back_to_sim') }}</button>
                     <button type="button" id="confirm-submit-btn" class="btn btn-success">
-                        <i class="fas fa-paper-plane me-1"></i> Consegna comunque
+                        <i class="fas fa-paper-plane me-1"></i> {{ __('viewer.simulator.submit_anyway') }}
                     </button>
                 </div>
             </div>
@@ -195,6 +195,14 @@
 @section('js')
     @parent
     @vite(['resources/js/tts.js'])
+    @php
+        $simUiStrings = [
+            'correct_feedback'    => __('viewer.correct_feedback'),
+            'wrong_feedback'      => __('viewer.wrong_feedback'),
+            'error_limit_reached' => __('viewer.simulator.error_limit_reached'),
+            'time_expired'        => __('viewer.simulator.time_expired'),
+        ];
+    @endphp
 
     <script>
         const questions  = @json($questionsJson);
@@ -202,6 +210,7 @@
         const attemptId  = {{ $attempt->id }};
         const timeLimit  = {{ $timeLimit }};   // in secondi
         const maxErrors  = {{ $maxErrors }};
+        const uiStrings  = @json($simUiStrings);
 
         let currentIndex     = 0;
         let errors           = 0;
@@ -327,14 +336,14 @@
             renderErrorDots();
 
             if (errors >= maxErrors) {
-                finishSimulator('Hai raggiunto il limite di errori');
+                finishSimulator(uiStrings.error_limit_reached);
                 return;
             }
 
             $('#feedback').html(
                 isCorrect
-                    ? '<span class="feedback-correct"><i class="fas fa-check-circle"></i> Risposta corretta</span>'
-                    : '<span class="feedback-wrong"><i class="fas fa-times-circle"></i> Risposta errata</span>'
+                    ? `<span class="feedback-correct"><i class="fas fa-check-circle"></i> ${uiStrings.correct_feedback}</span>`
+                    : `<span class="feedback-wrong"><i class="fas fa-times-circle"></i> ${uiStrings.wrong_feedback}</span>`
             );
 
             renderNavigator();
@@ -397,7 +406,7 @@
                 updateTimerUI();
                 if (remainingSeconds <= 0) {
                     clearInterval(interval);
-                    finishSimulator('Tempo scaduto!');
+                    finishSimulator(uiStrings.time_expired);
                 }
             }, 1000);
         }

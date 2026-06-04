@@ -5,6 +5,65 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Lingua spagnola (ES) per l'interfaccia
+
+Aggiunge lo spagnolo come terza lingua dell'interfaccia, affiancando italiano e inglese.
+Nessuna modifica al codice applicativo: segue esattamente il pattern di estensibilità definito
+in Feature 6.10.
+
+### Added
+
+- Entry `es` in `config/locales.php` (array `supported`): label "Español", flag `es.svg`.
+- `lang/es/menu.php` — 38 chiavi del menu/navbar tradotte in spagnolo.
+- `lang/es/auth.php`, `lang/es/pagination.php`, `lang/es/passwords.php`,
+  `lang/es/validation.php` — messaggi di sistema localizzati.
+- `public/images/language_flags/es.svg` — bandiera spagnola SVG inline.
+- `lang/it/viewer.php`, `lang/en/viewer.php`, `lang/es/viewer.php` — file di traduzione
+  per le view del viewer (quiz, simulatore, modalità studio): ~160 chiavi ciascuno.
+- 2 test in `LocaleTest`: `test_switch_locale_to_spanish` e
+  `test_menu_string_translated_to_spanish`.
+
+### Changed
+
+- `resources/views/quiz/play.blade.php`, `resources/views/simulator/{index,play,result}.blade.php`
+  — tutte le stringhe hardcoded sostituite con `__('viewer.*')` per supporto multilingua completo.
+- `StudyController::index()` — aggiunto eager-load `with('translations')` sulle categorie.
+
+---
+
+## [Unreleased] — Feature 7.2: Traduzioni categorie + seeder bilingue
+
+Aggiunge la traduzione del **nome delle categorie** seguendo lo stesso pattern di Feature 7.1
+(entità separata, fallback all'italiano, `Auditable`). Migliora i seeder di categorie e domande
+per popolare automaticamente le traduzioni EN dai due file Excel durante il `db:seed`.
+
+### Added
+
+- Migration `create_category_translations_table`: `category_id` (cascadeOnDelete), `locale`,
+  `name`, `created_by` (nullOnDelete), indice unico `(category_id, locale)`.
+- Model `CategoryTranslation` (trait `Auditable`, relazioni `category()` e `creator()`).
+- Relazione `Category::translations()` e metodo `Category::getLocalizedName(string $locale)`
+  con fallback all'italiano, null-safe, zero query aggiuntive se le traduzioni sono eager-loaded.
+- `CategorySeeder` aggiornato: legge `file_con_category_id_EN.xlsx` (foglio "Categorie")
+  e inserisce le traduzioni EN matchemate per `category_id`.
+- `QuestionSeeder` aggiornato: legge `file_con_category_id_EN.xlsx` (foglio "Domande")
+  e inserisce le traduzioni EN matchemate per posizione riga (stesso ordine dei due file).
+  Usa `DB::getPdo()->lastInsertId()` per recuperare gli ID assegnati dopo bulk insert.
+- `CategoryTranslationObserver` imposta `created_by` in `creating()`.
+- `CategoryTranslationService` (`upsert` idempotente, `delete`, `getForCategory`).
+- `Admin\CategoryTranslationController` (store/update/destroy) protetto da `canEditCategory()`.
+- Form Request `StoreCategoryTranslationRequest`, `UpdateCategoryTranslationRequest`.
+  La locale 'it' è esclusa a livello di validazione (fonte di verità, non traducibile).
+- Route `POST/PUT/DELETE /admin/categories/{category}/translations/{locale?}`.
+- Sezione "Traduzioni" embedded nella pagina `/admin/categories/{id}/edit`: mostra
+  traduzioni esistenti con form modifica/elimina e form aggiunta (locale select +
+  input nome). Visibile a admin/editor con `canEditCategory()`.
+- Feature test `CategoryTranslationTest` (15 test): `getLocalizedName()` + fallback,
+  service upsert idempotente, autorizzazione admin/editor/viewer, `created_by`,
+  update/delete, validazione locale, pagina edit, cascade delete.
+
+---
+
 ## [Unreleased] — Feature 7.1: Accessibilità esame — versione multilingua delle domande
 
 Traduzione del **testo delle domande** in lingue diverse dall'italiano per l'accessibilità
@@ -27,17 +86,19 @@ il testo italiano resta la fonte di verità.
   con fallback all'italiano, null-safe, zero query aggiuntive se le traduzioni sono eager-loaded.
 - `User::getPreferredLocale()` + cast e `$fillable` di `locale`.
 - `QuestionTranslationService` (`upsert` idempotente, `delete`, `getForQuestion`).
-- `Admin\QuestionTranslationController` (index/store/update/destroy) protetto da
+- `Admin\QuestionTranslationController` (store/update/destroy) protetto da
   `canEditQuestion()` su ogni metodo.
 - Form Request `StoreQuestionTranslationRequest`, `UpdateQuestionTranslationRequest`,
   `UpdateLocalePreferenceRequest`.
-- Route admin `questions/{question}/translations` (index/store/update/destroy) e
+- Route admin `POST/PUT/DELETE questions/{question}/translations/{locale?}` e
   `POST /profile/locale` per la preferenza lingua del viewer.
-- View `admin/questions/translations.blade.php` (lista + form add/edit/delete, empty state)
-  e pulsante "Traduzioni" nella DataTable domande (visibile a `canEditQuestion()`).
+- Sezione "Traduzioni" embedded nella pagina `/admin/questions/{id}/edit`: mostra
+  traduzioni esistenti con form modifica/elimina e form aggiunta (locale select +
+  textarea testo). Visibile a admin/editor con `canEditQuestion()`.
 - Card "Lingua preferita" nel profilo utente con select delle lingue d'esame.
-- Feature test `QuestionTranslationTest` (14 test): accessor + fallback, idempotenza upsert,
-  autorizzazione admin/editor/viewer, localizzazione view studio, cascade delete, preferenza profilo.
+- Feature test `QuestionTranslationTest` (17 test): accessor + fallback, idempotenza upsert,
+  autorizzazione admin/editor/viewer, localizzazione view studio, cascade delete, preferenza profilo,
+  edit page integrazione (traduzioni visibili, form add, nascoste a viewer).
 
 ### Changed
 

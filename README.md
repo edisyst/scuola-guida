@@ -21,7 +21,7 @@ Funzionalità principali:
 - **[Web Push Notifications](docs/07-pwa.md#web-push-notifications-feature-67)** — quarto canale di notifica nativo (browser chiuso / dispositivo bloccato). Il viewer si iscrive dal profilo; le push affiancano mail e database per approvazione iscrizione, badge guadagnati e promemoria ripasso SM-2 (schedulato alle 08:00).
 - **GDPR portabilità dati (art. 20)** — il viewer scarica un archivio ZIP con tutti i propri dati personali in formato JSON (quiz, bookmark, badge, attività, SM-2, documento d'identità). L'admin/editor può esportare i dati di qualsiasi utente da `/admin/users/{id}/edit`. Ogni export è tracciato nell'audit log; il file ZIP viene eliminato subito dopo l'invio (`deleteFileAfterSend`). Cleanup notturno automatico alle 03:00 via `gdpr:export --cleanup-only`.
 
-- **Interfaccia multilingua (IT/EN)** — il menu laterale e la navbar sono disponibili in italiano e inglese. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede solo creare `lang/{code}/menu.php` e aggiungere l'entry corrispondente in `config/locales.php`.
+- **Interfaccia multilingua (IT/EN/ES)** — menu, navbar e **tutte le pagine del viewer** (quiz, simulatore, modalità studio) sono disponibili in italiano, inglese e spagnolo. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede creare `lang/{code}/menu.php`, `lang/{code}/viewer.php` e aggiungere l'entry in `config/locales.php`.
 - **Accessibilità DSA — lettura audio TTS** — ogni viewer può attivare la lettura audio delle domande tramite la Web Speech API (zero costo server, funziona offline). Il toggle e l'opzione di avvio automatico sono configurabili dal profilo. Il supporto replica l'ausilio per candidati con DSA previsto dal D.Lgs. 62/2017 e dalle disposizioni MIT sull'esame teorico.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis · `laravel-notification-channels/webpush`
@@ -64,15 +64,17 @@ Per il setup completo vedi:
 
 ## Localizzazione
 
-L'interfaccia supporta **italiano** (default) e **inglese**. Solo le label statiche del menu
-laterale e della navbar vengono tradotte; i dati applicativi (quiz, domande, categorie,
-iscrizioni) restano in italiano.
+L'interfaccia supporta **italiano** (default), **inglese** e **spagnolo**. Vengono tradotte sia
+le label statiche del menu/navbar sia tutte le pagine del viewer (quiz, simulatore, modalità
+studio con riepilogo). I dati applicativi (testo domande, categorie, iscrizioni) restano in
+italiano — la traduzione del testo delle domande è un sistema separato (Feature 7.1).
 
 ### Aggiungere una nuova lingua
 
 1. Creare `lang/{code}/menu.php` con le stesse chiavi di `lang/it/menu.php`.
-2. Aggiungere un'entry in `config/locales.php` con `label` e `flag`.
-3. Salvare il file SVG della bandiera in `public/images/language_flags/{code}.svg`.
+2. Creare `lang/{code}/viewer.php` con le stesse chiavi di `lang/it/viewer.php`.
+3. Aggiungere un'entry in `config/locales.php` (array `supported`) con `label` e `flag`.
+4. Salvare il file SVG della bandiera in `public/images/language_flags/{code}.svg`.
 
 Nessuna modifica al codice applicativo è richiesta.
 
@@ -85,7 +87,7 @@ Nessuna modifica al codice applicativo è richiesta.
 
 Concetto **distinto** dalla i18n dell'interfaccia: qui si traduce il **testo delle domande**
 (non la UI) per l'accessibilità dell'esame teorico MIT. Admin ed editor caricano le traduzioni
-dalla DataTable domande (pulsante "Traduzioni"); il viewer sceglie la lingua preferita nella
+dalla pagina di modifica domanda (`/admin/questions/{id}/edit`, sezione "Traduzioni"); il viewer sceglie la lingua preferita nella
 card "Lingua preferita" del proprio profilo. La traduzione si applica in modalità studio, nel
 simulatore e nel test diagnostico, con **fallback automatico all'italiano** se manca.
 
@@ -117,7 +119,7 @@ nel versionamento domande (Feature 6.2).
 
 ## Test
 
-Suite con ~396 Feature test in ~35 classi (Laravel TestCase + `RefreshDatabase`):
+Suite con ~398 Feature test in ~35 classi (Laravel TestCase + `RefreshDatabase`):
 
 ```bash
 php artisan test

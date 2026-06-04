@@ -81,14 +81,18 @@ class SmartReview extends Component
         $isFinished      = $this->currentIndex >= count($this->reviewIds);
 
         if (!$isFinished && isset($this->reviewIds[$this->currentIndex])) {
-            $currentReview   = QuestionReview::with('question.category')
+            $currentReview   = QuestionReview::with('question.category.translations', 'question.translations')
                 ->find($this->reviewIds[$this->currentIndex]);
             $currentQuestion = $currentReview?->question;
         }
 
+        $locale        = auth()->user()->getPreferredLocale();
+        $localizedText = $currentQuestion?->getLocalizedText($locale);
+
         return view('livewire.smart-review', [
             'currentReview'   => $currentReview,
             'currentQuestion' => $currentQuestion,
+            'localizedText'   => $localizedText,
             'total'           => count($this->reviewIds),
             'isFinished'      => $isFinished,
         ]);
