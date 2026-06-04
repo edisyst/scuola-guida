@@ -63,6 +63,58 @@
     @endif
 
     @if($user->isViewer())
+    <div class="sg-card sg-mb-3"
+         x-data="{ ttsEnabled: {{ $user->tts_enabled ? 'true' : 'false' }}, ttsAutoplay: {{ $user->tts_autoplay ? 'true' : 'false' }} }">
+        <div class="sg-card-header">
+            <h2 class="sg-card-header-title">
+                <i class="fas fa-universal-access mr-2"></i> Accessibilità
+            </h2>
+        </div>
+        <div class="sg-card-body">
+            <p class="text-muted mb-3">
+                Attiva la lettura audio automatica delle domande per replicare il supporto DSA
+                previsto dall'esame ministeriale (D.Lgs. 62/2017).
+            </p>
+
+            <form action="{{ route('profile.accessibility.update') }}" method="POST">
+                @csrf
+
+                <div class="form-group d-flex align-items-center" style="gap:1rem;">
+                    <label class="mb-0">Lettura audio delle domande</label>
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               id="tts_enabled"
+                               name="tts_enabled"
+                               value="1"
+                               x-model="ttsEnabled"
+                               {{ $user->tts_enabled ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="tts_enabled"></label>
+                    </div>
+                </div>
+
+                <div class="form-group d-flex align-items-center mt-3" style="gap:1rem;"
+                     x-show="ttsEnabled" x-cloak>
+                    <label class="mb-0">Avvio automatico ad ogni domanda</label>
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               id="tts_autoplay"
+                               name="tts_autoplay"
+                               value="1"
+                               x-model="ttsAutoplay"
+                               {{ $user->tts_autoplay ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="tts_autoplay"></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">
+                    <i class="fas fa-save mr-1"></i> Salva preferenze
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div class="sg-card sg-mb-3" x-data="pushSubscription()" x-init="init()" x-cloak>
         <div class="sg-card-header sg-flex-between">
             <h2 class="sg-card-header-title">

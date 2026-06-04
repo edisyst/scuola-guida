@@ -67,6 +67,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/profile/download-data', [ProfileController::class, 'downloadPersonalData'])->name('profile.download-data');
 
+    // Preferenze accessibilità (viewer)
+    Route::post('/profile/accessibility', [ProfileController::class, 'updateAccessibility'])
+        ->name('profile.accessibility.update');
+
     // Iscrizione anagrafica viewer (invio dati per esami ufficiali)
     Route::post('/profile/registration', [RegistrationController::class, 'submit'])
         ->name('profile.registration.submit');

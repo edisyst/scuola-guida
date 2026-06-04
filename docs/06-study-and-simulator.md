@@ -12,7 +12,8 @@ Condividono il model `QuizAttempt` per la persistenza ma usano flussi e service 
 
 1. [Modalità Studio](#modalità-studio)
 2. [Simulatore Esame](#simulatore-esame)
-3. [Struttura dati — `QuizAttempt.answers`](#struttura-dati--quizattemptanswers)
+3. [Lettura audio TTS (Feature 7.0)](#lettura-audio-tts-feature-70)
+4. [Struttura dati — `QuizAttempt.answers`](#struttura-dati--quizattemptanswers)
 
 ---
 
@@ -117,6 +118,52 @@ Le risposte non date contano come errori al momento del submit. La view è dedic
 1. Chiama `StreakService::recordActivity()`.
 2. Se promosso (`total_questions - score <= max_errors`), chiama `BadgeService::awardIfEligible(..., 'first_pass', ...)`.
 3. Chiama `BadgeService::checkAllBadges()` per gli altri badge.
+
+---
+
+## Lettura audio TTS (Feature 7.0)
+
+Supporto alla lettura vocale delle domande tramite **Web Speech API** (nativa nei browser moderni).
+Replica il supporto per candidati con DSA previsto dal D.Lgs. 62/2017 e dalle disposizioni MIT
+sull'esame teorico. Funzione interamente client-side: zero chiamate server, zero dipendenze PHP,
+compatibile con la modalità offline PWA perché `SpeechSynthesis` non richiede rete.
+
+### Preferenze utente
+
+Ogni viewer può configurare dal proprio profilo (`/profile` → card "Accessibilità"):
+
+| Colonna `users` | Tipo | Significato |
+|---|---|---|
+| `tts_enabled` | `boolean\|null` | `null`/`false` = disattivato (default); `true` = pulsante "Ascolta" visibile |
+| `tts_autoplay` | `boolean` | `true` = la lettura parte automaticamente all'apertura di ogni domanda |
+
+### Architettura client-side
+
+- **`resources/js/tts.js`** — espone `window.ttsPlayer(text, { autoplay })`, funzione Alpine
+  riutilizzabile (usata direttamente nel simulatore).
+- **Modalità Studio** — i metodi TTS (`ttsSpeak`, `ttsStop`, `ttsToggle`) sono integrati
+  direttamente in `studyPlay()` (accesso reattivo a `currentQuestionText`). Stop automatico
+  in `_loadOfflineQuestion()` con autoplay opzionale tramite `$nextTick`.
+- **Simulatore** — Alpine island `x-data` isolata che ascolta l'evento `sim:question-loaded`
+  emesso da `renderQuestion()`. Stop automatico a `finishSimulator()`.
+- **Lingua TTS** — letta da `document.documentElement.lang` (impostato dal layout). Fallback a `it-IT`.
+- **Degradazione** — il pulsante non viene renderizzato se `'speechSynthesis' not in window`
+  (`x-show="supported"`), e il blocco intero non viene prodotto dal server se `tts_enabled` è falsy.
+
+### File coinvolti
+
+| File | Modifica |
+|---|---|
+| `database/migrations/2026_06_04_100000_add_tts_enabled_to_users_table.php` | Nuova migration |
+| `app/Models/User.php` | Cast + fillable |
+| `app/Http/Requests/UpdateAccessibilityPreferencesRequest.php` | Nuovo FormRequest |
+| `app/Http/Controllers/ProfileController.php` | Metodo `updateAccessibility` |
+| `routes/web.php` | Route `POST /profile/accessibility` |
+| `resources/views/profile/edit.blade.php` | Card "Accessibilità" |
+| `resources/js/tts.js` | Funzione Alpine TTS |
+| `resources/views/study/play.blade.php` | Metodi TTS in studyPlay + pulsante |
+| `resources/views/simulator/play.blade.php` | Alpine island TTS + evento sim:question-loaded |
+| `tests/Feature/TtsPreferenceTest.php` | Feature test (7 asserzioni) |
 
 ---
 

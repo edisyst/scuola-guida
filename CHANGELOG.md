@@ -48,6 +48,36 @@ il testo italiano resta la fonte di verità.
 
 ---
 
+## [Unreleased] — Feature 7.0: Accessibilità esame — lettura audio TTS delle domande
+
+Lettura audio (Web Speech API) del testo delle domande in modalità studio e simulatore,
+a supporto dei candidati con DSA come previsto dal D.Lgs. 62/2017 e dalle disposizioni MIT
+sull'esame teorico. Funzione interamente client-side, zero costo server, compatibile con
+la modalità offline PWA (Feature 5.6).
+
+### Added
+
+- Migration `add_tts_enabled_to_users_table`: colonne `tts_enabled` (boolean nullable)
+  e `tts_autoplay` (boolean, default false) sulla tabella `users`.
+- Cast `tts_enabled` e `tts_autoplay` come boolean nel model `User`; campi aggiunti a `$fillable`.
+- `UpdateAccessibilityPreferencesRequest`: validazione boolean per `tts_enabled` e `tts_autoplay`.
+- `ProfileController::updateAccessibility()`: salvataggio preferenze via `POST /profile/accessibility`.
+- Route `POST /profile/accessibility` → `profile.accessibility.update`.
+- Card "Accessibilità" nel profilo viewer con toggle TTS e toggle autoplay (l'autoplay è visibile
+  solo quando TTS è attivo, condizionato via Alpine `x-show`).
+- `resources/js/tts.js`: funzione `window.ttsPlayer()` per l'uso Alpine nel simulatore.
+- Metodi TTS (`ttsSpeak`, `ttsStop`, `ttsToggle`) integrati direttamente in `studyPlay()`
+  con accesso reattivo a `currentQuestionText`; hook in `_loadOfflineQuestion()` per lo stop
+  automatico e l'autoplay nella navigazione offline.
+- Pulsante "Ascolta" in `study/play.blade.php` (visibile solo se `tts_enabled`):
+  icona `fa-volume-up` / `fa-stop-circle`, `aria-label`, `aria-pressed`.
+- Pulsante "Ascolta" in `simulator/play.blade.php` con Alpine island che ascolta l'evento
+  `sim:question-loaded` emesso da `renderQuestion()`. TTS fermato al submit/fine simulazione.
+- `TtsPreferenceTest`: 7 asserzioni (abilitazione, autoplay, disabilitazione, accesso non-viewer,
+  rendering condizionato pulsante, validazione FormRequest, verifica colonne migration).
+
+---
+
 ## [Unreleased] — Feature 6.10: Internazionalizzazione UI (i18n sidebar)
 
 Supporto multilingua per il menu laterale e la navbar dell'interfaccia.

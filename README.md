@@ -22,6 +22,7 @@ Funzionalità principali:
 - **GDPR portabilità dati (art. 20)** — il viewer scarica un archivio ZIP con tutti i propri dati personali in formato JSON (quiz, bookmark, badge, attività, SM-2, documento d'identità). L'admin/editor può esportare i dati di qualsiasi utente da `/admin/users/{id}/edit`. Ogni export è tracciato nell'audit log; il file ZIP viene eliminato subito dopo l'invio (`deleteFileAfterSend`). Cleanup notturno automatico alle 03:00 via `gdpr:export --cleanup-only`.
 
 - **Interfaccia multilingua (IT/EN)** — il menu laterale e la navbar sono disponibili in italiano e inglese. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede solo creare `lang/{code}/menu.php` e aggiungere l'entry corrispondente in `config/locales.php`.
+- **Accessibilità DSA — lettura audio TTS** — ogni viewer può attivare la lettura audio delle domande tramite la Web Speech API (zero costo server, funziona offline). Il toggle e l'opzione di avvio automatico sono configurabili dal profilo. Il supporto replica l'ausilio per candidati con DSA previsto dal D.Lgs. 62/2017 e dalle disposizioni MIT sull'esame teorico.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis · `laravel-notification-channels/webpush`
 
