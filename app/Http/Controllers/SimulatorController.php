@@ -55,10 +55,15 @@ class SimulatorController extends Controller
         $attempt   = QuizAttempt::findOrFail($this->service->currentAttemptId());
         $questions = $this->service->loadSessionQuestions();
 
+        // Localizzazione testo domanda (Feature 7.1): lingua preferita del viewer,
+        // fallback automatico all'italiano. Le traduzioni sono già eager-loaded
+        // in loadSessionQuestions() per evitare N+1.
+        $locale = auth()->user()->getPreferredLocale();
+
         // Stesso payload JSON usato dalla view quiz.play (id/text/image/correct).
         $questionsJson = $questions->map(fn ($q) => [
             'id'      => $q->id,
-            'text'    => $q->question,
+            'text'    => $q->getLocalizedText($locale),
             'image'   => $q->image ? asset('storage/' . $q->image) : null,
             'correct' => (int) $q->is_true,
         ])->values()->all();

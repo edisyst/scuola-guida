@@ -28,4 +28,22 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Lingue d'esame (traduzione testo domande — Feature 7.1)
+    |--------------------------------------------------------------------------
+    | Concetto distinto da 'supported': qui non si traduce l'interfaccia ma solo
+    | il TESTO delle domande, per l'esame teorico MIT (accessibilità linguistica).
+    | 'it' è la fonte di verità (testo originale); le altre sono layer opzionali
+    | con fallback garantito all'italiano. Aggiungere qui una nuova lingua è
+    | l'unico punto da toccare per renderla disponibile a editor e viewer.
+    */
+    'exam' => [
+        'it' => 'Italiano',
+        'en' => 'English',
+        'fr' => 'Français',
+        'de' => 'Deutsch',
+        'es' => 'Español',
+    ],
+
 ];

@@ -5,6 +5,49 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 7.1: Accessibilità esame — versione multilingua delle domande
+
+Traduzione del **testo delle domande** in lingue diverse dall'italiano per l'accessibilità
+dell'esame teorico MIT. Concetto distinto dalla i18n dell'interfaccia (Feature 6.10): qui non
+si traduce la UI ma il contenuto delle domande, con fallback garantito all'italiano. Le
+traduzioni sono entità separate e **non** rientrano nel versionamento domande (Feature 6.2):
+il testo italiano resta la fonte di verità.
+
+### Added
+
+- Chiave `exam` in `config/locales.php` con le lingue d'esame configurabili
+  (`it`, `en`, `fr`, `de`, `es`) — zero hardcoding, aggiungere una lingua = una entry qui.
+- Migration `create_question_translations_table`: `question_id` (cascadeOnDelete), `locale`,
+  `text`, `created_by` (nullOnDelete), indice unico `(question_id, locale)`.
+- Migration `add_locale_to_users_table`: colonna `users.locale` nullable (idempotente verso
+  un'eventuale Feature 7.0). `null` = lingua di default dell'applicazione.
+- Model `QuestionTranslation` (trait `Auditable`) con observer `QuestionTranslationObserver`
+  che imposta `created_by` in `creating()`.
+- Relazione `Question::translations()` e accessor `Question::getLocalizedText(string $locale)`
+  con fallback all'italiano, null-safe, zero query aggiuntive se le traduzioni sono eager-loaded.
+- `User::getPreferredLocale()` + cast e `$fillable` di `locale`.
+- `QuestionTranslationService` (`upsert` idempotente, `delete`, `getForQuestion`).
+- `Admin\QuestionTranslationController` (index/store/update/destroy) protetto da
+  `canEditQuestion()` su ogni metodo.
+- Form Request `StoreQuestionTranslationRequest`, `UpdateQuestionTranslationRequest`,
+  `UpdateLocalePreferenceRequest`.
+- Route admin `questions/{question}/translations` (index/store/update/destroy) e
+  `POST /profile/locale` per la preferenza lingua del viewer.
+- View `admin/questions/translations.blade.php` (lista + form add/edit/delete, empty state)
+  e pulsante "Traduzioni" nella DataTable domande (visibile a `canEditQuestion()`).
+- Card "Lingua preferita" nel profilo utente con select delle lingue d'esame.
+- Feature test `QuestionTranslationTest` (14 test): accessor + fallback, idempotenza upsert,
+  autorizzazione admin/editor/viewer, localizzazione view studio, cascade delete, preferenza profilo.
+
+### Changed
+
+- `StudyController::play`, `SimulatorController::play` / `SimulatorService` e
+  `DiagnosticTest` (Livewire) ora eager-load le traduzioni e mostrano il testo nella lingua
+  preferita del viewer (`getLocalizedText()`), con fallback all'italiano. Le view admin
+  continuano a mostrare sempre il testo originale italiano.
+
+---
+
 ## [Unreleased] — Feature 6.10: Internazionalizzazione UI (i18n sidebar)
 
 Supporto multilingua per il menu laterale e la navbar dell'interfaccia.

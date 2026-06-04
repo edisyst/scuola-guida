@@ -22,7 +22,7 @@
         csrf:         '{{ csrf_token() }}',
         syncUrl:      '{{ route('api.offline.sync-answers') }}',
         prefetchUrl:  '{{ route('api.offline.questions') }}',
-        questionText: @json($question->question),
+        questionText: @json($localizedText),
         categoryName: @json($question->category?->name ?? ''),
         imageUrl:     @json($imageUrl),
         index:        {{ $index }},
