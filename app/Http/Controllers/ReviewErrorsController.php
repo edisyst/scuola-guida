@@ -41,7 +41,7 @@ class ReviewErrorsController extends Controller
         }
 
         $learnedCount = $this->service->getLearnedCount($user);
-        $categories   = Category::orderBy('name')->get();
+        $categories   = Category::with('translations')->orderBy('name')->get();
 
         return view('review-errors.index', compact(
             'errors', 'categories', 'categoryId', 'lastAttempts', 'showLearned', 'learnedCount'

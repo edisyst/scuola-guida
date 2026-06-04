@@ -173,7 +173,7 @@ class SimulatorService
         // Carica tutte le domande risposte. Eager-load translations (Feature 7.1)
         // per localizzare il testo nella lingua preferita dell'utente senza N+1.
         $locale        = $attempt->user?->getPreferredLocale() ?? config('locales.default', 'it');
-        $questionsById = Question::with(['category', 'translations'])
+        $questionsById = Question::with(['category.translations', 'translations'])
             ->whereIn('id', $answeredQids)->get()->keyBy('id');
 
         $rows = collect($answeredQids)->map(function ($qid) use ($attempt, $questionsById, $locale) {

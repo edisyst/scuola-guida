@@ -23,7 +23,7 @@
         syncUrl:      '{{ route('api.offline.sync-answers') }}',
         prefetchUrl:  '{{ route('api.offline.questions') }}',
         questionText: @json($localizedText),
-        categoryName: @json($question->category?->name ?? ''),
+        categoryName: @json($localizedCategoryName),
         imageUrl:     @json($imageUrl),
         index:        {{ $index }},
         total:        {{ $total }},
@@ -35,23 +35,23 @@
     <div x-show="offlineSyncBadge" x-cloak
          class="alert alert-warning d-flex align-items-center mb-3" style="gap:.5rem;">
         <i class="fas fa-wifi" style="opacity:.5;"></i>
-        <span>Sei offline — risposta salvata, sarà sincronizzata al ritorno online.</span>
+        <span>{{ __('viewer.study.offline_badge') }}</span>
     </div>
 
     {{-- ── Header + progress ────────────────────────────────── --}}
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Modalità Studio</p>
+            <p class="sg-header-subtitle">{{ __('viewer.study.title') }}</p>
             <h1 class="sg-header-title">
-                Domanda
+                {{ __('viewer.question_label') }}
                 <span x-text="offlineMode ? (offlineIndex + 1) : {{ $index + 1 }}">{{ $index + 1 }}</span>
-                di
+                {{ __('viewer.of') }}
                 <span x-text="offlineMode ? offlineTotal : {{ $total }}">{{ $total }}</span>
             </h1>
         </div>
         <div>
             <a href="{{ route('study.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                <i class="fas fa-cog"></i> Cambia sorgente
+                <i class="fas fa-cog"></i> {{ __('viewer.study.change_source') }}
             </a>
         </div>
     </div>
@@ -75,7 +75,7 @@
                     data-target="#materials-panel"
                     aria-expanded="false">
                 <i class="fas fa-book-open mr-2"></i>
-                <strong>Materiale didattico</strong>
+                <strong>{{ __('viewer.study.teaching_material') }}</strong>
                 <span class="badge badge-secondary ml-2">{{ $question->category->materials->count() }}</span>
                 <i class="fas fa-chevron-down float-right mt-1" style="font-size:.8rem;"></i>
             </button>
@@ -158,7 +158,7 @@
                             :class="answerButtonClass(1)"
                             :disabled="answered"
                             @click="answer(1)">
-                        <i class="fas fa-check"></i> VERO
+                        <i class="fas fa-check"></i> {{ __('viewer.answer_true') }}
                     </button>
                 </div>
                 <div class="col-12 col-sm-6">
@@ -167,7 +167,7 @@
                             :class="answerButtonClass(0)"
                             :disabled="answered"
                             @click="answer(0)">
-                        <i class="fas fa-times"></i> FALSO
+                        <i class="fas fa-times"></i> {{ __('viewer.answer_false') }}
                     </button>
                 </div>
             </div>
@@ -177,14 +177,14 @@
                 <div class="alert"
                      :class="selected === correct ? 'alert-success' : 'alert-danger'">
                     <template x-if="selected === correct">
-                        <span><i class="fas fa-check-circle"></i> <strong>Risposta corretta!</strong></span>
+                        <span><i class="fas fa-check-circle"></i> <strong>{{ __('viewer.study.correct_answer') }}</strong></span>
                     </template>
                     <template x-if="selected !== correct">
                         <span>
                             <i class="fas fa-times-circle"></i>
-                            <strong>Risposta errata.</strong>
-                            La risposta corretta è:
-                            <strong x-text="correct === 1 ? 'VERO' : 'FALSO'"></strong>
+                            <strong>{{ __('viewer.study.wrong_answer') }}</strong>
+                            {{ __('viewer.study.correct_is') }}
+                            <strong x-text="correct === 1 ? '{{ __('viewer.answer_true') }}' : '{{ __('viewer.answer_false') }}'"></strong>
                         </span>
                     </template>
                 </div>
@@ -201,11 +201,11 @@
                 <template x-if="!offlineMode">
                     @if($prevUrl)
                         <a href="{{ $prevUrl }}" class="sg-btn sg-btn-outline">
-                            <i class="fas fa-chevron-left"></i> Precedente
+                            <i class="fas fa-chevron-left"></i> {{ __('viewer.prev') }}
                         </a>
                     @else
                         <button class="sg-btn sg-btn-outline" disabled>
-                            <i class="fas fa-chevron-left"></i> Precedente
+                            <i class="fas fa-chevron-left"></i> {{ __('viewer.prev') }}
                         </button>
                     @endif
                 </template>
@@ -214,7 +214,7 @@
                     <button class="sg-btn sg-btn-outline"
                             :disabled="offlineIndex === 0"
                             @click="offlinePrev()">
-                        <i class="fas fa-chevron-left"></i> Precedente
+                        <i class="fas fa-chevron-left"></i> {{ __('viewer.prev') }}
                     </button>
                 </template>
             </div>
@@ -226,7 +226,7 @@
                         @click="toggleFlag()"
                         x-show="!offlineMode">
                     <i class="fas" :class="flagged ? 'fa-bookmark' : 'fa-bookmark'"></i>
-                    <span x-text="flagged ? 'Segnata da ripassare' : 'Segna da ripassare'"></span>
+                    <span x-text="flagged ? '{{ __('viewer.study.flagged') }}' : '{{ __('viewer.study.flag') }}'"></span>
                 </button>
 
                 @auth @if(auth()->user()->isViewer())
@@ -240,7 +240,7 @@
                 @endif @endauth
 
                 <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-dark" x-show="!offlineMode">
-                    <i class="fas fa-flag-checkered"></i> Termina sessione
+                    <i class="fas fa-flag-checkered"></i> {{ __('viewer.study.end_session') }}
                 </a>
             </div>
 
@@ -249,11 +249,11 @@
                 <template x-if="!offlineMode">
                     @if($nextUrl)
                         <a href="{{ $nextUrl }}" class="sg-btn sg-btn-primary">
-                            Prossima <i class="fas fa-chevron-right"></i>
+                            {{ __('viewer.next') }} <i class="fas fa-chevron-right"></i>
                         </a>
                     @else
                         <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-primary">
-                            Vai al riepilogo <i class="fas fa-chevron-right"></i>
+                            {{ __('viewer.study.go_to_summary') }} <i class="fas fa-chevron-right"></i>
                         </a>
                     @endif
                 </template>
@@ -262,7 +262,7 @@
                     <button class="sg-btn sg-btn-primary"
                             :disabled="offlineIndex >= offlineTotal - 1"
                             @click="offlineNext()">
-                        Prossima <i class="fas fa-chevron-right"></i>
+                        {{ __('viewer.next') }} <i class="fas fa-chevron-right"></i>
                     </button>
                 </template>
             </div>
@@ -279,7 +279,16 @@
     @parent
     @vite(['resources/js/offline-store.js', 'resources/js/tts.js'])
 
+    @php
+        $uiStrings = [
+            'bookmark_error' => __('viewer.study.bookmark_error'),
+            'synced_one'     => __('viewer.study.synced_one'),
+            'synced_many'    => __('viewer.study.synced_many'),
+        ];
+    @endphp
     <script>
+        const uiStrings = @json($uiStrings);
+
         function studyPlay(config) {
             return {
                 // ── Original state ─────────────────────────────
@@ -404,7 +413,7 @@
                         }
                     })
                     .catch(() => {
-                        if (window.toastr) toastr.error('Errore nel salvataggio del segnalibro');
+                        if (window.toastr) toastr.error(uiStrings.bookmark_error);
                     });
                 },
 
@@ -524,7 +533,7 @@
                         }
 
                         if (data.count > 0 && window.toastr) {
-                            toastr.success(data.count + (data.count === 1 ? ' risposta sincronizzata.' : ' risposte sincronizzate.'));
+                            toastr.success(data.count + ' ' + (data.count === 1 ? uiStrings.synced_one : uiStrings.synced_many));
                         }
                     } catch (e) {
                         // Sync failed — will retry next time online

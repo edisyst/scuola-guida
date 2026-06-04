@@ -8,8 +8,8 @@
 <div class="sg-wrapper">
 
     <div class="sg-header">
-        <p class="sg-header-subtitle">Allenati senza timer e senza punteggio</p>
-        <h1 class="sg-header-title"><i class="fas fa-graduation-cap mr-2"></i> Modalità Studio</h1>
+        <p class="sg-header-subtitle">{{ __('viewer.study.subtitle') }}</p>
+        <h1 class="sg-header-title"><i class="fas fa-graduation-cap mr-2"></i> {{ __('viewer.study.title') }}</h1>
     </div>
 
     @if($hasSession)
@@ -17,18 +17,18 @@
         <div class="alert alert-info d-flex flex-column flex-md-row justify-content-between align-items-md-center sg-gap-2 sg-mb-3">
             <div>
                 <i class="fas fa-info-circle"></i>
-                Hai una sessione di studio in corso.
+                {{ __('viewer.study.session_in_progress') }}
             </div>
             <div class="d-flex flex-wrap sg-gap-2">
                 <a href="{{ route('study.play') }}" class="sg-btn sg-btn-primary sg-btn-sm">
-                    <i class="fas fa-play"></i> Riprendi
+                    <i class="fas fa-play"></i> {{ __('viewer.study.resume') }}
                 </a>
                 <form action="{{ route('study.destroy') }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
                     <button class="sg-btn sg-btn-outline sg-btn-sm"
-                            onclick="return confirm('Vuoi davvero terminare la sessione in corso?');">
-                        <i class="fas fa-times"></i> Termina
+                            onclick="return confirm('{{ __('viewer.study.end_session_confirm') }}');">
+                        <i class="fas fa-times"></i> {{ __('viewer.study.end') }}
                     </button>
                 </form>
             </div>
@@ -37,7 +37,7 @@
 
     <div class="sg-card" style="max-width: 800px; margin: 0 auto;">
         <div class="card-body p-4">
-            <h5 class="mb-3">Scegli da dove studiare</h5>
+            <h5 class="mb-3">{{ __('viewer.study.choose_source') }}</h5>
 
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -59,13 +59,13 @@
                                class="custom-control-input"
                                {{ old('source') === 'quiz' ? 'checked' : '' }}>
                         <label class="custom-control-label font-weight-bold" for="source-quiz">
-                            Da un quiz specifico
+                            {{ __('viewer.study.from_quiz') }}
                         </label>
                     </div>
                     <div class="mt-2 ml-3">
                         <select name="quiz_id" class="form-control"
                                 onfocus="document.getElementById('source-quiz').checked = true;">
-                            <option value="">— Seleziona un quiz —</option>
+                            <option value="">{{ __('viewer.study.select_quiz') }}</option>
                             @foreach($quizzes as $quiz)
                                 <option value="{{ $quiz->id }}"
                                     {{ (int) old('quiz_id') === $quiz->id ? 'selected' : '' }}>
@@ -74,7 +74,7 @@
                             @endforeach
                         </select>
                         @if($quizzes->isEmpty())
-                            <small class="text-muted">Nessun quiz pubblicato disponibile.</small>
+                            <small class="text-muted">{{ __('viewer.study.no_quizzes') }}</small>
                         @endif
                     </div>
                 </div>
@@ -88,17 +88,17 @@
                                class="custom-control-input"
                                {{ old('source') === 'category' ? 'checked' : '' }}>
                         <label class="custom-control-label font-weight-bold" for="source-category">
-                            Da una categoria
+                            {{ __('viewer.study.from_category') }}
                         </label>
                     </div>
                     <div class="mt-2 ml-3">
                         <select name="category_id" class="form-control"
                                 onfocus="document.getElementById('source-category').checked = true;">
-                            <option value="">— Seleziona una categoria —</option>
+                            <option value="">{{ __('viewer.study.select_category') }}</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}"
                                     {{ (int) old('category_id') === $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }} ({{ $category->questions_count }} domande)
+                                    {{ $category->getLocalizedName() }} ({{ $category->questions_count }} {{ __('viewer.study.questions_unit') }})
                                 </option>
                             @endforeach
                         </select>
@@ -114,17 +114,17 @@
                                class="custom-control-input"
                                {{ old('source', 'random') === 'random' ? 'checked' : '' }}>
                         <label class="custom-control-label font-weight-bold" for="source-random">
-                            Domande casuali
+                            {{ __('viewer.study.random') }}
                         </label>
                     </div>
                     <small class="text-muted ml-3">
-                        Verranno estratte fino a {{ \App\Services\StudyService::RANDOM_LIMIT }} domande casuali da tutto il database.
+                        {{ __('viewer.study.random_limit_text', ['limit' => \App\Services\StudyService::RANDOM_LIMIT]) }}
                     </small>
                 </div>
 
                 <div class="d-grid d-sm-flex justify-content-sm-end mt-4">
                     <button type="submit" class="sg-btn sg-btn-primary">
-                        <i class="fas fa-play"></i> Inizia a studiare
+                        <i class="fas fa-play"></i> {{ __('viewer.study.start') }}
                     </button>
                 </div>
             </form>

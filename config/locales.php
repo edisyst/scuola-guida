@@ -26,6 +26,10 @@ return [
             'label' => 'English',
             'flag'  => 'en.svg',
         ],
+        'es' => [
+            'label' => 'Español',
+            'flag'  => 'es.svg',
+        ],
     ],
 
     /*

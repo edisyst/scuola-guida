@@ -9,12 +9,12 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Simulatore Esame Patente B</p>
-            <h1 class="sg-header-title">Risultato simulazione</h1>
+            <p class="sg-header-subtitle">{{ __('viewer.simulator.title_full') }}</p>
+            <h1 class="sg-header-title">{{ __('viewer.simulator.result_title') }}</h1>
         </div>
         <div class="sg-header-actions">
             <a href="{{ route('simulator.index') }}" class="sg-btn sg-btn-outline sg-btn-sm">
-                <i class="fas fa-redo"></i> Nuova simulazione
+                <i class="fas fa-redo"></i> {{ __('viewer.simulator.new_simulation') }}
             </a>
         </div>
     </div>
@@ -24,48 +24,48 @@
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas {{ $stats['passed'] ? 'fa-check-circle' : 'fa-times-circle' }} mr-2"></i>
-                Riepilogo
+                {{ __('viewer.summary') }}
             </h3>
         </div>
         <div class="card-body">
 
             <div class="text-center mb-4">
                 @if($stats['passed'])
-                    <span class="badge badge-success" style="font-size:1.3rem;padding:0.5rem 1.2rem;">PROMOSSO</span>
+                    <span class="badge badge-success" style="font-size:1.3rem;padding:0.5rem 1.2rem;">{{ __('viewer.passed') }}</span>
                     <p class="text-muted mt-2 mb-0 small">
-                        Errori totali: {{ $stats['total_errors'] }} su {{ $stats['max_errors'] }} consentiti
+                        {{ __('viewer.simulator.total_errors_passed', ['count' => $stats['total_errors'], 'max' => $stats['max_errors']]) }}
                     </p>
                 @else
-                    <span class="badge badge-danger" style="font-size:1.3rem;padding:0.5rem 1.2rem;">NON SUPERATO</span>
+                    <span class="badge badge-danger" style="font-size:1.3rem;padding:0.5rem 1.2rem;">{{ __('viewer.failed_sim') }}</span>
                     <p class="text-muted mt-2 mb-0 small">
-                        Errori totali: {{ $stats['total_errors'] }} (max consentiti: {{ $stats['max_errors'] }})
+                        {{ __('viewer.simulator.total_errors_failed', ['count' => $stats['total_errors'], 'max' => $stats['max_errors']]) }}
                     </p>
                 @endif
             </div>
 
             <div class="row text-center">
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Punteggio</p>
+                    <p class="sg-label mb-1">{{ __('viewer.score') }}</p>
                     <strong class="d-block">{{ $stats['correct'] }} / {{ $stats['total'] }}</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Percentuale</p>
+                    <p class="sg-label mb-1">{{ __('viewer.percentage') }}</p>
                     <strong class="d-block">{{ $stats['percentage'] }}%</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Errori</p>
+                    <p class="sg-label mb-1">{{ __('viewer.errors') }}</p>
                     <strong class="d-block">{{ $stats['wrong'] }}</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Non risposto</p>
+                    <p class="sg-label mb-1">{{ __('viewer.unanswered') }}</p>
                     <strong class="d-block">{{ $stats['not_answered'] }}</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Durata</p>
+                    <p class="sg-label mb-1">{{ __('viewer.duration') }}</p>
                     <strong class="d-block">{{ $stats['duration_human'] ?? '—' }}</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Data</p>
+                    <p class="sg-label mb-1">{{ __('viewer.date') }}</p>
                     <strong class="d-block">{{ $attempt->created_at->format('d/m/Y H:i') }}</strong>
                 </div>
             </div>
@@ -84,7 +84,7 @@
     {{-- Lista domande --}}
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-list me-1"></i> Domande risposte</h3>
+            <h3 class="card-title"><i class="fas fa-list me-1"></i> {{ __('viewer.simulator.answered_questions') }}</h3>
         </div>
         <div class="card-body p-0">
             @forelse($rows as $i => $row)
@@ -99,14 +99,14 @@
                         <p class="mb-1">{{ $row['localized_text'] ?? $row['question']->question }}</p>
                         <div class="small text-muted">
                             @if($row['question']->category)
-                                <i class="fas fa-tag me-1"></i>{{ $row['question']->category->name }}
+                                <i class="fas fa-tag me-1"></i>{{ $row['question']->category->getLocalizedName() }}
                                 &nbsp;&bull;&nbsp;
                             @endif
-                            Risposta data:
-                            <strong>{{ $row['user_answer'] === 1 ? 'VERO' : 'FALSO' }}</strong>
+                            {{ __('viewer.simulator.given_answer') }}:
+                            <strong>{{ $row['user_answer'] === 1 ? __('viewer.answer_true') : __('viewer.answer_false') }}</strong>
                             &nbsp;&bull;&nbsp;
-                            Risposta corretta:
-                            <strong>{{ $row['correct_answer'] === 1 ? 'VERO' : 'FALSO' }}</strong>
+                            {{ __('viewer.simulator.correct_answer') }}:
+                            <strong>{{ $row['correct_answer'] === 1 ? __('viewer.answer_true') : __('viewer.answer_false') }}</strong>
                         </div>
                     </div>
                     <div class="ms-3">
@@ -118,7 +118,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-muted p-3 mb-0">Nessuna risposta registrata.</p>
+                <p class="text-muted p-3 mb-0">{{ __('viewer.simulator.no_answers') }}</p>
             @endforelse
         </div>
     </div>

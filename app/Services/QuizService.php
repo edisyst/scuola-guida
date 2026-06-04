@@ -128,9 +128,9 @@ class QuizService
     /**
      * Avvia una sessione di gioco creando un nuovo QuizAttempt.
      */
-    public function startPlay(Quiz $quiz, int $userId, ?int $enrollmentId = null): array
+    public function startPlay(Quiz $quiz, int $userId, ?int $enrollmentId = null, string $locale = 'it'): array
     {
-        $questions = $quiz->questions()->get();
+        $questions = $quiz->questions()->with('translations')->get();
 
         $attempt = QuizAttempt::create([
             'user_id'            => $userId,
@@ -145,7 +145,7 @@ class QuizService
             'attempt'        => $attempt,
             'questions_json' => $questions->map(fn (Question $q) => [
                 'id'      => $q->id,
-                'text'    => $q->question,
+                'text'    => $q->getLocalizedText($locale),
                 'image'   => $q->image ? asset('storage/' . $q->image) : null,
                 'correct' => (int) $q->is_true,
             ])->all(),

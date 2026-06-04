@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Services\CategoryTranslationService;
 
 class CategoryController extends Controller
 {
@@ -30,11 +31,17 @@ class CategoryController extends Controller
             ->with('success', 'Categoria creata');
     }
 
-    public function edit(Category $category)
+    public function edit(Category $category, CategoryTranslationService $service)
     {
         abort_unless(auth()->user()->canEditCategory(), 403);
 
-        return view('admin.categories.edit', compact('category'));
+        $translations = $service->getForCategory($category);
+        $existing     = $translations->pluck('locale')->all();
+        // 'it' è sempre la fonte di verità per i contenuti, indipendente da APP_LOCALE.
+        $available    = collect(config('locales.exam', []))
+            ->except(array_merge($existing, ['it']));
+
+        return view('admin.categories.edit', compact('category', 'translations', 'available'));
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)

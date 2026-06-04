@@ -26,7 +26,7 @@
         <div class="mb-4">
             <div class="d-flex justify-content-between mb-1">
                 <small class="text-muted">Domanda {{ $currentIndex + 1 }} di {{ $total }}</small>
-                <small class="text-muted">{{ $currentQuestion->category->name ?? '' }}</small>
+                <small class="text-muted">{{ $currentQuestion->category?->getLocalizedName() ?? '' }}</small>
             </div>
             <div class="progress" style="height: 8px;">
                 <div class="progress-bar bg-primary"
@@ -50,7 +50,7 @@
                              style="max-height: 250px; object-fit: contain;">
                     </div>
                 @endif
-                <p class="h5 text-center mb-0">{{ $currentQuestion->question }}</p>
+                <p class="h5 text-center mb-0">{{ $localizedText ?? $currentQuestion->question }}</p>
             </div>
         </div>
 

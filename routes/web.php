@@ -18,6 +18,7 @@ use App\Http\Controllers\StudyController;
 use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\CategoryMaterialController;
 use App\Http\Controllers\Admin\QuestionReportController;
+use App\Http\Controllers\Admin\CategoryTranslationController;
 use App\Http\Controllers\Admin\QuestionTranslationController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -207,6 +208,17 @@ Route::middleware(['auth', '2fa'])
             Route::resource('categories', CategoryController::class)
                 ->except(['show']);
 
+            // CATEGORY TRANSLATIONS (Feature 7.2)
+            Route::prefix('categories/{category}/translations')
+                ->name('categories.translations.')
+                ->group(function () {
+                    Route::post('/', [CategoryTranslationController::class, 'store'])->name('store');
+                    Route::put('/{locale}', [CategoryTranslationController::class, 'update'])
+                        ->where('locale', '[a-z]{2,5}')->name('update');
+                    Route::delete('/{locale}', [CategoryTranslationController::class, 'destroy'])
+                        ->where('locale', '[a-z]{2,5}')->name('destroy');
+                });
+
             // CATEGORY MATERIALS
             Route::post('categories/{category}/materials/reorder', [CategoryMaterialController::class, 'reorder'])
                 ->name('categories.materials.reorder');
@@ -233,7 +245,6 @@ Route::middleware(['auth', '2fa'])
             Route::prefix('questions/{question}/translations')
                 ->name('questions.translations.')
                 ->group(function () {
-                    Route::get('/',          [QuestionTranslationController::class, 'index'])->name('index');
                     Route::post('/',         [QuestionTranslationController::class, 'store'])->name('store');
                     Route::put('/{locale}',  [QuestionTranslationController::class, 'update'])
                         ->where('locale', '[a-z]{2,5}')->name('update');
