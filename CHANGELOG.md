@@ -60,17 +60,19 @@ il testo italiano resta la fonte di verità.
   con fallback all'italiano, null-safe, zero query aggiuntive se le traduzioni sono eager-loaded.
 - `User::getPreferredLocale()` + cast e `$fillable` di `locale`.
 - `QuestionTranslationService` (`upsert` idempotente, `delete`, `getForQuestion`).
-- `Admin\QuestionTranslationController` (index/store/update/destroy) protetto da
+- `Admin\QuestionTranslationController` (store/update/destroy) protetto da
   `canEditQuestion()` su ogni metodo.
 - Form Request `StoreQuestionTranslationRequest`, `UpdateQuestionTranslationRequest`,
   `UpdateLocalePreferenceRequest`.
-- Route admin `questions/{question}/translations` (index/store/update/destroy) e
+- Route admin `POST/PUT/DELETE questions/{question}/translations/{locale?}` e
   `POST /profile/locale` per la preferenza lingua del viewer.
-- View `admin/questions/translations.blade.php` (lista + form add/edit/delete, empty state)
-  e pulsante "Traduzioni" nella DataTable domande (visibile a `canEditQuestion()`).
+- Sezione "Traduzioni" embedded nella pagina `/admin/questions/{id}/edit`: mostra
+  traduzioni esistenti con form modifica/elimina e form aggiunta (locale select +
+  textarea testo). Visibile a admin/editor con `canEditQuestion()`.
 - Card "Lingua preferita" nel profilo utente con select delle lingue d'esame.
-- Feature test `QuestionTranslationTest` (14 test): accessor + fallback, idempotenza upsert,
-  autorizzazione admin/editor/viewer, localizzazione view studio, cascade delete, preferenza profilo.
+- Feature test `QuestionTranslationTest` (17 test): accessor + fallback, idempotenza upsert,
+  autorizzazione admin/editor/viewer, localizzazione view studio, cascade delete, preferenza profilo,
+  edit page integrazione (traduzioni visibili, form add, nascoste a viewer).
 
 ### Changed
 

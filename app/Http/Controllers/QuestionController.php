@@ -14,6 +14,7 @@ use App\Models\Category;
 use App\Models\Question;
 use App\Services\MitImportService;
 use App\Services\QuestionService;
+use App\Services\QuestionTranslationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -60,11 +61,16 @@ class QuestionController extends Controller
             ->with('success', 'Domanda creata');
     }
 
-    public function edit(Question $question)
+    public function edit(Question $question, QuestionTranslationService $translationService)
     {
-        $categories = Category::pluck('name', 'id');
+        $categories   = Category::pluck('name', 'id');
+        $translations = $translationService->getForQuestion($question);
+        $existing     = $translations->pluck('locale')->all();
+        $default      = config('locales.default', 'it');
+        $available    = collect(config('locales.exam', []))
+            ->except(array_merge($existing, [$default]));
 
-        return view('admin.questions.edit', compact('question', 'categories'));
+        return view('admin.questions.edit', compact('question', 'categories', 'translations', 'available'));
     }
 
     public function update(UpdateQuestionRequest $request, Question $question)

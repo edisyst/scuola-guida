@@ -84,7 +84,7 @@ Nessuna modifica al codice applicativo è richiesta.
 
 Concetto **distinto** dalla i18n dell'interfaccia: qui si traduce il **testo delle domande**
 (non la UI) per l'accessibilità dell'esame teorico MIT. Admin ed editor caricano le traduzioni
-dalla DataTable domande (pulsante "Traduzioni"); il viewer sceglie la lingua preferita nella
+dalla pagina di modifica domanda (`/admin/questions/{id}/edit`, sezione "Traduzioni"); il viewer sceglie la lingua preferita nella
 card "Lingua preferita" del proprio profilo. La traduzione si applica in modalità studio, nel
 simulatore e nel test diagnostico, con **fallback automatico all'italiano** se manca.
 

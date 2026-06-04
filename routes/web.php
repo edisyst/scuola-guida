@@ -241,7 +241,6 @@ Route::middleware(['auth', '2fa'])
             Route::prefix('questions/{question}/translations')
                 ->name('questions.translations.')
                 ->group(function () {
-                    Route::get('/',          [QuestionTranslationController::class, 'index'])->name('index');
                     Route::post('/',         [QuestionTranslationController::class, 'store'])->name('store');
                     Route::put('/{locale}',  [QuestionTranslationController::class, 'update'])
                         ->where('locale', '[a-z]{2,5}')->name('update');
