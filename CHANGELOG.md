@@ -5,6 +5,27 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 7.2: Traduzioni categorie + seeder bilingue
+
+Aggiunge la traduzione del **nome delle categorie** seguendo lo stesso pattern di Feature 7.1
+(entità separata, fallback all'italiano, `Auditable`). Migliora i seeder di categorie e domande
+per popolare automaticamente le traduzioni EN dai due file Excel durante il `db:seed`.
+
+### Added
+
+- Migration `create_category_translations_table`: `category_id` (cascadeOnDelete), `locale`,
+  `name`, `created_by` (nullOnDelete), indice unico `(category_id, locale)`.
+- Model `CategoryTranslation` (trait `Auditable`, relazioni `category()` e `creator()`).
+- Relazione `Category::translations()` e metodo `Category::getLocalizedName(string $locale)`
+  con fallback all'italiano, null-safe, zero query aggiuntive se le traduzioni sono eager-loaded.
+- `CategorySeeder` aggiornato: legge `file_con_category_id_EN.xlsx` (foglio "Categorie")
+  e inserisce le traduzioni EN matchemate per `category_id`.
+- `QuestionSeeder` aggiornato: legge `file_con_category_id_EN.xlsx` (foglio "Domande")
+  e inserisce le traduzioni EN matchemate per posizione riga (stesso ordine dei due file).
+  Usa `DB::getPdo()->lastInsertId()` per recuperare gli ID assegnati dopo bulk insert.
+
+---
+
 ## [Unreleased] — Feature 7.1: Accessibilità esame — versione multilingua delle domande
 
 Traduzione del **testo delle domande** in lingue diverse dall'italiano per l'accessibilità
