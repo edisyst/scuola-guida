@@ -213,7 +213,7 @@ class StudyService
 
         $flagged = empty($flaggedIds)
             ? new Collection()
-            : Question::with('category')->whereIn('id', $flaggedIds)->get();
+            : Question::with('category.translations')->whereIn('id', $flaggedIds)->get();
 
         return [
             'total'         => $this->count(),

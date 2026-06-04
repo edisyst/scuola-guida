@@ -26,7 +26,7 @@ class StudyPlanService
      */
     public function buildPlan(User $user): Collection
     {
-        $categories = Category::whereHas('questions')->orderBy('name')->get()->keyBy('id');
+        $categories = Category::with('translations')->whereHas('questions')->orderBy('name')->get()->keyBy('id');
 
         if ($categories->isEmpty()) {
             return collect();

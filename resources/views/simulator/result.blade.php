@@ -99,7 +99,7 @@
                         <p class="mb-1">{{ $row['localized_text'] ?? $row['question']->question }}</p>
                         <div class="small text-muted">
                             @if($row['question']->category)
-                                <i class="fas fa-tag me-1"></i>{{ $row['question']->category->name }}
+                                <i class="fas fa-tag me-1"></i>{{ $row['question']->category->getLocalizedName() }}
                                 &nbsp;&bull;&nbsp;
                             @endif
                             Risposta data:

@@ -216,7 +216,7 @@ class QuizController extends Controller
             abort_unless($user->canEditQuiz() || $user->isAdmin(), 403);
         }
 
-        $session = $this->service->startPlay($quiz, $user->id, $enrollmentId);
+        $session = $this->service->startPlay($quiz, $user->id, $enrollmentId, $user->getPreferredLocale());
 
         // Consuma subito l'iscrizione: il viewer può svolgere il quiz una sola volta.
         if ($enrollment) {

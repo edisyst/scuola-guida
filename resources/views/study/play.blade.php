@@ -23,7 +23,7 @@
         syncUrl:      '{{ route('api.offline.sync-answers') }}',
         prefetchUrl:  '{{ route('api.offline.questions') }}',
         questionText: @json($localizedText),
-        categoryName: @json($question->category?->name ?? ''),
+        categoryName: @json($localizedCategoryName),
         imageUrl:     @json($imageUrl),
         index:        {{ $index }},
         total:        {{ $total }},

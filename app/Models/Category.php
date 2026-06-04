@@ -57,15 +57,16 @@ class Category extends Model
         return $this->hasMany(CategoryTranslation::class);
     }
 
-    public function getLocalizedName(string $locale): string
+    public function getLocalizedName(?string $locale = null): string
     {
-        if ($locale === 'it') {
+        $locale ??= app()->getLocale();
+
+        if ($locale === config('locales.default', 'it')) {
             return $this->name;
         }
 
         /** @var CategoryTranslation|null $translation */
-        $translation = $this->translations
-            ->firstWhere('locale', $locale);
+        $translation = $this->translations->firstWhere('locale', $locale);
 
         return $translation?->name ?? $this->name;
     }

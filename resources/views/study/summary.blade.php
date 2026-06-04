@@ -56,7 +56,7 @@
                         <li class="mb-2">
                             {{ \Illuminate\Support\Str::limit($q->question, 140) }}
                             @if($q->category)
-                                <span class="badge badge-secondary ml-1">{{ $q->category->name }}</span>
+                                <span class="badge badge-secondary ml-1">{{ $q->category->getLocalizedName() }}</span>
                             @endif
                         </li>
                     @endforeach

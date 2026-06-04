@@ -34,7 +34,7 @@
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}"
                             {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
+                            {{ $category->getLocalizedName() }}
                         </option>
                     @endforeach
                 </select>
@@ -69,7 +69,7 @@
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 @if($question->category)
-                    <span class="badge badge-info">{{ $question->category->name }}</span>
+                    <span class="badge badge-info">{{ $question->category->getLocalizedName() }}</span>
                 @else
                     <span></span>
                 @endif

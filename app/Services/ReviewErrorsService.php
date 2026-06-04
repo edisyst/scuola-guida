@@ -83,7 +83,7 @@ class ReviewErrorsService
             return collect();
         }
 
-        $query = Question::with('category')->whereIn('id', array_keys($errors));
+        $query = Question::with('category.translations')->whereIn('id', array_keys($errors));
         if ($categoryId !== null) {
             $query->where('category_id', $categoryId);
         }
@@ -154,7 +154,7 @@ class ReviewErrorsService
     {
         $learnedIds = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
 
-        $query = Question::with('category')->whereIn('id', $learnedIds);
+        $query = Question::with('category.translations')->whereIn('id', $learnedIds);
         if ($categoryId !== null) {
             $query->where('category_id', $categoryId);
         }
