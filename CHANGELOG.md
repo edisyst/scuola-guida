@@ -5,6 +5,24 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Lingua spagnola (ES) per l'interfaccia
+
+Aggiunge lo spagnolo come terza lingua dell'interfaccia, affiancando italiano e inglese.
+Nessuna modifica al codice applicativo: segue esattamente il pattern di estensibilità definito
+in Feature 6.10.
+
+### Added
+
+- Entry `es` in `config/locales.php` (array `supported`): label "Español", flag `es.svg`.
+- `lang/es/menu.php` — 38 chiavi del menu/navbar tradotte in spagnolo.
+- `lang/es/auth.php`, `lang/es/pagination.php`, `lang/es/passwords.php`,
+  `lang/es/validation.php` — messaggi di sistema localizzati.
+- `public/images/language_flags/es.svg` — bandiera spagnola SVG inline.
+- 2 test in `LocaleTest`: `test_switch_locale_to_spanish` e
+  `test_menu_string_translated_to_spanish`.
+
+---
+
 ## [Unreleased] — Feature 7.2: Traduzioni categorie + seeder bilingue
 
 Aggiunge la traduzione del **nome delle categorie** seguendo lo stesso pattern di Feature 7.1

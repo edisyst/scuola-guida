@@ -21,7 +21,7 @@ Funzionalità principali:
 - **[Web Push Notifications](docs/07-pwa.md#web-push-notifications-feature-67)** — quarto canale di notifica nativo (browser chiuso / dispositivo bloccato). Il viewer si iscrive dal profilo; le push affiancano mail e database per approvazione iscrizione, badge guadagnati e promemoria ripasso SM-2 (schedulato alle 08:00).
 - **GDPR portabilità dati (art. 20)** — il viewer scarica un archivio ZIP con tutti i propri dati personali in formato JSON (quiz, bookmark, badge, attività, SM-2, documento d'identità). L'admin/editor può esportare i dati di qualsiasi utente da `/admin/users/{id}/edit`. Ogni export è tracciato nell'audit log; il file ZIP viene eliminato subito dopo l'invio (`deleteFileAfterSend`). Cleanup notturno automatico alle 03:00 via `gdpr:export --cleanup-only`.
 
-- **Interfaccia multilingua (IT/EN)** — il menu laterale e la navbar sono disponibili in italiano e inglese. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede solo creare `lang/{code}/menu.php` e aggiungere l'entry corrispondente in `config/locales.php`.
+- **Interfaccia multilingua (IT/EN/ES)** — il menu laterale e la navbar sono disponibili in italiano, inglese e spagnolo. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede solo creare `lang/{code}/menu.php` e aggiungere l'entry corrispondente in `config/locales.php`.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis · `laravel-notification-channels/webpush`
 
@@ -63,9 +63,9 @@ Per il setup completo vedi:
 
 ## Localizzazione
 
-L'interfaccia supporta **italiano** (default) e **inglese**. Solo le label statiche del menu
-laterale e della navbar vengono tradotte; i dati applicativi (quiz, domande, categorie,
-iscrizioni) restano in italiano.
+L'interfaccia supporta **italiano** (default), **inglese** e **spagnolo**. Solo le label
+statiche del menu laterale e della navbar vengono tradotte; i dati applicativi (quiz, domande,
+categorie, iscrizioni) restano in italiano.
 
 ### Aggiungere una nuova lingua
 
@@ -116,7 +116,7 @@ nel versionamento domande (Feature 6.2).
 
 ## Test
 
-Suite con ~396 Feature test in ~35 classi (Laravel TestCase + `RefreshDatabase`):
+Suite con ~398 Feature test in ~35 classi (Laravel TestCase + `RefreshDatabase`):
 
 ```bash
 php artisan test
