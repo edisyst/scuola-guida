@@ -33,7 +33,9 @@ class QuizFactory extends Factory
                 default                => 'Quiz',
             };
 
-            $quiz->updateQuietly(['title' => "{$prefix} #{$id} da {$quiz->max_questions} domande"]);
+            if ($quiz->title === 'Quiz') {
+                $quiz->updateQuietly(['title' => "{$prefix} #{$id} da {$quiz->max_questions} domande"]);
+            }
         });
     }
 }
