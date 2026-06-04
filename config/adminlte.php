@@ -302,7 +302,7 @@ return [
         // Navbar items:
         [
             'type'        => 'navbar-search',
-            'text'        => 'Cerca domande e categorie...',
+            'text'        => 'cerca_placeholder',
             'topnav_right' => true,
             'href'        => '/search',
             'input_name'  => 'q',
@@ -322,13 +322,13 @@ return [
         // I gate 'can' restano invariati: cambia solo il contenitore, non la
         // visibilità né le funzionalità.
         [
-            'text'         => 'Profilo',
+            'text'         => 'profilo',
             'url'          => 'profile',
             'icon'         => 'fas fa-user-circle',
             'topnav_user'  => true,
         ],
         [
-            'text'         => 'I miei badge',
+            'text'         => 'i_miei_badge',
             'url'          => 'profile/badges',
             'icon'         => 'fas fa-award',
             'key'          => 'profile-badges',
@@ -336,7 +336,7 @@ return [
             'topnav_user'  => true,
         ],
         [
-            'text'         => 'Notifiche',
+            'text'         => 'notifiche',
             'url'          => 'notifications',
             'icon'         => 'far fa-bell',
             'key'          => 'notifications',
@@ -348,20 +348,20 @@ return [
         // tendina. Rotte, key e gate 'can' restano invariati: cambia solo il
         // contenitore, non la visibilità né le funzionalità.
         [
-            'text'    => 'Iscrizioni',
+            'text'    => 'iscrizioni',
             'icon'    => 'fas fa-id-card',
             'topnav'  => true,
             'can'     => 'admin-only',
             'submenu' => [
                 [
-                    'text' => 'Iscrizioni anagrafiche',
+                    'text' => 'iscrizioni_anagrafiche',
                     'url'  => 'admin/registrations',
                     'icon' => 'fas fa-id-card',
                     'can'  => 'admin-only',
                     'key'  => 'registrations',
                 ],
                 [
-                    'text' => 'Iscrizioni quiz',
+                    'text' => 'iscrizioni_quiz',
                     'url'  => 'admin/enrollments',
                     'icon' => 'fas fa-user-check',
                     'can'  => 'admin-only',
@@ -370,26 +370,26 @@ return [
             ],
         ],
         [
-            'text'    => 'Esiti & Statistiche',
+            'text'    => 'esiti_statistiche',
             'icon'    => 'fas fa-chart-bar',
             'topnav'  => true,
             'can'     => 'admin-only',
             'submenu' => [
                 [
-                    'text' => 'Esiti confermati',
+                    'text' => 'esiti_confermati',
                     'url'  => 'admin/confirmed-results',
                     'icon' => 'fas fa-trophy',
                     'can'  => 'admin-only',
                     'key'  => 'confirmed-results',
                 ],
                 [
-                    'text' => 'Statistiche',
+                    'text' => 'statistiche',
                     'url'  => 'admin/stats',
                     'icon' => 'fas fa-chart-bar',
                     'can'  => 'admin-only',
                 ],
                 [
-                    'text' => 'Report',
+                    'text' => 'report',
                     'url'  => 'admin/reports',
                     'icon' => 'fas fa-chart-pie',
                     'can'  => 'admin-only',
@@ -398,34 +398,34 @@ return [
             ],
         ],
         [
-            'text'    => 'Sistema',
+            'text'    => 'sistema',
             'icon'    => 'fas fa-server',
             'topnav'  => true,
             'can'     => 'admin-only',
             'submenu' => [
                 [
-                    'text' => 'Media Manager',
+                    'text' => 'media_manager',
                     'url'  => 'admin/media',
                     'icon' => 'fas fa-images',
                     'can'  => 'admin-only',
                     'key'  => 'media',
                 ],
                 [
-                    'text' => 'Audit Log',
+                    'text' => 'audit_log',
                     'url'  => 'admin/audit-logs',
                     'icon' => 'fas fa-history',
                     'can'  => 'admin-only',
                     'key'  => 'audit',
                 ],
                 [
-                    'text' => 'Comandi utili',
+                    'text' => 'comandi_utili',
                     'url'  => 'admin/commands',
                     'icon' => 'fas fa-terminal',
                     'can'  => 'admin-only',
                     'key'  => 'commands',
                 ],
                 [
-                    'text' => 'Stato sistema',
+                    'text' => 'stato_sistema',
                     'url'  => 'admin/health',
                     'icon' => 'fas fa-heartbeat',
                     'can'  => 'admin-only',
@@ -434,20 +434,20 @@ return [
             ],
         ],
         [
-            'text'    => 'Utenti & Ruoli',
+            'text'    => 'utenti_ruoli',
             'icon'    => 'fas fa-users-cog',
             'topnav'  => true,
             'can'     => 'admin-only',
             'submenu' => [
                 [
-                    'text' => 'Utenti',
+                    'text' => 'utenti',
                     'url'  => 'admin/users',
                     'icon' => 'fas fa-users',
                     'can'  => 'manage-users-menu',
                     'key'  => 'users',
                 ],
                 [
-                    'text' => 'Ruoli & Permessi',
+                    'text' => 'ruoli_permessi',
                     'url'  => 'admin/roles',
                     'icon' => 'fas fa-user-shield',
                     'can'  => 'admin-only',
@@ -464,7 +464,7 @@ return [
         // ── AREA PERSONALE (tutti i ruoli) ──────────────────────────────────
         ['header' => 'area_personale'],
         [
-            'text'  => 'Dashboard',
+            'text'  => 'dashboard',
             'url'   => 'dashboard',
             'icon'  => 'fas fa-tachometer-alt',
             'key'   => 'dashboard',
@@ -473,21 +473,21 @@ return [
         // ── STUDIO (allenamento libero, solo viewer/exam-participant) ────────
         ['header' => 'studio', 'can' => 'exam-participant'],
         [
-            'text'  => 'Modalità Studio',
+            'text'  => 'modalita_studio',
             'url'   => 'study',
             'icon'  => 'fas fa-graduation-cap',
             'key'   => 'study',
             'can'   => 'exam-participant',
         ],
         [
-            'text'  => 'Simulatore esame',
+            'text'  => 'simulatore_esame',
             'url'   => 'simulator',
             'icon'  => 'fas fa-stopwatch',
             'key'   => 'simulator',
             'can'   => 'exam-participant',
         ],
         [
-            'text'        => 'Domande salvate',
+            'text'        => 'domande_salvate',
             'url'         => 'bookmarks',
             'icon'        => 'fas fa-bookmark',
             'key'         => 'bookmarks',
@@ -495,21 +495,21 @@ return [
             // TODO: aggiungere label con contatore bookmark dell'utente via View Composer
         ],
         [
-            'text' => 'Revisione errori',
+            'text' => 'revisione_errori',
             'url'  => 'review-errors',
             'icon' => 'fas fa-exclamation-triangle',
             'key'  => 'review-errors',
             'can'  => 'exam-participant',
         ],
         [
-            'text' => 'Piano di studio',
+            'text' => 'piano_studio',
             'url'  => 'study-plan',
             'icon' => 'fas fa-route',
             'key'  => 'study-plan',
             'can'  => 'exam-participant',
         ],
         [
-            'text' => 'Ripasso intelligente',
+            'text' => 'ripasso_intelligente',
             'url'  => 'smart-review',
             'icon' => 'fas fa-brain',
             'key'  => 'smart-review',
@@ -519,28 +519,28 @@ return [
         // ── ESAMI UFFICIALI (viewer partecipa, admin/editor sola lettura) ───
         ['header' => 'esami', 'can' => 'viewer-quiz-area'],
         [
-            'text' => 'Quiz disponibili',
+            'text' => 'quiz_disponibili',
             'url'  => 'quiz/confirmed',
             'icon' => 'fas fa-clipboard-check',
             'can'  => 'viewer-quiz-area',
             'key'  => 'quiz-confirmed',
         ],
         [
-            'text' => 'Calendario sessioni',
+            'text' => 'calendario_sessioni',
             'url'  => 'calendar',
             'icon' => 'fas fa-calendar-alt',
             'can'  => 'viewer-quiz-area',
             'key'  => 'calendar',
         ],
         [
-            'text' => 'Le mie iscrizioni',
+            'text' => 'le_mie_iscrizioni',
             'url'  => 'quiz/enrollments',
             'icon' => 'fas fa-list-check',
             'can'  => 'exam-participant',
             'key'  => 'quiz-enrollments-mine',
         ],
         [
-            'text'  => 'I miei tentativi',
+            'text'  => 'i_miei_tentativi',
             'url'   => 'quiz/attempts',
             'icon'  => 'fas fa-history',
             'can'   => 'exam-participant',
@@ -550,28 +550,28 @@ return [
         // ── CATALOGO (admin, editor, viewer) ────────────────────────────────
         ['header' => 'catalogo', 'can' => 'view-admin'],
         [
-            'text' => 'Produzione contenuti',
+            'text' => 'produzione_contenuti',
             'url'  => 'editor/dashboard',
             'icon' => 'fas fa-pen-fancy',
             'can'  => 'content-editor',
             'key'  => 'editor-dashboard',
         ],
         [
-            'text' => 'Categorie',
+            'text' => 'categorie',
             'url'  => 'admin/categories',
             'icon' => 'fas fa-tags',
             'can'  => 'view-admin',
             'key'  => 'categories',
         ],
         [
-            'text' => 'Domande',
+            'text' => 'domande',
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question-circle',
             'can'  => 'view-admin',
             'key'  => 'questions',
         ],
         [
-            'text'        => 'Segnalazioni',
+            'text'        => 'segnalazioni',
             'url'         => 'admin/question-reports',
             'icon'        => 'fas fa-flag',
             'can'         => 'view-question-reports',
@@ -581,7 +581,7 @@ return [
         // ── QUIZ (admin, editor, viewer) ────────────────────────────────────
         ['header' => 'quiz', 'can' => 'view-admin'],
         [
-            'text' => 'Quizzes',
+            'text' => 'quizzes',
             'url'  => 'admin/quizzes',
             'icon' => 'fas fa-clipboard-list',
             'can'  => 'view-admin',
@@ -595,7 +595,7 @@ return [
         // ── ISTRUTTORE (istruttore + admin per supervisione) ─────────────────
         ['header' => 'istruttore', 'can' => 'instructor-area'],
         [
-            'text' => 'I miei studenti',
+            'text' => 'i_miei_studenti',
             'url'  => 'instructor/students',
             'icon' => 'fas fa-user-graduate',
             'can'  => 'instructor-area',
@@ -604,7 +604,7 @@ return [
 
         // ── GESTIONE ISTRUTTORI (solo admin) ────────────────────────────────
         [
-            'text' => 'Gestione istruttori',
+            'text' => 'gestione_istruttori',
             'url'  => 'admin/instructors',
             'icon' => 'fas fa-chalkboard-teacher',
             'can'  => 'admin-only',

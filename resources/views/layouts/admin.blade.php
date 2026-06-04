@@ -19,6 +19,31 @@
 @stop
 
 @section('content_top_nav_right')
+    {{-- Language switcher --}}
+    <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#" aria-label="{{ config('locales.supported')[App::getLocale()]['label'] }}">
+            <img src="{{ asset('images/language_flags/' . config('locales.supported')[App::getLocale()]['flag']) }}"
+                 alt="{{ config('locales.supported')[App::getLocale()]['label'] }}"
+                 width="20" height="14"
+                 style="border-radius: 2px;">
+        </a>
+        <div class="dropdown-menu dropdown-menu-right">
+            @foreach(config('locales.supported') as $code => $lang)
+                <form method="POST" action="{{ route('locale.switch') }}">
+                    @csrf
+                    <input type="hidden" name="locale" value="{{ $code }}">
+                    <button type="submit"
+                            class="dropdown-item {{ App::getLocale() === $code ? 'active' : '' }}">
+                        <img src="{{ asset('images/language_flags/' . $lang['flag']) }}"
+                             alt="{{ $lang['label'] }}"
+                             width="20" height="14"
+                             style="border-radius: 2px; margin-right: 6px;">
+                        {{ $lang['label'] }}
+                    </button>
+                </form>
+            @endforeach
+        </div>
+    </li>
     <livewire:notification-bell />
 @stop
 

@@ -21,6 +21,8 @@ Funzionalità principali:
 - **[Web Push Notifications](docs/07-pwa.md#web-push-notifications-feature-67)** — quarto canale di notifica nativo (browser chiuso / dispositivo bloccato). Il viewer si iscrive dal profilo; le push affiancano mail e database per approvazione iscrizione, badge guadagnati e promemoria ripasso SM-2 (schedulato alle 08:00).
 - **GDPR portabilità dati (art. 20)** — il viewer scarica un archivio ZIP con tutti i propri dati personali in formato JSON (quiz, bookmark, badge, attività, SM-2, documento d'identità). L'admin/editor può esportare i dati di qualsiasi utente da `/admin/users/{id}/edit`. Ogni export è tracciato nell'audit log; il file ZIP viene eliminato subito dopo l'invio (`deleteFileAfterSend`). Cleanup notturno automatico alle 03:00 via `gdpr:export --cleanup-only`.
 
+- **Interfaccia multilingua (IT/EN)** — il menu laterale e la navbar sono disponibili in italiano e inglese. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede solo creare `lang/{code}/menu.php` e aggiungere l'entry corrispondente in `config/locales.php`.
+
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis · `laravel-notification-channels/webpush`
 
 ## Panoramica architettura
@@ -56,6 +58,27 @@ Per il setup completo vedi:
 - [Comandi artisan utili](docs/01-installation.md#comandi-artisan-utili)
 - [Variabili `.env` rilevanti](docs/01-installation.md#variabili-env-rilevanti)
 - [Risoluzione problemi comuni](docs/01-installation.md#risoluzione-problemi-comuni)
+
+---
+
+## Localizzazione
+
+L'interfaccia supporta **italiano** (default) e **inglese**. Solo le label statiche del menu
+laterale e della navbar vengono tradotte; i dati applicativi (quiz, domande, categorie,
+iscrizioni) restano in italiano.
+
+### Aggiungere una nuova lingua
+
+1. Creare `lang/{code}/menu.php` con le stesse chiavi di `lang/it/menu.php`.
+2. Aggiungere un'entry in `config/locales.php` con `label` e `flag`.
+3. Salvare il file SVG della bandiera in `public/images/language_flags/{code}.svg`.
+
+Nessuna modifica al codice applicativo è richiesta.
+
+> **Nota**: la funzionalità non è compatibile con `php artisan config:cache` perché i
+> testi del menu sono tradotti a runtime dal `LangFilter` di AdminLTE, che legge i file
+> `lang/{locale}/menu.php` ad ogni request. Non eseguire config:cache in produzione se
+> si usa il cambio lingua dinamico.
 
 ---
 

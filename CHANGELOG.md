@@ -5,6 +5,30 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 6.10: Internazionalizzazione UI (i18n sidebar)
+
+Supporto multilingua per il menu laterale e la navbar dell'interfaccia.
+I dati applicativi (quiz, domande, categorie) restano in italiano.
+
+### Added
+
+- `config/locales.php` con elenco lingue configurabile senza modifiche al codice.
+  Aggiungere una lingua richiede solo un'entry qui e il relativo file di traduzione.
+- Middleware `SetLocale` che legge `app_locale` dalla sessione e imposta il locale
+  applicativo su ogni request via `App::setLocale()`.
+- `SwitchLocaleRequest` con validazione `in:` sulle lingue supportate.
+- `LocaleController::switch()` che salva il locale scelto in sessione e reindirizza
+  con flash `info`.
+- Route `POST /locale/switch` (fuori dai gruppi autenticati, funziona anche sulla pagina di login).
+- File di traduzione `lang/it/menu.php` e `lang/en/menu.php` per tutte le voci
+  del menu laterale e della navbar (38 chiavi ciascuno).
+- Dropdown con bandierine nella navbar AdminLTE per il cambio lingua (italiano/inglese).
+- SVG bandiere in `public/images/language_flags/` (`it.svg`, `en.svg`).
+- Feature test `LocaleTest` (6 asserzioni: salvataggio sessione, validazione locale
+  non supportato, applicazione middleware, traduzioni IT/EN, flash message).
+
+---
+
 ## [Unreleased] — Feature 6.9: GDPR data portability (export dati personali)
 
 Implementazione del diritto alla portabilità dei dati (GDPR art. 20): il viewer può scaricare
