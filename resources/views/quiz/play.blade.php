@@ -101,6 +101,16 @@
 
 @section('js')
     @parent
+    @php
+        $quizUiStrings = [
+            'correct_feedback'    => __('viewer.correct_feedback'),
+            'wrong_feedback'      => __('viewer.wrong_feedback'),
+            'error_limit_reached' => __('viewer.error_limit_reached'),
+            'time_expired'        => __('viewer.time_expired'),
+            'answer_required'     => __('viewer.quiz.answer_required'),
+            'save_error'          => __('viewer.quiz.save_error'),
+        ];
+    @endphp
 
     <script>
         const questions  = @json($questionsJson);
@@ -108,14 +118,7 @@
         const attemptId  = {{ $attemptId }};
         const timeLimit  = {{ $timeLimit }};
         const maxErrors  = {{ $maxErrors }};
-        const uiStrings  = @json([
-            'correct_feedback'    => __('viewer.correct_feedback'),
-            'wrong_feedback'      => __('viewer.wrong_feedback'),
-            'error_limit_reached' => __('viewer.error_limit_reached'),
-            'time_expired'        => __('viewer.time_expired'),
-            'answer_required'     => __('viewer.quiz.answer_required'),
-            'save_error'          => __('viewer.quiz.save_error'),
-        ]);
+        const uiStrings  = @json($quizUiStrings);
 
         let currentIndex    = 0;
         let errors          = 0;

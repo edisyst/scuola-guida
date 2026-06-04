@@ -10,7 +10,7 @@
     @if(auth()->id() !== $attempt->user_id)
     <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
         <i class="fas fa-info-circle mr-1"></i>
-        Stai visualizzando il tentativo di <strong>{{ $attempt->user->name }}</strong>.
+        {{ __('viewer.quiz.viewing_attempt') }} <strong>{{ $attempt->user->name }}</strong>.
         <button type="button" class="close" data-dismiss="alert">
             <span>&times;</span>
         </button>
@@ -19,12 +19,12 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Revisione tentativo</p>
+            <p class="sg-header-subtitle">{{ __('viewer.quiz.attempt_review') }}</p>
             <h1 class="sg-header-title">{{ $quiz->title }}</h1>
         </div>
         <div class="sg-header-actions">
             <a href="{{ route('quiz.attempts.index') }}" class="sg-btn sg-btn-outline sg-btn-sm">
-                <i class="fas fa-arrow-left"></i> Torna allo storico
+                <i class="fas fa-arrow-left"></i> {{ __('viewer.quiz.back_to_history') }}
             </a>
         </div>
     </div>
@@ -34,42 +34,42 @@
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas {{ $stats['passed'] ? 'fa-check-circle' : 'fa-times-circle' }} mr-2"></i>
-                Riepilogo
+                {{ __('viewer.summary') }}
             </h3>
         </div>
         <div class="card-body">
 
             <div class="text-center mb-4">
                 @if($stats['passed'])
-                    <span class="badge badge-success" style="font-size:1.3rem;padding:0.5rem 1.2rem;">PROMOSSO</span>
+                    <span class="badge badge-success" style="font-size:1.3rem;padding:0.5rem 1.2rem;">{{ __('viewer.passed') }}</span>
                 @else
-                    <span class="badge badge-danger" style="font-size:1.3rem;padding:0.5rem 1.2rem;">RIMANDATO</span>
+                    <span class="badge badge-danger" style="font-size:1.3rem;padding:0.5rem 1.2rem;">{{ __('viewer.failed_quiz') }}</span>
                 @endif
             </div>
 
             <div class="row text-center">
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Punteggio</p>
+                    <p class="sg-label mb-1">{{ __('viewer.score') }}</p>
                     <strong class="d-block">{{ $stats['correct'] }} / {{ $stats['total'] }}</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Percentuale</p>
+                    <p class="sg-label mb-1">{{ __('viewer.percentage') }}</p>
                     <strong class="d-block">{{ $stats['percentage'] }}%</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Errori</p>
+                    <p class="sg-label mb-1">{{ __('viewer.errors') }}</p>
                     <strong class="d-block">{{ $stats['wrong'] }} / {{ $quiz->max_errors ?? '—' }}</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Non risposto</p>
+                    <p class="sg-label mb-1">{{ __('viewer.unanswered') }}</p>
                     <strong class="d-block">{{ $stats['not_answered'] }}</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Durata</p>
+                    <p class="sg-label mb-1">{{ __('viewer.duration') }}</p>
                     <strong class="d-block">{{ $stats['duration_human'] ?? '—' }}</strong>
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <p class="sg-label mb-1">Data</p>
+                    <p class="sg-label mb-1">{{ __('viewer.date') }}</p>
                     <strong class="d-block">{{ $attempt->created_at->format('d/m/Y H:i') }}</strong>
                 </div>
             </div>
@@ -99,10 +99,10 @@
     <div class="card {{ $borderClass }} mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span class="font-weight-normal">
-                Domanda {{ $loop->iteration }} di {{ $stats['total'] }}
+                {{ __('viewer.question_label') }} {{ $loop->iteration }} {{ __('viewer.of') }} {{ $stats['total'] }}
             </span>
             @if($item['question']->category)
-                <span class="badge badge-info">{{ $item['question']->category->name }}</span>
+                <span class="badge badge-info">{{ $item['question']->category->getLocalizedName() }}</span>
             @endif
         </div>
         <div class="card-body">
@@ -115,8 +115,8 @@
                 @if($item['is_historical'])
                     <span class="badge badge-secondary ml-1"
                           data-toggle="tooltip"
-                          title="Questa domanda è stata modificata dopo questo tentativo. Stai vedendo il testo originale che hai risposto.">
-                        <i class="fas fa-history mr-1"></i>Versione storica
+                          title="{{ __('viewer.quiz.historical_tooltip') }}">
+                        <i class="fas fa-history mr-1"></i>{{ __('viewer.quiz.historical_badge') }}
                     </span>
                 @endif
             </p>
@@ -131,22 +131,22 @@
             @endif
 
             <p class="mb-1">
-                La tua risposta:
+                {{ __('viewer.quiz.your_answer') }}
                 @if($item['user_answer'] === null)
-                    <em class="text-muted">Non risposto</em>
+                    <em class="text-muted">{{ __('viewer.unanswered') }}</em>
                 @elseif($item['user_answer'] === 1)
-                    <strong class="{{ $item['is_correct'] ? 'text-success' : 'text-danger' }}">Vero</strong>
+                    <strong class="{{ $item['is_correct'] ? 'text-success' : 'text-danger' }}">{{ __('viewer.answer_true_full') }}</strong>
                 @else
-                    <strong class="{{ $item['is_correct'] ? 'text-success' : 'text-danger' }}">Falso</strong>
+                    <strong class="{{ $item['is_correct'] ? 'text-success' : 'text-danger' }}">{{ __('viewer.answer_false_full') }}</strong>
                 @endif
             </p>
             <p class="mb-0">
-                Risposta corretta:
-                <strong>{{ $item['correct_answer'] === 1 ? 'Vero' : 'Falso' }}</strong>
+                {{ __('viewer.quiz.correct_answer') }}
+                <strong>{{ $item['correct_answer'] === 1 ? __('viewer.answer_true_full') : __('viewer.answer_false_full') }}</strong>
             </p>
 
             @if($item['time_spent'] !== null)
-            <p class="text-right text-muted small mb-0 mt-2">Tempo: {{ $item['time_spent'] }}s</p>
+            <p class="text-right text-muted small mb-0 mt-2">{{ __('viewer.quiz.time_spent') }} {{ $item['time_spent'] }}s</p>
             @endif
 
             @auth @if(auth()->user()->isViewer())
@@ -161,7 +161,7 @@
 
     <div class="text-center mb-4">
         <a href="{{ route('quiz.attempts.index') }}" class="sg-btn sg-btn-outline">
-            <i class="fas fa-arrow-left"></i> Torna allo storico
+            <i class="fas fa-arrow-left"></i> {{ __('viewer.quiz.back_to_history') }}
         </a>
     </div>
 

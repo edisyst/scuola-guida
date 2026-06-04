@@ -211,7 +211,7 @@
                         @click="toggleFlag()"
                         x-show="!offlineMode">
                     <i class="fas" :class="flagged ? 'fa-bookmark' : 'fa-bookmark'"></i>
-                    <span x-text="flagged ? 'Segnata da ripassare' : 'Segna da ripassare'"></span>
+                    <span x-text="flagged ? '{{ __('viewer.study.flagged') }}' : '{{ __('viewer.study.flag') }}'"></span>
                 </button>
 
                 @auth @if(auth()->user()->isViewer())
@@ -225,7 +225,7 @@
                 @endif @endauth
 
                 <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-dark" x-show="!offlineMode">
-                    <i class="fas fa-flag-checkered"></i> Termina sessione
+                    <i class="fas fa-flag-checkered"></i> {{ __('viewer.study.end_session') }}
                 </a>
             </div>
 
@@ -234,11 +234,11 @@
                 <template x-if="!offlineMode">
                     @if($nextUrl)
                         <a href="{{ $nextUrl }}" class="sg-btn sg-btn-primary">
-                            Prossima <i class="fas fa-chevron-right"></i>
+                            {{ __('viewer.next') }} <i class="fas fa-chevron-right"></i>
                         </a>
                     @else
                         <a href="{{ route('study.summary') }}" class="sg-btn sg-btn-primary">
-                            Vai al riepilogo <i class="fas fa-chevron-right"></i>
+                            {{ __('viewer.study.go_to_summary') }} <i class="fas fa-chevron-right"></i>
                         </a>
                     @endif
                 </template>
@@ -247,7 +247,7 @@
                     <button class="sg-btn sg-btn-primary"
                             :disabled="offlineIndex >= offlineTotal - 1"
                             @click="offlineNext()">
-                        Prossima <i class="fas fa-chevron-right"></i>
+                        {{ __('viewer.next') }} <i class="fas fa-chevron-right"></i>
                     </button>
                 </template>
             </div>
@@ -264,7 +264,16 @@
     @parent
     @vite(['resources/js/offline-store.js'])
 
+    @php
+        $uiStrings = [
+            'bookmark_error' => __('viewer.study.bookmark_error'),
+            'synced_one'     => __('viewer.study.synced_one'),
+            'synced_many'    => __('viewer.study.synced_many'),
+        ];
+    @endphp
     <script>
+        const uiStrings = @json($uiStrings);
+
         function studyPlay(config) {
             return {
                 // ── Original state ─────────────────────────────
@@ -357,7 +366,7 @@
                         }
                     })
                     .catch(() => {
-                        if (window.toastr) toastr.error('Errore nel salvataggio del segnalibro');
+                        if (window.toastr) toastr.error(uiStrings.bookmark_error);
                     });
                 },
 
@@ -471,7 +480,7 @@
                         }
 
                         if (data.count > 0 && window.toastr) {
-                            toastr.success(data.count + (data.count === 1 ? ' risposta sincronizzata.' : ' risposte sincronizzate.'));
+                            toastr.success(data.count + ' ' + (data.count === 1 ? uiStrings.synced_one : uiStrings.synced_many));
                         }
                     } catch (e) {
                         // Sync failed — will retry next time online

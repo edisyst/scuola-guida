@@ -148,6 +148,14 @@
 
 @section('js')
     @parent
+    @php
+        $simUiStrings = [
+            'correct_feedback'    => __('viewer.correct_feedback'),
+            'wrong_feedback'      => __('viewer.wrong_feedback'),
+            'error_limit_reached' => __('viewer.simulator.error_limit_reached'),
+            'time_expired'        => __('viewer.simulator.time_expired'),
+        ];
+    @endphp
 
     <script>
         const questions  = @json($questionsJson);
@@ -155,12 +163,7 @@
         const attemptId  = {{ $attempt->id }};
         const timeLimit  = {{ $timeLimit }};   // in secondi
         const maxErrors  = {{ $maxErrors }};
-        const uiStrings  = @json([
-            'correct_feedback'    => __('viewer.correct_feedback'),
-            'wrong_feedback'      => __('viewer.wrong_feedback'),
-            'error_limit_reached' => __('viewer.simulator.error_limit_reached'),
-            'time_expired'        => __('viewer.simulator.time_expired'),
-        ]);
+        const uiStrings  = @json($simUiStrings);
 
         let currentIndex     = 0;
         let errors           = 0;
