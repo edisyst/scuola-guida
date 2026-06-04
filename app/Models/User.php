@@ -137,7 +137,9 @@ class User extends Authenticatable
      */
     public function getPreferredLocale(): string
     {
-        return $this->locale ?? config('locales.default', 'it');
+        // Il testo originale delle domande è sempre italiano (MIT): 'it' come base
+        // è una proprietà del contenuto, non della lingua dell'interfaccia.
+        return $this->locale ?? 'it';
     }
 
     /*

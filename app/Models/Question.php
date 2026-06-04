@@ -104,12 +104,8 @@ class Question extends Model
      */
     public function getLocalizedText(string $locale): string
     {
-        $default = config('locales.default', 'it');
-
-        if ($locale === $default) {
-            return $this->question;
-        }
-
+        // Cerca la traduzione nella collection già caricata (zero query aggiuntive
+        // se eager-loaded). Fallback al testo italiano originale se non esiste.
         $translation = $this->translations->firstWhere('locale', $locale);
 
         return $translation?->text ?: $this->question;

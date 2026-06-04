@@ -67,9 +67,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/profile/download-data', [ProfileController::class, 'downloadPersonalData'])->name('profile.download-data');
 
-    // Lingua preferita per il testo delle domande (Feature 7.1)
-    Route::post('/profile/locale', [ProfileController::class, 'updateLocale'])->name('profile.locale.update');
-
     // Iscrizione anagrafica viewer (invio dati per esami ufficiali)
     Route::post('/profile/registration', [RegistrationController::class, 'submit'])
         ->name('profile.registration.submit');

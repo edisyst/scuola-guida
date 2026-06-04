@@ -12,9 +12,15 @@ class SetLocale
     public function handle(Request $request, Closure $next): Response
     {
         $supported = array_keys(config('locales.supported', []));
-        $locale    = $request->session()->get('app_locale', config('locales.default', 'it'));
+        $default   = config('locales.default', 'it');
 
-        App::setLocale(in_array($locale, $supported) ? $locale : config('locales.default', 'it'));
+        // Priorità: sessione (click bandierina) → users.locale (Feature 7.1) → default.
+        // Non scrive in sessione: solo LocaleController::switch() lo fa esplicitamente.
+        $locale = $request->session()->get('app_locale')
+            ?? ($request->user()?->locale)
+            ?? $default;
+
+        App::setLocale(in_array($locale, $supported) ? $locale : $default);
 
         return $next($request);
     }

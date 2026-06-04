@@ -8,7 +8,15 @@ class LocaleController extends Controller
 {
     public function switch(SwitchLocaleRequest $request): \Illuminate\Http\RedirectResponse
     {
-        $request->session()->put('app_locale', $request->validated('locale'));
+        $locale = $request->validated('locale');
+
+        $request->session()->put('app_locale', $locale);
+
+        // Persiste la preferenza lingua nel profilo utente (Feature 7.1):
+        // la bandierina diventa l'unico punto di scelta per il viewer.
+        if (auth()->check()) {
+            auth()->user()->update(['locale' => $locale]);
+        }
 
         return redirect()->back()->with('info', __('menu.locale_changed'));
     }

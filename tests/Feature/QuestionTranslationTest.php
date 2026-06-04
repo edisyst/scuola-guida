@@ -250,26 +250,37 @@ class QuestionTranslationTest extends TestCase
         ]);
     }
 
-    public function test_profile_locale_preference_is_saved(): void
+    /*
+    |--------------------------------------------------------------------------
+    | BANDIERINA — LocaleController persiste users.locale
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_flag_switcher_persists_locale_to_users_locale(): void
     {
         $viewer = $this->viewerUser(null);
 
         $this->actingAs($viewer)
-            ->post(route('profile.locale.update'), ['locale' => 'fr'])
-            ->assertRedirect(route('profile.edit'));
+            ->post(route('locale.switch'), ['locale' => 'en'])
+            ->assertRedirect();
 
-        $this->assertSame('fr', $viewer->fresh()->locale);
+        $this->assertSame('en', $viewer->fresh()->locale);
     }
 
-    public function test_profile_locale_can_be_reset_to_default(): void
+    public function test_flag_switcher_sets_session_app_locale(): void
     {
-        $viewer = $this->viewerUser('fr');
+        $viewer = $this->viewerUser(null);
 
         $this->actingAs($viewer)
-            ->post(route('profile.locale.update'), ['locale' => ''])
-            ->assertRedirect(route('profile.edit'));
+            ->post(route('locale.switch'), ['locale' => 'en']);
 
-        $this->assertNull($viewer->fresh()->locale);
+        $this->assertEquals('en', session('app_locale'));
+    }
+
+    public function test_flag_switcher_unauthenticated_does_not_crash(): void
+    {
+        $this->post(route('locale.switch'), ['locale' => 'en'])
+            ->assertRedirect();
     }
 
     public function test_invalid_locale_is_rejected(): void
