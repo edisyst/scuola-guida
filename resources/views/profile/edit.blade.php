@@ -42,6 +42,17 @@
 
     <div class="sg-card sg-mb-3">
         <div class="sg-card-header">
+            <h2 class="sg-card-header-title">
+                <i class="fas fa-language mr-2"></i> Lingua preferita
+            </h2>
+        </div>
+        <div class="sg-card-body">
+            @include('profile.partials.language-preference-form')
+        </div>
+    </div>
+
+    <div class="sg-card sg-mb-3">
+        <div class="sg-card-header">
             <h2 class="sg-card-header-title">Aggiorna password</h2>
         </div>
         <div class="sg-card-body">

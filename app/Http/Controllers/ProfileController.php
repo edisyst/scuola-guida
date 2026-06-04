@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\UpdateLocalePreferenceRequest;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Services\GdprExportService;
@@ -38,6 +39,18 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Aggiorna la lingua preferita per il testo delle domande (Feature 7.1).
+     * null = usa la lingua di default dell'applicazione (italiano).
+     */
+    public function updateLocale(UpdateLocalePreferenceRequest $request): RedirectResponse
+    {
+        $request->user()->update(['locale' => $request->validated('locale')]);
+
+        return Redirect::route('profile.edit')
+            ->with('success', 'Lingua preferita aggiornata.');
     }
 
     public function downloadPersonalData(GdprExportService $service): \Symfony\Component\HttpFoundation\BinaryFileResponse

@@ -18,6 +18,7 @@ use App\Http\Controllers\StudyController;
 use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\CategoryMaterialController;
 use App\Http\Controllers\Admin\QuestionReportController;
+use App\Http\Controllers\Admin\QuestionTranslationController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -65,6 +66,9 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/profile/download-data', [ProfileController::class, 'downloadPersonalData'])->name('profile.download-data');
+
+    // Lingua preferita per il testo delle domande (Feature 7.1)
+    Route::post('/profile/locale', [ProfileController::class, 'updateLocale'])->name('profile.locale.update');
 
     // Iscrizione anagrafica viewer (invio dati per esami ufficiali)
     Route::post('/profile/registration', [RegistrationController::class, 'submit'])
@@ -223,6 +227,19 @@ Route::middleware(['auth', '2fa'])
                 ->name('questions.mit-import');
             Route::post('questions/mit-import', [QuestionController::class, 'storeMitImport'])
                 ->name('questions.mit-import.store');
+            // QUESTION TRANSLATIONS (Feature 7.1) — autorizzazione canEditQuestion()
+            // nel controller (admin/editor passa, viewer 403). {locale} non numerico.
+            Route::prefix('questions/{question}/translations')
+                ->name('questions.translations.')
+                ->group(function () {
+                    Route::get('/',          [QuestionTranslationController::class, 'index'])->name('index');
+                    Route::post('/',         [QuestionTranslationController::class, 'store'])->name('store');
+                    Route::put('/{locale}',  [QuestionTranslationController::class, 'update'])
+                        ->where('locale', '[a-z]{2,5}')->name('update');
+                    Route::delete('/{locale}', [QuestionTranslationController::class, 'destroy'])
+                        ->where('locale', '[a-z]{2,5}')->name('destroy');
+                });
+
             Route::resource('questions', QuestionController::class)
                 ->except(['show']);
 

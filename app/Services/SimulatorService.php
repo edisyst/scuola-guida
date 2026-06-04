@@ -88,7 +88,9 @@ class SimulatorService
             return collect();
         }
 
-        return Question::whereIn('id', $ids)
+        // Eager-load translations (Feature 7.1): localizzazione testo senza N+1.
+        return Question::with('translations')
+            ->whereIn('id', $ids)
             ->get()
             ->sortBy(fn ($q) => array_search($q->id, $ids))
             ->values();
@@ -168,10 +170,13 @@ class SimulatorService
         $answeredQids    = array_map('intval', array_keys($attempt->answers ?? []));
         $totalConfigured = (int) ($attempt->total_questions ?: config('simulator.questions'));
 
-        // Carica tutte le domande risposte (con relazione category già nel $with del model).
-        $questionsById = Question::with('category')->whereIn('id', $answeredQids)->get()->keyBy('id');
+        // Carica tutte le domande risposte. Eager-load translations (Feature 7.1)
+        // per localizzare il testo nella lingua preferita dell'utente senza N+1.
+        $locale        = $attempt->user?->getPreferredLocale() ?? config('locales.default', 'it');
+        $questionsById = Question::with(['category', 'translations'])
+            ->whereIn('id', $answeredQids)->get()->keyBy('id');
 
-        $rows = collect($answeredQids)->map(function ($qid) use ($attempt, $questionsById) {
+        $rows = collect($answeredQids)->map(function ($qid) use ($attempt, $questionsById, $locale) {
             $question = $questionsById->get($qid);
             if (!$question) {
                 return null;
@@ -182,6 +187,7 @@ class SimulatorService
 
             return [
                 'question'       => $question,
+                'localized_text' => $question->getLocalizedText($locale),
                 'user_answer'    => $userAnswer,
                 'correct_answer' => $correctAnswer,
                 'is_correct'     => $userAnswer === $correctAnswer,

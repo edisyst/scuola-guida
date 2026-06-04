@@ -40,7 +40,7 @@
                              style="max-height: 250px; object-fit: contain;">
                     </div>
                 @endif
-                <p class="h5 text-center mb-0">{{ $currentQuestion->question }}</p>
+                <p class="h5 text-center mb-0">{{ $localizedText ?? $currentQuestion->question }}</p>
             </div>
         </div>
 

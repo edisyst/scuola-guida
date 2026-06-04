@@ -84,6 +84,37 @@ class Question extends Model
         return $this->hasMany(QuestionVersion::class)->orderByDesc('version_number');
     }
 
+    public function translations(): HasMany
+    {
+        return $this->hasMany(QuestionTranslation::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOCALIZZAZIONE TESTO (Feature 7.1)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Testo della domanda nella lingua richiesta, con fallback all'italiano.
+     *
+     * Riusa la collection `translations` se già eager-loaded (zero query
+     * aggiuntive). Null-safe in ogni passaggio: se la traduzione manca o è
+     * vuota, ritorna sempre il testo originale italiano. Non lancia eccezioni.
+     */
+    public function getLocalizedText(string $locale): string
+    {
+        $default = config('locales.default', 'it');
+
+        if ($locale === $default) {
+            return $this->question;
+        }
+
+        $translation = $this->translations->firstWhere('locale', $locale);
+
+        return $translation?->text ?: $this->question;
+    }
+
     public function currentVersion(): ?QuestionVersion
     {
         return $this->versions()->first();

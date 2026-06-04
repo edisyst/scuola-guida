@@ -80,6 +80,19 @@ Nessuna modifica al codice applicativo è richiesta.
 > `lang/{locale}/menu.php` ad ogni request. Non eseguire config:cache in produzione se
 > si usa il cambio lingua dinamico.
 
+### Accessibilità esame — traduzione del testo delle domande (Feature 7.1)
+
+Concetto **distinto** dalla i18n dell'interfaccia: qui si traduce il **testo delle domande**
+(non la UI) per l'accessibilità dell'esame teorico MIT. Admin ed editor caricano le traduzioni
+dalla DataTable domande (pulsante "Traduzioni"); il viewer sceglie la lingua preferita nella
+card "Lingua preferita" del proprio profilo. La traduzione si applica in modalità studio, nel
+simulatore e nel test diagnostico, con **fallback automatico all'italiano** se manca.
+
+Le lingue d'esame disponibili sono configurate in `config/locales.php` sotto la chiave `exam`
+(`it`, `en`, `fr`, `de`, `es`). Aggiungere una lingua = una entry lì, nessuna modifica al codice.
+Il testo italiano resta la fonte di verità: le traduzioni sono entità separate e non rientrano
+nel versionamento domande (Feature 6.2).
+
 ---
 
 ## Documentazione

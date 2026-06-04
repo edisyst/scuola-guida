@@ -42,13 +42,22 @@ class DiagnosticTest extends Component
     public function render(): View
     {
         $currentQuestion = null;
+        $localizedText   = null;
 
         if (!$this->completed && isset($this->questionIds[$this->currentIndex])) {
-            $currentQuestion = Question::with('category')->find($this->questionIds[$this->currentIndex]);
+            // Eager-load translations (Feature 7.1): localizzazione testo senza N+1.
+            $currentQuestion = Question::with(['category', 'translations'])
+                ->find($this->questionIds[$this->currentIndex]);
+
+            if ($currentQuestion) {
+                $locale        = auth()->user()->getPreferredLocale();
+                $localizedText = $currentQuestion->getLocalizedText($locale);
+            }
         }
 
         return view('livewire.diagnostic-test', [
             'currentQuestion' => $currentQuestion,
+            'localizedText'   => $localizedText,
             'total'           => count($this->questionIds),
         ]);
     }

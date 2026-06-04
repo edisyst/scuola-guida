@@ -106,6 +106,8 @@ class User extends Authenticatable
         'registration_reviewed_at',
         'registration_reviewed_by',
         'registration_rejection_reason',
+        // Lingua preferita per il testo delle domande (Feature 7.1)
+        'locale',
     ];
 
     protected $hidden = [
@@ -125,7 +127,17 @@ class User extends Authenticatable
             'two_factor_secret'          => 'encrypted',
             'two_factor_recovery_codes'  => 'encrypted:array',
             'two_factor_enabled_at'      => 'datetime',
+            'locale'                     => 'string',
         ];
+    }
+
+    /**
+     * Lingua preferita per il testo delle domande (Feature 7.1).
+     * Fallback alla lingua di default dell'applicazione se non impostata.
+     */
+    public function getPreferredLocale(): string
+    {
+        return $this->locale ?? config('locales.default', 'it');
     }
 
     /*

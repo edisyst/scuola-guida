@@ -2,6 +2,9 @@
     <a href="{{ route('admin.questions.edit', $q) }}" class="sg-btn-icon edit" title="Modifica">
         <i class="fas fa-edit"></i>
     </a>
+    <a href="{{ route('admin.questions.translations.index', $q) }}" class="sg-btn-icon" title="Traduzioni">
+        <i class="fas fa-language"></i>
+    </a>
 @endif
 
 @if(auth()->user()->canDeleteQuestion())

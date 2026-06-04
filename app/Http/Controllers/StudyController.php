@@ -73,16 +73,22 @@ class StudyController extends Controller
                 ->with('error', 'La sessione di studio non contiene domande valide.');
         }
 
-        $question->loadMissing('category');
+        $question->loadMissing('category', 'translations');
         if ($question->category) {
             $question->category->load(['materials' => fn($q) => $q->ordered()]);
         }
 
+        // Localizzazione testo domanda (Feature 7.1): lingua preferita del viewer,
+        // fallback automatico all'italiano se la traduzione non esiste.
+        $locale        = auth()->user()->getPreferredLocale();
+        $localizedText = $question->getLocalizedText($locale);
+
         return view('study.play', [
-            'question'   => $question,
-            'index'      => $this->service->currentIndex(),
-            'total'      => $this->service->count(),
-            'isFlagged'  => $this->service->isFlagged($question->id),
+            'question'      => $question,
+            'localizedText' => $localizedText,
+            'index'         => $this->service->currentIndex(),
+            'total'         => $this->service->count(),
+            'isFlagged'     => $this->service->isFlagged($question->id),
         ]);
     }
 
