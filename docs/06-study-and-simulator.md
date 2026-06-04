@@ -8,6 +8,14 @@ Condividono il model `QuizAttempt` per la persistenza ma usano flussi e service 
 
 ---
 
+## Indice
+
+1. [Modalità Studio](#modalità-studio)
+2. [Simulatore Esame](#simulatore-esame)
+3. [Struttura dati — `QuizAttempt.answers`](#struttura-dati--quizattemptanswers)
+
+---
+
 ## Modalità Studio
 
 Il `StudyService` gestisce una sessione di allenamento interamente in `$_SESSION` (nessuna tabella dedicata).

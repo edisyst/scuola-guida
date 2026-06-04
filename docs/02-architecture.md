@@ -4,6 +4,15 @@ Questa sezione descrive i flussi architetturali principali del progetto attraver
 
 ---
 
+## Indice
+
+1. [Laravel Request Lifecycle](#1-laravel-request-lifecycle)
+2. [Livewire 3 Components](#2-livewire-3-components)
+3. [Role-based Access Control](#3-role-based-access-control)
+4. [Quiz Lifecycle & Enrollment Workflow](#4-quiz-lifecycle--enrollment-workflow)
+
+---
+
 ## 1. Laravel Request Lifecycle
 
 Ciclo di vita di una HTTP request nel contesto di scuola-guida: dall'entry point `public/index.php` attraverso il Kernel, la Global Middleware Pipeline (auth, throttle, verified, CORS), il Route Middleware con `RoleMiddleware`, fino al Controller con `FormRequest`, il Service Layer e il pattern Observer sui Model per audit log e invalidazione cache.

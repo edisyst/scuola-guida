@@ -11,6 +11,18 @@ Riferimenti incrociati:
 
 ---
 
+## Indice
+
+1. [Area Admin / Editor](#area-admin--editor)
+   - [Comandi utili](#comandi-utili)
+   - [Badge sidebar](#badge-sidebar--counter-dellultima-ora)
+2. [Area Utente (Viewer)](#area-utente-viewer)
+3. [Ciclo di vita dell'iscrizione anagrafica (viewer)](#ciclo-di-vita-delliscrizione-anagrafica-viewer)
+4. [Ciclo di vita del Quiz](#ciclo-di-vita-del-quiz)
+5. [Dashboard utente — dettaglio tecnico](#dashboard-utente--dettaglio-tecnico)
+
+---
+
 ## Area Admin / Editor
 
 - **Domande** — CRUD, upload immagine, import/export Excel, import listato MIT, bulk delete, filtro DataTable
@@ -83,7 +95,7 @@ Tutto è centralizzato in un unico **View Composer** registrato in `App\Provider
 
 - **Registrazione account** — email e password (livello base, abilita subito le esercitazioni)
 - **Iscrizione anagrafica** — dal proprio profilo il viewer compila nome, cognome, indirizzo, data e luogo di nascita, codice fiscale e carica il documento di identità (PDF/JPG/PNG, max 5 MB), poi invia la richiesta all'amministratore. Solo dopo l'approvazione può iscriversi agli esami ufficiali. Vedi [Ciclo di vita iscrizione anagrafica](#ciclo-di-vita-delliscrizione-anagrafica-viewer)
-- **Dashboard personale** — statistiche tentativi con cache 10 minuti (`UserStatsService`), invalidata automaticamente ad ogni nuovo tentativo tramite `QuizAttempt::booted()`. Vedi [Dashboard utente](#dashboard-utente-dettaglio-tecnico)
+- **Dashboard personale** — statistiche tentativi con cache 10 minuti (`UserStatsService`), invalidata automaticamente ad ogni nuovo tentativo tramite `QuizAttempt::booted()`. Vedi [Dashboard utente](#dashboard-utente--dettaglio-tecnico)
 - **Catalogo quiz confermati** — richiedi iscrizione a un quiz ufficiale (riservato ai viewer approvati)
 - **Calendario sessioni** (`GET /calendar`) — lista cronologica di tutti i quiz confermati divisa in tre sezioni: *Prossime sessioni* (iscrizioni non ancora aperte, con countdown Alpine.js), *Iscrizioni aperte* (finestra attiva o senza date), *Sessioni chiuse* (ultime 10). Il widget "Prossima sessione" appare anche nella dashboard personale, mostrando il quiz più vicino tra aperti e upcoming
 - **Le mie iscrizioni** — traccia lo stato delle richieste (in attesa / approvata / completata)

@@ -15,6 +15,15 @@ php artisan test --filter test_viewer_can_submit_anagrafica
 
 ---
 
+## Indice
+
+1. [Convenzioni](#convenzioni)
+2. [Mappa completa](#mappa-completa)
+3. [Pattern ricorrenti](#pattern-ricorrenti)
+4. [Checklist di test per nuova feature](#checklist-di-test-per-nuova-feature)
+
+---
+
 ## Convenzioni
 
 - **Cartella unica** — `tests/Feature/`. Aggiungere test ai file esistenti prima di crearne di nuovi.
