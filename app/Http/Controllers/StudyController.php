@@ -29,6 +29,7 @@ class StudyController extends Controller
             ->get();
 
         $categories = Category::query()
+            ->with('translations')
             ->withCount('questions')
             ->orderBy('name')
             ->get();

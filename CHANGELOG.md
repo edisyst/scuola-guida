@@ -18,8 +18,16 @@ in Feature 6.10.
 - `lang/es/auth.php`, `lang/es/pagination.php`, `lang/es/passwords.php`,
   `lang/es/validation.php` — messaggi di sistema localizzati.
 - `public/images/language_flags/es.svg` — bandiera spagnola SVG inline.
+- `lang/it/viewer.php`, `lang/en/viewer.php`, `lang/es/viewer.php` — file di traduzione
+  per le view del viewer (quiz, simulatore, modalità studio): ~160 chiavi ciascuno.
 - 2 test in `LocaleTest`: `test_switch_locale_to_spanish` e
   `test_menu_string_translated_to_spanish`.
+
+### Changed
+
+- `resources/views/quiz/play.blade.php`, `resources/views/simulator/{index,play,result}.blade.php`
+  — tutte le stringhe hardcoded sostituite con `__('viewer.*')` per supporto multilingua completo.
+- `StudyController::index()` — aggiunto eager-load `with('translations')` sulle categorie.
 
 ---
 

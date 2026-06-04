@@ -16,7 +16,7 @@
          (vedi media query in scuola-guida.css). --}}
     <div class="quiz-header d-flex flex-wrap justify-content-between align-items-end">
         <div class="quiz-header-info">
-            <p class="progress-label">Domanda <span id="current-num">1</span> di <span id="total-num"></span></p>
+            <p class="progress-label">{{ __('viewer.question_label') }} <span id="current-num">1</span> {{ __('viewer.of') }} <span id="total-num"></span></p>
             <h1 class="quiz-title">{{ $quiz->title ?? 'Quiz Random' }}</h1>
         </div>
         <div class="quiz-header-progress" style="min-width:140px">
@@ -34,7 +34,7 @@
             <div class="card question-card h-100">
                 <div class="card-body p-4">
 
-                    <span class="question-badge">Domanda <span id="q-badge-num">1</span></span>
+                    <span class="question-badge">{{ __('viewer.question_label') }} <span id="q-badge-num">1</span></span>
 
                     <div id="question-text"></div>
 
@@ -42,10 +42,10 @@
 
                     <div class="answer-area">
                         <button class="btn btn-answer" data-value="1">
-                            <i class="fas fa-check"></i> VERO
+                            <i class="fas fa-check"></i> {{ __('viewer.answer_true') }}
                         </button>
                         <button class="btn btn-answer" data-value="0">
-                            <i class="fas fa-times"></i> FALSO
+                            <i class="fas fa-times"></i> {{ __('viewer.answer_false') }}
                         </button>
                     </div>
 
@@ -69,26 +69,26 @@
 
                 {{-- Timer --}}
                 <div class="sidebar-section text-center">
-                    <p class="sidebar-label mb-1">Tempo rimasto</p>
+                    <p class="sidebar-label mb-1">{{ __('viewer.time_remaining') }}</p>
                     <span id="timer">00:00</span>
                 </div>
 
                 {{-- Errori --}}
                 <div class="sidebar-section">
-                    <p class="sidebar-label">Errori <span id="errors-count">0</span> / {{ $maxErrors }}</p>
+                    <p class="sidebar-label">{{ __('viewer.errors') }} <span id="errors-count">0</span> / {{ $maxErrors }}</p>
                     <div class="error-dots" id="error-dots"></div>
                 </div>
 
                 {{-- Navigatore --}}
                 <div class="sidebar-section flex-grow-1">
-                    <p class="sidebar-label">Navigazione rapida</p>
+                    <p class="sidebar-label">{{ __('viewer.quick_nav') }}</p>
                     <div id="navigator"></div>
                 </div>
 
                 {{-- Termina --}}
                 <div class="sidebar-section">
                     <button id="finish-quiz" class="btn btn-dark">
-                        <i class="fas fa-flag-checkered mr-1"></i> Termina Quiz
+                        <i class="fas fa-flag-checkered mr-1"></i> {{ __('viewer.quiz.end_quiz') }}
                     </button>
                 </div>
 
@@ -108,6 +108,14 @@
         const attemptId  = {{ $attemptId }};
         const timeLimit  = {{ $timeLimit }};
         const maxErrors  = {{ $maxErrors }};
+        const uiStrings  = @json([
+            'correct_feedback'    => __('viewer.correct_feedback'),
+            'wrong_feedback'      => __('viewer.wrong_feedback'),
+            'error_limit_reached' => __('viewer.error_limit_reached'),
+            'time_expired'        => __('viewer.time_expired'),
+            'answer_required'     => __('viewer.quiz.answer_required'),
+            'save_error'          => __('viewer.quiz.save_error'),
+        ]);
 
         let currentIndex    = 0;
         let errors          = 0;
@@ -222,14 +230,14 @@
             renderErrorDots();
 
             if (errors >= maxErrors) {
-                finishQuiz('Hai raggiunto il limite di errori');
+                finishQuiz(uiStrings.error_limit_reached);
                 return;
             }
 
             $('#feedback').html(
                 isCorrect
-                    ? '<span class="feedback-correct"><i class="fas fa-check-circle"></i> Risposta corretta</span>'
-                    : '<span class="feedback-wrong"><i class="fas fa-times-circle"></i> Risposta errata</span>'
+                    ? `<span class="feedback-correct"><i class="fas fa-check-circle"></i> ${uiStrings.correct_feedback}</span>`
+                    : `<span class="feedback-wrong"><i class="fas fa-times-circle"></i> ${uiStrings.wrong_feedback}</span>`
             );
 
             renderNavigator();
@@ -258,7 +266,7 @@
         // ── Termina ──────────────────────────────────────────
         $('#finish-quiz').click(function () {
             if (Object.keys(answers).length === 0) {
-                toastr.warning('Rispondi almeno a una domanda prima di terminare');
+                toastr.warning(uiStrings.answer_required);
                 return;
             }
             finishQuiz();
@@ -273,7 +281,7 @@
                 updateTimerUI();
                 if (remainingSeconds <= 0) {
                     clearInterval(interval);
-                    finishQuiz('Tempo scaduto!');
+                    finishQuiz(uiStrings.time_expired);
                 }
             }, 1000);
         }
@@ -306,7 +314,7 @@
                     if (reason) toastr.warning(reason);
                     window.location.href = `/quiz/attempts/${attemptId}`;
                 },
-                error: () => toastr.error('Errore nel salvataggio del quiz')
+                error: () => toastr.error(uiStrings.save_error)
             });
         }
 
