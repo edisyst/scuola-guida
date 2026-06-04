@@ -129,6 +129,21 @@
 
             <h4 class="mb-4" x-text="currentQuestionText"></h4>
 
+            @auth @if(auth()->user()->tts_enabled)
+            <div class="mb-3">
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        x-show="ttsSupported"
+                        x-cloak
+                        @click="ttsToggle()"
+                        :aria-pressed="ttsSpeaking ? 'true' : 'false'"
+                        aria-label="Leggi la domanda ad alta voce">
+                    <i class="fas" :class="ttsSpeaking ? 'fa-stop-circle' : 'fa-volume-up'"></i>
+                    <span x-text="ttsSpeaking ? 'Stop' : 'Ascolta'">Ascolta</span>
+                </button>
+            </div>
+            @endif @endauth
+
             <div class="text-center mb-4" x-show="currentImageUrl">
                 <img :src="currentImageUrl"
                      alt="Immagine domanda"
@@ -262,7 +277,7 @@
 
 @section('js')
     @parent
-    @vite(['resources/js/offline-store.js'])
+    @vite(['resources/js/offline-store.js', 'resources/js/tts.js'])
 
     <script>
         function studyPlay(config) {
@@ -281,6 +296,12 @@
                 currentCategoryName: config.categoryName,
                 currentImageUrl:     config.imageUrl,
 
+                // ── TTS state ─────────────────────────────────
+                ttsEnabled:   {{ json_encode((bool) auth()->user()?->tts_enabled) }},
+                ttsAutoplay:  {{ json_encode((bool) auth()->user()?->tts_autoplay) }},
+                ttsSpeaking:  false,
+                ttsSupported: 'speechSynthesis' in window,
+
                 // ── Offline state ──────────────────────────────
                 offlineMode:       false,
                 offlineSyncBadge:  false,
@@ -288,8 +309,34 @@
                 offlineIndex:      0,
                 offlineTotal:      0,
 
+                // ── TTS methods ────────────────────────────────
+                ttsSpeak() {
+                    if (!this.ttsSupported) return;
+                    window.speechSynthesis.cancel();
+                    const utt = new SpeechSynthesisUtterance(this.currentQuestionText);
+                    utt.lang = document.documentElement.lang || 'it-IT';
+                    utt.onend  = () => { this.ttsSpeaking = false; };
+                    utt.onerror = () => { this.ttsSpeaking = false; };
+                    this.ttsSpeaking = true;
+                    window.speechSynthesis.speak(utt);
+                },
+
+                ttsStop() {
+                    if (!this.ttsSupported) return;
+                    window.speechSynthesis.cancel();
+                    this.ttsSpeaking = false;
+                },
+
+                ttsToggle() {
+                    this.ttsSpeaking ? this.ttsStop() : this.ttsSpeak();
+                },
+
                 // ── Lifecycle ──────────────────────────────────
                 async init() {
+                    if (this.ttsEnabled && this.ttsAutoplay && this.ttsSupported) {
+                        this.ttsSpeak();
+                    }
+
                     // Prefetch questions for offline use when online
                     if (navigator.onLine) {
                         this._prefetchQuestions(config.prefetchUrl, config.csrf);
@@ -390,6 +437,8 @@
                     const q = this.offlineQuestions[this.offlineIndex];
                     if (!q) return;
 
+                    this.ttsStop();
+
                     this.questionId          = q.id;
                     this.correct             = q.is_true;
                     this.flagged             = false;
@@ -399,6 +448,10 @@
                     this.currentQuestionText = q.question;
                     this.currentCategoryName = (q.category && q.category.name) ? q.category.name : '';
                     this.currentImageUrl     = q.image || null;
+
+                    if (this.ttsEnabled && this.ttsAutoplay) {
+                        this.$nextTick(() => this.ttsSpeak());
+                    }
                 },
 
                 // ── Internal helpers ───────────────────────────

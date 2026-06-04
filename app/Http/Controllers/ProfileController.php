@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\UpdateAccessibilityPreferencesRequest;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Services\GdprExportService;
@@ -58,6 +59,20 @@ class ProfileController extends Controller
         return response()
             ->download($zipPath, "miei-dati-{$user->id}.zip")
             ->deleteFileAfterSend(true);
+    }
+
+    public function updateAccessibility(UpdateAccessibilityPreferencesRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        abort_unless($user->isViewer(), 403);
+
+        $user->tts_enabled  = $request->boolean('tts_enabled');
+        $user->tts_autoplay = $request->boolean('tts_autoplay');
+        $user->save();
+
+        return Redirect::route('profile.edit')
+            ->with('success', 'Preferenze di accessibilità aggiornate.');
     }
 
     /**

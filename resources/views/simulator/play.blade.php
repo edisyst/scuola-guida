@@ -47,6 +47,52 @@
 
                     <div id="question-text"></div>
 
+                    @auth @if(auth()->user()->tts_enabled)
+                    <div class="mt-2"
+                         x-data="{
+                             text: @json($questionsJson[0]['text'] ?? ''),
+                             speaking: false,
+                             supported: 'speechSynthesis' in window,
+                             autoplay: {{ json_encode((bool) auth()->user()->tts_autoplay) }},
+                             speak() {
+                                 if (!this.supported) return;
+                                 window.speechSynthesis.cancel();
+                                 const utt = new SpeechSynthesisUtterance(this.text);
+                                 utt.lang = document.documentElement.lang || 'it-IT';
+                                 utt.onend  = () => { this.speaking = false; };
+                                 utt.onerror = () => { this.speaking = false; };
+                                 this.speaking = true;
+                                 window.speechSynthesis.speak(utt);
+                             },
+                             stop() {
+                                 if (!this.supported) return;
+                                 window.speechSynthesis.cancel();
+                                 this.speaking = false;
+                             },
+                             init() {
+                                 window.addEventListener('sim:question-loaded', (e) => {
+                                     this.stop();
+                                     this.text = e.detail.text;
+                                     if (this.autoplay && this.supported) {
+                                         this.$nextTick(() => this.speak());
+                                     }
+                                 });
+                                 if (this.autoplay && this.supported) this.speak();
+                             },
+                         }">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                x-show="supported"
+                                x-cloak
+                                @click="speaking ? stop() : speak()"
+                                :aria-pressed="speaking ? 'true' : 'false'"
+                                aria-label="Leggi la domanda ad alta voce">
+                            <i class="fas" :class="speaking ? 'fa-stop-circle' : 'fa-volume-up'"></i>
+                            <span x-text="speaking ? 'Stop' : 'Ascolta'">Ascolta</span>
+                        </button>
+                    </div>
+                    @endif @endauth
+
                     <div id="question-image" class="mt-3"></div>
 
                     <div class="answer-area">
@@ -148,6 +194,7 @@
 
 @section('js')
     @parent
+    @vite(['resources/js/tts.js'])
 
     <script>
         const questions  = @json($questionsJson);
@@ -191,6 +238,8 @@
             $('#question-text').text(q.text);
             $('#q-badge-num').text(num);
             $('#feedback').html('');
+
+            window.dispatchEvent(new CustomEvent('sim:question-loaded', { detail: { text: q.text } }));
 
             if (window.Livewire) {
                 window.Livewire.dispatch('report-button-set-question', { id: q.id });
@@ -367,6 +416,7 @@
         function finishSimulator(reason = '') {
             if (simulatorFinished) return;
             simulatorFinished = true;
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
             $('.btn-answer, #prev-question, #next-question, #finish-quiz').prop('disabled', true);
 
             // Disattiva l'autosave pendente per evitare race con il submit.

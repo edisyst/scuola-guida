@@ -93,6 +93,8 @@ class User extends Authenticatable
         'password',
         'role',
         'permissions',
+        'tts_enabled',
+        'tts_autoplay',
         // Dati anagrafici per iscrizione esami ufficiali
         'first_name',
         'last_name',
@@ -125,6 +127,8 @@ class User extends Authenticatable
             'two_factor_secret'          => 'encrypted',
             'two_factor_recovery_codes'  => 'encrypted:array',
             'two_factor_enabled_at'      => 'datetime',
+            'tts_enabled'                => 'boolean',
+            'tts_autoplay'               => 'boolean',
         ];
     }
 
