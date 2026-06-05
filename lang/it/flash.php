@@ -3,30 +3,6 @@
 return [
     // Studio
     'study_no_bookmarks'     => 'Non hai domande salvate da studiare.',
-    // Backend CRUD flash messages
-    'flash.question_created' => 'Domanda creata',
-    'flash.question_updated' => 'Domanda aggiornata',
-    'flash.question_deleted' => 'Domanda eliminata',
-    'flash.quiz_created' => 'Quiz creato',
-    'flash.quiz_updated' => 'Quiz aggiornato',
-    'flash.quiz_deleted' => 'Quiz eliminato',
-    'flash.category_created' => 'Categoria creata',
-    'flash.category_updated' => 'Categoria aggiornata',
-    'flash.category_deleted' => 'Categoria eliminata',
-    'flash.user_created' => 'Utente creato',
-    'flash.user_updated' => 'Utente aggiornato',
-    'flash.user_deleted' => 'Utente eliminato',
-    'flash.enrollment_created' => 'Iscrizione creata',
-    'flash.enrollment_updated' => 'Iscrizione aggiornata',
-    'flash.enrollment_deleted' => 'Iscrizione eliminata',
-    'flash.report_generated' => 'Report generato',
-    'flash.audit_logged' => 'Audit registrato',
-    'flash.media_uploaded' => 'Media caricato',
-    'flash.backup_started' => 'Backup avviato',
-    'flash.backup_failed' => 'Backup fallito',
-    'flash.instructor_note_added' => 'Nota istruttore aggiunta',
-    'flash.editor_metric_updated' => 'Metrica editor aggiornata',
-    'flash.nav_admin_updated' => 'Navigazione admin aggiornata',
     'study_start_new'        => 'Avvia una nuova sessione di studio per iniziare.',
     'study_invalid_session'  => 'La sessione di studio non contiene domande valide.',
     'study_no_active'        => 'Nessuna sessione di studio attiva.',
@@ -38,13 +14,13 @@ return [
     'sim_completed'          => 'Simulazione completata. Ecco il tuo risultato.',
     'sim_abandoned'          => 'Simulazione annullata.',
 
-    // Iscrizione anagrafica
+    // Iscrizione anagrafica (viewer)
     'registration_submitted' => "Richiesta di iscrizione inviata. Riceverai una notifica dopo la revisione dell'amministratore.",
 
-    // Iscrizione quiz
+    // Iscrizione quiz (viewer)
     'enrollment_requested'   => "Richiesta di iscrizione inviata. Attendi l'approvazione.",
 
-    // Notifiche
+    // Notifiche (viewer)
     'notification_deleted'       => 'Notifica eliminata.',
     'notifications_all_deleted'  => 'Tutte le notifiche sono state eliminate.',
 
@@ -59,5 +35,67 @@ return [
     'bookmark_removed'  => 'Domanda rimossa dai salvati.',
 
     // Statistiche
-    'stats_refreshed'   => 'Statistiche aggiornate',
+    'stats_refreshed'   => 'Statistiche aggiornate.',
+
+    // --- Backend CRUD ---
+    'question_created'           => 'Domanda creata con successo.',
+    'question_updated'           => 'Domanda aggiornata.',
+    'question_deleted'           => 'Domanda eliminata.',
+    'question_bulk_deleted'      => 'Domande eliminate.',
+    'questions_imported'         => 'Domande importate con successo.',
+    'question_version_restored'  => 'Versione della domanda ripristinata.',
+
+    'quiz_created'    => 'Quiz creato con successo.',
+    'quiz_updated'    => 'Quiz aggiornato.',
+    'quiz_deleted'    => 'Quiz eliminato.',
+    'quiz_published'  => 'Quiz pubblicato.',
+    'quiz_unpublished'=> 'Quiz riportato in bozza.',
+    'quiz_confirmed'  => 'Quiz confermato e bloccato per esame.',
+    'quiz_filled'     => 'Domande random aggiunte al quiz.',
+
+    'category_created' => 'Categoria creata.',
+    'category_updated' => 'Categoria aggiornata.',
+    'category_deleted' => 'Categoria eliminata.',
+
+    'material_created' => 'Materiale didattico aggiunto.',
+    'material_updated' => 'Materiale didattico aggiornato.',
+    'material_deleted' => 'Materiale didattico eliminato.',
+
+    'user_created' => 'Utente creato.',
+    'user_updated' => 'Utente aggiornato.',
+    'user_deleted' => 'Utente eliminato.',
+    'role_updated' => 'Ruolo aggiornato.',
+    'permissions_updated' => 'Permessi aggiornati.',
+    'instructor_assigned'   => 'Istruttore assegnato allo studente.',
+    'instructor_unassigned' => 'Assegnazione istruttore rimossa.',
+
+    'registration_approved' => 'Iscrizione anagrafica approvata.',
+    'registration_rejected' => 'Iscrizione anagrafica rifiutata.',
+
+    'enrollment_approved' => 'Iscrizione approvata.',
+    'enrollment_rejected' => 'Iscrizione rifiutata.',
+    'enrollment_reopened' => 'Nuova iscrizione riaperta.',
+
+    'report_closed'         => 'Segnalazione chiusa.',
+    'report_resolved'       => 'Segnalazione risolta.',
+
+    'media_uploaded'        => 'Immagine caricata.',
+    'media_renamed'         => 'File rinominato.',
+    'media_deleted'         => 'File eliminato.',
+
+    'backup_started'        => 'Backup manuale avviato.',
+
+    'instructor_note_added'   => 'Nota aggiunta.',
+    'instructor_note_deleted' => 'Nota eliminata.',
+
+    'quiz_schedule_updated'  => 'Schedulazione iscrizioni aggiornata.',
+
+    'translation_saved'   => 'Traduzione salvata.',
+    'translation_updated' => 'Traduzione aggiornata.',
+    'translation_deleted' => 'Traduzione eliminata.',
+    'report_accepted'     => 'Segnalazione accettata.',
+    'report_rejected'     => 'Segnalazione rifiutata.',
+    'permissions_saved'   => 'Permessi aggiornati.',
+    'quiz_random_created' => 'Quiz creato con :count domande.',
+    'quiz_random_filled'  => 'Aggiunte :count domande random al quiz.',
 ];

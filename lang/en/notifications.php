@@ -81,4 +81,23 @@ return [
     'new_enrollment_subject'   => 'New enrollment request',
     'new_enrollment_db_title'  => 'New enrollment',
     'new_enrollment_db_body'   => ':name has requested enrollment in quiz ":title".',
+
+    // Backup failed (admin)
+    'backup_failed_subject'    => 'Backup failed',
+    'backup_failed_mail_title' => 'Automatic backup failed',
+    'backup_failed_mail_body'  => 'The scheduled automatic backup encountered an error. Check the system logs and resolve it before the next cycle.',
+    'backup_failed_mail_cta'   => 'Go to System status',
+
+    // New question report (admin/editor)
+    'new_report_subject'  => 'New question report',
+    'new_report_db_title' => 'New report',
+    'new_report_db_body'  => ':user reported question #:id.',
+
+    // Student quiz outcome (instructor)
+    'outcome_subject'    => 'Student completed a quiz',
+    'outcome_db_title'   => 'Quiz completed',
+    'outcome_db_body'    => ':name completed the quiz «:quiz» with score :score%.',
+    'outcome_mail_title' => 'Quiz completed by a student',
+    'outcome_mail_body'  => ':name completed the quiz «:quiz». Score: :score%.',
+    'outcome_mail_cta'   => 'Go to student detail',
 ];

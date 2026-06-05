@@ -67,7 +67,7 @@ class QuestionReportController extends Controller
 
         return redirect()
             ->route('admin.question-reports.index')
-            ->with('success', 'Segnalazione accettata.');
+            ->with('success', __('flash.report_accepted'));
     }
 
     public function reject(Request $request, QuestionReport $report): RedirectResponse
@@ -87,7 +87,7 @@ class QuestionReportController extends Controller
 
         return redirect()
             ->route('admin.question-reports.index')
-            ->with('success', 'Segnalazione rifiutata.');
+            ->with('success', __('flash.report_rejected'));
     }
 
     public function destroy(QuestionReport $report): RedirectResponse
@@ -98,6 +98,6 @@ class QuestionReportController extends Controller
 
         return redirect()
             ->route('admin.question-reports.index')
-            ->with('success', 'Segnalazione eliminata.');
+            ->with('success', __('flash.report_closed'));
     }
 }

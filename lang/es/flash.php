@@ -1,39 +1,70 @@
 <?php
-
 return [
-    // Estudio
     'study_no_bookmarks'     => 'No tienes preguntas guardadas para estudiar.',
     'study_start_new'        => 'Inicia una nueva sesión de estudio para comenzar.',
     'study_invalid_session'  => 'La sesión de estudio no contiene preguntas válidas.',
     'study_no_active'        => 'No hay sesión de estudio activa.',
     'study_ended'            => 'Sesión de estudio finalizada.',
-
-    // Simulador
     'sim_no_questions'       => 'No hay preguntas disponibles para iniciar el simulador.',
     'sim_expired'            => 'Sesión expirada. Inicia una nueva simulación.',
     'sim_completed'          => 'Simulación completada. Aquí está tu resultado.',
     'sim_abandoned'          => 'Simulación cancelada.',
-
-    // Inscripción de datos personales
-    'registration_submitted' => 'Solicitud de inscripción enviada. Recibirás una notificación tras la revisión del administrador.',
-
-    // Inscripción al quiz
+    'registration_submitted' => 'Solicitud de inscripción enviada. Recibirás una notificación después de la revisión del administrador.',
     'enrollment_requested'   => 'Solicitud de inscripción enviada. Esperando aprobación.',
-
-    // Notificaciones
     'notification_deleted'       => 'Notificación eliminada.',
     'notifications_all_deleted'  => 'Todas las notificaciones han sido eliminadas.',
-
-    // Revisión de errores
     'learned_marked'    => 'Pregunta marcada como aprendida.',
-    'learned_unmarked'  => 'Pregunta devuelta a los errores a revisar.',
-
-    // Perfil
+    'learned_unmarked'  => 'Pregunta devuelta a errores para revisar.',
     'accessibility_updated' => 'Preferencias de accesibilidad actualizadas.',
-
-    // Bookmark
     'bookmark_removed'  => 'Pregunta eliminada de guardados.',
+    'stats_refreshed'   => 'Estadísticas actualizadas.',
+    'question_created'           => 'Pregunta creada correctamente.',
+    'question_updated'           => 'Pregunta actualizada.',
+    'question_deleted'           => 'Pregunta eliminada.',
+    'question_bulk_deleted'      => 'Preguntas eliminadas.',
+    'questions_imported'         => 'Preguntas importadas correctamente.',
+    'question_version_restored'  => 'Versión de pregunta restaurada.',
+    'quiz_created'    => 'Quiz creado correctamente.',
+    'quiz_updated'    => 'Quiz actualizado.',
+    'quiz_deleted'    => 'Quiz eliminado.',
+    'quiz_published'  => 'Quiz publicado.',
+    'quiz_unpublished'=> 'Quiz movido a borrador.',
+    'quiz_confirmed'  => 'Quiz confirmado y bloqueado para examen.',
+    'quiz_filled'     => 'Preguntas aleatorias añadidas al quiz.',
+    'category_created' => 'Categoría creada.',
+    'category_updated' => 'Categoría actualizada.',
+    'category_deleted' => 'Categoría eliminada.',
+    'material_created' => 'Material didáctico añadido.',
+    'material_updated' => 'Material didáctico actualizado.',
+    'material_deleted' => 'Material didáctico eliminado.',
+    'user_created' => 'Usuario creado.',
+    'user_updated' => 'Usuario actualizado.',
+    'user_deleted' => 'Usuario eliminado.',
+    'role_updated' => 'Rol actualizado.',
+    'permissions_updated' => 'Permisos actualizados.',
+    'instructor_assigned'   => 'Instructor asignado al estudiante.',
+    'instructor_unassigned' => 'Asignación de instructor eliminada.',
+    'registration_approved' => 'Inscripción de datos personales aprobada.',
+    'registration_rejected' => 'Inscripción de datos personales rechazada.',
+    'enrollment_approved' => 'Inscripción aprobada.',
+    'enrollment_rejected' => 'Inscripción rechazada.',
+    'enrollment_reopened' => 'Nueva inscripción reabierta.',
+    'report_closed'         => 'Reporte cerrado.',
+    'report_resolved'       => 'Reporte resuelto.',
+    'media_uploaded'        => 'Imagen subida.',
+    'media_renamed'         => 'Archivo renombrado.',
+    'media_deleted'         => 'Archivo eliminado.',
+    'backup_started'        => 'Copia de seguridad manual iniciada.',
+    'instructor_note_added'   => 'Nota añadida.',
+    'instructor_note_deleted' => 'Nota eliminada.',
+    'quiz_schedule_updated'  => 'Programación de inscripciones actualizada.',
 
-    // Estadísticas
-    'stats_refreshed'   => 'Estadísticas actualizadas',
+    'translation_saved'   => 'Traducción guardada.',
+    'translation_updated' => 'Traducción actualizada.',
+    'translation_deleted' => 'Traducción eliminada.',
+    'report_accepted'     => 'Reporte aceptado.',
+    'report_rejected'     => 'Reporte rechazado.',
+    'permissions_saved'   => 'Permisos actualizados.',
+    'quiz_random_created' => 'Quiz creado con :count preguntas.',
+    'quiz_random_filled'  => 'Añadidas :count preguntas aleatorias al quiz.',
 ];

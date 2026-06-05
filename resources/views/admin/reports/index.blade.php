@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Report periodici')
+@section('title', __('reports.title'))
 @section('content_header')@endsection
 
 @section('content')
 <div class="sg-wrapper">
 
     <div class="sg-header">
-        <p class="sg-header-subtitle">Amministrazione</p>
-        <h1 class="sg-header-title"><i class="fas fa-chart-pie mr-2"></i> Report periodici</h1>
+        <p class="sg-header-subtitle">{{ __('reports.subtitle') }}</p>
+        <h1 class="sg-header-title"><i class="fas fa-chart-pie mr-2"></i> {{ __('reports.title') }}</h1>
     </div>
 
     <div class="sg-card">
@@ -16,27 +16,27 @@
             <form method="GET" action="{{ route('admin.reports.show') }}" id="report-form">
 
                 <div class="form-group">
-                    <label class="font-weight-bold">Periodo rapido</label>
+                    <label class="font-weight-bold">{{ __('reports.label_period') }}</label>
                     <div class="mt-1">
-                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="current_month">Mese corrente</button>
-                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="last_month">Mese scorso</button>
-                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="current_quarter">Trimestre corrente</button>
-                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="last_quarter">Trimestre scorso</button>
-                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="current_year">Anno corrente</button>
+                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="current_month">{{ __('reports.preset_current_month') }}</button>
+                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="last_month">{{ __('reports.preset_last_month') }}</button>
+                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="current_quarter">{{ __('reports.preset_current_quarter') }}</button>
+                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="last_quarter">{{ __('reports.preset_last_quarter') }}</button>
+                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="current_year">{{ __('reports.preset_current_year') }}</button>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="from">Data inizio</label>
+                            <label for="from">{{ __('reports.label_from') }}</label>
                             <input type="date" name="from" id="from" class="form-control"
                                    value="{{ $defaultFrom }}" required>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="to">Data fine</label>
+                            <label for="to">{{ __('reports.label_to') }}</label>
                             <input type="date" name="to" id="to" class="form-control"
                                    value="{{ $defaultTo }}" required>
                         </div>
@@ -48,17 +48,17 @@
                         <input type="checkbox" class="custom-control-input" id="compare"
                                name="compare" value="1">
                         <label class="custom-control-label" for="compare">
-                            Confronta con il periodo precedente di pari durata
+                            {{ __('reports.label_compare') }}
                         </label>
                     </div>
                 </div>
 
                 <div>
                     <button type="submit" class="sg-btn sg-btn-primary">
-                        <i class="fas fa-chart-pie"></i> Genera report
+                        <i class="fas fa-chart-pie"></i> {{ __('reports.action_generate') }}
                     </button>
                     <button type="button" id="btn-export-pdf" class="sg-btn sg-btn-danger ml-2">
-                        <i class="fas fa-file-pdf"></i> Esporta PDF
+                        <i class="fas fa-file-pdf"></i> {{ __('reports.action_export_pdf') }}
                     </button>
                 </div>
             </form>

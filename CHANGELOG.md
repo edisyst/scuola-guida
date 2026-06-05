@@ -5,6 +5,74 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 7.3b: i18n completa area backend (admin / editor / instructor)
+
+Porta la localizzazione a tutta l'area backend: gestione domande, quiz, categorie,
+utenti, iscrizioni, audit log, media manager, reportistica, backup/health dashboard,
+area istruttore, dashboard editor. Comprende DataTables i18n, flash messages e
+notifiche backend.
+
+### Added
+
+- `lang/{it,en,es}/categories.php` — titoli, colonne, materiale didattico.
+- `lang/{it,en,es}/audit.php` — filtri, tipi azione, colonne, pannello diff, export Excel.
+- `lang/{it,en,es}/media.php` — upload, rinomina, modal eliminazione con warning referenze.
+- `lang/{it,en,es}/backup.php` — small boxes stato sistema, card code, card backup,
+  top tabelle DB, spazio disco, errori log.
+- `lang/{it,en,es}/instructor.php` — overview studenti, dettaglio, KPI, statistiche,
+  badge, tentativi, note.
+- `lang/{it,en,es}/editor.php` — filtri periodo, KPI produzione, grafici, segnalazioni.
+- `lang/{it,en,es}/nav_admin.php` — sezioni sidebar, titoli pagina, breadcrumb backend.
+- `lang/{it,en,es}/datatables.php` — tutte le stringhe UI del widget DataTables
+  (search, paginazione, info, zero records, processing).
+- `public/js/datatables-i18n.js` — helper JS che legge il `<meta name="datatables-i18n">`
+  iniettato da Blade e popola `$.fn.dataTable.defaults.language` al `DOMContentLoaded`.
+- `tests/Feature/LocalizationBackendTest.php` — Feature Test per 7.3b: admin EN/IT/ES
+  vede view backend nella lingua corretta, intestazioni colonna DataTable localizzate,
+  meta tag datatables-i18n presente, flash messages in locale corretto, notifica
+  BackupFailed renderizzata nel locale dell'admin, audit log mostra stringhe localizzate,
+  smoke test strutturale parità chiavi IT/EN/ES.
+
+### Changed
+
+- `lang/{it,en,es}/questions.php` esteso con: subtitolo, import excel, colonne
+  risposta/immagine, filtri, azioni bulk, conferme JS, versioni domanda.
+- `lang/{it,en,es}/quiz.php` esteso con: colonne, stati con descrizioni, legenda,
+  tutte le azioni, tooltip disabled, conferme JS.
+- `lang/{it,en,es}/users.php` esteso con: subtitolo, colonne complete, azioni, confirm.
+- `lang/{it,en,es}/enrollments.php` esteso con sezione admin: titoli, filtri, colonne,
+  azioni (approva/rifiuta/riapri), conferme.
+- `lang/{it,en,es}/reports.php` esteso con: form labels, preset periodo, azioni.
+- `lang/{it,en,es}/flash.php` — bug fix chiavi dot-prefixed (es. `flash.question_created`
+  → `question_created`), aggiunti tutti i flash backend CRUD: domande, quiz, categorie,
+  materiali, utenti, registrazioni anagrafiche, iscrizioni, segnalazioni, media, backup,
+  note istruttore, traduzioni, schedulazione quiz.
+- `lang/{it,en,es}/notifications.php` esteso con: `backup_failed_*` (admin),
+  `new_report_*` (admin/editor), `outcome_*` (instructor).
+- View backend aggiornate a `__()` / `@lang()`:
+  `admin/questions/index`, `admin/questions/create`,
+  `admin/categories/index`, `admin/categories/create`,
+  `admin/users/index`,
+  `admin/quizzes/index`, `admin/quizzes/create`,
+  `admin/registrations/index`, `admin/enrollments/index`,
+  `admin/audit-log/index`, `admin/health/index`, `admin/reports/index`,
+  `editor/dashboard`, `instructor/index`, `instructor/student`,
+  `livewire/admin/media-manager`.
+- Controller backend aggiornati a chiavi `flash.*`: `CategoryController`,
+  `QuizController`, `QuestionController`, `Admin/UserController`,
+  `Admin/RegistrationController`, `Admin/RolePermissionController`,
+  `Admin/InstructorAssignmentController`, `Admin/QuestionReportController`,
+  `Admin/CategoryMaterialController`, `Admin/CategoryTranslationController`,
+  `Admin/QuestionTranslationController`, `QuizEnrollmentController`,
+  `Instructor/InstructorController`.
+- `app/Notifications/BackupFailed` — `toMail()` e `toDatabase()` convertiti a
+  chiavi `notifications.backup_failed_*` (rispetta `HasLocalePreference`).
+- `layouts/admin.blade.php` — aggiunto `<meta name="datatables-i18n">` con JSON
+  delle stringhe DataTables nel locale corrente; caricamento di `datatables-i18n.js`
+  e impostazione globale di `$.fn.dataTable.defaults.language`.
+
+---
+
 ## [Unreleased] — Feature 7.3a: i18n completa area viewer
 
 Porta la localizzazione a tutta l'area viewer (dashboard, gamification, profilo,

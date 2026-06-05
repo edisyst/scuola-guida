@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Produzione contenuti')
+@section('title', __('editor.title'))
 @section('content_header')@endsection
 
 @section('content')
 <div class="sg-wrapper">
 
     <div class="sg-header">
-        <p class="sg-header-subtitle">Editor</p>
-        <h1 class="sg-header-title"><i class="fas fa-pen-fancy mr-2"></i> Produzione contenuti</h1>
+        <p class="sg-header-subtitle">{{ __('editor.subtitle') }}</p>
+        <h1 class="sg-header-title"><i class="fas fa-pen-fancy mr-2"></i> {{ __('editor.title') }}</h1>
     </div>
 
     {{-- FILTRI PERIODO + SELEZIONE EDITOR (admin) --}}
@@ -18,9 +18,9 @@
 
                 @if($editors !== null)
                 <div class="form-group mb-3">
-                    <label class="font-weight-bold">Editor</label>
+                    <label class="font-weight-bold">{{ __('editor.filter_editor') }}</label>
                     <select name="editor_id" id="editor_id" class="form-control" style="max-width:320px;">
-                        <option value="">Tutti gli editor (aggregato)</option>
+                        <option value="">{{ __('editor.filter_editor_all') }}</option>
                         @foreach($editors as $e)
                         <option value="{{ $e->id }}" @selected($selectedEditorId == $e->id)>{{ $e->name }}</option>
                         @endforeach
@@ -29,25 +29,25 @@
                 @endif
 
                 <div class="form-group mb-2">
-                    <label class="font-weight-bold">Periodo rapido</label>
+                    <label class="font-weight-bold">{{ __('editor.filter_period') }}</label>
                     <div class="mt-1">
-                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="month">Mese corrente</button>
-                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="quarter">Trimestre corrente</button>
-                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="year">Anno corrente</button>
+                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="month">{{ __('editor.preset_month') }}</button>
+                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="quarter">{{ __('editor.preset_quarter') }}</button>
+                        <button type="button" class="sg-btn sg-btn-light sg-btn-sm mr-1 mb-1" data-preset="year">{{ __('editor.preset_year') }}</button>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="from">Da</label>
+                            <label for="from">{{ __('editor.filter_from') }}</label>
                             <input type="date" name="from" id="from" class="form-control"
                                    value="{{ $from->format('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="to">A</label>
+                            <label for="to">{{ __('editor.filter_to') }}</label>
                             <input type="date" name="to" id="to" class="form-control"
                                    value="{{ $to->format('Y-m-d') }}">
                         </div>
@@ -55,7 +55,7 @@
                     <div class="col-md-3 d-flex align-items-end">
                         <div class="form-group">
                             <button type="submit" class="sg-btn sg-btn-primary">
-                                <i class="fas fa-search"></i> Visualizza
+                                <i class="fas fa-search"></i> {{ __('editor.filter_submit') }}
                             </button>
                         </div>
                     </div>
@@ -69,10 +69,10 @@
     <div class="sg-header" style="margin-top:1.5rem;">
         <h2 class="sg-card-header-title" style="font-size:1.1rem;">
             @if($editor)
-                <i class="fas fa-user-edit mr-1"></i> Produzione di <strong>{{ $editor->name }}</strong>
+                <i class="fas fa-user-edit mr-1"></i> {!! __('editor.production_by', ['name' => '<strong>'.$editor->name.'</strong>']) !!}
                 &nbsp;<small class="text-muted">{{ $from->format('d/m/Y') }} — {{ $to->format('d/m/Y') }}</small>
             @else
-                <i class="fas fa-users mr-1"></i> Produzione aggregata di tutti gli editor
+                <i class="fas fa-users mr-1"></i> {{ __('editor.production_aggregate') }}
                 &nbsp;<small class="text-muted">{{ $from->format('d/m/Y') }} — {{ $to->format('d/m/Y') }}</small>
             @endif
         </h2>
@@ -86,7 +86,7 @@
                 <div class="sg-stat-icon grad-green"><i class="fas fa-plus-circle"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $productionMetrics['questions_created'] }}</div>
-                    <div class="sg-stat-label">Domande create</div>
+                    <div class="sg-stat-label">{{ __('editor.kpi_questions_created') }}</div>
                 </div>
             </div>
         </div>
@@ -96,7 +96,7 @@
                 <div class="sg-stat-icon grad-orange"><i class="fas fa-edit"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $productionMetrics['questions_updated'] }}</div>
-                    <div class="sg-stat-label">Domande modificate</div>
+                    <div class="sg-stat-label">{{ __('editor.kpi_questions_updated') }}</div>
                 </div>
             </div>
         </div>
@@ -106,7 +106,7 @@
                 <div class="sg-stat-icon grad-blue"><i class="fas fa-paper-plane"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $productionMetrics['quizzes_published'] }}</div>
-                    <div class="sg-stat-label">Quiz pubblicati</div>
+                    <div class="sg-stat-label">{{ __('editor.kpi_quizzes_published') }}</div>
                 </div>
             </div>
         </div>
@@ -116,7 +116,7 @@
                 <div class="sg-stat-icon grad-red"><i class="fas fa-check-double"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $productionMetrics['quizzes_confirmed'] }}</div>
-                    <div class="sg-stat-label">Quiz confermati</div>
+                    <div class="sg-stat-label">{{ __('editor.kpi_quizzes_confirmed') }}</div>
                 </div>
             </div>
         </div>
@@ -128,13 +128,13 @@
         <div class="col-12 sg-grid-col">
             <div class="sg-card">
                 <div class="sg-card-header">
-                    <h2 class="sg-card-header-title">Attività giornaliera</h2>
+                    <h2 class="sg-card-header-title">{{ __('editor.chart_activity') }}</h2>
                 </div>
                 <div class="sg-card-body">
                     @if(collect($productionMetrics['activity_by_day'])->sum('total') === 0)
                     <div class="text-center py-5 text-muted">
                         <i class="fas fa-chart-line fa-3x mb-3"></i>
-                        <p>Nessuna attività nel periodo selezionato.</p>
+                        <p>{{ __('editor.chart_no_activity') }}</p>
                     </div>
                     @else
                     <canvas id="activityChart" style="max-height:280px;"></canvas>
@@ -147,7 +147,7 @@
     {{-- ── STATO DEI CONTENUTI ─────────────────────────────────────────────── --}}
     <div class="sg-header" style="margin-top:1.5rem;">
         <h2 class="sg-card-header-title" style="font-size:1.1rem;">
-            <i class="fas fa-layer-group mr-1"></i> Stato dei contenuti
+            <i class="fas fa-layer-group mr-1"></i> {{ __('editor.content_state_title') }}
         </h2>
     </div>
 
@@ -160,7 +160,7 @@
                 <div class="sg-stat-icon grad-blue"><i class="fas fa-clipboard-list"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $quizzesByState['draft'] ?? 0 }}</div>
-                    <div class="sg-stat-label">Quiz in bozza</div>
+                    <div class="sg-stat-label">{{ __('editor.quiz_draft') }}</div>
                 </div>
             </div>
         </div>
@@ -169,7 +169,7 @@
                 <div class="sg-stat-icon grad-green"><i class="fas fa-paper-plane"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $quizzesByState['published'] ?? 0 }}</div>
-                    <div class="sg-stat-label">Quiz pubblicati</div>
+                    <div class="sg-stat-label">{{ __('editor.quiz_published') }}</div>
                 </div>
             </div>
         </div>
@@ -178,7 +178,7 @@
                 <div class="sg-stat-icon grad-orange"><i class="fas fa-trophy"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $quizzesByState['confirmed'] ?? 0 }}</div>
-                    <div class="sg-stat-label">Quiz confermati</div>
+                    <div class="sg-stat-label">{{ __('editor.quiz_confirmed') }}</div>
                 </div>
             </div>
         </div>
@@ -189,7 +189,7 @@
                     <div class="sg-stat-value">{{ $globalMetrics['questions_without_image'] }}</div>
                     <div class="sg-stat-label">
                         <a href="{{ route('admin.questions.index', ['no_image' => 1]) }}" class="text-inherit">
-                            Domande senza immagine
+                            {{ __('editor.questions_no_image') }}
                         </a>
                     </div>
                 </div>
@@ -205,13 +205,13 @@
         <div class="col-12 col-md-6 sg-grid-col">
             <div class="sg-card" style="height:100%;">
                 <div class="sg-card-header">
-                    <h2 class="sg-card-header-title">Domande per categoria</h2>
+                    <h2 class="sg-card-header-title">{{ __('editor.categories_chart_title') }}</h2>
                 </div>
                 <div class="sg-card-body">
                     @if($globalMetrics['categories_by_question_count']->isEmpty())
                     <div class="text-center py-4 text-muted">
                         <i class="fas fa-tags fa-3x mb-2"></i>
-                        <p>Nessuna categoria.</p>
+                        <p>{{ __('editor.no_categories') }}</p>
                     </div>
                     @else
                     <canvas id="categoriesChart"></canvas>
@@ -224,20 +224,20 @@
         <div class="col-12 col-md-6 sg-grid-col">
             <div class="sg-card" style="height:100%;">
                 <div class="sg-card-header">
-                    <h2 class="sg-card-header-title">Domande più segnalate (aperte)</h2>
+                    <h2 class="sg-card-header-title">{{ __('editor.most_reported_title') }}</h2>
                 </div>
                 <div class="sg-card-body p-0">
                     @if($globalMetrics['most_reported_questions']->isEmpty())
                     <div class="text-center py-4 text-muted">
                         <i class="fas fa-flag fa-3x mb-2"></i>
-                        <p>Nessuna segnalazione aperta.</p>
+                        <p>{{ __('editor.no_reports') }}</p>
                     </div>
                     @else
                     <div class="table-responsive">
                         <table class="table table-sm table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Domanda</th>
+                                    <th>{{ __('editor.reports_col_question') }}</th>
                                     <th class="text-center" style="width:60px;">Segnalazioni</th>
                                     <th style="width:110px;"></th>
                                 </tr>
@@ -280,17 +280,17 @@
         <div class="col-12 sg-grid-col">
             <div class="sg-card">
                 <div class="sg-card-header">
-                    <h2 class="sg-card-header-title">Ultime segnalazioni da gestire</h2>
+                    <h2 class="sg-card-header-title">{{ __('editor.recent_reports_title') }}</h2>
                 </div>
                 <div class="sg-card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-sm table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Domanda</th>
-                                    <th>Tipo</th>
-                                    <th>Segnalato da</th>
-                                    <th>Data</th>
+                                    <th>{{ __('editor.reports_col_question') }}</th>
+                                    <th>{{ __('editor.reports_col_type') }}</th>
+                                    <th>{{ __('editor.reports_col_reporter') }}</th>
+                                    <th>{{ __('editor.reports_col_date') }}</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -307,7 +307,7 @@
                                     <td>
                                         <a href="{{ route('admin.question-reports.show', $report->id) }}"
                                            class="sg-btn sg-btn-primary sg-btn-sm">
-                                            Gestisci
+                                            {{ __('editor.action_manage') }}
                                         </a>
                                     </td>
                                 </tr>
@@ -318,7 +318,7 @@
                 </div>
                 <div class="sg-card-footer text-right">
                     <a href="{{ route('admin.question-reports.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                        Vedi tutte le segnalazioni <i class="fas fa-arrow-right ml-1"></i>
+                        {{ __('editor.view_all_reports') }} <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
             </div>
@@ -345,7 +345,7 @@
             data: {
                 labels: activityData.map(function (i) { return i.date; }),
                 datasets: [{
-                    label: 'Azioni',
+                    label: '{{ __('editor.chart_activity_label') }}',
                     data: activityData.map(function (i) { return i.total; }),
                     tension: 0.35,
                     borderColor: '#28a745',
@@ -381,7 +381,7 @@
             data: {
                 labels: catData.map(function (c) { return c.name; }),
                 datasets: [{
-                    label: 'Domande',
+                    label: '{{ __('categories.col_questions') }}',
                     data: catData.map(function (c) { return c.questions_count; }),
                     backgroundColor: '#4361ee22',
                     borderColor: '#4361ee',

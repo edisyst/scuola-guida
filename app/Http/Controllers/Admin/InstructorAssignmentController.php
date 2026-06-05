@@ -63,7 +63,7 @@ class InstructorAssignmentController extends Controller
 
         return redirect()
             ->route('admin.instructors.edit', $instructor)
-            ->with('success', 'Studenti assegnati con successo.');
+            ->with('success', __('flash.instructor_assigned'));
     }
 
     public function unassign(Request $request, User $instructor, User $student)
@@ -75,6 +75,6 @@ class InstructorAssignmentController extends Controller
 
         return redirect()
             ->route('admin.instructors.edit', $instructor)
-            ->with('success', 'Studente rimosso dall\'istruttore.');
+            ->with('success', __('flash.instructor_unassigned'));
     }
 }

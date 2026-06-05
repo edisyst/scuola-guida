@@ -105,7 +105,7 @@ class QuizEnrollmentController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Iscrizione approvata.');
+        return back()->with('success', __('flash.enrollment_approved'));
     }
 
     public function reject(QuizEnrollment $enrollment)
@@ -118,7 +118,7 @@ class QuizEnrollmentController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Iscrizione rifiutata.');
+        return back()->with('success', __('flash.enrollment_rejected'));
     }
 
     public function reopen(Quiz $quiz, User $user)
@@ -131,6 +131,6 @@ class QuizEnrollmentController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Iscrizione riaperta per ' . $user->name . '.');
+        return back()->with('success', __('flash.enrollment_reopened'));
     }
 }

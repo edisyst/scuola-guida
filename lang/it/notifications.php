@@ -81,4 +81,23 @@ return [
     'new_enrollment_subject'   => 'Nuova richiesta di iscrizione',
     'new_enrollment_db_title'  => 'Nuova iscrizione',
     'new_enrollment_db_body'   => ':name ha richiesto l\'iscrizione al quiz «:title».',
+
+    // Backup fallito (admin)
+    'backup_failed_subject'    => 'Backup fallito',
+    'backup_failed_mail_title' => 'Backup automatico fallito',
+    'backup_failed_mail_body'  => "Il backup automatico pianificato ha riscontrato un errore. Verificare i log di sistema e risolvere prima del prossimo ciclo.",
+    'backup_failed_mail_cta'   => 'Vai a Stato sistema',
+
+    // Nuova segnalazione (admin/editor)
+    'new_report_subject'  => 'Nuova segnalazione domanda',
+    'new_report_db_title' => 'Nuova segnalazione',
+    'new_report_db_body'  => ':user ha segnalato la domanda #:id.',
+
+    // Outcome studente (instructor)
+    'outcome_subject'    => 'Studente ha completato un quiz',
+    'outcome_db_title'   => 'Quiz completato',
+    'outcome_db_body'    => ':name ha completato il quiz «:quiz» con punteggio :score%.',
+    'outcome_mail_title' => 'Quiz completato da uno studente',
+    'outcome_mail_body'  => ':name ha completato il quiz «:quiz». Punteggio: :score%.',
+    'outcome_mail_cta'   => 'Vai al dettaglio studente',
 ];

@@ -25,19 +25,18 @@ class BackupFailed extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->error()
-            ->subject('[' . config('app.name') . '] Backup fallito')
-            ->greeting('Attenzione!')
-            ->line('Il backup automatico dell\'applicazione non è riuscito.')
-            ->line('Errore: ' . $this->sanitizedMessage())
-            ->line('Verificare i log di sistema per maggiori dettagli.')
-            ->action('Vai alla Health Dashboard', route('admin.health.index'));
+            ->subject('[' . config('app.name') . '] ' . __('notifications.backup_failed_subject'))
+            ->greeting(__('notifications.backup_failed_mail_title'))
+            ->line(__('notifications.backup_failed_mail_body'))
+            ->line('Error: ' . $this->sanitizedMessage())
+            ->action(__('notifications.backup_failed_mail_cta'), route('admin.health.index'));
     }
 
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Backup fallito',
-            'body'  => 'Errore durante il backup automatico: ' . $this->sanitizedMessage(),
+            'title' => __('notifications.backup_failed_subject'),
+            'body'  => __('notifications.backup_failed_mail_body') . ' ' . $this->sanitizedMessage(),
             'url'   => route('admin.health.index'),
             'icon'  => 'fas fa-exclamation-triangle',
             'color' => 'danger',

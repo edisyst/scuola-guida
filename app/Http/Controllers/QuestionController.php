@@ -58,7 +58,7 @@ class QuestionController extends Controller
         $this->service->create($request->validated(), $request->file('image'));
 
         return redirect()->route('admin.questions.index')
-            ->with('success', 'Domanda creata');
+            ->with('success', __('flash.question_created'));
     }
 
     public function edit(Question $question, QuestionTranslationService $translationService)
@@ -78,7 +78,7 @@ class QuestionController extends Controller
         $this->service->update($question, $request->validated(), $request->file('image'));
 
         return redirect()->route('admin.questions.index')
-            ->with('success', 'Domanda aggiornata');
+            ->with('success', __('flash.question_updated'));
     }
 
     public function destroy(Question $question)
@@ -87,7 +87,7 @@ class QuestionController extends Controller
 
         $this->service->delete($question);
 
-        return back()->with('success', 'Domanda eliminata');
+        return back()->with('success', __('flash.question_deleted'));
     }
 
     /*
@@ -123,7 +123,7 @@ class QuestionController extends Controller
     {
         Excel::import(new QuestionsImport, $request->file('file'));
 
-        return back()->with('success', 'Import completato');
+        return back()->with('success', __('flash.questions_imported'));
     }
 
     public function template()

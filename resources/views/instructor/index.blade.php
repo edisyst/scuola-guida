@@ -1,22 +1,22 @@
 @extends('layouts.admin')
 
-@section('title', 'I miei studenti')
+@section('title', __('instructor.title'))
 @section('content_header')@endsection
 
 @section('content')
 <div class="sg-wrapper">
 
     <div class="sg-header">
-        <h1 class="sg-header-title"><i class="fas fa-user-graduate mr-2"></i> I miei studenti</h1>
-        <p class="sg-header-subtitle sg-mt-1">Monitora i progressi degli studenti assegnati — sola lettura</p>
+        <h1 class="sg-header-title"><i class="fas fa-user-graduate mr-2"></i> {{ __('instructor.title') }}</h1>
+        <p class="sg-header-subtitle sg-mt-1">{{ __('instructor.subtitle') }}</p>
     </div>
 
     @if(empty($overview))
         <div class="sg-card">
             <div class="text-center py-5">
                 <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
-                <p class="text-muted mb-1">Nessuno studente assegnato.</p>
-                <p class="text-muted small">Contatta un amministratore per ricevere studenti da monitorare.</p>
+                <p class="text-muted mb-1">{{ __('instructor.no_students') }}</p>
+                <p class="text-muted small">{{ __('instructor.no_students_hint') }}</p>
             </div>
         </div>
     @else
@@ -25,12 +25,12 @@
                 <table class="sg-table">
                     <thead>
                         <tr>
-                            <th>Studente</th>
-                            <th>Ultimo tentativo</th>
-                            <th>Ultimo punteggio</th>
-                            <th>Streak</th>
-                            <th>Attivo oggi</th>
-                            <th class="text-right" style="width:100px;">Dettaglio</th>
+                            <th>{{ __('instructor.col_student') }}</th>
+                            <th>{{ __('instructor.col_last_attempt') }}</th>
+                            <th>{{ __('instructor.col_last_score') }}</th>
+                            <th>{{ __('instructor.col_streak') }}</th>
+                            <th>{{ __('instructor.col_active_today') }}</th>
+                            <th class="text-right" style="width:100px;">{{ __('instructor.col_detail') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,15 +66,15 @@
                                 </td>
                                 <td>
                                     @if($row['active_today'])
-                                        <i class="fas fa-circle text-success" title="Attivo oggi"></i>
+                                        <i class="fas fa-circle text-success" title="{{ __('instructor.active_today_yes') }}"></i>
                                     @else
-                                        <i class="fas fa-circle text-secondary" title="Non attivo oggi"></i>
+                                        <i class="fas fa-circle text-secondary" title="{{ __('instructor.active_today_no') }}"></i>
                                     @endif
                                 </td>
                                 <td class="text-right">
                                     <a href="{{ route('instructor.students.show', $row['id']) }}"
                                        class="sg-btn sg-btn-primary sg-btn-sm">
-                                        <i class="fas fa-eye"></i> Vedi
+                                        <i class="fas fa-eye"></i> {{ __('instructor.action_view') }}
                                     </a>
                                 </td>
                             </tr>

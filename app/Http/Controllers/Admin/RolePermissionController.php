@@ -29,6 +29,6 @@ class RolePermissionController extends Controller
         $this->service->syncMatrix($request->validated('matrix') ?? []);
 
         return redirect()->route('admin.roles.index')
-            ->with('success', 'Permessi dei ruoli aggiornati');
+            ->with('success', __('flash.permissions_saved'));
     }
 }

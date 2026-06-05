@@ -57,7 +57,7 @@ class InstructorController extends Controller
 
         return redirect()
             ->route('instructor.students.show', $student)
-            ->with('success', 'Nota aggiunta con successo.');
+            ->with('success', __('flash.instructor_note_added'));
     }
 
     public function destroyNote(Request $request, User $student, InstructorNote $note): RedirectResponse
@@ -71,7 +71,7 @@ class InstructorController extends Controller
 
         return redirect()
             ->route('instructor.students.show', $student)
-            ->with('success', 'Nota eliminata con successo.');
+            ->with('success', __('flash.instructor_note_deleted'));
     }
 
     public function exportStudentPdf(Request $request, User $student): Response
