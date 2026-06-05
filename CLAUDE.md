@@ -288,7 +288,7 @@ Chiudere nella PR dedicata quando si lavora sull'area coinvolta.
 | Issue                                                                                                                                  | Da chiudere in                                |
 |----------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
 | `View::composer('*', ...)` in `AppServiceProvider` gira su ogni view: usare layout specifici, non aggiungere altri composer su `'*'`   | PR notifiche in-app                           |
-| `ImportQuestionsRequest` non valida `max:5120`                                                                                         | PR Import MIT                                 |
-| Migration `drop_quiz_results_table` da creare                                                                                          | PR dedicata                                   |
-| `Quiz::hasQuestion()` e `QuizAttemptService::scoreAnswers()` senza type hint                                                           | prossima PR che tocca questi metodi           |
+| ~~`ImportQuestionsRequest` non valida `max:5120`~~ — **già presente, issue chiuso**                                                    | ~~PR Import MIT~~                             |
+| ~~Migration `drop_quiz_results_table` da creare~~ — **CHIUSO in Refactor 7.2**                                                        | ~~PR dedicata~~                               |
+| ~~`Quiz::hasQuestion()` e `QuizAttemptService::scoreAnswers()` senza type hint~~ — **CHIUSO in Refactor 7.2**                          | ~~prossima PR che tocca questi metodi~~       |
 | ~~`RoleMiddleware::handle()` senza return type `Response`~~ — **CHIUSO in Feature 6.6**                                                | ~~prossima PR che tocca il middleware~~       |

@@ -5,6 +5,49 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Refactor 7.2: Hardening DevOps
+
+Sprint tecnico senza nuove funzionalità utente: analisi statica con Larastan/PHPStan,
+test browser E2E con Laravel Dusk, containerizzazione Docker per CI/onboarding e
+chiusura dei known issue pendenti.
+
+### Added
+
+- `larastan/larastan ^3.0` in `require-dev`; `phpstan.neon` a livello 5 con
+  `checkModelProperties: true` e include dell'extension Larastan.
+- `phpstan-baseline.neon` commissionato con i 140 errori pre-esistenti: il baseline
+  è committato; da questo punto solo nuove regressioni fanno fallire l'analisi.
+- Script `composer analyse` (`phpstan analyse --memory-limit=512M`) e
+  `composer lint` (`pint --test`) in `composer.json`.
+- `laravel/dusk ^8.0` in `require-dev`; scaffolding via `php artisan dusk:install`
+  (ChromeDriver v149, `DuskTestCase.php`, `.env.dusk.local`).
+- `tests/Browser/LoginWith2faTest.php` — login completo con 2FA TOTP per un admin;
+  genera il codice OTP con `PragmaRX\Google2FA\Google2FA` dalla secret dell'utente.
+- `tests/Browser/SimulatorFlowTest.php` — flusso completo simulatore come viewer
+  approvato: avvio sessione, risposta a tutte le domande, submit, asserzione pagina esito.
+- `tests/Browser/QuizEnrollmentFlowTest.php` — viewer richiede iscrizione a un quiz,
+  admin approva, viewer ricarica la pagina e vede lo stato "Approvata".
+- `docker-compose.yml` — stack locale CI/onboarding: `app` (php:8.3-fpm), `nginx`
+  (nginx:alpine), `db` (mysql:8.0), `redis` (redis:7-alpine). Non sostituisce Laragon
+  sullo sviluppo Windows.
+- `Dockerfile` — immagine `php:8.3-fpm-alpine` con estensioni `pdo_mysql`, `redis`,
+  `zip`, `exif`, `gd`, `bcmath`, `pcntl`; Node.js per Vite; Composer 2 multi-stage.
+- `.env.docker.example` — copia di `.env.example` con `DB_HOST=db`, `REDIS_HOST=redis`,
+  `APP_URL=http://localhost`.
+- `.github/workflows/tests.yml` aggiornato: aggiunto service Redis 7-alpine, step
+  `composer lint` e `composer analyse` prima di `php artisan test`; cache Composer.
+
+### Fixed
+
+- **Known issue chiuso**: migration `2026_06_04_225529_drop_quiz_results_table`
+  rimuove la tabella `quiz_results` obsoleta; `down()` la ricrea con schema originale.
+- **Known issue chiuso**: `Quiz::hasQuestion()` — aggiunto type hint `int|string` al
+  parametro e `: bool` come return type.
+- **Known issue chiuso**: `QuizAttemptService::scoreAnswers()` — aggiunto type hint
+  `\Illuminate\Support\Collection` per il parametro `$correctMap`.
+
+---
+
 ## [Unreleased] — Lingua spagnola (ES) per l'interfaccia
 
 Aggiunge lo spagnolo come terza lingua dell'interfaccia, affiancando italiano e inglese.

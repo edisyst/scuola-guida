@@ -212,7 +212,7 @@ class QuizAttemptService
      * @param  array  $answers      [question_id => 0|1]  oppure  [question_id => {correct: 0|1, ...}]
      * @param  iterable  $correctMap [question_id => bool]
      */
-    private function scoreAnswers(array $answers, $correctMap): int
+    private function scoreAnswers(array $answers, \Illuminate\Support\Collection $correctMap): int
     {
         $score = 0;
 
