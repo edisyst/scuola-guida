@@ -62,6 +62,24 @@ Per il setup completo vedi:
 
 ---
 
+## Docker (CI / onboarding)
+
+Il `docker-compose.yml` nella root avvia lo stack completo (app, nginx, MySQL 8, Redis 7)
+per l'ambiente di CI e per l'onboarding su macchine senza Laragon. **Non** sostituisce
+Laragon sullo sviluppo Windows: rimane la scelta consigliata per lo sviluppo locale.
+
+```bash
+cp .env.docker.example .env
+docker compose up -d
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate --seed
+docker compose exec app php artisan storage:link
+```
+
+L'app è raggiungibile su `http://localhost`. Per fermare lo stack: `docker compose down`.
+
+---
+
 ## Localizzazione
 
 L'interfaccia supporta **italiano** (default), **inglese** e **spagnolo**. Vengono tradotte sia
@@ -127,6 +145,30 @@ php artisan test
 
 Per la mappa completa dei file di test e i pattern ricorrenti (Livewire, fake notifications, file upload, bypass middleware 2FA) vedi **[docs/09-testing.md](docs/09-testing.md)**.
 
+### Analisi statica
+
+```bash
+composer analyse    # PHPStan livello 5 via Larastan — deve restare a 0 errori nuovi
+composer lint       # Laravel Pint in modalità --test (solo verifica, no modifica)
+```
+
+La baseline `phpstan-baseline.neon` contiene i 140 errori pre-esistenti; ogni commit
+nuovo deve restare a **0 errori fuori baseline**. Per aggiornare la baseline dopo un
+refactor legittimo: `./vendor/bin/phpstan analyse --generate-baseline`.
+
+### Test browser E2E (Laravel Dusk)
+
+Tre test browser automatizzati per i flussi critici (login 2FA, simulatore completo,
+flusso iscrizione quiz). Richiedono Chrome installato e l'app in esecuzione.
+
+```bash
+php artisan dusk            # esegue tutti i test browser
+php artisan dusk --filter LoginWith2faTest
+```
+
+Per lo sviluppo locale, Dusk usa `.env.dusk.local` (override di `.env`): assicurarsi
+che `APP_URL` punti all'istanza attiva (`http://127.0.0.1:8000` con Laragon).
+
 ---
 
 ## Dipendenze principali
@@ -144,4 +186,6 @@ Per la mappa completa dei file di test e i pattern ricorrenti (Livewire, fake no
 | `alpinejs` | Interattività JS leggera (toggle, dropdown, feedback studio) | [ui-patterns](docs/08-ui-patterns.md) |
 | `barryvdh/laravel-debugbar` | Debug toolbar (solo sviluppo) | — |
 | `laravel/pint` | Code style (solo sviluppo) | — |
+| `larastan/larastan` | Analisi statica PHPStan livello 5 per Laravel (solo sviluppo) | — |
+| `laravel/dusk` | Test browser E2E con ChromeDriver (solo sviluppo) | — |
 | `spatie/laravel-backup` | Backup automatico DB + media, retention policy, notifica fallimento | [backup-health](docs/10-backup-health.md) |

@@ -46,7 +46,7 @@ class Quiz extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function hasQuestion($questionId)
+    public function hasQuestion(int|string $questionId): bool
     {
         return $this->questions()->where('question_id', $questionId)->exists();
     }

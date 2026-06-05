@@ -1,0 +1,11 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    paths:
+        - app/
+    level: 5
+    checkModelProperties: true
+    ignoreErrors:
+        # Nessun ignore aggiuntivo: tutti gli errori pre-esistenti sono nella baseline
