@@ -259,13 +259,31 @@ class StudyService
             throw new RuntimeException('Categoria non trovata.');
         }
 
-        return $category->questions()->inRandomOrder()->pluck('id')->all();
+        $licenseType = auth()->user()->getActiveLicenseType();
+        $query       = $category->questions();
+
+        if ($licenseType) {
+            $query->whereHas('category', fn($q) =>
+                $q->whereHas('licenseTypes', fn($lq) => $lq->where('license_types.id', $licenseType->id))
+            );
+        }
+
+        return $query->inRandomOrder()->pluck('id')->all();
     }
 
     private function randomQuestions(): array
     {
-        return Question::query()
-            ->inRandomOrder()
+        $licenseType = auth()->user()->getActiveLicenseType();
+
+        $query = Question::query();
+
+        if ($licenseType) {
+            $query->whereHas('category', fn($q) =>
+                $q->whereHas('licenseTypes', fn($lq) => $lq->where('license_types.id', $licenseType->id))
+            );
+        }
+
+        return $query->inRandomOrder()
             ->limit(self::RANDOM_LIMIT)
             ->pluck('id')
             ->all();

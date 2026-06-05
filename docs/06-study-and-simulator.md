@@ -62,11 +62,24 @@ Prima di ogni domanda viene mostrata (se presente) una **card collassabile** con
 - **Gamification** — `StudyController::flag()` chiama anche `StreakService::recordActivity()` e `BadgeService::checkAllBadges()`.
 - **Offline (PWA)** — la modalità studio è l'unica funzionalità con supporto offline. Vedi [docs/07-pwa.md](07-pwa.md).
 
+### Filtro per tipo di patente (Feature 8.1)
+
+Ogni viewer sceglie il tipo di patente per cui sta studiando dalla **card "Patente in studio"** nel profilo (menu Profilo → sezione "Patente in studio"). Il selettore contiene tutti i tipi `is_active = true`, ordinati per `sort_order`.
+
+Una volta selezionato, la modalità studio **filtra le categorie** disponibili alle sole categorie associate al tipo di patente — nessuna categoria di tipi diversi è mostrata. Le sorgenti di domande si adattano automaticamente:
+- Sorgente `category` — solo categorie del tipo attivo
+- Sorgente `random` — solo domande dalle categorie del tipo attivo
+- Sorgente `quiz` — non dipende dal tipo (un quiz è già associato a un tipo specifico)
+- Sorgente `bookmarks` — filtrate alle sole domande delle categorie del tipo attivo
+- Sorgente `flagged` — filtrate alle sole domande delle categorie del tipo attivo
+
+Se un viewer non ha ancora scelto una patente, il middleware `RequireLicenseType` lo reindirizza al profilo con flash warning prima di accedere a qualsiasi funzionalità di studio (studio, simulatore, diagnostico, SM-2, gamification).
+
 ---
 
 ## Simulatore Esame
 
-Il `SimulatorService` riproduce il formato ufficiale dell'esame teorico patente B vigente dal **20 dicembre 2021** (DM MIT 27/10/2021): **30 domande**, **20 minuti**, **max 3 errori**. I parametri sono configurabili in `config/simulator.php` insieme alla distribuzione per categoria — nessun valore hardcoded.
+Il `SimulatorService` riproduce il formato ufficiale dell'esame teorico, personalizzato per il tipo di patente in studio del viewer. **Per patente B** (default ministeriale dal 20 dicembre 2021, DM MIT 27/10/2021): **30 domande**, **20 minuti**, **max 3 errori**. I parametri sono configurabili per ciascun `LicenseType` (campi `exam_questions`, `exam_minutes`, `exam_max_errors`) e fallback su `config/simulator.php` se non valorizzati — nessun valore hardcoded.
 
 ### Distribuzione per categoria
 

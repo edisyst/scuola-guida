@@ -43,6 +43,12 @@ return [
     'tts_enabled_label'     => 'Attiva sintesi vocale (TTS)',
     'tts_autoplay_label'    => 'Avvio automatico voce',
 
+    // Scelta patente in studio (Feature 8.1)
+    'license_type_title'    => 'Patente in studio',
+    'license_type_desc'     => 'Seleziona il tipo di patente per cui stai studiando. Studio, simulatore e revisione verranno filtrati per le domande di questo tipo.',
+    'license_type_field_label' => 'Patente',
+    'license_type_select'   => 'Scegli una patente...',
+
     // Pagina profilo — sezioni e titoli
     'page_title'            => 'Profilo',
     'account_subtitle'      => 'Account',

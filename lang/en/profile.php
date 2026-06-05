@@ -43,6 +43,12 @@ return [
     'tts_enabled_label'     => 'Enable text-to-speech (TTS)',
     'tts_autoplay_label'    => 'Auto-play voice',
 
+    // License type selection (Feature 8.1)
+    'license_type_title'    => 'License type for study',
+    'license_type_desc'     => 'Select the license type you are studying for. Study, simulator, and review will be filtered for questions related to this type.',
+    'license_type_field_label' => 'License type',
+    'license_type_select'   => 'Choose a license type...',
+
     // Profile page — sections and titles
     'page_title'            => 'Profile',
     'account_subtitle'      => 'Account',

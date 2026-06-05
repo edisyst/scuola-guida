@@ -152,6 +152,11 @@ return [
     'ulid'                 => 'El campo :attribute debe ser un ULID válido.',
     'uuid'                 => 'El campo :attribute debe ser un UUID válido.',
 
+    // Mensajes personalizados para Feature 8.1 (Tipo de Permiso)
+    'license_type_required' => 'Debes seleccionar un tipo de permiso.',
+    'license_type_invalid'  => 'El tipo de permiso seleccionado no es válido.',
+    'license_type_inactive' => 'El tipo de permiso seleccionado no está disponible.',
+
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',

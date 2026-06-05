@@ -64,6 +64,15 @@
             @endforeach
         </div>
     </li>
+    @if(auth()->check() && auth()->user()->isViewer() && auth()->user()->getActiveLicenseType())
+        <li class="nav-item">
+            <a href="{{ route('profile.edit') }}" class="nav-link" title="{{ __('profile.license_type_title') }}">
+                <span class="badge badge-info">
+                    <i class="fas fa-id-card mr-1"></i>{{ auth()->user()->getActiveLicenseType()->code }}
+                </span>
+            </a>
+        </li>
+    @endif
     <livewire:notification-bell />
 @stop
 

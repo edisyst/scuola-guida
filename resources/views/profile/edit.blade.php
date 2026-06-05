@@ -63,6 +63,45 @@
     @endif
 
     @if($user->isViewer())
+    <div class="sg-card sg-mb-3">
+        <div class="sg-card-header">
+            <h2 class="sg-card-header-title">
+                <i class="fas fa-id-card mr-2"></i> {{ __('profile.license_type_title') }}
+            </h2>
+        </div>
+        <div class="sg-card-body">
+            <p class="text-muted mb-3">{{ __('profile.license_type_desc') }}</p>
+
+            <form action="{{ route('profile.license-type.update') }}" method="POST">
+                @csrf
+                @method('PATCH')
+
+                <div class="form-group">
+                    <label for="active_license_type_id">{{ __('profile.license_type_field_label') }}</label>
+                    <select class="form-control @error('active_license_type_id') is-invalid @enderror"
+                            id="active_license_type_id"
+                            name="active_license_type_id"
+                            required>
+                        <option value="">{{ __('profile.license_type_select') }}</option>
+                        @foreach(\App\Models\LicenseType::active()->orderBy('sort_order')->get() as $type)
+                            <option value="{{ $type->id }}"
+                                    @if($user->active_license_type_id === $type->id) selected @endif>
+                                {{ $type->code }} - {{ $type->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('active_license_type_id')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save mr-1"></i> {{ __('profile.save_prefs') }}
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div class="sg-card sg-mb-3"
          x-data="{ ttsEnabled: {{ $user->tts_enabled ? 'true' : 'false' }}, ttsAutoplay: {{ $user->tts_autoplay ? 'true' : 'false' }} }">
         <div class="sg-card-header">

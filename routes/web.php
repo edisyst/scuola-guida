@@ -73,6 +73,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/accessibility', [ProfileController::class, 'updateAccessibility'])
         ->name('profile.accessibility.update');
 
+    // Scelta patente in studio (viewer)
+    Route::patch('/profile/license-type', [ProfileController::class, 'updateActiveLicenseType'])
+        ->name('profile.license-type.update');
+
     // Iscrizione anagrafica viewer (invio dati per esami ufficiali)
     Route::post('/profile/registration', [RegistrationController::class, 'submit'])
         ->name('profile.registration.submit');
@@ -100,7 +104,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('quiz/attempts/{attempt}', [QuizAttemptController::class, 'update'])->name('quiz.attempts.update');
 
     // Modalità Studio — allenamento libero senza timer/punteggio
-    Route::prefix('study')->name('study.')->group(function () {
+    Route::middleware('license.required')->prefix('study')->name('study.')->group(function () {
         Route::get('/', [StudyController::class, 'index'])->name('index');
         Route::post('/start', [StudyController::class, 'start'])->name('start');
         Route::get('/play', [StudyController::class, 'play'])->name('play');
@@ -110,7 +114,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Simulatore esame teorico patente B (allenamento individuale)
-    Route::prefix('simulator')->name('simulator.')->group(function () {
+    Route::middleware('license.required')->prefix('simulator')->name('simulator.')->group(function () {
         Route::get('/',                    [SimulatorController::class, 'index'])->name('index');
         Route::post('/start',              [SimulatorController::class, 'start'])->name('start');
         Route::get('/play',                [SimulatorController::class, 'play'])->name('play');
@@ -121,7 +125,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Revisione errori aggregata personale (solo viewer)
-    Route::prefix('review-errors')->name('viewer.review-errors.')->group(function () {
+    Route::middleware('license.required')->prefix('review-errors')->name('viewer.review-errors.')->group(function () {
         Route::get('/', [ReviewErrorsController::class, 'index'])->name('index');
         Route::post('/{question}/learned', [ReviewErrorsController::class, 'markLearned'])->name('learned.store');
         Route::delete('/{question}/learned', [ReviewErrorsController::class, 'unmarkLearned'])->name('learned.destroy');
@@ -129,16 +133,19 @@ Route::middleware(['auth'])->group(function () {
 
     // Test diagnostico e piano di studio (viewer)
     Route::get('/diagnostic', [StudyPlanController::class, 'startDiagnostic'])
+        ->middleware('license.required')
         ->name('viewer.diagnostic.show');
     Route::get('/study-plan', [StudyPlanController::class, 'show'])
+        ->middleware('license.required')
         ->name('viewer.study-plan.show');
 
     // Badge e streak personali (viewer)
     Route::get('/profile/badges', [ProfileBadgesController::class, 'index'])
+        ->middleware('license.required')
         ->name('viewer.profile.badges');
 
     // Ripasso intelligente — spaced repetition (viewer)
-    Route::prefix('smart-review')->name('viewer.smart-review.')->group(function () {
+    Route::middleware('license.required')->prefix('smart-review')->name('viewer.smart-review.')->group(function () {
         Route::get('/',        [SmartReviewController::class, 'index'])->name('index');
         Route::get('/session', [SmartReviewController::class, 'session'])->name('session');
     });

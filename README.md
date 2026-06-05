@@ -3,9 +3,9 @@
 Applicazione web per la gestione di quiz della patente di guida. Gli amministratori creano domande, le raggruppano in quiz e gestiscono l'intero ciclo di vita (bozza → pubblicato → confermato); gli utenti si registrano con email/password, completano la propria scheda anagrafica e — una volta approvati dall'amministratore — richiedono l'iscrizione ai quiz ufficiali, li svolgono e consultano le proprie statistiche.
 
 Funzionalità principali:
-- **[Modalità Studio](docs/06-study-and-simulator.md#modalità-studio)** — esercitazione libera senza timer né punteggio, con materiale didattico per categoria (PDF, video YouTube, note).
-- **[Simulatore Esame](docs/06-study-and-simulator.md#simulatore-esame)** — riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori).
-- **[Multi-patente](docs/04-license-types.md)** — supporto completo di tutti i tipi di patente italiano (AM, A1, A2, A, B, B96, BE, C1, C1E, C, CE, D1, D1E, D, DE, CQC); ogni tipo ha categoria associate e formato esame configurabile.
+- **[Modalità Studio](docs/06-study-and-simulator.md#modalità-studio)** — esercitazione libera senza timer né punteggio, con materiale didattico per categoria (PDF, video YouTube, note). Filtrata per il tipo di patente in studio scelto dal viewer.
+- **[Simulatore Esame](docs/06-study-and-simulator.md#simulatore-esame)** — riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori), personalizzato per il tipo di patente. Domande filtrate per le categorie della patente scelta.
+- **[Multi-patente](docs/04-license-types.md)** — supporto completo di tutti i tipi di patente italiano (AM, A1, A2, A, B, B96, BE, C1, C1E, C, CE, D1, D1E, D, DE, CQC); ogni tipo ha categoria associate e formato esame configurabile. Ogni viewer sceglie il tipo per cui sta studiando (profilo → "Patente in studio"); studio, simulatore, diagnostico e ripasso SM-2 vengono filtrati di conseguenza.
 - **[Domande salvate](docs/03-features.md#area-utente-viewer)** — bookmark persistente con nota personale opzionale.
 - **[Segnalazione errori](docs/03-features.md#area-utente-viewer)** — il viewer può segnalare problemi sulle domande; l'admin modera.
 - **[Revisione errori](docs/03-features.md#area-utente-viewer)** — aggregato delle domande sbagliate con toggle "imparata".

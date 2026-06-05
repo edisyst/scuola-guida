@@ -43,6 +43,12 @@ return [
     'tts_enabled_label'     => 'Activar síntesis de voz (TTS)',
     'tts_autoplay_label'    => 'Reproducción automática de voz',
 
+    // Selección de tipo de permiso (Feature 8.1)
+    'license_type_title'    => 'Tipo de permiso para estudiar',
+    'license_type_desc'     => 'Selecciona el tipo de permiso por el que estás estudiando. El estudio, simulador y revisión se filtrarán para preguntas relacionadas con este tipo.',
+    'license_type_field_label' => 'Tipo de permiso',
+    'license_type_select'   => 'Elige un tipo de permiso...',
+
     // Página de perfil — secciones y títulos
     'page_title'            => 'Perfil',
     'account_subtitle'      => 'Cuenta',

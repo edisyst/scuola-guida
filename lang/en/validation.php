@@ -163,6 +163,11 @@ return [
     'ulid' => 'The :attribute field must be a valid ULID.',
     'uuid' => 'The :attribute field must be a valid UUID.',
 
+    // Custom messages for Feature 8.1 (License Type)
+    'license_type_required' => 'You must select a license type.',
+    'license_type_invalid'  => 'The selected license type is not valid.',
+    'license_type_inactive' => 'The selected license type is not available.',
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines

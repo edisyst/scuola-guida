@@ -22,17 +22,25 @@ class StudyController extends Controller
 
     public function index(): View
     {
+        $user        = auth()->user();
+        $licenseType = $user->getActiveLicenseType();
+
         $quizzes = Quiz::query()
             ->whereIn('status', [Quiz::STATUS_PUBLISHED, Quiz::STATUS_CONFIRMED])
             ->withCount('questions')
             ->orderBy('title')
             ->get();
 
-        $categories = Category::query()
+        $categoryQuery = Category::query()
             ->with('translations')
             ->withCount('questions')
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
+
+        if ($licenseType) {
+            $categoryQuery->whereHas('licenseTypes', fn($q) => $q->where('license_types.id', $licenseType->id));
+        }
+
+        $categories = $categoryQuery->get();
 
         return view('study.index', [
             'quizzes'    => $quizzes,

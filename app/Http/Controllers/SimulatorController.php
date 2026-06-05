@@ -22,9 +22,9 @@ class SimulatorController extends Controller
     public function index(): View
     {
         return view('simulator.index', [
-            'questions' => (int) config('simulator.questions'),
-            'timeLimit' => (int) config('simulator.time_limit'),
-            'maxErrors' => (int) config('simulator.max_errors'),
+            'questions' => $this->service->getExamQuestionsCount(),
+            'timeLimit' => $this->service->getExamMinutes(),
+            'maxErrors' => $this->service->getExamMaxErrors(),
         ]);
     }
 
@@ -71,8 +71,8 @@ class SimulatorController extends Controller
         return view('simulator.play', [
             'attempt'       => $attempt,
             'questionsJson' => $questionsJson,
-            'timeLimit'     => (int) config('simulator.time_limit') * 60,
-            'maxErrors'     => (int) config('simulator.max_errors'),
+            'timeLimit'     => $this->service->getExamMinutes() * 60,
+            'maxErrors'     => $this->service->getExamMaxErrors(),
         ]);
     }
 
@@ -129,7 +129,7 @@ class SimulatorController extends Controller
         $this->service->clearSession();
 
         $user      = auth()->user();
-        $maxErrors = (int) config('simulator.max_errors', 4);
+        $maxErrors = $this->service->getExamMaxErrors();
         $passed    = ($attempt->total_questions - $attempt->score) <= $maxErrors;
 
         $this->streakService->recordActivity($user);

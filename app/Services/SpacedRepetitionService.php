@@ -78,12 +78,13 @@ class SpacedRepetitionService
     /**
      * Domande in scadenza (next_review_at <= now), con eager loading, escludendo
      * quelle già in learned_questions. Carica gli ID imparati in memoria per
-     * evitare subquery nel ciclo (zero N+1).
+     * evitare subquery nel ciclo (zero N+1). Filtra per il tipo di patente attivo.
      */
     public function getDueQuestions(User $user, ?int $categoryId = null, int $limit = 30): Collection
     {
         // Pre-carica in memoria: subquery evitabile perché il numero è tipicamente piccolo.
-        $learnedIds = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
+        $learnedIds  = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
+        $licenseType = $user->getActiveLicenseType();
 
         $query = QuestionReview::with(['question.category'])
             ->where('user_id', $user->id)
@@ -93,6 +94,14 @@ class SpacedRepetitionService
 
         if ($categoryId !== null) {
             $query->whereHas('question', fn ($q) => $q->where('category_id', $categoryId));
+        }
+
+        if ($licenseType) {
+            $query->whereHas('question', fn ($q) =>
+                $q->whereHas('category', fn ($cq) =>
+                    $cq->whereHas('licenseTypes', fn ($lq) => $lq->where('license_types.id', $licenseType->id))
+                )
+            );
         }
 
         return $query->limit($limit)->get();
@@ -150,20 +159,29 @@ class SpacedRepetitionService
 
     /**
      * Conteggio domande in scadenza oggi per categoria — usato nel piano di studio.
+     * Filtra per il tipo di patente attivo.
      *
      * @return array<int, int>  [category_id => count]
      */
     public function getDueCountByCategory(User $user): array
     {
-        $learnedIds = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
+        $learnedIds  = LearnedQuestion::where('user_id', $user->id)->pluck('question_id');
+        $licenseType = $user->getActiveLicenseType();
 
-        return QuestionReview::where('question_reviews.user_id', $user->id)
+        $query = QuestionReview::where('question_reviews.user_id', $user->id)
             ->where('next_review_at', '<=', now())
             ->whereNotIn('question_reviews.question_id', $learnedIds)
             ->join('questions', 'questions.id', '=', 'question_reviews.question_id')
             ->selectRaw('questions.category_id, COUNT(*) as cnt')
-            ->groupBy('questions.category_id')
-            ->pluck('cnt', 'questions.category_id')
-            ->all();
+            ->groupBy('questions.category_id');
+
+        if ($licenseType) {
+            $query->join('category_license_type', function ($join) use ($licenseType) {
+                $join->on('category_license_type.category_id', '=', 'questions.category_id')
+                     ->where('category_license_type.license_type_id', '=', $licenseType->id);
+            });
+        }
+
+        return $query->pluck('cnt', 'questions.category_id')->all();
     }
 }

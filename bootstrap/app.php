@@ -14,8 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
-            '2fa'  => \App\Http\Middleware\EnsureTwoFactorAuthenticated::class,
+            'role'              => \App\Http\Middleware\RoleMiddleware::class,
+            '2fa'               => \App\Http\Middleware\EnsureTwoFactorAuthenticated::class,
+            'license.required'  => \App\Http\Middleware\RequireLicenseType::class,
         ]);
 
         $middleware->appendToGroup('web', \App\Http\Middleware\SetLocale::class);

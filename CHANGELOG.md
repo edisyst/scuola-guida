@@ -5,6 +5,65 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 8.1: Esperienza viewer multi-patente
+
+Connette `LicenseType` all'esperienza concreta dello studio. Ogni viewer sceglie
+la patente per cui sta studiando; studio, simulatore, diagnostico e SM-2 sono
+filtrati per le domande di quel tipo. Il formato esame diventa quello ufficiale
+del tipo selezionato.
+
+### Added
+
+- **Migration:**
+  - `add_active_license_type_id_to_users_table` — colonna nullable con FK a `license_types`
+    e `nullOnDelete` (disattivando un tipo, l'utente non perde l'account).
+
+- **Model:**
+  - `User::activeLicenseType()` BelongsTo relazione.
+  - `User::getActiveLicenseType(): ?LicenseType` helper.
+  - `active_license_type_id` aggiunto a `$fillable` e cast.
+
+- **Middleware:**
+  - `RequireLicenseType` — reindirizza i viewer senza `active_license_type_id`
+    al profilo con flash warning. Non blocca admin/editor/instructor.
+  - Registrato con alias `license.required` in `bootstrap/app.php`.
+  - Applicato alle route: studio, simulatore, diagnostico, SM-2, gamification.
+
+- **Form Request:**
+  - `UpdateActiveLicenseTypeRequest` — valida che il tipo esista e sia `is_active`.
+
+- **Controller:**
+  - `ProfileController::updateActiveLicenseType()` — PATCH /profile/license-type.
+
+- **UI:**
+  - Card "Patente in studio" nel profilo viewer con select per i tipi attivi.
+  - Badge patente attiva nella navbar/sidebar (mostra il tipo selezionato).
+
+- **Service Filters:**
+  - `StudyController::index()` filtra categorie per licenseType attivo.
+  - `StudyService::questionsFromCategory()` e `randomQuestions()` filtrano per licenseType.
+  - `SimulatorService::buildQuestionList()` filtra categorie per licenseType.
+  - `SimulatorService` — metodi `getExamQuestionsCount()`, `getExamMinutes()`, `getExamMaxErrors()`
+    (da licenseType se presente, fallback a config).
+  - `SimulatorController` usa i metodi del service per formato esame.
+  - `DiagnosticService::generateQuestions()` filtra categorie per licenseType.
+  - `SpacedRepetitionService::getDueQuestions()` e `getDueCountByCategory()` filtrano per licenseType.
+
+- **Translations:**
+  - `lang/it/profile.php` — sezione "Patente in studio".
+  - `lang/it/flash.php` — messaggi `license_type_updated` e `license_type_required`.
+  - `lang/it/validation.php` — custom messages `license_type_required`, `license_type_invalid`, `license_type_inactive`.
+
+- **Tests:**
+  - `tests/Feature/ViewerLicenseTypeTest.php` — 12 test su redirect, filtri, formato esame, validazione.
+
+### Changed
+
+- `SimulatorController::play()` e `::submit()` usano `SimulatorService::getExamMaxErrors()`.
+- `SimulatorService::getResultDetail()` usa `getExamMaxErrors()` anziché config.
+
+---
+
 ## [Unreleased] — Feature 8.0: Fondamenta multi-patente con entità `LicenseType`
 
 Introduce `LicenseType` come entità di prima classe nel dominio. Ogni tipo di patente

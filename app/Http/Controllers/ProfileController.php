@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\UpdateAccessibilityPreferencesRequest;
+use App\Http\Requests\UpdateActiveLicenseTypeRequest;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Services\GdprExportService;
@@ -73,6 +74,14 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.edit')
             ->with('success', __('flash.accessibility_updated'));
+    }
+
+    public function updateActiveLicenseType(UpdateActiveLicenseTypeRequest $request): RedirectResponse
+    {
+        $request->user()->update($request->validated());
+
+        return Redirect::route('profile.edit')
+            ->with('success', __('flash.license_type_updated'));
     }
 
     /**

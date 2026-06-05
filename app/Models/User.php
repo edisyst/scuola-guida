@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\InstructorNote;
@@ -111,6 +112,8 @@ class User extends Authenticatable implements HasLocalePreference
         'registration_rejection_reason',
         // Lingua preferita per il testo delle domande (Feature 7.1)
         'locale',
+        // Patente attiva per studio/simulatore (Feature 8.1)
+        'active_license_type_id',
     ];
 
     protected $hidden = [
@@ -133,6 +136,7 @@ class User extends Authenticatable implements HasLocalePreference
             'locale'                     => 'string',
             'tts_enabled'                => 'boolean',
             'tts_autoplay'               => 'boolean',
+            'active_license_type_id'     => 'integer',
         ];
     }
 
@@ -218,6 +222,11 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->hasMany(InstructorNote::class, 'instructor_id');
     }
 
+    public function activeLicenseType(): BelongsTo
+    {
+        return $this->belongsTo(LicenseType::class, 'active_license_type_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | REGISTRAZIONE DEFINITIVA (viewer)
@@ -271,6 +280,11 @@ class User extends Authenticatable implements HasLocalePreference
     {
         $parts = array_filter([$this->first_name, $this->last_name]);
         return $parts ? implode(' ', $parts) : $this->name;
+    }
+
+    public function getActiveLicenseType(): ?LicenseType
+    {
+        return $this->activeLicenseType;
     }
 
     /*

@@ -16,6 +16,8 @@ return [
     'learned_marked'    => 'Pregunta marcada como aprendida.',
     'learned_unmarked'  => 'Pregunta devuelta a errores para revisar.',
     'accessibility_updated' => 'Preferencias de accesibilidad actualizadas.',
+    'license_type_updated'  => 'Tipo de permiso para estudiar actualizado.',
+    'license_type_required' => 'Selecciona un tipo de permiso antes de acceder a las funcionalidades de estudio.',
     'bookmark_removed'  => 'Pregunta eliminada de guardados.',
     'stats_refreshed'   => 'Estadísticas actualizadas.',
     'question_created'           => 'Pregunta creada correctamente.',

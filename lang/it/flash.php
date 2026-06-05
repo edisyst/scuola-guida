@@ -30,6 +30,8 @@ return [
 
     // Profilo
     'accessibility_updated' => 'Preferenze di accessibilità aggiornate.',
+    'license_type_updated'  => 'Patente in studio aggiornata.',
+    'license_type_required' => 'Seleziona un tipo di patente prima di accedere alle funzionalità di studio.',
 
     // Bookmark
     'bookmark_removed'  => 'Domanda rimossa dai salvati.',

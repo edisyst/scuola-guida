@@ -14,20 +14,77 @@ class SimulatorService
     private const SESSION_ATTEMPT   = 'simulator_attempt_id';
 
     /**
+     * Restituisce il numero di domande per il formato esame
+     * (da licenseType se presente, altrimenti da config).
+     */
+    public function getExamQuestionsCount(): int
+    {
+        $user        = auth()->user();
+        $licenseType = $user->getActiveLicenseType();
+
+        if ($licenseType && $licenseType->exam_questions !== null) {
+            return (int) $licenseType->exam_questions;
+        }
+
+        return (int) config('simulator.questions', 30);
+    }
+
+    /**
+     * Restituisce il tempo limite in minuti per il formato esame
+     * (da licenseType se presente, altrimenti da config).
+     */
+    public function getExamMinutes(): int
+    {
+        $user        = auth()->user();
+        $licenseType = $user->getActiveLicenseType();
+
+        if ($licenseType && $licenseType->exam_minutes !== null) {
+            return (int) $licenseType->exam_minutes;
+        }
+
+        return (int) config('simulator.time_limit', 20);
+    }
+
+    /**
+     * Restituisce il massimo numero di errori per il formato esame
+     * (da licenseType se presente, altrimenti da config).
+     */
+    public function getExamMaxErrors(): int
+    {
+        $user        = auth()->user();
+        $licenseType = $user->getActiveLicenseType();
+
+        if ($licenseType && $licenseType->exam_max_errors !== null) {
+            return (int) $licenseType->exam_max_errors;
+        }
+
+        return (int) config('simulator.max_errors', 3);
+    }
+
+    /**
      * Costruisce la lista di domande per una sessione simulatore
-     * secondo la distribuzione configurata in config/simulator.php.
+     * secondo la distribuzione configurata in config/simulator.php,
+     * filtrata per il tipo di patente attivo dell'utente.
      *
      * Pre-carica tutte le categorie in memoria con una singola query ed esegue
      * il lookup per nome in PHP, evitando N query Category nel ciclo.
      */
     public function buildQuestionList(): Collection
     {
+        $user        = auth()->user();
+        $licenseType = $user->getActiveLicenseType();
         $distribution = config('simulator.distribution', []);
         $target       = (int) config('simulator.questions', 30);
         $questions    = collect();
 
-        // 1 query invece di N: recupera tutte le categorie e filtra in memoria.
-        $allCategories = Category::select('id', 'name')->get();
+        // 1 query invece di N: recupera tutte le categorie (filtrate per licenseType se presente).
+        $categoryQuery = Category::select('id', 'name');
+
+        if ($licenseType) {
+            $categoryQuery->whereHas('licenseTypes', fn($q) => $q->where('license_types.id', $licenseType->id));
+        }
+
+        $allCategories = $categoryQuery->get();
 
         foreach ($distribution as $categoryName => $count) {
             $needle   = strtolower($categoryName);
@@ -207,8 +264,8 @@ class SimulatorService
         $wrong       = $rows->filter(fn ($r) => !$r['is_correct'])->count();
         $notAnswered = max(0, $totalConfigured - $answered);
 
-        // Criterio reale esame patente B: max errori da config.
-        $maxErrors   = (int) config('simulator.max_errors');
+        // Criterio reale esame: max errori da licenseType o config.
+        $maxErrors   = $this->getExamMaxErrors();
         $totalErrors = $wrong + $notAnswered;
         $passed      = $totalErrors <= $maxErrors;
 

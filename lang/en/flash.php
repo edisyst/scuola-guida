@@ -30,6 +30,8 @@ return [
 
     // Profile
     'accessibility_updated' => 'Accessibility preferences updated.',
+    'license_type_updated'  => 'License type for study updated.',
+    'license_type_required' => 'Select a license type before accessing study features.',
 
     // Bookmark
     'bookmark_removed' => 'Question removed from saved.',

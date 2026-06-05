@@ -163,6 +163,11 @@ return [
     'ulid' => 'Il campo :attribute deve essere un ULID valido.',
     'uuid' => 'Il campo :attribute deve essere un UUID valido.',
 
+    // Custom messages for Feature 8.1 (License Type)
+    'license_type_required' => 'Devi selezionare un tipo di patente.',
+    'license_type_invalid'  => 'Il tipo di patente selezionato non è valido.',
+    'license_type_inactive' => 'Il tipo di patente selezionato non è disponibile.',
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines

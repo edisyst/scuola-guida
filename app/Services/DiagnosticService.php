@@ -16,12 +16,20 @@ class DiagnosticService
     /**
      * Restituisce una Collection di Question, una per categoria attiva.
      * Esclude le domande risposte nelle ultime 24h, rilevate dai quiz_attempts.
+     * Filtra le categorie per il tipo di patente attivo dell'utente.
      */
     public function generateQuestions(User $user): Collection
     {
-        $seenIds = $this->recentlySeenQuestionIds($user);
+        $seenIds     = $this->recentlySeenQuestionIds($user);
+        $licenseType = $user->getActiveLicenseType();
 
-        $categories = Category::whereHas('questions')->get();
+        $categoryQuery = Category::whereHas('questions');
+
+        if ($licenseType) {
+            $categoryQuery->whereHas('licenseTypes', fn($q) => $q->where('license_types.id', $licenseType->id));
+        }
+
+        $categories = $categoryQuery->get();
 
         $questions = collect();
 
