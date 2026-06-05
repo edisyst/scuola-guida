@@ -27,7 +27,7 @@ class NuovaIscrizioneQuizNotification extends Notification implements ShouldQueu
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Nuova richiesta di iscrizione a un quiz')
+            ->subject(__('notifications.new_enrollment_subject'))
             ->markdown('emails.nuova-iscrizione-quiz', [
                 'admin'  => $notifiable,
                 'viewer' => $this->viewer,
@@ -41,8 +41,11 @@ class NuovaIscrizioneQuizNotification extends Notification implements ShouldQueu
         $viewerName = $this->viewer->fullAnagraphicName();
 
         return [
-            'title' => 'Nuova iscrizione quiz',
-            'body'  => $viewerName . ' ha richiesto l\'iscrizione al quiz «' . \Illuminate\Support\Str::limit($this->quiz->title, 40) . '».',
+            'title' => __('notifications.new_enrollment_db_title'),
+            'body'  => __('notifications.new_enrollment_db_body', [
+                'name'  => $viewerName,
+                'title' => \Illuminate\Support\Str::limit($this->quiz->title, 40),
+            ]),
             'url'   => route('admin.enrollments.index'),
             'icon'  => 'fas fa-user-clock',
             'color' => 'warning',

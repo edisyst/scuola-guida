@@ -1,5 +1,5 @@
 @component('mail::message')
-# Nuova richiesta di iscrizione a un quiz
+# {{ __('notifications.new_enrollment_subject') }}
 
 Ciao **{{ $admin->name }}**,
 

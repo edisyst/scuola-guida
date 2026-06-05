@@ -1,5 +1,5 @@
 @component('mail::message')
-# Esame completato
+# {{ __('notifications.exam_completed_db_title') }}
 
 Ciao **{{ $admin->name }}**,
 

@@ -29,7 +29,7 @@ class BadgeEarned extends Notification implements ShouldQueue
         $badge = config('badges.' . $this->badgeCode, []);
 
         return [
-            'title' => 'Hai guadagnato un badge: ' . ($badge['name'] ?? $this->badgeCode),
+            'title' => __('notifications.badge_db_title', ['name' => $badge['name'] ?? $this->badgeCode]),
             'body'  => $badge['description'] ?? '',
             'url'   => route('viewer.profile.badges'),
             'icon'  => $badge['icon'] ?? 'fas fa-award',
@@ -42,9 +42,9 @@ class BadgeEarned extends Notification implements ShouldQueue
         $badge = config('badges.' . $this->badgeCode, []);
 
         return (new WebPushMessage())
-            ->title('Nuovo badge: ' . ($badge['name'] ?? $this->badgeCode))
-            ->body($badge['description'] ?? 'Hai guadagnato un nuovo badge!')
+            ->title(__('notifications.badge_push_title', ['name' => $badge['name'] ?? $this->badgeCode]))
+            ->body($badge['description'] ?? __('notifications.badge_push_body'))
             ->icon('/icons/icon-192.png')
-            ->action('Vedi badge', route('viewer.profile.badges'));
+            ->action(__('notifications.badge_push_action'), route('viewer.profile.badges'));
     }
 }

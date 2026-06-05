@@ -32,7 +32,7 @@ class QuizEsameCompletatoNotification extends Notification implements ShouldQueu
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Esame completato: ' . $this->viewer->fullAnagraphicName())
+            ->subject(__('notifications.exam_completed_subject', ['name' => $this->viewer->fullAnagraphicName()]))
             ->markdown('emails.quiz-esame-completato', [
                 'admin'   => $notifiable,
                 'viewer'  => $this->viewer,
@@ -45,7 +45,7 @@ class QuizEsameCompletatoNotification extends Notification implements ShouldQueu
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Esame completato',
+            'title' => __('notifications.exam_completed_db_title'),
             'body'  => $this->viewer->fullAnagraphicName()
                 . ' ha completato «' . Str::limit($this->quiz->title, 35) . '»: '
                 . $this->attempt->score . '/' . $this->attempt->total_questions . '.',

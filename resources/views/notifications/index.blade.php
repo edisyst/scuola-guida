@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Notifiche')
+@section('title', __('nav.notifications_label'))
 @section('content_header')@endsection
 
 @section('content')
@@ -8,17 +8,17 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Area personale</p>
-            <h1 class="sg-header-title"><i class="far fa-bell mr-2"></i> Notifiche</h1>
+            <p class="sg-header-subtitle">{{ __('menu.area_personale') }}</p>
+            <h1 class="sg-header-title"><i class="far fa-bell mr-2"></i> {{ __('nav.notifications_label') }}</h1>
         </div>
         @if ($notifications->total() > 0)
             <form method="POST"
                   action="{{ route('notifications.destroyAll') }}"
-                  onsubmit="return confirm('Eliminare definitivamente tutte le notifiche?');">
+                  onsubmit="return confirm('{{ __('nav.notifications_delete_all_confirm') }}');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="sg-btn sg-btn-outline sg-btn-sm">
-                    <i class="fas fa-trash"></i> Elimina tutte
+                    <i class="fas fa-trash"></i> {{ __('nav.notifications_delete_all') }}
                 </button>
             </form>
         @endif
@@ -26,17 +26,17 @@
 
     <div class="sg-card">
         @if ($notifications->isEmpty())
-            <div class="sg-table-empty">Non hai ancora nessuna notifica.</div>
+            <div class="sg-table-empty">{{ __('nav.notifications_empty_page') }}</div>
         @else
             <div class="table-responsive">
                 <table class="sg-table">
                     <thead>
                         <tr>
                             <th style="width: 40px;"></th>
-                            <th>Titolo</th>
-                            <th>Messaggio</th>
-                            <th style="width: 160px;">Data</th>
-                            <th class="text-right" style="width: 100px;">Azioni</th>
+                            <th>{{ __('nav.col_title') }}</th>
+                            <th>{{ __('nav.col_message') }}</th>
+                            <th style="width: 160px;">{{ __('nav.col_date') }}</th>
+                            <th class="text-right" style="width: 100px;">{{ __('nav.col_actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,7 +45,7 @@
                                 $data  = $notification->data ?? [];
                                 $icon  = $data['icon']  ?? 'fas fa-info-circle';
                                 $color = $data['color'] ?? 'info';
-                                $title = $data['title'] ?? 'Notifica';
+                                $title = $data['title'] ?? __('nav.notifications_default_title');
                                 $body  = $data['body']  ?? '';
                                 $url   = $data['url']   ?? null;
                                 $unread = is_null($notification->read_at);
@@ -69,7 +69,7 @@
                                     <form method="POST"
                                           action="{{ route('notifications.destroy', $notification->id) }}"
                                           class="d-inline"
-                                          onsubmit="return confirm('Eliminare questa notifica?');">
+                                          onsubmit="return confirm('{{ __('nav.notifications_delete_one_confirm') }}');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="sg-btn sg-btn-outline sg-btn-sm">

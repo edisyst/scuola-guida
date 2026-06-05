@@ -48,7 +48,7 @@ class StudyController extends Controller
         } catch (RuntimeException $e) {
             if ($request->input('source') === StudyService::SOURCE_BOOKMARKS) {
                 return redirect()->route('bookmarks.index')
-                    ->with('warning', 'Non hai domande salvate da studiare.');
+                    ->with('warning', __('flash.study_no_bookmarks'));
             }
             return back()->with('error', $e->getMessage())->withInput();
         }
@@ -60,7 +60,7 @@ class StudyController extends Controller
     {
         if (!$this->service->hasSession()) {
             return redirect()->route('study.index')
-                ->with('info', 'Avvia una nuova sessione di studio per iniziare.');
+                ->with('info', __('flash.study_start_new'));
         }
 
         if ($request->has('index')) {
@@ -71,7 +71,7 @@ class StudyController extends Controller
 
         if (!$question) {
             return redirect()->route('study.index')
-                ->with('error', 'La sessione di studio non contiene domande valide.');
+                ->with('error', __('flash.study_invalid_session'));
         }
 
         $question->loadMissing('category.translations', 'translations');
@@ -133,7 +133,7 @@ class StudyController extends Controller
     {
         if (!$this->service->hasSession()) {
             return redirect()->route('study.index')
-                ->with('info', 'Nessuna sessione di studio attiva.');
+                ->with('info', __('flash.study_no_active'));
         }
 
         return view('study.summary', [
@@ -146,6 +146,6 @@ class StudyController extends Controller
         $this->service->clear();
 
         return redirect()->route('study.index')
-            ->with('success', 'Sessione di studio terminata.');
+            ->with('success', __('flash.study_ended'));
     }
 }

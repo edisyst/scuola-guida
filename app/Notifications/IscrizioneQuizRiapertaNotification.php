@@ -27,7 +27,7 @@ class IscrizioneQuizRiapertaNotification extends Notification implements ShouldQ
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Iscrizione al quiz riaperta')
+            ->subject(__('notifications.enrollment_reopened_subject'))
             ->markdown('emails.iscrizione-quiz-riaperta', [
                 'user'   => $notifiable,
                 'quiz'   => $this->quiz,
@@ -38,8 +38,8 @@ class IscrizioneQuizRiapertaNotification extends Notification implements ShouldQ
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Iscrizione quiz riaperta',
-            'body'  => 'L\'iscrizione al quiz «' . \Illuminate\Support\Str::limit($this->quiz->title, 60) . '» è stata riaperta dall\'amministratore.',
+            'title' => __('notifications.enrollment_reopened_db_title'),
+            'body'  => __('notifications.enrollment_reopened_db_body', ['title' => \Illuminate\Support\Str::limit($this->quiz->title, 60)]),
             'url'   => route('quiz.enrollments.mine'),
             'icon'  => 'fas fa-redo',
             'color' => 'info',

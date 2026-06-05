@@ -54,7 +54,7 @@ class ReviewErrorsController extends Controller
 
         $this->service->markAsLearned(auth()->user(), $question->id);
 
-        return redirect()->back()->with('success', 'Domanda marcata come imparata.');
+        return redirect()->back()->with('success', __('flash.learned_marked'));
     }
 
     public function unmarkLearned(Question $question): RedirectResponse
@@ -63,6 +63,6 @@ class ReviewErrorsController extends Controller
 
         $this->service->unmarkAsLearned(auth()->user(), $question->id);
 
-        return redirect()->back()->with('success', 'Domanda reinserita tra gli errori da rivedere.');
+        return redirect()->back()->with('success', __('flash.learned_unmarked'));
     }
 }

@@ -1,9 +1,9 @@
 @component('mail::message')
-# Iscrizione al quiz rifiutata
+# {{ __('notifications.enrollment_rejected_mail_title') }}
 
 Ciao **{{ $user->fullAnagraphicName() }}**,
 
-la tua richiesta di iscrizione al quiz **«{{ $quiz->title }}»** è stata **rifiutata** dall'amministratore.
+{{ __('notifications.enrollment_rejected_mail_body', ['title' => $quiz->title]) }}
 
 @if (!empty($motivazione))
 **Motivazione:**
@@ -11,10 +11,8 @@ la tua richiesta di iscrizione al quiz **«{{ $quiz->title }}»** è stata **rif
 > {{ $motivazione }}
 @endif
 
-Puoi consultare l'elenco delle tue iscrizioni dal portale.
-
 @component('mail::button', ['url' => $appUrl . '/quiz/enrollments'])
-Vai alle mie iscrizioni
+{{ __('notifications.enrollment_rejected_mail_cta') }}
 @endcomponent
 
 Grazie,<br>

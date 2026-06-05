@@ -12,8 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\InstructorNote;
 use NotificationChannels\WebPush\HasPushSubscriptions;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference
 {
     use HasFactory, Notifiable, HasPushSubscriptions;
 
@@ -136,13 +137,20 @@ class User extends Authenticatable
     }
 
     /**
+     * Implementazione HasLocalePreference: notifiche e Mailable in coda usano
+     * questo valore per impostare il locale automaticamente nel job worker.
+     */
+    public function preferredLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    /**
      * Lingua preferita per il testo delle domande (Feature 7.1).
      * Fallback alla lingua di default dell'applicazione se non impostata.
      */
     public function getPreferredLocale(): string
     {
-        // Il testo originale delle domande è sempre italiano (MIT): 'it' come base
-        // è una proprietà del contenuto, non della lingua dell'interfaccia.
         return $this->locale ?? config('locales.default', 'it');
     }
 

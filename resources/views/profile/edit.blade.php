@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Profilo')
+@section('title', __('profile.page_title'))
 
 @section('content_header')@endsection
 
@@ -9,8 +9,8 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Account</p>
-            <h1 class="sg-header-title">Il mio profilo</h1>
+            <p class="sg-header-subtitle">{{ __('profile.account_subtitle') }}</p>
+            <h1 class="sg-header-title">{{ __('profile.my_profile') }}</h1>
         </div>
         <div class="sg-header-actions d-none d-sm-flex">
             <i class="fas fa-user-circle" style="font-size:2rem;opacity:.6;"></i>
@@ -19,7 +19,7 @@
 
     <div class="sg-card sg-mb-3">
         <div class="sg-card-header">
-            <h2 class="sg-card-header-title">Informazioni profilo</h2>
+            <h2 class="sg-card-header-title">{{ __('profile.info_section') }}</h2>
         </div>
         <div class="sg-card-body">
             @include('profile.partials.update-profile-information-form')
@@ -30,7 +30,7 @@
         <div class="sg-card sg-mb-3">
             <div class="sg-card-header sg-flex-between">
                 <h2 class="sg-card-header-title">
-                    <i class="fas fa-id-card mr-2"></i> Iscrizione esami ufficiali
+                    <i class="fas fa-id-card mr-2"></i> {{ __('profile.reg_section') }}
                 </h2>
                 @include('profile.partials.registration-status-badge', ['user' => $user])
             </div>
@@ -42,7 +42,7 @@
 
     <div class="sg-card sg-mb-3">
         <div class="sg-card-header">
-            <h2 class="sg-card-header-title">Aggiorna password</h2>
+            <h2 class="sg-card-header-title">{{ __('profile.password_section') }}</h2>
         </div>
         <div class="sg-card-body">
             @include('profile.partials.update-password-form')
@@ -53,7 +53,7 @@
         <div class="sg-card sg-mb-3">
             <div class="sg-card-header">
                 <h2 class="sg-card-header-title">
-                    <i class="fas fa-shield-alt mr-2"></i> Autenticazione a due fattori
+                    <i class="fas fa-shield-alt mr-2"></i> {{ __('profile.twofa_section') }}
                 </h2>
             </div>
             <div class="sg-card-body">
@@ -67,20 +67,17 @@
          x-data="{ ttsEnabled: {{ $user->tts_enabled ? 'true' : 'false' }}, ttsAutoplay: {{ $user->tts_autoplay ? 'true' : 'false' }} }">
         <div class="sg-card-header">
             <h2 class="sg-card-header-title">
-                <i class="fas fa-universal-access mr-2"></i> Accessibilità
+                <i class="fas fa-universal-access mr-2"></i> {{ __('profile.tts_title') }}
             </h2>
         </div>
         <div class="sg-card-body">
-            <p class="text-muted mb-3">
-                Attiva la lettura audio automatica delle domande per replicare il supporto DSA
-                previsto dall'esame ministeriale (D.Lgs. 62/2017).
-            </p>
+            <p class="text-muted mb-3">{{ __('profile.tts_desc') }}</p>
 
             <form action="{{ route('profile.accessibility.update') }}" method="POST">
                 @csrf
 
                 <div class="form-group d-flex align-items-center" style="gap:1rem;">
-                    <label class="mb-0">Lettura audio delle domande</label>
+                    <label class="mb-0">{{ __('profile.tts_field_label') }}</label>
                     <div class="custom-control custom-switch">
                         <input type="checkbox"
                                class="custom-control-input"
@@ -95,7 +92,7 @@
 
                 <div class="form-group d-flex align-items-center mt-3" style="gap:1rem;"
                      x-show="ttsEnabled" x-cloak>
-                    <label class="mb-0">Avvio automatico ad ogni domanda</label>
+                    <label class="mb-0">{{ __('profile.tts_autoplay_field_label') }}</label>
                     <div class="custom-control custom-switch">
                         <input type="checkbox"
                                class="custom-control-input"
@@ -109,7 +106,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary mt-3">
-                    <i class="fas fa-save mr-1"></i> Salva preferenze
+                    <i class="fas fa-save mr-1"></i> {{ __('profile.save_prefs') }}
                 </button>
             </form>
         </div>
@@ -118,20 +115,17 @@
     <div class="sg-card sg-mb-3" x-data="pushSubscription()" x-init="init()" x-cloak>
         <div class="sg-card-header sg-flex-between">
             <h2 class="sg-card-header-title">
-                <i class="fas fa-bell mr-2"></i> Notifiche push
+                <i class="fas fa-bell mr-2"></i> {{ __('profile.push_section') }}
             </h2>
-            <span x-show="subscribed" class="badge badge-success">Attive</span>
-            <span x-show="!subscribed" class="badge badge-secondary">Non attive</span>
+            <span x-show="subscribed" class="badge badge-success">{{ __('profile.push_active') }}</span>
+            <span x-show="!subscribed" class="badge badge-secondary">{{ __('profile.push_inactive') }}</span>
         </div>
         <div class="sg-card-body">
-            <p class="text-muted mb-3">
-                Ricevi notifiche native anche a app chiusa (badge guadagnati, approvazione iscrizione,
-                promemoria ripasso SM-2).
-            </p>
+            <p class="text-muted mb-3">{{ __('profile.push_desc') }}</p>
 
             <div x-show="!supported" class="alert alert-warning">
                 <i class="fas fa-exclamation-triangle mr-1"></i>
-                Il tuo browser non supporta le notifiche push oppure il sito non è servito via HTTPS.
+                {{ __('profile.push_not_supported') }}
             </div>
 
             <div x-show="supported">
@@ -140,8 +134,8 @@
                     x-bind:disabled="loading"
                     @click="subscribe()"
                     class="btn btn-primary">
-                    <span x-show="!loading"><i class="fas fa-bell mr-1"></i> Attiva notifiche push</span>
-                    <span x-show="loading"><i class="fas fa-spinner fa-spin mr-1"></i> Attivazione…</span>
+                    <span x-show="!loading"><i class="fas fa-bell mr-1"></i> {{ __('profile.push_subscribe') }}</span>
+                    <span x-show="loading"><i class="fas fa-spinner fa-spin mr-1"></i> {{ __('profile.push_subscribing') }}</span>
                 </button>
 
                 <button
@@ -149,8 +143,8 @@
                     x-bind:disabled="loading"
                     @click="unsubscribe()"
                     class="btn btn-outline-secondary">
-                    <span x-show="!loading"><i class="fas fa-bell-slash mr-1"></i> Disattiva notifiche push</span>
-                    <span x-show="loading"><i class="fas fa-spinner fa-spin mr-1"></i> Disattivazione…</span>
+                    <span x-show="!loading"><i class="fas fa-bell-slash mr-1"></i> {{ __('profile.push_unsubscribe') }}</span>
+                    <span x-show="loading"><i class="fas fa-spinner fa-spin mr-1"></i> {{ __('profile.push_unsubscribing') }}</span>
                 </button>
 
                 <div x-show="error" class="alert alert-danger mt-2" x-text="error"></div>
@@ -162,24 +156,20 @@
     <div class="sg-card sg-mb-3">
         <div class="sg-card-header">
             <h2 class="sg-card-header-title">
-                <i class="fas fa-file-archive mr-2"></i> Portabilità dei dati
+                <i class="fas fa-file-archive mr-2"></i> {{ __('profile.gdpr_section') }}
             </h2>
         </div>
         <div class="sg-card-body">
-            <p class="text-muted mb-3">
-                Scarica un archivio ZIP con tutti i tuoi dati personali in formato JSON
-                (GDPR art. 20 — diritto alla portabilità). Il file include quiz, bookmark,
-                badge, attività e, se caricato, il documento d'identità.
-            </p>
+            <p class="text-muted mb-3">{{ __('profile.gdpr_desc') }}</p>
             <a href="{{ route('profile.download-data') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-download mr-1"></i> Scarica i miei dati
+                <i class="fas fa-download mr-1"></i> {{ __('profile.gdpr_download') }}
             </a>
         </div>
     </div>
 
     <div class="sg-card sg-card-danger">
         <div class="sg-card-header">
-            <h2 class="sg-card-header-title sg-text-danger">Elimina account</h2>
+            <h2 class="sg-card-header-title sg-text-danger">{{ __('profile.delete_section') }}</h2>
         </div>
         <div class="sg-card-body">
             @include('profile.partials.delete-user-form')
@@ -216,7 +206,7 @@
                     try {
                         const permission = await Notification.requestPermission();
                         if (permission !== 'granted') {
-                            this.error = 'Permesso negato. Abilita le notifiche nelle impostazioni del browser.';
+                            this.error = '{{ __('profile.push_permission_denied') }}';
                             return;
                         }
                         const reg    = await navigator.serviceWorker.ready;
@@ -244,7 +234,7 @@
 
                         this.subscribed = true;
                     } catch (e) {
-                        this.error = 'Errore durante l\'attivazione: ' + (e.message || e);
+                        this.error = '{{ __('profile.push_activate_error') }}' + (e.message || e);
                     } finally {
                         this.loading = false;
                     }
@@ -269,7 +259,7 @@
                         this._sub      = null;
                         this.subscribed = false;
                     } catch (e) {
-                        this.error = 'Errore durante la disattivazione: ' + (e.message || e);
+                        this.error = '{{ __('profile.push_deactivate_error') }}' + (e.message || e);
                     } finally {
                         this.loading = false;
                     }
@@ -280,11 +270,11 @@
 
     <script>
         @if (session('status') === 'profile-updated')
-            toastr.success('Profilo aggiornato con successo.');
+            toastr.success('{{ __('profile.profile_updated') }}');
         @endif
 
         @if (session('status') === 'password-updated')
-            toastr.success('Password aggiornata con successo.');
+            toastr.success('{{ __('profile.password_updated') }}');
         @endif
 
         @if (session('success'))

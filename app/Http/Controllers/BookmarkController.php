@@ -38,6 +38,6 @@ class BookmarkController extends Controller
             abort(403);
         }
 
-        return redirect()->back()->with('success', 'Domanda rimossa dai salvati.');
+        return redirect()->back()->with('success', __('flash.bookmark_removed'));
     }
 }

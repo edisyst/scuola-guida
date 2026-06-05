@@ -26,7 +26,7 @@ class RuoloAggiornatoNotification extends Notification implements ShouldQueue
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Il tuo ruolo è stato aggiornato')
+            ->subject(__('notifications.role_updated_subject'))
             ->markdown('emails.ruolo-aggiornato', [
                 'user'      => $notifiable,
                 'oldLabel'  => $this->roleLabel($this->oldRole),
@@ -38,7 +38,7 @@ class RuoloAggiornatoNotification extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Ruolo aggiornato',
+            'title' => __('notifications.role_updated_db_title'),
             'body'  => 'Il tuo ruolo è stato cambiato da "'
                 . $this->roleLabel($this->oldRole)
                 . '" a "'

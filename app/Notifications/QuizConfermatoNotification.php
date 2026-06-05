@@ -28,7 +28,7 @@ class QuizConfermatoNotification extends Notification implements ShouldQueue
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Nuovo quiz disponibile per iscrizione')
+            ->subject(__('notifications.quiz_confirmed_subject'))
             ->markdown('emails.quiz-confermato', [
                 'user'   => $notifiable,
                 'quiz'   => $this->quiz,
@@ -39,8 +39,8 @@ class QuizConfermatoNotification extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Nuovo quiz disponibile',
-            'body'  => 'Il quiz «' . Str::limit($this->quiz->title, 50) . '» è ora aperto alle iscrizioni.',
+            'title' => __('notifications.quiz_confirmed_db_title'),
+            'body'  => __('notifications.quiz_confirmed_db_body', ['title' => Str::limit($this->quiz->title, 50)]),
             'url'   => route('quiz.confirmed.index'),
             'icon'  => 'fas fa-clipboard-check',
             'color' => 'info',

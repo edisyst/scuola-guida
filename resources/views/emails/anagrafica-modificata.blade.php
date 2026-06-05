@@ -1,5 +1,5 @@
 @component('mail::message')
-# Anagrafica modificata — richiesta nuova revisione
+# {{ __('notifications.anagrafica_modified_db_title') }}
 
 Ciao **{{ $admin->name }}**,
 

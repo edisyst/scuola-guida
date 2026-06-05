@@ -5,6 +5,58 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 7.3a: i18n completa area viewer
+
+Porta la localizzazione a tutta l'area viewer (dashboard, gamification, profilo,
+iscrizioni, notifiche, email) e unifica la preferenza lingua su `users.locale`
+per gli utenti loggati.
+
+### Added
+
+- `lang/{it,en,es}/common.php` — bottoni condivisi, azioni, unità plurali (domande,
+  minuti, giorni, errori) con `trans_choice()`.
+- `lang/{it,en,es}/nav.php` — stringhe notification bell (unread count, mark all,
+  empty state, delete all, intestazioni tabella notifiche).
+- `lang/{it,en,es}/dashboard.php` — KPI, titoli widget, banner prossima sessione,
+  streak, diagnostico, grafico trend/esiti, tabelle per-quiz e ultimi tentativi,
+  banner PWA install.
+- `lang/{it,en,es}/gamification.php` — pagina badge: streak attuale/record,
+  contatore badge, progressione, earned_on, empty state.
+- `lang/{it,en,es}/profile.php` — form iscrizione anagrafica con tutti i suoi stati
+  (approved/pending/rejected/none), label campi, pulsanti submit, confirm dialog,
+  sezione accessibilità TTS.
+- `lang/{it,en,es}/enrollments.php` — pagina "Le mie iscrizioni": intestazioni,
+  badge stati (pending/approved/rejected/completed), confirm e bottone Svolgi.
+- `lang/{it,en,es}/flags.php` — segnalazione errori lato viewer.
+- `lang/{it,en,es}/review.php` — revisione errori, ripasso intelligente SM-2,
+  test diagnostico.
+- `lang/{it,en,es}/flash.php` — tutti i flash message generati per i flussi viewer
+  (studio, simulatore, iscrizione, notifiche, revisione errori, profilo, bookmark,
+  statistiche).
+- `lang/{it,en,es}/notifications.php` — oggetti email e testi database/webpush per
+  tutte le notifiche viewer: registrazione, iscrizione quiz, badge, ripasso SM-2,
+  ruolo aggiornato, anagrafica modificata.
+- `User` implementa `Illuminate\Contracts\Translation\HasLocalePreference`:
+  `preferredLocale(): ?string` espone `users.locale`. Le notifiche e i Mailable in
+  coda vengono automaticamente renderizzati nel locale dell'utente senza `App::setLocale()`.
+
+### Changed
+
+- `SetLocale` middleware: per gli utenti autenticati `users.locale` ha ora priorità
+  sulla sessione (prima era il contrario); per gli ospiti la sessione resta l'unica fonte.
+- Tutte le view viewer convertite a `__()` / `@lang()`: dashboard (stats/dashboard.blade.php),
+  gamification (viewer/badges.blade.php), profilo (registration-form.blade.php),
+  notification bell (livewire/notification-bell.blade.php), pagina notifiche
+  (notifications/index.blade.php), iscrizioni (quiz/enrollments/index.blade.php).
+- Tutti i flash messages dei controller viewer convertiti a chiavi `flash.*`
+  (StudyController, SimulatorController, RegistrationController, NotificationController,
+  ReviewErrorsController, ProfileController, BookmarkController,
+  QuizEnrollmentController, UserStatsController).
+- Tutte le notifiche PHP (`app/Notifications/`) e i template email Markdown
+  (`resources/views/emails/`) convertiti a `__()` con chiavi `notifications.*`.
+
+---
+
 ## [Unreleased] — Refactor 7.2: Hardening DevOps
 
 Sprint tecnico senza nuove funzionalità utente: analisi statica con Larastan/PHPStan,

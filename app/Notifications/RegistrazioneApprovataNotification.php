@@ -30,7 +30,7 @@ class RegistrazioneApprovataNotification extends Notification implements ShouldQ
         $appUrl = config('app.url');
 
         return (new MailMessage())
-            ->subject('Iscrizione anagrafica approvata')
+            ->subject(__('notifications.reg_approved_subject'))
             ->markdown('emails.registrazione-approvata', [
                 'user'   => $notifiable,
                 'appUrl' => $appUrl,
@@ -40,8 +40,8 @@ class RegistrazioneApprovataNotification extends Notification implements ShouldQ
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Iscrizione approvata',
-            'body'  => 'La tua iscrizione anagrafica è stata approvata: ora puoi iscriverti agli esami ufficiali.',
+            'title' => __('notifications.reg_approved_db_title'),
+            'body'  => __('notifications.reg_approved_db_body'),
             'url'   => route('dashboard'),
             'icon'  => 'fas fa-check-circle',
             'color' => 'success',
@@ -51,9 +51,9 @@ class RegistrazioneApprovataNotification extends Notification implements ShouldQ
     public function toWebPush(object $notifiable, object $notification): WebPushMessage
     {
         return (new WebPushMessage())
-            ->title('Iscrizione approvata')
-            ->body('La tua iscrizione è stata approvata: ora puoi iscriverti agli esami ufficiali.')
+            ->title(__('notifications.reg_approved_push_title'))
+            ->body(__('notifications.reg_approved_push_body'))
             ->icon('/icons/icon-192.png')
-            ->action('Apri dashboard', route('dashboard'));
+            ->action(__('notifications.reg_approved_push_action'), route('dashboard'));
     }
 }

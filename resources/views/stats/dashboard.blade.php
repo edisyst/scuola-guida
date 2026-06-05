@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $isAdminView ? "Statistiche di {$user->name}" : 'Dashboard')
+@section('title', $isAdminView ? __('dashboard.admin_title', ['name' => $user->name]) : __('dashboard.title'))
 
 @section('content_header')@endsection
 
@@ -11,30 +11,30 @@
         <div>
             <p class="sg-header-subtitle">
                 @if($isAdminView)
-                    Statistiche — vista admin
+                    {{ __('dashboard.admin_subtitle') }}
                 @else
-                    La tua dashboard personale
+                    {{ __('dashboard.subtitle') }}
                 @endif
             </p>
             <h1 class="sg-header-title">
                 <i class="fas fa-chart-line mr-2"></i>
                 @if($isAdminView)
-                    Statistiche di {{ $user->name }}
+                    {{ __('dashboard.admin_title', ['name' => $user->name]) }}
                 @else
-                    Dashboard
+                    {{ __('dashboard.title') }}
                 @endif
             </h1>
             <p class="sg-text-muted sg-mt-1">
                 <i class="far fa-clock"></i>
-                Aggiornato:
+                {{ __('dashboard.updated_at') }}
                 {{ \Illuminate\Support\Carbon::parse($stats['generated_at'])->diffForHumans() }}
-                — cache {{ \App\Services\UserStatsService::CACHE_TTL / 60 }} min
+                — {{ __('dashboard.cache_ttl', ['minutes' => \App\Services\UserStatsService::CACHE_TTL / 60]) }}
             </p>
         </div>
         <div class="sg-header-actions">
             @if($isAdminView)
                 <a href="{{ route('admin.users.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                    <i class="fas fa-arrow-left"></i> Torna agli utenti
+                    <i class="fas fa-arrow-left"></i> {{ __('dashboard.back_users') }}
                 </a>
             @endif
             <form method="POST" action="{{ route('dashboard.refresh', $user) }}" class="d-inline">
@@ -43,7 +43,7 @@
                     <input type="hidden" name="as_admin" value="1">
                 @endif
                 <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm">
-                    <i class="fas fa-sync-alt"></i> Aggiorna ora
+                    <i class="fas fa-sync-alt"></i> {{ __('dashboard.refresh') }}
                 </button>
             </form>
         </div>
@@ -57,18 +57,19 @@
         >
             <span class="info-box-icon"><i class="fas fa-calendar-{{ $nextSession->enrollment_status === 'upcoming' ? 'alt' : 'check' }}"></i></span>
             <div class="info-box-content">
-                <span class="info-box-text">Prossima sessione</span>
+                <span class="info-box-text">{{ __('dashboard.next_session') }}</span>
                 <span class="info-box-number">{{ $nextSession->title }}</span>
                 <span class="progress-description">
                     @if(in_array($nextSession->enrollment_status, ['open', 'not_scheduled']))
-                        Iscrizioni aperte
                         @if($nextSession->enrollments_close_at)
-                            fino al {{ $nextSession->enrollments_close_at->format('d/m/Y') }}
+                            {{ __('dashboard.enrollments_open_until', ['date' => $nextSession->enrollments_close_at->format('d/m/Y')]) }}
+                        @else
+                            {{ __('dashboard.enrollments_open') }}
                         @endif
                     @elseif($nextSession->enrollment_status === 'upcoming' && $nextSession->enrollments_open_at)
-                        Apre tra: <strong x-text="display">{{ $nextSession->enrollments_open_at->format('d/m/Y H:i') }}</strong>
+                        {{ __('dashboard.opens_in') }} <strong x-text="display">{{ $nextSession->enrollments_open_at->format('d/m/Y H:i') }}</strong>
                     @endif
-                    &mdash; <a href="{{ route('calendar.index') }}" class="{{ $nextSession->enrollment_status === 'upcoming' ? 'text-dark' : 'text-white' }}"><u>Vedi calendario</u></a>
+                    &mdash; <a href="{{ route('calendar.index') }}" class="{{ $nextSession->enrollment_status === 'upcoming' ? 'text-dark' : 'text-white' }}"><u>{{ __('dashboard.see_calendar') }}</u></a>
                 </span>
             </div>
         </div>
@@ -80,9 +81,9 @@
            style="text-decoration:none;">
             <span class="info-box-icon"><i class="fas fa-exclamation-triangle"></i></span>
             <div class="info-box-content">
-                <span class="info-box-text">Errori da rivedere</span>
+                <span class="info-box-text">{{ __('dashboard.errors_to_review') }}</span>
                 <span class="info-box-number">{{ $reviewErrorsCount }}</span>
-                <span class="progress-description">domande con risposte sbagliate &mdash; clicca per rivedere</span>
+                <span class="progress-description">{{ __('dashboard.errors_description') }}</span>
             </div>
         </a>
     @endif
@@ -93,9 +94,9 @@
            style="text-decoration:none;">
             <span class="info-box-icon"><i class="fas fa-brain"></i></span>
             <div class="info-box-content">
-                <span class="info-box-text">Ripasso intelligente</span>
+                <span class="info-box-text">{{ __('dashboard.smart_review_due') }}</span>
                 <span class="info-box-number">{{ $dueToday }}</span>
-                <span class="progress-description">domande da ripassare oggi &mdash; clicca per iniziare</span>
+                <span class="progress-description">{{ __('dashboard.smart_review_description') }}</span>
             </div>
         </a>
     @endif
@@ -112,26 +113,26 @@
                 <i class="fas fa-fire{{ $currentStreak === 0 ? '-alt' : '' }}"></i>
             </span>
             <div class="info-box-content">
-                <span class="info-box-text">La tua streak</span>
+                <span class="info-box-text">{{ __('dashboard.streak_title') }}</span>
                 <span class="info-box-number">
                     @if($currentStreak === 0)
-                        0 giorni
+                        0 {{ trans_choice('common.unit_days', 0) }}
                     @else
-                        {{ $currentStreak }} {{ $currentStreak === 1 ? 'giorno' : 'giorni' }}
+                        {{ $currentStreak }} {{ trans_choice('common.unit_days', $currentStreak) }}
                         @if($atRisk)
-                            <span class="badge badge-danger ml-2" style="font-size:0.7rem;">A rischio</span>
+                            <span class="badge badge-danger ml-2" style="font-size:0.7rem;">{{ __('dashboard.streak_at_risk') }}</span>
                         @endif
                     @endif
                 </span>
                 <span class="progress-description">
                     @if($currentStreak === 0)
-                        Inizia oggi! Studia qualcosa per avviare la tua streak.
+                        {{ __('dashboard.streak_start') }}
                     @elseif($atRisk)
-                        Non hai ancora studiato oggi &mdash; studia per non perdere la streak!
+                        {{ __('dashboard.streak_no_study') }}
                     @else
-                        Migliore di sempre: {{ $longestStreak }} {{ $longestStreak === 1 ? 'giorno' : 'giorni' }}
+                        {{ __('dashboard.streak_best', ['count' => $longestStreak . ' ' . trans_choice('common.unit_days', $longestStreak)]) }}
                     @endif
-                    &mdash; <u>Vedi badge</u>
+                    &mdash; <u>{{ __('dashboard.see_badges') }}</u>
                 </span>
             </div>
         </a>
@@ -143,10 +144,10 @@
            style="text-decoration:none;">
             <span class="info-box-icon"><i class="fas fa-stethoscope"></i></span>
             <div class="info-box-content">
-                <span class="info-box-text">Punto di partenza</span>
-                <span class="info-box-number" style="font-size:1rem;">Inizia con un test diagnostico</span>
+                <span class="info-box-text">{{ __('dashboard.diagnostic_prompt') }}</span>
+                <span class="info-box-number" style="font-size:1rem;">{{ __('dashboard.diagnostic_title') }}</span>
                 <span class="progress-description">
-                    Rispondi a una domanda per categoria e costruiamo il tuo piano di studio — clicca per iniziare
+                    {{ __('dashboard.diagnostic_desc') }}
                 </span>
             </div>
         </a>
@@ -156,18 +157,18 @@
         <div class="sg-card sg-mt-3">
             <div class="sg-card-body sg-text-center p-5">
                 <i class="fas fa-inbox text-muted" style="font-size:48px;"></i>
-                <h3 class="sg-mt-2">Nessun tentativo registrato</h3>
+                <h3 class="sg-mt-2">{{ __('dashboard.no_attempts') }}</h3>
                 <p class="sg-text-muted">
                     @if($isAdminView)
-                        Questo utente non ha ancora completato nessun quiz.
+                        {{ __('dashboard.no_attempts_admin') }}
                     @else
-                        Inizia a giocare un quiz per vedere le tue statistiche.
+                        {{ __('dashboard.no_attempts_self') }}
                     @endif
                 </p>
                 @unless($isAdminView)
                     {{-- entry point quiz: catalogo dei quiz confermati per iscrizione --}}
                     <a href="{{ route('quiz.confirmed.index') }}" class="sg-btn sg-btn-success sg-mt-2">
-                        <i class="fas fa-clipboard-list"></i> Scegli un quiz
+                        <i class="fas fa-clipboard-list"></i> {{ __('dashboard.start_quiz') }}
                     </a>
                 @endunless
             </div>
@@ -182,7 +183,7 @@
                     <div class="sg-stat-icon grad-blue"><i class="fas fa-clipboard-check"></i></div>
                     <div>
                         <div class="sg-stat-value">{{ $stats['total_attempts'] }}</div>
-                        <div class="sg-stat-label">Tentativi totali</div>
+                        <div class="sg-stat-label">{{ __('dashboard.kpi_total') }}</div>
                     </div>
                 </div>
             </div>
@@ -192,7 +193,7 @@
                     <div class="sg-stat-icon grad-green"><i class="fas fa-percentage"></i></div>
                     <div>
                         <div class="sg-stat-value">{{ $stats['avg_percentage'] }}%</div>
-                        <div class="sg-stat-label">Media risultato</div>
+                        <div class="sg-stat-label">{{ __('dashboard.kpi_average') }}</div>
                     </div>
                 </div>
             </div>
@@ -202,7 +203,7 @@
                     <div class="sg-stat-icon grad-orange"><i class="fas fa-trophy"></i></div>
                     <div>
                         <div class="sg-stat-value">{{ $stats['best_percentage'] }}%</div>
-                        <div class="sg-stat-label">Miglior risultato</div>
+                        <div class="sg-stat-label">{{ __('dashboard.kpi_best') }}</div>
                     </div>
                 </div>
             </div>
@@ -213,7 +214,7 @@
                     <div>
                         <div class="sg-stat-value">{{ $stats['pass_rate'] }}%</div>
                         <div class="sg-stat-label">
-                            Tasso di superamento
+                            {{ __('dashboard.kpi_pass_rate') }}
                             <small class="sg-text-muted">({{ $stats['passed_count'] }}/{{ $stats['total_attempts'] }})</small>
                         </div>
                     </div>
@@ -230,7 +231,7 @@
                     <div class="sg-stat-icon grad-blue"><i class="fas fa-stopwatch"></i></div>
                     <div>
                         <div class="sg-stat-value">{{ gmdate('i:s', $stats['avg_duration']) }}</div>
-                        <div class="sg-stat-label">Durata media</div>
+                        <div class="sg-stat-label">{{ __('dashboard.avg_duration') }}</div>
                     </div>
                 </div>
             </div>
@@ -240,7 +241,7 @@
                     <div class="sg-stat-icon grad-green"><i class="fas fa-check"></i></div>
                     <div>
                         <div class="sg-stat-value">{{ $stats['total_correct'] }}/{{ $stats['total_questions'] }}</div>
-                        <div class="sg-stat-label">Risposte corrette / totali</div>
+                        <div class="sg-stat-label">{{ __('dashboard.correct_answers') }}</div>
                     </div>
                 </div>
             </div>
@@ -252,7 +253,7 @@
                         <div class="sg-stat-value" style="font-size:1.2rem;">
                             {{ $stats['last_attempt_at'] ? \Illuminate\Support\Carbon::parse($stats['last_attempt_at'])->diffForHumans() : '—' }}
                         </div>
-                        <div class="sg-stat-label">Ultimo tentativo</div>
+                        <div class="sg-stat-label">{{ __('dashboard.last_attempt') }}</div>
                     </div>
                 </div>
             </div>
@@ -265,7 +266,7 @@
             <div class="col-12 col-md-7 sg-grid-col">
                 <div class="sg-card">
                     <div class="sg-card-header">
-                        <h2 class="sg-card-header-title">Andamento — ultimi 30 giorni</h2>
+                        <h2 class="sg-card-header-title">{{ __('dashboard.chart_trend') }}</h2>
                     </div>
                     <div class="sg-card-body">
                         <canvas id="dailyChart" height="120"></canvas>
@@ -276,7 +277,7 @@
             <div class="col-12 col-md-5 sg-grid-col">
                 <div class="sg-card">
                     <div class="sg-card-header">
-                        <h2 class="sg-card-header-title">Esiti</h2>
+                        <h2 class="sg-card-header-title">{{ __('dashboard.chart_results') }}</h2>
                     </div>
                     <div class="sg-card-body">
                         <canvas id="passChart" height="120"></canvas>
@@ -290,16 +291,16 @@
         @if(!empty($stats['avg_by_quiz']))
             <div class="sg-card sg-mt-3">
                 <div class="sg-card-header">
-                    <h2 class="sg-card-header-title">Performance per quiz</h2>
+                    <h2 class="sg-card-header-title">{{ __('dashboard.table_by_quiz') }}</h2>
                 </div>
                 <div class="table-responsive">
                     <table class="sg-table">
                         <thead>
                             <tr>
-                                <th>Quiz</th>
-                                <th class="text-right">Tentativi</th>
-                                <th class="text-right">Media %</th>
-                                <th class="text-right">Miglior %</th>
+                                <th>{{ __('dashboard.col_quiz') }}</th>
+                                <th class="text-right">{{ __('dashboard.col_attempts') }}</th>
+                                <th class="text-right">{{ __('dashboard.col_avg_pct') }}</th>
+                                <th class="text-right">{{ __('dashboard.col_best_pct') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -325,18 +326,18 @@
         @if(!empty($stats['latest_attempts']))
             <div class="sg-card sg-mt-3">
                 <div class="sg-card-header">
-                    <h2 class="sg-card-header-title">Ultimi 10 tentativi</h2>
+                    <h2 class="sg-card-header-title">{{ __('dashboard.recent_title') }}</h2>
                 </div>
                 <div class="table-responsive">
                     <table class="sg-table">
                         <thead>
                             <tr>
-                                <th>Quiz</th>
-                                <th>Data</th>
-                                <th class="text-right">Punteggio</th>
-                                <th class="text-right">%</th>
-                                <th>Esito</th>
-                                <th class="text-right">Durata</th>
+                                <th>{{ __('dashboard.col_quiz') }}</th>
+                                <th>{{ __('dashboard.col_date') }}</th>
+                                <th class="text-right">{{ __('dashboard.col_score') }}</th>
+                                <th class="text-right">{{ __('dashboard.col_pct') }}</th>
+                                <th>{{ __('dashboard.col_result') }}</th>
+                                <th class="text-right">{{ __('dashboard.col_duration') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -350,9 +351,9 @@
                                     <td class="text-right"><strong>{{ $a['percentage'] }}%</strong></td>
                                     <td>
                                         @if($a['is_passed'])
-                                            <span class="sg-badge sg-badge-success">Superato</span>
+                                            <span class="sg-badge sg-badge-success">{{ __('dashboard.passed_badge') }}</span>
                                         @else
-                                            <span class="sg-badge sg-badge-danger">Non superato</span>
+                                            <span class="sg-badge sg-badge-danger">{{ __('dashboard.failed_badge') }}</span>
                                         @endif
                                     </td>
                                     <td class="text-right sg-text-muted">
@@ -401,16 +402,16 @@
                     <img src="{{ asset('icons/icon.svg') }}" alt="ScuolaGUIDA" style="width:28px;height:28px;filter:brightness(10);">
                 </div>
                 <div>
-                    <div style="font-weight:600;">Installa l'app sul tuo dispositivo</div>
-                    <div class="text-muted" style="font-size:.85rem;">Accesso rapido, studio offline, nessun browser necessario.</div>
+                    <div style="font-weight:600;">{{ __('dashboard.pwa_title') }}</div>
+                    <div class="text-muted" style="font-size:.85rem;">{{ __('dashboard.pwa_desc') }}</div>
                 </div>
             </div>
             <div class="d-flex" style="gap:.5rem;">
                 <button class="sg-btn sg-btn-primary sg-btn-sm" @click="install()">
-                    <i class="fas fa-download"></i> Installa
+                    <i class="fas fa-download"></i> {{ __('dashboard.pwa_install') }}
                 </button>
                 <button class="sg-btn sg-btn-light sg-btn-sm" @click="dismiss()">
-                    Non ora
+                    {{ __('dashboard.pwa_dismiss') }}
                 </button>
             </div>
         </div>
@@ -424,7 +425,13 @@
 @section('js')
 @parent
 
+@php
+    // Etichette tradotte passate al JS per il countdown
+    $enrollmentsOpenLabel = __('dashboard.enrollments_open_now');
+@endphp
 <script>
+const enrollmentsOpenLabel = "{{ $enrollmentsOpenLabel }}";
+
 function countdown(targetTimestamp) {
     return {
         display: '',
@@ -436,7 +443,7 @@ function countdown(targetTimestamp) {
         update() {
             const diff = targetTimestamp - Math.floor(Date.now() / 1000);
             if (diff <= 0) {
-                this.display = 'Iscrizioni aperte';
+                this.display = enrollmentsOpenLabel;
                 clearInterval(this.intervalId);
                 return;
             }
@@ -463,7 +470,7 @@ function countdown(targetTimestamp) {
                 labels: dailyData.map(i => i.date),
                 datasets: [
                     {
-                        label: 'Media %',
+                        label: '{{ __("dashboard.chart_avg_pct") }}',
                         data: dailyData.map(i => i.avg_pct),
                         tension: 0.35,
                         borderColor: '#4361ee',
@@ -474,7 +481,7 @@ function countdown(targetTimestamp) {
                         pointRadius: 3,
                     },
                     {
-                        label: 'Tentativi',
+                        label: '{{ __("dashboard.chart_attempts") }}',
                         data: dailyData.map(i => i.attempts),
                         type: 'bar',
                         backgroundColor: '#28a74566',
@@ -488,8 +495,8 @@ function countdown(targetTimestamp) {
                 responsive: true,
                 plugins: { legend: { display: true, position: 'bottom' } },
                 scales: {
-                    y:  { beginAtZero: true, max: 100, position: 'left',  title: { display: true, text: 'Media %' } },
-                    y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Tentativi' }, grid: { drawOnChartArea: false } },
+                    y:  { beginAtZero: true, max: 100, position: 'left',  title: { display: true, text: '{{ __("dashboard.chart_avg_pct") }}' } },
+                    y1: { beginAtZero: true, position: 'right', title: { display: true, text: '{{ __("dashboard.chart_attempts") }}' }, grid: { drawOnChartArea: false } },
                     x:  { grid: { display: false } }
                 }
             }
@@ -500,7 +507,7 @@ function countdown(targetTimestamp) {
         new Chart(document.getElementById('passChart'), {
             type: 'doughnut',
             data: {
-                labels: ['Superati', 'Non superati'],
+                labels: ['{{ __("dashboard.passed") }}', '{{ __("dashboard.not_passed") }}'],
                 datasets: [{
                     data: [passed, failed],
                     backgroundColor: ['#28a745', '#dc3545'],

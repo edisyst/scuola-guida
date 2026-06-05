@@ -25,13 +25,13 @@ class SpacedRepetitionReminderNotification extends Notification implements Shoul
     public function toWebPush(object $notifiable, object $notification): WebPushMessage
     {
         $body = $this->dueCount === 1
-            ? 'Hai 1 domanda in scadenza oggi — dedicale 2 minuti!'
-            : "Hai {$this->dueCount} domande in scadenza oggi — dedicaci qualche minuto!";
+            ? __('notifications.sr_push_body_one')
+            : __('notifications.sr_push_body_many', ['count' => $this->dueCount]);
 
         return (new WebPushMessage())
-            ->title('Ripasso intelligente')
+            ->title(__('notifications.sr_push_title'))
             ->body($body)
             ->icon('/icons/icon-192.png')
-            ->action('Inizia il ripasso', route('viewer.smart-review.index'));
+            ->action(__('notifications.sr_push_action'), route('viewer.smart-review.index'));
     }
 }

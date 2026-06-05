@@ -27,7 +27,7 @@ class IscrizioneQuizApprovataNotification extends Notification implements Should
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Iscrizione al quiz approvata')
+            ->subject(__('notifications.enrollment_approved_subject'))
             ->markdown('emails.iscrizione-quiz-approvata', [
                 'user'   => $notifiable,
                 'quiz'   => $this->quiz,
@@ -38,8 +38,8 @@ class IscrizioneQuizApprovataNotification extends Notification implements Should
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Iscrizione quiz approvata',
-            'body'  => 'La tua iscrizione al quiz «' . \Illuminate\Support\Str::limit($this->quiz->title, 60) . '» è stata approvata.',
+            'title' => __('notifications.enrollment_approved_db_title'),
+            'body'  => __('notifications.enrollment_approved_db_body', ['title' => \Illuminate\Support\Str::limit($this->quiz->title, 60)]),
             'url'   => route('quiz.enrollments.mine'),
             'icon'  => 'fas fa-check-circle',
             'color' => 'success',

@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'save'    => 'Guardar',
+    'cancel'  => 'Cancelar',
+    'confirm' => 'Confirmar',
+    'back'    => 'Volver',
+    'search'  => 'Buscar',
+    'filter'  => 'Filtrar',
+    'export'  => 'Exportar',
+    'yes'     => 'Sí',
+    'no'      => 'No',
+    'loading' => 'Cargando...',
+    'actions' => 'Acciones',
+    'delete'  => 'Eliminar',
+    'edit'    => 'Editar',
+    'view'    => 'Ver',
+    'close'   => 'Cerrar',
+    'send'    => 'Enviar',
+    'update'  => 'Actualizar',
+    'play'    => 'Realizar',
+    'required' => 'obligatorio',
+    'unit_questions' => '{1} pregunta|[2,*] preguntas',
+    'unit_minutes'   => '{1} minuto|[2,*] minutos',
+    'unit_days'      => '{1} día|[2,*] días',
+    'unit_errors'    => '{1} error|[2,*] errores',
+];

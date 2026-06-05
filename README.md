@@ -82,19 +82,51 @@ L'app è raggiungibile su `http://localhost`. Per fermare lo stack: `docker comp
 
 ## Localizzazione
 
-L'interfaccia supporta **italiano** (default), **inglese** e **spagnolo**. Vengono tradotte sia
-le label statiche del menu/navbar sia tutte le pagine del viewer (quiz, simulatore, modalità
-studio con riepilogo). I dati applicativi (testo domande, categorie, iscrizioni) restano in
-italiano — la traduzione del testo delle domande è un sistema separato (Feature 7.1).
+L'interfaccia supporta **italiano** (default), **inglese** e **spagnolo**. Sono tradotte:
+- Menu/navbar (sidebar, dropdown bandierine)
+- Tutte le pagine del viewer: dashboard, gamification/badge, profilo/iscrizione anagrafica, iscrizioni quiz, notifiche, revisione errori, ripasso SM-2, modalità studio, simulatore, risultati
+- Flash messages dei flussi viewer
+- Email e notifiche in-app/webpush inviate ai viewer
+
+I dati applicativi (testo domande, categorie) restano in italiano — la traduzione del testo delle domande è un sistema separato (Feature 7.1).
+
+### Preferenza lingua e riconciliazione
+
+- **Utenti autenticati**: la lingua dell'interfaccia è letta da `users.locale` (fonte primaria). Quando l'utente cambia lingua dal dropdown, la scelta è persisted su `users.locale` e in sessione.
+- **Ospiti**: la lingua viene letta dalla sessione/cookie.
+- Notifiche e Mailable in coda vengono renderizzati nel locale dell'utente automaticamente (`User` implementa `HasLocalePreference`).
+- Il Middleware `SetLocale` è l'unico punto che chiama `App::setLocale()`.
+
+### File di traduzione
+
+Ogni locale ha i seguenti file in `lang/{locale}/`:
+
+| File | Contenuto |
+|---|---|
+| `menu.php` | Sidebar, navbar, dropdown lingua |
+| `viewer.php` | Studio, simulatore, quiz (161 chiavi) |
+| `common.php` | Bottoni condivisi, azioni, unità plurali |
+| `nav.php` | Notification bell e pagina notifiche |
+| `dashboard.php` | KPI, widget, grafici dashboard viewer |
+| `gamification.php` | Badge, streak, progressione |
+| `profile.php` | Form iscrizione anagrafica, campi, stati, TTS |
+| `enrollments.php` | Pagina "Le mie iscrizioni", stati |
+| `flags.php` | Segnalazione errori lato viewer |
+| `review.php` | Revisione errori, ripasso SM-2, diagnostico |
+| `flash.php` | Flash messages viewer |
+| `notifications.php` | Oggetti e corpi notifiche/email viewer |
+| `auth.php` | Messaggi di autenticazione |
+| `validation.php` | Messaggi di validazione form |
+| `passwords.php` | Reset password |
+| `pagination.php` | Paginazione |
 
 ### Aggiungere una nuova lingua
 
-1. Creare `lang/{code}/menu.php` con le stesse chiavi di `lang/it/menu.php`.
-2. Creare `lang/{code}/viewer.php` con le stesse chiavi di `lang/it/viewer.php`.
-3. Aggiungere un'entry in `config/locales.php` (array `supported`) con `label` e `flag`.
-4. Salvare il file SVG della bandiera in `public/images/language_flags/{code}.svg`.
+1. Creare tutti i file `lang/{code}/*.php` (copiare da `lang/it/` e tradurre).
+2. Aggiungere un'entry in `config/locales.php` (array `supported`) con `label` e `flag`.
+3. Salvare il file SVG della bandiera in `public/images/language_flags/{code}.svg`.
 
-Nessuna modifica al codice applicativo è richiesta.
+Nessuna modifica al codice applicativo è richiesta. Il fallback è sempre l'italiano.
 
 > **Nota**: la funzionalità non è compatibile con `php artisan config:cache` perché i
 > testi del menu sono tradotti a runtime dal `LangFilter` di AdminLTE, che legge i file

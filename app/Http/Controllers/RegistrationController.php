@@ -28,6 +28,6 @@ class RegistrationController extends Controller
 
         return redirect()
             ->route('profile.edit')
-            ->with('success', 'Richiesta di iscrizione inviata. Riceverai una notifica dopo la revisione dell\'amministratore.');
+            ->with('success', __('flash.registration_submitted'));
     }
 }
