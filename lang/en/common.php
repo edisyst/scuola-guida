@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'save'    => 'Save',
+    'cancel'  => 'Cancel',
+    'confirm' => 'Confirm',
+    'back'    => 'Back',
+    'search'  => 'Search',
+    'filter'  => 'Filter',
+    'export'  => 'Export',
+    'yes'     => 'Yes',
+    'no'      => 'No',
+    'loading' => 'Loading...',
+    'actions' => 'Actions',
+    'delete'  => 'Delete',
+    'edit'    => 'Edit',
+    'view'    => 'View',
+    'close'   => 'Close',
+    'send'    => 'Send',
+    'update'  => 'Update',
+    'play'    => 'Start',
+    'required' => 'required',
+    'unit_questions' => '{1} question|[2,*] questions',
+    'unit_minutes'   => '{1} minute|[2,*] minutes',
+    'unit_days'      => '{1} day|[2,*] days',
+    'unit_errors'    => '{1} error|[2,*] errors',
+];

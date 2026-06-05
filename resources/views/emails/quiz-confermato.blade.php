@@ -1,15 +1,13 @@
 @component('mail::message')
-# Nuovo quiz disponibile
+# {{ __('notifications.quiz_confirmed_mail_title') }}
 
 Ciao **{{ $user->fullAnagraphicName() }}**,
 
-il quiz **«{{ $quiz->title }}»** è stato confermato dall'amministratore ed è ora aperto alle iscrizioni.
+{{ __('notifications.quiz_confirmed_mail_body', ['title' => $quiz->title]) }}
 
 @component('mail::button', ['url' => $appUrl . '/quiz/confirmed'])
-Vai ai quiz disponibili
+{{ __('notifications.quiz_confirmed_mail_cta') }}
 @endcomponent
-
-Iscriviti per partecipare alla prossima sessione d'esame.
 
 Grazie,<br>
 {{ config('app.name') }}

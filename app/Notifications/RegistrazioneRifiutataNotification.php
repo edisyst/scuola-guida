@@ -26,7 +26,7 @@ class RegistrazioneRifiutataNotification extends Notification implements ShouldQ
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Iscrizione anagrafica rifiutata')
+            ->subject(__('notifications.reg_rejected_subject'))
             ->markdown('emails.registrazione-rifiutata', [
                 'user'        => $notifiable,
                 'motivazione' => $this->motivazione,
@@ -36,14 +36,14 @@ class RegistrazioneRifiutataNotification extends Notification implements ShouldQ
 
     public function toDatabase(object $notifiable): array
     {
-        $body = 'La tua iscrizione anagrafica è stata rifiutata.';
+        $body = __('notifications.reg_rejected_db_body');
 
         if ($this->motivazione) {
             $body .= ' Motivo: ' . \Illuminate\Support\Str::limit($this->motivazione, 60);
         }
 
         return [
-            'title' => 'Iscrizione rifiutata',
+            'title' => __('notifications.reg_rejected_db_title'),
             'body'  => $body,
             'url'   => route('profile.edit'),
             'icon'  => 'fas fa-times-circle',

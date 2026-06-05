@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Piano di studio')
+@section('title', __('review.study_plan_title'))
 
 @section('content_header')@endsection
 
@@ -9,9 +9,9 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Le categorie ordinate dalla più debole alla più forte</p>
+            <p class="sg-header-subtitle">{{ __('review.study_plan_subtitle') }}</p>
             <h1 class="sg-header-title">
-                <i class="fas fa-route mr-2"></i> Piano di studio
+                <i class="fas fa-route mr-2"></i> {{ __('review.study_plan_title') }}
             </h1>
         </div>
     </div>
@@ -21,21 +21,20 @@
         <div class="alert alert-success mb-4 d-flex align-items-center justify-content-between flex-wrap" style="gap:.5rem;">
             <div>
                 <i class="fas fa-check-circle mr-1"></i>
-                Hai completato il test diagnostico — il piano include i tuoi risultati iniziali.
+                {{ __('review.study_plan_diagnostic_done') }}
             </div>
             <a href="{{ route('viewer.diagnostic.show') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                <i class="fas fa-redo mr-1"></i> Rifai il test
+                <i class="fas fa-redo mr-1"></i> {{ __('review.study_plan_diagnostic_redo') }}
             </a>
         </div>
     @else
         <div class="alert alert-warning mb-4 d-flex align-items-center justify-content-between flex-wrap" style="gap:.5rem;">
             <div>
                 <i class="fas fa-lightbulb mr-1"></i>
-                Vuoi un punto di partenza più preciso?
-                Fai il test diagnostico per personalizzare ulteriormente il piano.
+                {{ __('review.study_plan_diagnostic_prompt') }}
             </div>
             <a href="{{ route('viewer.diagnostic.show') }}" class="sg-btn sg-btn-warning sg-btn-sm">
-                <i class="fas fa-stethoscope mr-1"></i> Fai il test diagnostico
+                <i class="fas fa-stethoscope mr-1"></i> {{ __('review.study_plan_diagnostic_cta') }}
             </a>
         </div>
     @endif
@@ -46,16 +45,15 @@
         <div class="sg-card">
             <div class="sg-card-body text-center p-5">
                 <i class="fas fa-graduation-cap text-muted" style="font-size:48px;"></i>
-                <h3 class="mt-3">Inizia il tuo percorso</h3>
+                <h3 class="mt-3">{{ __('review.study_plan_empty_title') }}</h3>
                 <p class="text-muted">
-                    Non hai ancora dati sufficienti per costruire il piano.<br>
-                    Fai il test diagnostico oppure completa il tuo primo quiz.
+                    {{ __('review.study_plan_empty_desc') }}
                 </p>
                 <a href="{{ route('viewer.diagnostic.show') }}" class="sg-btn sg-btn-primary mt-2 mr-2">
-                    <i class="fas fa-stethoscope mr-1"></i> Test diagnostico
+                    <i class="fas fa-stethoscope mr-1"></i> {{ __('review.study_plan_diagnostic_btn') }}
                 </a>
                 <a href="{{ route('study.index') }}" class="sg-btn sg-btn-outline mt-2">
-                    <i class="fas fa-graduation-cap mr-1"></i> Modalità studio
+                    <i class="fas fa-graduation-cap mr-1"></i> {{ __('menu.modalita_studio') }}
                 </a>
             </div>
         </div>
@@ -98,7 +96,7 @@
                             {{-- Statistiche --}}
                             <p class="sg-text-muted small mb-1">
                                 <i class="fas fa-clipboard-list mr-1"></i>
-                                {{ $item['attempts_count'] }} {{ Str::plural('risposta', $item['attempts_count']) }} nella storia
+                                {{ trans_choice('review.study_plan_attempts', $item['attempts_count'], ['count' => $item['attempts_count']]) }}
                             </p>
                             <p class="small mb-3">
                                 <i class="fas fa-info-circle text-muted mr-1"></i>
@@ -112,14 +110,14 @@
                                     <input type="hidden" name="source" value="category">
                                     <input type="hidden" name="category_id" value="{{ $item['category']->id }}">
                                     <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm w-100">
-                                        <i class="fas fa-play mr-1"></i> Studia ora
+                                        <i class="fas fa-play mr-1"></i> {{ __('review.study_plan_study_now') }}
                                     </button>
                                 </form>
                                 @if(($reviewCountByCategory[$item['category']->id] ?? 0) > 0)
                                     <a href="{{ route('viewer.smart-review.session', ['category_id' => $item['category']->id]) }}"
                                        class="sg-btn sg-btn-outline sg-btn-sm w-100 mt-2">
                                         <i class="fas fa-brain mr-1"></i>
-                                        Ripassa ({{ $reviewCountByCategory[$item['category']->id] }})
+                                        {{ __('review.study_plan_review_count', ['count' => $reviewCountByCategory[$item['category']->id]]) }}
                                     </a>
                                 @endif
                             </div>

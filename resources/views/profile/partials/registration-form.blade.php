@@ -9,49 +9,47 @@
 @if($isApproved)
     <div class="alert alert-success sg-mb-3">
         <i class="fas fa-check-circle"></i>
-        Sei abilitato a iscriverti agli <strong>esami ufficiali</strong> per la patente.
+        {!! __('profile.reg_approved') !!}
         @if($user->registration_reviewed_at)
             <small class="sg-text-muted d-block">
-                Approvata il {{ $user->registration_reviewed_at->format('d/m/Y H:i') }}
-                @if($user->registrationReviewer) da {{ $user->registrationReviewer->name }} @endif
+                {{ __('profile.reg_approved_on', ['date' => $user->registration_reviewed_at->format('d/m/Y H:i')]) }}
+                @if($user->registrationReviewer) {{ __('profile.reg_approved_by', ['name' => $user->registrationReviewer->name]) }} @endif
             </small>
         @endif
         <small class="d-block sg-mt-1">
             <i class="fas fa-info-circle"></i>
-            Se modifichi i dati anagrafici e li reinvii, dovrai essere nuovamente abilitato
-            dall'amministratore prima di poter partecipare a nuovi esami.
+            {!! __('profile.reg_resubmit_warn') !!}
         </small>
     </div>
 @elseif($isPending)
     <div class="alert alert-warning sg-mb-3">
         <i class="fas fa-hourglass-half"></i>
-        La tua richiesta è <strong>in attesa di approvazione</strong>.
+        {!! __('profile.reg_pending') !!}
         @if($user->registration_submitted_at)
             <small class="sg-text-muted d-block">
-                Inviata il {{ $user->registration_submitted_at->format('d/m/Y H:i') }}
+                {{ __('profile.reg_pending_sent', ['date' => $user->registration_submitted_at->format('d/m/Y H:i')]) }}
             </small>
         @endif
         <small class="d-block sg-mt-1">
-            Puoi comunque <strong>esercitarti liberamente con i quiz</strong> in attesa della revisione.
+            {!! __('profile.reg_pending_practice') !!}
         </small>
     </div>
 @elseif($isRejected)
     <div class="alert alert-danger sg-mb-3">
         <i class="fas fa-times-circle"></i>
-        La tua richiesta è stata <strong>rifiutata</strong>.
+        {!! __('profile.reg_rejected') !!}
         @if($user->registration_rejection_reason)
-            <div class="sg-mt-1"><strong>Motivo:</strong> {{ $user->registration_rejection_reason }}</div>
+            <div class="sg-mt-1"><strong>{{ __('profile.reg_rejected_reason') }}</strong> {{ $user->registration_rejection_reason }}</div>
         @endif
         <small class="d-block sg-mt-1">
-            Correggi i dati e invia nuovamente la richiesta.
+            {{ __('profile.reg_rejected_fix') }}
         </small>
     </div>
 @else
     <div class="alert alert-info sg-mb-3">
         <i class="fas fa-info-circle"></i>
-        Per iscriverti agli <strong>esami ufficiali</strong> della patente devi prima inviare i tuoi dati anagrafici
-        e attendere l'approvazione dell'amministratore.
-        Nel frattempo puoi sempre <strong>esercitarti con i quiz</strong> a piacere.
+        {!! __('profile.reg_none') !!}
+        {!! __('profile.reg_practice_meanwhile') !!}
     </div>
 @endif
 
@@ -61,7 +59,7 @@
     <div class="row">
         <div class="col-12 col-md-6">
             <div class="sg-form-group">
-                <label for="first_name" class="sg-form-label">Nome *</label>
+                <label for="first_name" class="sg-form-label">{{ __('profile.field_first_name') }} *</label>
                 <input id="first_name" name="first_name" type="text"
                        class="sg-form-control @error('first_name') is-invalid @enderror"
                        value="{{ old('first_name', $user->first_name) }}" required>
@@ -70,7 +68,7 @@
         </div>
         <div class="col-12 col-md-6">
             <div class="sg-form-group">
-                <label for="last_name" class="sg-form-label">Cognome *</label>
+                <label for="last_name" class="sg-form-label">{{ __('profile.field_last_name') }} *</label>
                 <input id="last_name" name="last_name" type="text"
                        class="sg-form-control @error('last_name') is-invalid @enderror"
                        value="{{ old('last_name', $user->last_name) }}" required>
@@ -80,18 +78,18 @@
     </div>
 
     <div class="sg-form-group">
-        <label for="address" class="sg-form-label">Indirizzo di residenza *</label>
+        <label for="address" class="sg-form-label">{{ __('profile.field_address') }} *</label>
         <input id="address" name="address" type="text"
                class="sg-form-control @error('address') is-invalid @enderror"
                value="{{ old('address', $user->address) }}" required
-               placeholder="Via, numero civico, città, CAP">
+               placeholder="{{ __('profile.field_address_ph') }}">
         @error('address')<div class="sg-form-error">{{ $message }}</div>@enderror
     </div>
 
     <div class="row">
         <div class="col-12 col-md-6">
             <div class="sg-form-group">
-                <label for="birth_date" class="sg-form-label">Data di nascita *</label>
+                <label for="birth_date" class="sg-form-label">{{ __('profile.field_birth_date') }} *</label>
                 <input id="birth_date" name="birth_date" type="date"
                        class="sg-form-control @error('birth_date') is-invalid @enderror"
                        value="{{ old('birth_date', optional($user->birth_date)->format('Y-m-d')) }}" required>
@@ -100,7 +98,7 @@
         </div>
         <div class="col-12 col-md-6">
             <div class="sg-form-group">
-                <label for="birth_place" class="sg-form-label">Luogo di nascita *</label>
+                <label for="birth_place" class="sg-form-label">{{ __('profile.field_birth_place') }} *</label>
                 <input id="birth_place" name="birth_place" type="text"
                        class="sg-form-control @error('birth_place') is-invalid @enderror"
                        value="{{ old('birth_place', $user->birth_place) }}" required>
@@ -110,7 +108,7 @@
     </div>
 
     <div class="sg-form-group">
-        <label for="fiscal_code" class="sg-form-label">Codice fiscale *</label>
+        <label for="fiscal_code" class="sg-form-label">{{ __('profile.field_fiscal_code') }} *</label>
         <input id="fiscal_code" name="fiscal_code" type="text"
                class="sg-form-control text-uppercase @error('fiscal_code') is-invalid @enderror"
                value="{{ old('fiscal_code', $user->fiscal_code) }}" required
@@ -120,36 +118,36 @@
 
     <div class="sg-form-group">
         <label for="id_document" class="sg-form-label">
-            Documento di identità @if(!$hasFile)*@endif
+            {{ __('profile.field_document') }} @if(!$hasFile)*@endif
         </label>
         @if($hasFile)
             <div class="sg-mb-1">
                 <span class="sg-badge">
-                    <i class="fas fa-paperclip"></i> Documento caricato
+                    <i class="fas fa-paperclip"></i> {{ __('profile.document_uploaded') }}
                 </span>
-                <small class="sg-text-muted">— carica un nuovo file solo se vuoi sostituirlo</small>
+                <small class="sg-text-muted">— {{ __('profile.document_replace') }}</small>
             </div>
         @endif
         <input id="id_document" name="id_document" type="file"
                class="sg-form-control @error('id_document') is-invalid @enderror"
                accept=".pdf,.jpg,.jpeg,.png" @if(!$hasFile) required @endif>
-        <small class="sg-text-muted">Formati ammessi: PDF, JPG, PNG. Dimensione massima 5 MB.</small>
+        <small class="sg-text-muted">{{ __('profile.document_formats') }}</small>
         @error('id_document')<div class="sg-form-error">{{ $message }}</div>@enderror
     </div>
 
     <button type="submit" class="sg-btn sg-btn-primary sg-mt-2"
-            @if(!$isApproved && !$isRejected && !$isPending) onclick="return confirm('Confermi l\'invio dei dati per l\'iscrizione agli esami ufficiali?');"
-            @elseif($isApproved) onclick="return confirm('Reinviando i dati perderai temporaneamente l\'abilitazione agli esami fino alla riapprovazione dell\'amministratore. Procedere?');"
+            @if(!$isApproved && !$isRejected && !$isPending) onclick="return confirm('{{ __('profile.confirm_first_send') }}');"
+            @elseif($isApproved) onclick="return confirm('{{ __('profile.confirm_reapprove') }}');"
             @endif>
         <i class="fas fa-paper-plane"></i>
         @if($isApproved)
-            Reinvia dati (richiede nuova approvazione)
+            {{ __('profile.submit_reapprove') }}
         @elseif($isPending)
-            Aggiorna richiesta in attesa
+            {{ __('profile.submit_update_pending') }}
         @elseif($isRejected)
-            Reinvia richiesta
+            {{ __('profile.submit_rejected') }}
         @else
-            Invia richiesta di iscrizione
+            {{ __('profile.submit_first') }}
         @endif
     </button>
 </form>

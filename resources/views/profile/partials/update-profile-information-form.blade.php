@@ -7,7 +7,7 @@
     @method('patch')
 
     <div class="sg-form-group">
-        <label for="name" class="sg-form-label">{{ __('Nome') }}</label>
+        <label for="name" class="sg-form-label">{{ __('profile.name_label') }}</label>
         <input id="name" name="name" type="text"
                class="sg-form-control @error('name') is-invalid @enderror"
                value="{{ old('name', $user->name) }}"
@@ -18,7 +18,7 @@
     </div>
 
     <div class="sg-form-group">
-        <label for="email" class="sg-form-label">{{ __('Email') }}</label>
+        <label for="email" class="sg-form-label">{{ __('profile.email_label') }}</label>
         <input id="email" name="email" type="email"
                class="sg-form-control @error('email') is-invalid @enderror"
                value="{{ old('email', $user->email) }}"
@@ -30,14 +30,14 @@
         @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
             <div class="sg-mt-2">
                 <p class="sg-form-hint sg-mb-1">
-                    {{ __('Il tuo indirizzo email non è verificato.') }}
+                    {{ __('profile.email_unverified') }}
                     <button form="send-verification" class="sg-btn-reset sg-link" style="font-size:.82rem;">
-                        {{ __('Clicca qui per inviare nuovamente l\'email di verifica.') }}
+                        {{ __('profile.send_verification') }}
                     </button>
                 </p>
                 @if (session('status') === 'verification-link-sent')
                     <p class="sg-text-success sg-mb-0" style="font-size:.82rem;font-weight:600;">
-                        {{ __('Un nuovo link di verifica è stato inviato al tuo indirizzo email.') }}
+                        {{ __('profile.verification_sent') }}
                     </p>
                 @endif
             </div>
@@ -45,6 +45,6 @@
     </div>
 
     <button type="submit" class="sg-btn sg-btn-primary sg-mt-2">
-        <i class="fas fa-save"></i> {{ __('Salva') }}
+        <i class="fas fa-save"></i> {{ __('common.save') }}
     </button>
 </form>

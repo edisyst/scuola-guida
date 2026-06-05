@@ -14,10 +14,10 @@ class SetLocale
         $supported = array_keys(config('locales.supported', []));
         $default   = config('locales.default', 'it');
 
-        // Priorità: sessione (click bandierina) → users.locale (Feature 7.1) → default.
-        // Non scrive in sessione: solo LocaleController::switch() lo fa esplicitamente.
-        $locale = $request->session()->get('app_locale')
-            ?? ($request->user()?->locale)
+        // Per i loggati: users.locale ha priorità (fonte di verità persistita).
+        // Per gli ospiti: sessione/cookie. LocaleController::switch() aggiorna entrambi.
+        $locale = ($request->user()?->locale)
+            ?? $request->session()->get('app_locale')
             ?? $default;
 
         App::setLocale(in_array($locale, $supported) ? $locale : $default);

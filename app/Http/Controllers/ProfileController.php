@@ -72,7 +72,7 @@ class ProfileController extends Controller
         $user->save();
 
         return Redirect::route('profile.edit')
-            ->with('success', 'Preferenze di accessibilità aggiornate.');
+            ->with('success', __('flash.accessibility_updated'));
     }
 
     /**

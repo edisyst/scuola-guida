@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Domande salvate')
+@section('title', __('review.bookmarks_title'))
 
 @section('content_header')@endsection
 
@@ -9,8 +9,8 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Il tuo studio</p>
-            <h1 class="sg-header-title">Domande salvate</h1>
+            <p class="sg-header-subtitle">{{ __('review.bookmarks_subtitle') }}</p>
+            <h1 class="sg-header-title">{{ __('review.bookmarks_title') }}</h1>
         </div>
         <div class="sg-header-actions">
             @if($bookmarks->total() > 0)
@@ -18,7 +18,7 @@
                     @csrf
                     <input type="hidden" name="source" value="bookmarks">
                     <button type="submit" class="sg-btn sg-btn-primary">
-                        <i class="fas fa-play"></i> Studia le domande salvate
+                        <i class="fas fa-play"></i> {{ __('review.bookmarks_study_btn') }}
                     </button>
                 </form>
             @endif
@@ -30,7 +30,7 @@
         <div class="card-body py-2">
             <form action="{{ route('bookmarks.index') }}" method="GET" class="form-inline">
                 <select name="category_id" class="form-control form-control-sm mr-2 mb-1">
-                    <option value="">Tutte le categorie</option>
+                    <option value="">{{ __('review.bookmarks_all_cat') }}</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}"
                             {{ request('category_id') == $category->id ? 'selected' : '' }}>
@@ -41,10 +41,10 @@
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       placeholder="Cerca nel testo..."
+                       placeholder="{{ __('review.bookmarks_search_ph') }}"
                        class="form-control form-control-sm mr-2 mb-1">
                 <button type="submit" class="btn btn-sm btn-primary mr-1 mb-1">
-                    <i class="fas fa-search"></i> Filtra
+                    <i class="fas fa-search"></i> {{ __('common.filter') }}
                 </button>
                 <a href="{{ route('bookmarks.index') }}" class="btn btn-sm btn-outline-secondary mb-1">
                     <i class="fas fa-times"></i> Reset
@@ -57,9 +57,9 @@
     @if($bookmarks->isEmpty())
         <div class="text-center py-5 text-muted">
             <i class="far fa-bookmark fa-3x mb-3"></i>
-            <p class="mb-1">Non hai ancora salvato nessuna domanda.</p>
+            <p class="mb-1">{{ __('review.bookmarks_no_saved') }}</p>
             <a href="{{ route('study.index') }}" class="btn btn-sm btn-outline-primary mt-2">
-                <i class="fas fa-graduation-cap"></i> Vai alla modalità studio
+                <i class="fas fa-graduation-cap"></i> {{ __('review.bookmarks_go_study') }}
             </a>
         </div>
     @else
@@ -74,7 +74,7 @@
                     <span></span>
                 @endif
                 <small class="text-muted">
-                    Salvata il {{ $question->pivot->created_at->format('d/m/Y') }}
+                    {{ __('review.bookmarks_saved_on', ['date' => $question->pivot->created_at->format('d/m/Y')]) }}
                 </small>
             </div>
             <div class="card-body">
@@ -83,18 +83,18 @@
                 @if($question->image)
                     <div class="mb-3">
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($question->image) }}"
-                             alt="Immagine domanda"
+                             alt="{{ __('review.bookmarks_image_alt') }}"
                              class="img-fluid rounded"
                              style="max-height: 150px; object-fit: cover;">
                     </div>
                 @endif
 
                 <p class="mb-2">
-                    Risposta corretta:
+                    {{ __('review.bookmarks_correct_answer') }}
                     @if($question->is_true)
-                        <strong class="text-success"><i class="fas fa-check"></i> Vero</strong>
+                        <strong class="text-success"><i class="fas fa-check"></i> {{ __('viewer.answer_true_full') }}</strong>
                     @else
-                        <strong class="text-danger"><i class="fas fa-times"></i> Falso</strong>
+                        <strong class="text-danger"><i class="fas fa-times"></i> {{ __('viewer.answer_false_full') }}</strong>
                     @endif
                 </p>
 

@@ -1,12 +1,12 @@
 @component('mail::message')
-# Iscrizione al quiz riaperta
+# {{ __('notifications.enrollment_reopened_mail_title') }}
 
 Ciao **{{ $user->fullAnagraphicName() }}**,
 
-l'amministratore ha **riaperto** una nuova iscrizione per il quiz **«{{ $quiz->title }}»**. Puoi quindi svolgerlo nuovamente quando preferisci.
+{{ __('notifications.enrollment_reopened_mail_body', ['title' => $quiz->title]) }}
 
 @component('mail::button', ['url' => $appUrl . '/quiz/enrollments'])
-Vai alle mie iscrizioni
+{{ __('notifications.enrollment_reopened_mail_cta') }}
 @endcomponent
 
 Grazie,<br>

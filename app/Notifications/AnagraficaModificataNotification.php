@@ -26,7 +26,7 @@ class AnagraficaModificataNotification extends Notification implements ShouldQue
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Anagrafica modificata — richiesta nuova revisione')
+            ->subject(__('notifications.anagrafica_modified_subject'))
             ->markdown('emails.anagrafica-modificata', [
                 'admin'  => $notifiable,
                 'viewer' => $this->viewer,
@@ -37,7 +37,7 @@ class AnagraficaModificataNotification extends Notification implements ShouldQue
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Anagrafica modificata',
+            'title' => __('notifications.anagrafica_modified_db_title'),
             'body'  => $this->viewer->fullAnagraphicName() . ' ha modificato i dati anagrafici dopo l\'approvazione: nuova revisione richiesta.',
             'url'   => route('admin.registrations.show', $this->viewer),
             'icon'  => 'fas fa-exclamation-triangle',

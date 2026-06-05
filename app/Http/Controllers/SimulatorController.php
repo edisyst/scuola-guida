@@ -37,7 +37,7 @@ class SimulatorController extends Controller
 
         if ($questions->isEmpty()) {
             return redirect()->route('simulator.index')
-                ->with('error', 'Non ci sono domande disponibili per avviare il simulatore.');
+                ->with('error', __('flash.sim_no_questions'));
         }
 
         $this->service->startSession(auth()->id(), $questions);
@@ -49,7 +49,7 @@ class SimulatorController extends Controller
     {
         if (!$this->service->hasActiveSession()) {
             return redirect()->route('simulator.index')
-                ->with('warning', 'Sessione scaduta. Avvia una nuova simulazione.');
+                ->with('warning', __('flash.sim_expired'));
         }
 
         $attempt   = QuizAttempt::findOrFail($this->service->currentAttemptId());
@@ -145,7 +145,7 @@ class SimulatorController extends Controller
         $this->badgeService->checkAllBadges($user);
 
         return redirect()->route('simulator.result', $attempt)
-            ->with('success', 'Simulazione completata. Ecco il tuo risultato.');
+            ->with('success', __('flash.sim_completed'));
     }
 
     public function result(QuizAttempt $attempt): View
@@ -162,7 +162,7 @@ class SimulatorController extends Controller
         $this->service->clearSession();
 
         return redirect()->route('simulator.index')
-            ->with('info', 'Simulazione annullata.');
+            ->with('info', __('flash.sim_abandoned'));
     }
 
     private function authorizeAttempt(QuizAttempt $attempt): void

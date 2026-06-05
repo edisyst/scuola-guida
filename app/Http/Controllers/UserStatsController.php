@@ -90,6 +90,6 @@ class UserStatsController extends Controller
             ? route('admin.users.stats', $user)
             : ($isSelf ? route('dashboard') : route('admin.users.stats', $user));
 
-        return redirect($back)->with('success', 'Statistiche aggiornate');
+        return redirect($back)->with('success', __('flash.stats_refreshed'));
     }
 }

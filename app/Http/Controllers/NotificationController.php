@@ -32,13 +32,13 @@ class NotificationController extends Controller
 
         $notification->delete();
 
-        return back()->with('success', 'Notifica eliminata.');
+        return back()->with('success', __('flash.notification_deleted'));
     }
 
     public function destroyAll(Request $request)
     {
         $request->user()->notifications()->delete();
 
-        return back()->with('success', 'Tutte le notifiche sono state eliminate.');
+        return back()->with('success', __('flash.notifications_all_deleted'));
     }
 }

@@ -27,7 +27,7 @@ class IscrizioneQuizRifiutataNotification extends Notification implements Should
     {
         /** @var User $notifiable */
         return (new MailMessage())
-            ->subject('Iscrizione al quiz rifiutata')
+            ->subject(__('notifications.enrollment_rejected_subject'))
             ->markdown('emails.iscrizione-quiz-rifiutata', [
                 'user'        => $notifiable,
                 'quiz'        => $this->quiz,
@@ -38,14 +38,14 @@ class IscrizioneQuizRifiutataNotification extends Notification implements Should
 
     public function toDatabase(object $notifiable): array
     {
-        $body = 'Iscrizione al quiz «' . \Illuminate\Support\Str::limit($this->quiz->title, 40) . '» rifiutata.';
+        $body = __('notifications.enrollment_rejected_db_body', ['title' => \Illuminate\Support\Str::limit($this->quiz->title, 40)]);
 
         if ($this->motivazione) {
             $body .= ' Motivo: ' . \Illuminate\Support\Str::limit($this->motivazione, 40);
         }
 
         return [
-            'title' => 'Iscrizione quiz rifiutata',
+            'title' => __('notifications.enrollment_rejected_db_title'),
             'body'  => $body,
             'url'   => route('quiz.enrollments.mine'),
             'icon'  => 'fas fa-times-circle',

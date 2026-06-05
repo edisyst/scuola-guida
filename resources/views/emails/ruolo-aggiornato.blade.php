@@ -1,5 +1,5 @@
 @component('mail::message')
-# Ruolo aggiornato
+# {{ __('notifications.role_updated_db_title') }}
 
 Ciao **{{ $user->name }}**,
 

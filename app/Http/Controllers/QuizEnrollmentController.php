@@ -53,7 +53,7 @@ class QuizEnrollmentController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Richiesta di iscrizione inviata. Attendi l\'approvazione.');
+        return back()->with('success', __('flash.enrollment_requested'));
     }
 
     /**

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Revisione errori')
+@section('title', __('review.title'))
 
 @section('content_header')@endsection
 
@@ -9,12 +9,12 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Il tuo studio</p>
+            <p class="sg-header-subtitle">{{ __('review.your_study') }}</p>
             <h1 class="sg-header-title">
-                <i class="fas fa-exclamation-triangle mr-2"></i>Revisione errori
+                <i class="fas fa-exclamation-triangle mr-2"></i>{{ __('review.title') }}
             </h1>
             <p class="sg-text-muted sg-mt-1">
-                Domande che hai risposto in modo errato negli ultimi tentativi
+                {{ __('review.subtitle') }}
             </p>
         </div>
     </div>
@@ -26,7 +26,7 @@
 
                 <div class="col-auto mb-1">
                     <select name="category_id" class="form-control form-control-sm">
-                        <option value="">Tutte le categorie</option>
+                        <option value="">{{ __('review.all_categories') }}</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}"
                                 {{ $categoryId === $category->id ? 'selected' : '' }}>
@@ -41,7 +41,7 @@
                     <select name="last_attempts" class="form-control form-control-sm">
                         @foreach([10, 20, 30, 50] as $n)
                             <option value="{{ $n }}" {{ $lastAttempts === $n ? 'selected' : '' }}>
-                                Ultimi {{ $n }} tentativi
+                                {{ __('review.last_n_attempts', ['n' => $n]) }}
                             </option>
                         @endforeach
                     </select>
@@ -55,7 +55,7 @@
                                {{ $showLearned ? 'checked' : '' }}
                                onchange="this.form.submit()">
                         <label class="form-check-label" for="show_learned">
-                            Mostra solo le imparate
+                            {{ __('review.show_learned') }}
                             @if($learnedCount > 0)
                                 <span class="badge badge-secondary ml-1">{{ $learnedCount }}</span>
                             @endif
@@ -66,7 +66,7 @@
                 @unless($showLearned)
                 <div class="col-auto mb-1">
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <i class="fas fa-search"></i> Filtra
+                        <i class="fas fa-search"></i> {{ __('common.filter') }}
                     </button>
                     <a href="{{ route('viewer.review-errors.index') }}" class="btn btn-sm btn-outline-secondary ml-1">
                         <i class="fas fa-times"></i> Reset
@@ -83,23 +83,23 @@
         <div class="text-center py-5 text-muted">
             @if($showLearned)
                 <i class="fas fa-graduation-cap fa-3x mb-3"></i>
-                <p class="mb-1 font-weight-bold">Nessuna domanda marcata come imparata.</p>
-                <p class="mb-3">Usa il pulsante "Marca come imparata" sulla lista degli errori per archiviarle qui.</p>
+                <p class="mb-1 font-weight-bold">{{ __('review.no_learned') }}</p>
+                <p class="mb-3">{{ __('review.no_learned_tip') }}</p>
                 <a href="{{ route('viewer.review-errors.index') }}" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-exclamation-triangle"></i> Vedi errori da rivedere
+                    <i class="fas fa-exclamation-triangle"></i> {{ __('review.see_errors') }}
                 </a>
             @else
                 <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
-                <p class="mb-1 font-weight-bold">Nessun errore da rivedere.</p>
+                <p class="mb-1 font-weight-bold">{{ __('review.no_errors') }}</p>
                 <p class="mb-3 text-muted">
                     @if($categoryId)
-                        Nessun errore trovato per questa categoria negli ultimi {{ $lastAttempts }} tentativi.
+                        {{ __('review.no_errors_category', ['n' => $lastAttempts]) }}
                     @else
-                        Non hai ancora completato tentativi sufficienti, oppure hai risposto correttamente a tutto.
+                        {{ __('review.no_errors_general') }}
                     @endif
                 </p>
                 <a href="{{ route('study.index') }}" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-graduation-cap"></i> Vai alla modalità studio
+                    <i class="fas fa-graduation-cap"></i> {{ __('review.go_study') }}
                 </a>
             @endif
         </div>
@@ -138,23 +138,23 @@
                     @endif
                     @if($errorCount !== null)
                         <span class="badge {{ $badgeClass }}">
-                            Sbagliata {{ $errorCount }} {{ $errorCount === 1 ? 'volta' : 'volte' }}
+                            {{ trans_choice('review.wrong_n_times', $errorCount, ['count' => $errorCount]) }}
                         </span>
                     @else
                         <span class="badge badge-success">
-                            <i class="fas fa-graduation-cap"></i> Imparata
+                            <i class="fas fa-graduation-cap"></i> {{ __('review.mark_learned') }}
                         </span>
                     @endif
                     @if($isHistorical)
                         <span class="badge badge-secondary ml-1"
                               data-toggle="tooltip"
-                              title="La domanda è stata modificata dopo il tuo ultimo errore. Stai vedendo il testo originale che hai risposto.">
-                            <i class="fas fa-history"></i> Versione storica
+                              title="{{ __('viewer.quiz.historical_tooltip') }}">
+                            <i class="fas fa-history"></i> {{ __('viewer.quiz.historical_badge') }}
                         </span>
                     @endif
                 </div>
                 @if($lastWrongAt)
-                    <small class="text-muted">Ultimo sbaglio: {{ $lastWrongAt->diffForHumans() }}</small>
+                    <small class="text-muted">{{ __('review.last_wrong') }} {{ $lastWrongAt->diffForHumans() }}</small>
                 @endif
             </div>
             <div class="card-body py-2">
@@ -165,18 +165,18 @@
                     {{ Str::limit($displayVersion->question, 120) }}
                 </p>
                 <small class="text-muted">
-                    Risposta corretta:
+                    {{ __('review.correct_answer_label') }}
                     @if($displayVersion->is_true)
-                        <strong class="text-success"><i class="fas fa-check"></i> Vero</strong>
+                        <strong class="text-success"><i class="fas fa-check"></i> {{ __('viewer.answer_true_full') }}</strong>
                     @else
-                        <strong class="text-danger"><i class="fas fa-times"></i> Falso</strong>
+                        <strong class="text-danger"><i class="fas fa-times"></i> {{ __('viewer.answer_false_full') }}</strong>
                     @endif
                 </small>
             </div>
             <div class="card-footer py-2 d-flex justify-content-between align-items-center">
                 <a href="{{ route('study.index', ['category_id' => $question->category_id]) }}"
                    class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-graduation-cap"></i> Studia questa categoria
+                    <i class="fas fa-graduation-cap"></i> {{ __('review.study_category') }}
                 </a>
 
                 @if($isLearned)
@@ -189,8 +189,8 @@
                             @method('DELETE')
                             <button type="button"
                                     class="btn btn-sm btn-outline-secondary"
-                                    @click="if(confirm('Reinserire questa domanda tra gli errori da rivedere?')) $refs.unmarkForm.submit()">
-                                <i class="fas fa-undo"></i> Reinserisci negli errori
+                                    @click="if(confirm('{{ __('review.unmark_confirm') }}')) $refs.unmarkForm.submit()">
+                                <i class="fas fa-undo"></i> {{ __('review.unmark_learned') }}
                             </button>
                         </form>
                     </div>
@@ -203,8 +203,8 @@
                             @csrf
                             <button type="button"
                                     class="btn btn-sm btn-outline-success"
-                                    @click="if(confirm('Marcare questa domanda come imparata? Verrà esclusa dalla lista degli errori.')) $refs.markForm.submit()">
-                                <i class="fas fa-graduation-cap"></i> Marca come imparata
+                                    @click="if(confirm('{{ __('review.mark_confirm') }}')) $refs.markForm.submit()">
+                                <i class="fas fa-graduation-cap"></i> {{ __('review.mark_learned') }}
                             </button>
                         </form>
                     </div>
@@ -216,12 +216,12 @@
         {{-- Riepilogo --}}
         <div class="text-muted small mt-3 mb-2">
             @if($showLearned)
-                {{ $errors->count() }} domanda{{ $errors->count() === 1 ? '' : 'e' }} già marcata{{ $errors->count() === 1 ? '' : 'e' }} come imparata{{ $errors->count() === 1 ? '' : 'e' }}.
+                {{ trans_choice('review.learned_count', $errors->count(), ['count' => $errors->count()]) }}.
             @else
-                <strong>{{ $errors->count() }}</strong> errore{{ $errors->count() === 1 ? '' : 'i' }} da rivedere
+                <strong>{{ $errors->count() }}</strong> {{ trans_choice('review.errors_count', $errors->count(), ['count' => $errors->count()]) }}
                 @if($learnedCount > 0)
-                    &mdash; <strong>{{ $learnedCount }}</strong> domanda{{ $learnedCount === 1 ? '' : 'e' }} già marcata{{ $learnedCount === 1 ? '' : 'e' }} come imparata{{ $learnedCount === 1 ? '' : 'e' }}
-                    (<a href="{{ route('viewer.review-errors.index', ['show_learned' => 1] + ($categoryId ? ['category_id' => $categoryId] : [])) }}">vedi</a>).
+                    &mdash; <strong>{{ $learnedCount }}</strong> {{ trans_choice('review.learned_count', $learnedCount, ['count' => $learnedCount]) }}
+                    (<a href="{{ route('viewer.review-errors.index', ['show_learned' => 1] + ($categoryId ? ['category_id' => $categoryId] : [])) }}">{{ __('review.see_learned') }}</a>).
                 @endif
             @endif
         </div>

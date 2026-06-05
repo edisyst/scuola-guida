@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'I miei tentativi')
+@section('title', __('enrollments.attempts_title'))
 
 @section('content_header')@endsection
 
@@ -9,13 +9,13 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Storico delle sessioni</p>
-            <h1 class="sg-header-title">I miei tentativi</h1>
+            <p class="sg-header-subtitle">{{ __('enrollments.attempts_subtitle') }}</p>
+            <h1 class="sg-header-title">{{ __('enrollments.attempts_title') }}</h1>
         </div>
         <div class="sg-header-actions">
             {{-- entry point quiz: catalogo dei quiz confermati per iscrizione --}}
             <a href="{{ route('quiz.confirmed.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                <i class="fas fa-clipboard-list"></i> Scegli un quiz
+                <i class="fas fa-clipboard-list"></i> {{ __('dashboard.start_quiz') }}
             </a>
         </div>
     </div>
@@ -23,10 +23,10 @@
     <div class="sg-card">
         @if($attempts->isEmpty())
             <div class="sg-table-empty">
-                <p class="sg-mb-2">Nessun tentativo ancora registrato.</p>
+                <p class="sg-mb-2">{{ __('enrollments.no_attempts') }}</p>
                 {{-- entry point quiz: catalogo dei quiz confermati per iscrizione --}}
                 <a href="{{ route('quiz.confirmed.index') }}" class="sg-btn sg-btn-primary">
-                    <i class="fas fa-clipboard-list"></i> Scegli un quiz
+                    <i class="fas fa-clipboard-list"></i> {{ __('dashboard.start_quiz') }}
                 </a>
             </div>
         @else
@@ -35,12 +35,12 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Quiz</th>
-                            <th>Punteggio</th>
-                            <th>%</th>
-                            <th>Esito</th>
-                            <th>Durata</th>
-                            <th>Data</th>
+                            <th>{{ __('dashboard.col_quiz') }}</th>
+                            <th>{{ __('dashboard.col_score') }}</th>
+                            <th>{{ __('dashboard.col_pct') }}</th>
+                            <th>{{ __('dashboard.col_result') }}</th>
+                            <th>{{ __('dashboard.col_duration') }}</th>
+                            <th>{{ __('dashboard.col_date') }}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -56,9 +56,9 @@
                                 <td>{{ $attempt->percentage }}%</td>
                                 <td>
                                     @if($attempt->is_passed)
-                                        <span class="sg-badge sg-badge-success">Superato</span>
+                                        <span class="sg-badge sg-badge-success">{{ __('dashboard.passed_badge') }}</span>
                                     @else
-                                        <span class="sg-badge sg-badge-danger">Non superato</span>
+                                        <span class="sg-badge sg-badge-danger">{{ __('dashboard.failed_badge') }}</span>
                                     @endif
                                 </td>
                                 <td class="sg-text-muted">
@@ -70,7 +70,7 @@
                                 <td>
                                     <a href="{{ route('quiz.attempts.show', $attempt) }}"
                                        class="sg-btn sg-btn-outline sg-btn-sm">
-                                        Dettaglio
+                                        {{ __('enrollments.detail_btn') }}
                                     </a>
                                 </td>
                             </tr>

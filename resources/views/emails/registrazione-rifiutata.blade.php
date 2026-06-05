@@ -1,9 +1,9 @@
 @component('mail::message')
-# Iscrizione anagrafica rifiutata
+# {{ __('notifications.reg_rejected_mail_title') }}
 
 Ciao **{{ $user->fullAnagraphicName() }}**,
 
-l'amministratore ha **rifiutato** la tua richiesta di iscrizione anagrafica.
+{{ __('notifications.reg_rejected_mail_body') }}
 
 @if (!empty($motivazione))
 **Motivazione:**
@@ -11,10 +11,8 @@ l'amministratore ha **rifiutato** la tua richiesta di iscrizione anagrafica.
 > {{ $motivazione }}
 @endif
 
-Puoi correggere i dati dal tuo profilo e reinviare la richiesta per una nuova revisione.
-
 @component('mail::button', ['url' => $appUrl . '/profile'])
-Aggiorna i tuoi dati
+{{ __('notifications.reg_rejected_mail_cta') }}
 @endcomponent
 
 Grazie,<br>

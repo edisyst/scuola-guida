@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', 'I miei badge')
+@section('title', __('gamification.title'))
 @section('content_header')@endsection
 
 @section('content')
@@ -7,14 +7,14 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Traguardi e riconoscimenti</p>
+            <p class="sg-header-subtitle">{{ __('gamification.subtitle') }}</p>
             <h1 class="sg-header-title">
-                <i class="fas fa-award mr-2"></i> I miei badge
+                <i class="fas fa-award mr-2"></i> {{ __('gamification.title') }}
             </h1>
         </div>
         <div class="sg-header-actions">
             <a href="{{ route('dashboard') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                <i class="fas fa-arrow-left"></i> Dashboard
+                <i class="fas fa-arrow-left"></i> {{ __('gamification.back_dashboard') }}
             </a>
         </div>
     </div>
@@ -29,10 +29,10 @@
                 <div>
                     <div class="sg-stat-value">{{ $currentStreak }}</div>
                     <div class="sg-stat-label">
-                        Streak attuale
+                        {{ __('gamification.current_streak') }}
                         @if($currentStreak > 0)
                             <small class="sg-text-muted d-block">
-                                {{ $currentStreak === 1 ? 'giorno' : 'giorni' }} consecutivi
+                                {{ trans_choice('gamification.consecutive_days', $currentStreak) }}
                             </small>
                         @endif
                     </div>
@@ -48,8 +48,8 @@
                 <div>
                     <div class="sg-stat-value">{{ $longestStreak }}</div>
                     <div class="sg-stat-label">
-                        Streak record
-                        <small class="sg-text-muted d-block">migliore di sempre</small>
+                        {{ __('gamification.streak_record') }}
+                        <small class="sg-text-muted d-block">{{ __('gamification.streak_best') }}</small>
                     </div>
                 </div>
             </div>
@@ -63,8 +63,8 @@
                 <div>
                     <div class="sg-stat-value">{{ $earnedBadges->count() }} / {{ count($allBadges) }}</div>
                     <div class="sg-stat-label">
-                        Badge ottenuti
-                        <small class="sg-text-muted d-block">su {{ count($allBadges) }} disponibili</small>
+                        {{ __('gamification.badges_earned') }}
+                        <small class="sg-text-muted d-block">{{ __('gamification.badges_of', ['total' => count($allBadges)]) }}</small>
                     </div>
                 </div>
             </div>
@@ -77,7 +77,7 @@
         <div class="sg-card sg-mt-2 mb-4">
             <div class="sg-card-body py-3">
                 <div class="d-flex justify-content-between mb-1">
-                    <small class="font-weight-bold">Progressione badge</small>
+                    <small class="font-weight-bold">{{ __('gamification.badge_progress') }}</small>
                     <small class="text-muted">{{ $pct }}%</small>
                 </div>
                 <div class="progress" style="height: 10px;">
@@ -110,12 +110,12 @@
                         @if($earned)
                             <span class="badge badge-{{ $badge['color'] }}">
                                 <i class="fas fa-check-circle mr-1"></i>
-                                Ottenuto il {{ $earned->earned_at->format('d/m/Y') }}
+                                {{ __('gamification.earned_on', ['date' => $earned->earned_at->format('d/m/Y')]) }}
                             </span>
                         @else
                             <span class="badge badge-secondary">
                                 <i class="fas fa-lock mr-1"></i>
-                                Non ancora ottenuto
+                                {{ __('gamification.not_yet_earned') }}
                             </span>
                         @endif
                     </div>
@@ -128,12 +128,12 @@
         <div class="sg-card sg-mt-3">
             <div class="sg-card-body sg-text-center p-5">
                 <i class="fas fa-award fa-3x text-muted mb-3"></i>
-                <h3 class="sg-mt-2">Nessun badge ancora</h3>
+                <h3 class="sg-mt-2">{{ __('gamification.no_badges_title') }}</h3>
                 <p class="sg-text-muted">
-                    Continua a studiare e completa i quiz per sbloccare i tuoi primi badge!
+                    {{ __('gamification.no_badges_text') }}
                 </p>
                 <a href="{{ route('study.index') }}" class="sg-btn sg-btn-primary sg-mt-2">
-                    <i class="fas fa-graduation-cap mr-1"></i> Vai allo studio
+                    <i class="fas fa-graduation-cap mr-1"></i> {{ __('gamification.go_study') }}
                 </a>
             </div>
         </div>
