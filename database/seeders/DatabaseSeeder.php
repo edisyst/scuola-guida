@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             AdminUserSeeder::class,
             UserSeeder::class,
+            LicenseTypeSeeder::class,
             CategorySeeder::class,
             QuestionSeeder::class,
             QuizSeeder::class,

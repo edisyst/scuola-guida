@@ -19,6 +19,7 @@ use App\Http\Controllers\UserStatsController;
 use App\Http\Controllers\Admin\CategoryMaterialController;
 use App\Http\Controllers\Admin\QuestionReportController;
 use App\Http\Controllers\Admin\CategoryTranslationController;
+use App\Http\Controllers\Admin\LicenseTypeController;
 use App\Http\Controllers\Admin\QuestionTranslationController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -395,6 +396,11 @@ Route::middleware(['auth', '2fa'])
                 ->name('instructors.assign');
             Route::delete('instructors/{instructor}/students/{student}', [InstructorAssignmentController::class, 'unassign'])
                 ->name('instructors.unassign');
+
+            // TIPI DI PATENTE (Feature 8.0)
+            Route::resource('license-types', LicenseTypeController::class);
+            Route::post('license-types/{license_type}/sync-categories', [LicenseTypeController::class, 'syncCategories'])
+                ->name('license-types.sync-categories');
         });
     });
 

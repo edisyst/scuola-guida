@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Question;
 use App\Models\Category;
 use App\Models\Quiz;
+use App\Models\LicenseType;
 use App\Models\AuditLog;
 use App\Models\QuestionReport;
 use Illuminate\Support\Facades\View;
@@ -23,6 +24,7 @@ use App\Observers\CategoryTranslationObserver;
 use App\Observers\QuestionTranslationObserver;
 use App\Observers\QuizObserver;
 use App\Observers\UserObserver;
+use App\Observers\LicenseTypeObserver;
 use App\Listeners\SendBackupFailedNotification;
 use Spatie\Backup\Events\BackupHasFailed;
 
@@ -55,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
         Question::observe(QuestionObserver::class);
         Category::observe(CategoryObserver::class);
         User::observe(UserObserver::class);
+        LicenseType::observe(LicenseTypeObserver::class);
         \App\Models\CategoryMaterial::observe(CategoryMaterialObserver::class);
         InstructorNote::observe(InstructorNoteObserver::class);
         \App\Models\QuestionTranslation::observe(QuestionTranslationObserver::class);

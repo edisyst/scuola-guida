@@ -6,6 +6,7 @@ use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Quiz extends Model
 {
@@ -26,6 +27,7 @@ class Quiz extends Model
         'status',
         'confirmed_at',
         'confirmed_by',
+        'license_type_id',
         'max_questions',
         'time_limit',
         'max_errors',
@@ -192,5 +194,10 @@ class Quiz extends Model
     public function confirmedBy()
     {
         return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    public function licenseType(): BelongsTo
+    {
+        return $this->belongsTo(LicenseType::class);
     }
 }

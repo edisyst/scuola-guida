@@ -51,6 +51,7 @@ return [
     'categorie'               => 'Categorie',
     'domande'                 => 'Domande',
     'segnalazioni'            => 'Segnalazioni',
+    'tipi_patente'            => 'Tipi di patente',
     'quizzes'                 => 'Quizzes',
     'i_miei_studenti'         => 'I miei studenti',
     'gestione_istruttori'     => 'Gestione istruttori',
