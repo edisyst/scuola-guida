@@ -92,7 +92,7 @@
                     <div class="form-group">
                         <label for="locale">Lingua</label>
                         <select name="locale" id="locale"
-                                class="form-control @error('locale') is-invalid @enderror" required>
+                                class="sg-form-control @error('locale') is-invalid @enderror" required>
                             @foreach($available as $code => $label)
                                 <option value="{{ $code }}" @selected(old('locale') === $code)>
                                     {{ $label }} ({{ $code }})
