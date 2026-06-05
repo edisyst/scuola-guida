@@ -73,4 +73,42 @@ return [
     'delete_section'        => 'Eliminar cuenta',
     'profile_updated'       => 'Perfil actualizado con éxito.',
     'password_updated'      => 'Contraseña actualizada con éxito.',
+
+    // Formulario de información del perfil
+    'name_label'          => 'Nombre',
+    'email_label'         => 'Correo electrónico',
+    'email_unverified'    => 'Tu dirección de correo electrónico no está verificada.',
+    'send_verification'   => 'Haz clic aquí para reenviar el correo de verificación.',
+    'verification_sent'   => 'Se ha enviado un nuevo enlace de verificación a tu dirección de correo.',
+
+    // Formulario de contraseña
+    'current_password'    => 'Contraseña actual',
+    'new_password'        => 'Nueva contraseña',
+    'confirm_password'    => 'Confirmar contraseña',
+    'update_password_btn' => 'Actualizar contraseña',
+
+    // Eliminar cuenta
+    'delete_account'             => 'Eliminar cuenta',
+    'delete_account_desc'        => 'Una vez eliminada tu cuenta, todos sus recursos y datos serán eliminados permanentemente. Antes de continuar, descarga los datos que desees conservar.',
+    'delete_account_confirm_title' => '¿Seguro que deseas eliminar tu cuenta?',
+    'delete_account_confirm_desc'  => 'Una vez eliminada tu cuenta, todos sus recursos y datos serán eliminados permanentemente. Introduce tu contraseña para confirmar la eliminación.',
+
+    // 2FA
+    'twofa_active_since'      => '2FA activo desde :date.',
+    'twofa_disable_btn'       => 'Desactivar 2FA',
+    'twofa_regenerate_btn'    => 'Regenerar códigos de recuperación',
+    'twofa_disable_title'     => 'Desactivar autenticación de dos factores',
+    'twofa_disable_desc'      => 'Introduce tu contraseña actual para confirmar la desactivación del 2FA.',
+    'twofa_regen_title'       => 'Regenerar códigos de recuperación',
+    'twofa_regen_desc'        => 'Los códigos actuales quedarán invalidados. Introduce tu contraseña para continuar.',
+    'twofa_regen_btn'         => 'Regenerar códigos',
+    'twofa_not_enabled'       => 'El 2FA aún no está activado en tu cuenta. Es obligatorio para acceder al área de administración.',
+    'twofa_enable_btn'        => 'Activar 2FA',
+    'twofa_platform_disabled' => 'El 2FA está actualmente desactivado en la plataforma.',
+
+    // Insignia de estado de inscripción
+    'status_approved_badge' => 'Aprobada',
+    'status_pending_badge'  => 'Pendiente de aprobación',
+    'status_rejected_badge' => 'Rechazada',
+    'status_none_badge'     => 'Sin presentar',
 ];

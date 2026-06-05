@@ -73,4 +73,42 @@ return [
     'delete_section'        => 'Elimina account',
     'profile_updated'       => 'Profilo aggiornato con successo.',
     'password_updated'      => 'Password aggiornata con successo.',
+
+    // Form aggiornamento profilo base
+    'name_label'          => 'Nome',
+    'email_label'         => 'Email',
+    'email_unverified'    => 'Il tuo indirizzo email non è verificato.',
+    'send_verification'   => 'Clicca qui per inviare nuovamente l\'email di verifica.',
+    'verification_sent'   => 'Un nuovo link di verifica è stato inviato al tuo indirizzo email.',
+
+    // Form aggiornamento password
+    'current_password'    => 'Password attuale',
+    'new_password'        => 'Nuova password',
+    'confirm_password'    => 'Conferma password',
+    'update_password_btn' => 'Aggiorna password',
+
+    // Elimina account
+    'delete_account'             => 'Elimina account',
+    'delete_account_desc'        => 'Una volta eliminato l\'account, tutte le risorse e i dati saranno cancellati definitivamente. Prima di procedere, scarica eventuali dati che desideri conservare.',
+    'delete_account_confirm_title' => 'Vuoi davvero eliminare il tuo account?',
+    'delete_account_confirm_desc'  => 'Una volta eliminato l\'account, tutte le risorse e i dati saranno cancellati definitivamente. Inserisci la password per confermare l\'eliminazione.',
+
+    // 2FA
+    'twofa_active_since'      => '2FA attivo dal :date.',
+    'twofa_disable_btn'       => 'Disabilita 2FA',
+    'twofa_regenerate_btn'    => 'Rigenera codici di recupero',
+    'twofa_disable_title'     => 'Disabilita autenticazione a due fattori',
+    'twofa_disable_desc'      => 'Inserisci la password corrente per confermare la disabilitazione del 2FA.',
+    'twofa_regen_title'       => 'Rigenera codici di recupero',
+    'twofa_regen_desc'        => 'I codici attuali verranno invalidati. Inserisci la password per procedere.',
+    'twofa_regen_btn'         => 'Rigenera codici',
+    'twofa_not_enabled'       => 'Il 2FA non è ancora abilitato sul tuo account. È obbligatorio per accedere all\'area admin.',
+    'twofa_enable_btn'        => 'Abilita 2FA',
+    'twofa_platform_disabled' => 'Il 2FA è attualmente disabilitato sulla piattaforma.',
+
+    // Badge stato iscrizione anagrafica
+    'status_approved_badge' => 'Approvata',
+    'status_pending_badge'  => 'In attesa di approvazione',
+    'status_rejected_badge' => 'Rifiutata',
+    'status_none_badge'     => 'Da compilare',
 ];

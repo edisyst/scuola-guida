@@ -109,10 +109,10 @@ Ogni locale ha i seguenti file in `lang/{locale}/`:
 | `nav.php` | Notification bell e pagina notifiche |
 | `dashboard.php` | KPI, widget, grafici dashboard viewer |
 | `gamification.php` | Badge, streak, progressione |
-| `profile.php` | Form iscrizione anagrafica, campi, stati, TTS |
+| `profile.php` | Form iscrizione anagrafica, campi, stati, TTS, 2FA, password, elimina account, badge stato |
 | `enrollments.php` | Pagina "Le mie iscrizioni", stati |
-| `flags.php` | Segnalazione errori lato viewer |
-| `review.php` | Revisione errori, ripasso SM-2, diagnostico |
+| `flags.php` | Segnalazione errori lato viewer (bottone + form) |
+| `review.php` | Revisione errori, ripasso SM-2 (indice + sessione), diagnostico, piano di studio, domande salvate |
 | `flash.php` | Flash messages viewer |
 | `notifications.php` | Oggetti e corpi notifiche/email viewer |
 | `auth.php` | Messaggi di autenticazione |

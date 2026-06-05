@@ -1,20 +1,20 @@
 @extends('layouts.admin')
-@section('title', 'Ripasso intelligente')
+@section('title', __('review.smart_title'))
 @section('content_header')@endsection
 @section('content')
 <div class="sg-wrapper">
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Algoritmo SM-2 — domande ordinate per urgenza</p>
+            <p class="sg-header-subtitle">{{ __('review.sm2_sort_hint') }}</p>
             <h1 class="sg-header-title">
-                <i class="fas fa-brain mr-2"></i> Ripasso intelligente
+                <i class="fas fa-brain mr-2"></i> {{ __('review.smart_title') }}
             </h1>
         </div>
         <div class="sg-header-actions">
             @if($upcoming['due_today'] > 0)
                 <a href="{{ route('viewer.smart-review.session') }}" class="sg-btn sg-btn-primary">
-                    <i class="fas fa-play mr-1"></i> Inizia ripasso ({{ $upcoming['due_today'] }})
+                    <i class="fas fa-play mr-1"></i> {{ __('review.start_session_count', ['count' => $upcoming['due_today']]) }}
                 </a>
             @endif
         </div>
@@ -27,7 +27,7 @@
                 <div class="sg-stat-icon grad-blue"><i class="fas fa-layer-group"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $stats['total_tracked'] }}</div>
-                    <div class="sg-stat-label">Domande tracciate</div>
+                    <div class="sg-stat-label">{{ __('review.stats_tracked') }}</div>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                 <div class="sg-stat-icon grad-green"><i class="fas fa-trophy"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $stats['mastered'] }}</div>
-                    <div class="sg-stat-label">Padroneggiata</div>
+                    <div class="sg-stat-label">{{ __('review.stats_mastered') }}</div>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
                 <div class="sg-stat-icon grad-orange"><i class="fas fa-sync-alt"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $stats['learning'] }}</div>
-                    <div class="sg-stat-label">In apprendimento</div>
+                    <div class="sg-stat-label">{{ __('review.stats_learning') }}</div>
                 </div>
             </div>
         </div>
@@ -54,7 +54,7 @@
                 <div class="sg-stat-icon grad-red"><i class="fas fa-star"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $stats['new'] }}</div>
-                    <div class="sg-stat-label">Da iniziare</div>
+                    <div class="sg-stat-label">{{ __('review.stats_new') }}</div>
                 </div>
             </div>
         </div>
@@ -66,9 +66,9 @@
             <div class="info-box {{ $upcoming['due_today'] > 0 ? 'bg-gradient-danger' : 'bg-gradient-light' }}">
                 <span class="info-box-icon"><i class="fas fa-exclamation-circle"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Oggi</span>
+                    <span class="info-box-text">{{ __('review.upcoming_today') }}</span>
                     <span class="info-box-number">{{ $upcoming['due_today'] }}</span>
-                    <span class="progress-description">domande in scadenza</span>
+                    <span class="progress-description">{{ __('review.upcoming_due') }}</span>
                 </div>
             </div>
         </div>
@@ -76,9 +76,9 @@
             <div class="info-box bg-gradient-light">
                 <span class="info-box-icon"><i class="fas fa-calendar-day"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Domani</span>
+                    <span class="info-box-text">{{ __('review.upcoming_tomorrow') }}</span>
                     <span class="info-box-number">{{ $upcoming['due_tomorrow'] }}</span>
-                    <span class="progress-description">domande in scadenza</span>
+                    <span class="progress-description">{{ __('review.upcoming_due') }}</span>
                 </div>
             </div>
         </div>
@@ -86,9 +86,9 @@
             <div class="info-box bg-gradient-light">
                 <span class="info-box-icon"><i class="fas fa-calendar-week"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Questa settimana</span>
+                    <span class="info-box-text">{{ __('review.upcoming_week') }}</span>
                     <span class="info-box-number">{{ $upcoming['due_this_week'] }}</span>
-                    <span class="progress-description">domande in scadenza</span>
+                    <span class="progress-description">{{ __('review.upcoming_due') }}</span>
                 </div>
             </div>
         </div>
@@ -98,21 +98,21 @@
     @if($stats['total_tracked'] > 0 && $categories->isNotEmpty())
         <div class="sg-card sg-mt-3">
             <div class="sg-card-header">
-                <h2 class="sg-card-header-title">Ripasso per categoria</h2>
+                <h2 class="sg-card-header-title">{{ __('review.by_category') }}</h2>
             </div>
             <div class="sg-card-body p-3">
                 <form action="{{ route('viewer.smart-review.session') }}" method="GET"
                       class="d-flex align-items-center" style="gap:1rem; flex-wrap:wrap;">
                     <div class="flex-grow-1">
                         <select name="category_id" class="form-control">
-                            <option value="">Tutte le categorie</option>
+                            <option value="">{{ __('review.all_categories') }}</option>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <button type="submit" class="sg-btn sg-btn-primary">
-                        <i class="fas fa-play mr-1"></i> Avvia sessione filtrata
+                        <i class="fas fa-play mr-1"></i> {{ __('review.start_filtered') }}
                     </button>
                 </form>
             </div>
@@ -123,13 +123,12 @@
         <div class="sg-card sg-mt-3">
             <div class="sg-card-body text-center p-5">
                 <i class="fas fa-brain text-muted fa-3x"></i>
-                <h3 class="mt-3">Inizia a studiare</h3>
+                <h3 class="mt-3">{{ __('review.start_studying_title') }}</h3>
                 <p class="text-muted">
-                    Il sistema traccerà automaticamente le domande man mano che studi o svolgi quiz.<br>
-                    Più rispondi, più il ripasso intelligente diventa preciso.
+                    {{ __('review.start_studying_desc') }}
                 </p>
                 <a href="{{ route('study.index') }}" class="sg-btn sg-btn-primary mt-2">
-                    <i class="fas fa-graduation-cap mr-1"></i> Modalità studio
+                    <i class="fas fa-graduation-cap mr-1"></i> {{ __('menu.modalita_studio') }}
                 </a>
             </div>
         </div>

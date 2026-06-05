@@ -44,16 +44,42 @@ per gli utenti loggati.
 
 - `SetLocale` middleware: per gli utenti autenticati `users.locale` ha ora priorità
   sulla sessione (prima era il contrario); per gli ospiti la sessione resta l'unica fonte.
-- Tutte le view viewer convertite a `__()` / `@lang()`: dashboard (stats/dashboard.blade.php),
-  gamification (viewer/badges.blade.php), profilo (registration-form.blade.php),
-  notification bell (livewire/notification-bell.blade.php), pagina notifiche
-  (notifications/index.blade.php), iscrizioni (quiz/enrollments/index.blade.php).
+- `lang/{it,en,es}/review.php` esteso con: pagina indice smart review (stats SM-2,
+  upcoming per giorno/settimana), sessione ripasso (titolo, feedback prossima revisione),
+  revisione errori (filtri, contatori, confirm dialog), piano di studio (banner diagnostico,
+  empty state, studia ora), domande salvate (filtro categoria, ricerca, empty state),
+  test diagnostico (intro, complete state).
+- `lang/{it,en,es}/flags.php` esteso con: label form segnalazione (tipo problema,
+  descrizione, placeholder, bottone invia/invio).
+- `lang/{it,en,es}/profile.php` esteso con: form password (attuale/nuova/conferma),
+  form info profilo (nome, email, verifica), elimina account (desc, confirm dialog),
+  sezione 2FA (attivo/disabilita/rigenera, modal titoli e descrizioni, abilita 2FA,
+  piattaforma disabilitata), badge stato iscrizione anagrafica (approvata/in attesa/
+  rifiutata/da compilare).
+- View viewer completamente convertite a `__()` in questa iterazione:
+  `smart-review/index.blade.php`, `smart-review/session.blade.php`,
+  `livewire/smart-review.blade.php`, `livewire/diagnostic-test.blade.php`,
+  `livewire/report-button.blade.php`, `review-errors/index.blade.php`,
+  `bookmarks/index.blade.php`, `study-plan/show.blade.php`,
+  `diagnostic/show.blade.php`, `profile/partials/registration-status-badge.blade.php`,
+  `profile/partials/two-factor-form.blade.php`, `profile/partials/update-password-form.blade.php`,
+  `profile/partials/update-profile-information-form.blade.php`,
+  `profile/partials/delete-user-form.blade.php`.
+- Tutte le view viewer convertite a `__()` / `@lang()` anche nelle iterazioni precedenti:
+  dashboard (stats/dashboard.blade.php), gamification (viewer/badges.blade.php),
+  profilo (registration-form.blade.php), notification bell (livewire/notification-bell.blade.php),
+  pagina notifiche (notifications/index.blade.php), iscrizioni (quiz/enrollments/index.blade.php).
 - Tutti i flash messages dei controller viewer convertiti a chiavi `flash.*`
   (StudyController, SimulatorController, RegistrationController, NotificationController,
   ReviewErrorsController, ProfileController, BookmarkController,
   QuizEnrollmentController, UserStatsController).
 - Tutte le notifiche PHP (`app/Notifications/`) e i template email Markdown
   (`resources/views/emails/`) convertiti a `__()` con chiavi `notifications.*`.
+- `tests/Feature/LocalizationViewerTest.php` — suite Feature Test per la Feature 7.3a:
+  viewer EN/ES/null vedono il contenuto nella lingua corretta, locale non supportato
+  fallback a italiano, persistenza su `users.locale`, `HasLocalePreference`, subject
+  notifica in spagnolo, `validation.required` in tutte e tre le lingue, presenza chiavi
+  viewer in tutti i locale.
 
 ---
 

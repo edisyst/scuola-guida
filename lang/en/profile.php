@@ -73,4 +73,42 @@ return [
     'delete_section'        => 'Delete account',
     'profile_updated'       => 'Profile updated successfully.',
     'password_updated'      => 'Password updated successfully.',
+
+    // Profile info form
+    'name_label'          => 'Name',
+    'email_label'         => 'Email',
+    'email_unverified'    => 'Your email address is not verified.',
+    'send_verification'   => 'Click here to re-send the verification email.',
+    'verification_sent'   => 'A new verification link has been sent to your email address.',
+
+    // Password form
+    'current_password'    => 'Current password',
+    'new_password'        => 'New password',
+    'confirm_password'    => 'Confirm password',
+    'update_password_btn' => 'Update password',
+
+    // Delete account
+    'delete_account'             => 'Delete account',
+    'delete_account_desc'        => 'Once your account is deleted, all its resources and data will be permanently deleted. Before proceeding, please download any data you wish to retain.',
+    'delete_account_confirm_title' => 'Are you sure you want to delete your account?',
+    'delete_account_confirm_desc'  => 'Once your account is deleted, all its resources and data will be permanently deleted. Please enter your password to confirm account deletion.',
+
+    // 2FA
+    'twofa_active_since'      => '2FA active since :date.',
+    'twofa_disable_btn'       => 'Disable 2FA',
+    'twofa_regenerate_btn'    => 'Regenerate recovery codes',
+    'twofa_disable_title'     => 'Disable two-factor authentication',
+    'twofa_disable_desc'      => 'Enter your current password to confirm disabling 2FA.',
+    'twofa_regen_title'       => 'Regenerate recovery codes',
+    'twofa_regen_desc'        => 'Current codes will be invalidated. Enter your password to proceed.',
+    'twofa_regen_btn'         => 'Regenerate codes',
+    'twofa_not_enabled'       => '2FA is not yet enabled on your account. It is required to access the admin area.',
+    'twofa_enable_btn'        => 'Enable 2FA',
+    'twofa_platform_disabled' => '2FA is currently disabled on this platform.',
+
+    // Registration status badge
+    'status_approved_badge' => 'Approved',
+    'status_pending_badge'  => 'Pending approval',
+    'status_rejected_badge' => 'Rejected',
+    'status_none_badge'     => 'Not submitted',
 ];

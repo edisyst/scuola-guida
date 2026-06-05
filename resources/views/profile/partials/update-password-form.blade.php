@@ -3,7 +3,7 @@
     @method('put')
 
     <div class="sg-form-group">
-        <label for="update_password_current_password" class="sg-form-label">{{ __('Password attuale') }}</label>
+        <label for="update_password_current_password" class="sg-form-label">{{ __('profile.current_password') }}</label>
         <input id="update_password_current_password" name="current_password" type="password"
                class="sg-form-control @if($errors->updatePassword->has('current_password')) is-invalid @endif"
                autocomplete="current-password">
@@ -13,7 +13,7 @@
     </div>
 
     <div class="sg-form-group">
-        <label for="update_password_password" class="sg-form-label">{{ __('Nuova password') }}</label>
+        <label for="update_password_password" class="sg-form-label">{{ __('profile.new_password') }}</label>
         <input id="update_password_password" name="password" type="password"
                class="sg-form-control @if($errors->updatePassword->has('password')) is-invalid @endif"
                autocomplete="new-password">
@@ -23,7 +23,7 @@
     </div>
 
     <div class="sg-form-group">
-        <label for="update_password_password_confirmation" class="sg-form-label">{{ __('Conferma password') }}</label>
+        <label for="update_password_password_confirmation" class="sg-form-label">{{ __('profile.confirm_password') }}</label>
         <input id="update_password_password_confirmation" name="password_confirmation" type="password"
                class="sg-form-control @if($errors->updatePassword->has('password_confirmation')) is-invalid @endif"
                autocomplete="new-password">
@@ -33,6 +33,6 @@
     </div>
 
     <button type="submit" class="sg-btn sg-btn-primary sg-mt-2">
-        <i class="fas fa-key"></i> {{ __('Aggiorna password') }}
+        <i class="fas fa-key"></i> {{ __('profile.update_password_btn') }}
     </button>
 </form>
