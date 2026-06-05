@@ -17,7 +17,8 @@ nel tema AdminLTE 3 e i pattern Livewire in uso nel progetto.
 8. [Pattern Livewire](#8-pattern-livewire)
 9. [Sidebar e tema ruoli](#9-sidebar-e-tema-ruoli)
 10. [Dark mode](#10-dark-mode)
-11. [Cosa NON fare](#11-cosa-non-fare)
+11. [Internazionalizzazione (i18n)](#11-internazionalizzazione-i18n)
+12. [Cosa NON fare](#12-cosa-non-fare)
 
 ---
 
@@ -528,7 +529,101 @@ nel CSS nello stesso file, nella sezione `DARK MODE` dedicata.
 
 ---
 
-## 11. Cosa NON fare
+## 11. Internazionalizzazione (i18n)
+
+### Pattern generale
+
+Ogni stringa visibile all'utente nelle view backend usa `__()` o `@lang()`:
+
+```blade
+{{-- Titolo pagina --}}
+@section('title', __('questions.title'))
+
+{{-- Header --}}
+<p class="sg-header-subtitle">{{ __('questions.subtitle') }}</p>
+<h1 class="sg-header-title">{{ __('questions.title') }}</h1>
+
+{{-- Bottoni --}}
+<button>{{ __('common.save') }}</button>
+
+{{-- Placeholder --}}
+<input placeholder="{{ __('audit.filter_search_ph') }}">
+
+{{-- Confirm dialog --}}
+<button onclick="return confirm('{{ __('categories.confirm_delete') }}')">
+```
+
+### Flash messages nei controller
+
+Non usare stringhe hardcoded. Usare sempre chiavi da `flash.php`:
+
+```php
+return redirect()->route('admin.questions.index')
+    ->with('success', __('flash.question_created'));
+```
+
+### Localizzazione DataTables
+
+Le intestazioni di colonna sono in Blade e si traducono con `__()` come qualsiasi altro testo.
+
+Le stringhe dell'UI del widget DataTables (search box, paginazione, "Mostra N elementi")
+si localizzano tramite il file `public/js/datatables-i18n.js` e il meta tag iniettato dal layout:
+
+**Come funziona:**
+
+1. `layouts/admin.blade.php` inietta un `<meta name="datatables-i18n">` con un oggetto JSON
+   delle stringhe nel locale corrente, generato da `__('datatables.*')`.
+
+2. `public/js/datatables-i18n.js` (caricato nel layout) legge il meta e espone
+   `window.DataTablesI18n.get()` che restituisce l'oggetto `language` per DataTables.
+
+3. Il layout imposta `$.fn.dataTable.defaults.language` al `DOMContentLoaded`: tutte le
+   tabelle inizializzate senza un `language` esplicito ereditano le stringhe localizzate.
+
+**Non fare:**
+
+```js
+// ❌ Stringhe hardcoded in JS
+$('#my-table').DataTable({ language: { sSearch: 'Cerca:' } });
+```
+
+**Fare:**
+
+```js
+// ✓ Non serve niente — il default viene già impostato dal layout.
+// Se serve override esplicito per una tabella specifica:
+$('#my-table').DataTable({ language: window.DataTablesI18n.get() });
+```
+
+**Aggiungere nuove stringhe DataTables:**
+
+Aggiungere la chiave in `lang/it/datatables.php`, `lang/en/datatables.php`,
+`lang/es/datatables.php`, e nella funzione `g()` di `datatables-i18n.js`.
+
+### File di traduzione backend
+
+| File | Contenuto |
+|------|-----------|
+| `questions.php` | Gestione domande, import, versioni |
+| `quiz.php` | Gestione quiz, stati, azioni |
+| `categories.php` | Categorie e materiali |
+| `users.php` | Utenti, ruoli, permessi |
+| `enrollments.php` | Iscrizioni (viewer + admin) |
+| `reports.php` | Reportistica |
+| `audit.php` | Audit log, filtri, diff |
+| `media.php` | Media Manager |
+| `backup.php` | Stato sistema, backup, code |
+| `instructor.php` | Area istruttore |
+| `editor.php` | Dashboard produzione editor |
+| `nav_admin.php` | Navbar/breadcrumb backend |
+| `datatables.php` | Stringhe UI widget DataTables |
+| `flash.php` | Tutti i flash messages (viewer + backend) |
+| `common.php` | Bottoni e label condivisi |
+| `notifications.php` | Email, DB, push per tutte le notifiche |
+
+---
+
+## 12. Cosa NON fare
 
 | ❌ Sbagliato | ✓ Corretto |
 |---|---|

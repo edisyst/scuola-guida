@@ -11,7 +11,7 @@
     <div class="sg-card sg-mb-4 p-4">
         <div class="d-flex align-items-center flex-wrap" style="gap:1rem;">
             <span class="text-muted">
-                <i class="fas fa-folder-open text-warning mr-2"></i> Cartella:
+                <i class="fas fa-folder-open text-warning mr-2"></i> {{ __('media.folder_label') }}
             </span>
             @foreach ($folders as $key => $path)
                 <button type="button"
@@ -31,7 +31,7 @@
     <div class="sg-card sg-mb-5 p-4">
         <h5 class="sg-section-title sg-mb-3">
             <i class="fas fa-upload"></i>
-            Carica nuova immagine in <strong>{{ $folder }}</strong>
+            {!! __('media.upload_title', ['folder' => '<strong>'.$folder.'</strong>']) !!}
         </h5>
         <div class="d-flex align-items-start flex-wrap" style="gap:1rem;">
             <div class="sg-upload-box">
@@ -40,17 +40,17 @@
                     <div class="text-danger mt-2" style="font-size:0.95rem;">{{ $message }}</div>
                 @enderror
                 <div wire:loading wire:target="newImage" class="text-muted mt-2">
-                    <i class="fas fa-spinner fa-spin"></i> Caricamento in corso...
+                    <i class="fas fa-spinner fa-spin"></i> {{ __('media.uploading') }}
                 </div>
             </div>
             <button type="button" wire:click="save"
                     class="sg-btn sg-btn-primary sg-btn-sm"
                     wire:loading.attr="disabled" wire:target="save,newImage">
                 <span wire:loading.remove wire:target="save">
-                    <i class="fas fa-upload mr-1"></i> Carica
+                    <i class="fas fa-upload mr-1"></i> {{ __('media.action_upload') }}
                 </span>
                 <span wire:loading wire:target="save">
-                    <i class="fas fa-spinner fa-spin"></i> Caricamento...
+                    <i class="fas fa-spinner fa-spin"></i> {{ __('media.uploading_btn') }}
                 </span>
             </button>
         </div>
@@ -60,7 +60,7 @@
     @if (count($files) === 0)
         <div class="sg-card text-center text-muted py-5">
             <i class="fas fa-images fa-2x mb-2 d-block"></i>
-            Nessuna immagine nella cartella <strong>{{ $folder }}</strong>.
+            {!! __('media.no_files', ['folder' => '<strong>'.$folder.'</strong>']) !!}
         </div>
     @else
         <div class="row" style="row-gap:1.5rem;">
@@ -86,10 +86,10 @@
                                     <div class="text-danger mt-2" style="font-size:0.85rem;">{{ $message }}</div>
                                 @enderror
                                 <div class="d-flex mt-2" style="gap:0.5rem;">
-                                    <button wire:click="rename" class="btn btn-sm btn-success flex-fill" title="Conferma">
+                                    <button wire:click="rename" class="btn btn-sm btn-success flex-fill" title="{{ __('media.rename_confirm') }}">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button wire:click="cancelRename" class="btn btn-sm btn-secondary flex-fill" title="Annulla">
+                                    <button wire:click="cancelRename" class="btn btn-sm btn-secondary flex-fill" title="{{ __('media.rename_cancel') }}">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -111,11 +111,11 @@
                             {{-- AZIONI --}}
                             <div class="d-flex mt-auto" style="gap:0.5rem;">
                                 <button wire:click="startRename('{{ $file['path'] }}')"
-                                        class="btn btn-sm btn-outline-secondary flex-fill" title="Rinomina">
+                                        class="btn btn-sm btn-outline-secondary flex-fill" title="{{ __('media.action_rename') }}">
                                     <i class="fas fa-pen"></i>
                                 </button>
                                 <button wire:click="confirmDelete('{{ $file['path'] }}')"
-                                        class="btn btn-sm btn-outline-danger flex-fill" title="Elimina">
+                                        class="btn btn-sm btn-outline-danger flex-fill" title="{{ __('media.action_delete') }}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -133,35 +133,38 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            <i class="fas fa-exclamation-triangle text-danger mr-1"></i> Conferma eliminazione
+                            <i class="fas fa-exclamation-triangle text-danger mr-1"></i> {{ __('media.modal_delete_title') }}
                         </h5>
                         <button type="button" class="close" wire:click="cancelDelete">
                             <span>&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Stai per eliminare <strong>{{ basename($deletingFile) }}</strong>.</p>
+                        <p>{!! __('media.modal_delete_body', ['filename' => '<strong>'.basename($deletingFile).'</strong>']) !!}</p>
                         @if ($deletingRefs > 0)
                             <div class="alert alert-warning mb-2">
                                 <i class="fas fa-exclamation-circle mr-1"></i>
-                                Questo file è usato da <strong>{{ $deletingRefs }}</strong>
-                                {{ $deletingRefs === 1 ? 'domanda' : 'domande' }}.
-                                Il campo immagine verrà azzerato su quelle domande.
+                                {!! __('media.modal_delete_refs_warning', [
+                                    'count'  => $deletingRefs,
+                                    'entity' => $deletingRefs === 1
+                                        ? __('media.modal_delete_refs_singular')
+                                        : __('media.modal_delete_refs_plural'),
+                                ]) !!}
                             </div>
                         @endif
-                        <p class="mb-0 text-muted small">Questa azione non può essere annullata.</p>
+                        <p class="mb-0 text-muted small">{{ __('media.modal_delete_irreversible') }}</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="sg-btn sg-btn-secondary sg-btn-sm"
-                                wire:click="cancelDelete">Annulla</button>
+                                wire:click="cancelDelete">{{ __('media.modal_delete_cancel') }}</button>
                         <button type="button" class="sg-btn sg-btn-danger sg-btn-sm"
                                 wire:click="delete"
                                 wire:loading.attr="disabled" wire:target="delete">
                             <span wire:loading.remove wire:target="delete">
-                                <i class="fas fa-trash mr-1"></i> Elimina
+                                <i class="fas fa-trash mr-1"></i> {{ __('media.modal_delete_confirm') }}
                             </span>
                             <span wire:loading wire:target="delete">
-                                <i class="fas fa-spinner fa-spin"></i> Eliminando...
+                                <i class="fas fa-spinner fa-spin"></i> {{ __('media.deleting') }}
                             </span>
                         </button>
                     </div>

@@ -15,6 +15,26 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="{{ asset('css/scuola-guida.css') }}">
+
+    {{-- DataTables i18n strings injected for current locale --}}
+    @php
+        $dtI18nJson = htmlspecialchars(json_encode([
+            'search'            => __('datatables.search'),
+            'length_menu'       => __('datatables.length_menu'),
+            'info'              => __('datatables.info'),
+            'info_empty'        => __('datatables.info_empty'),
+            'info_filtered'     => __('datatables.info_filtered'),
+            'zero_records'      => __('datatables.zero_records'),
+            'loading_records'   => __('datatables.loading_records'),
+            'processing'        => __('datatables.processing'),
+            'paginate_first'    => __('datatables.paginate_first'),
+            'paginate_last'     => __('datatables.paginate_last'),
+            'paginate_previous' => __('datatables.paginate_previous'),
+            'paginate_next'     => __('datatables.paginate_next'),
+        ]), ENT_QUOTES, 'UTF-8');
+    @endphp
+    <meta name="datatables-i18n" content="{{ $dtI18nJson }}">
+
     @livewireStyles
 @stop
 
@@ -57,10 +77,16 @@
 
 @section('js')
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('js/datatables-i18n.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
         $(function () {
+            // Apply DataTables i18n globally for this locale
+            if (typeof $.fn.dataTable !== 'undefined' && typeof window.DataTablesI18n !== 'undefined') {
+                $.extend($.fn.dataTable.defaults, { language: window.DataTablesI18n.get() });
+            }
+
 
             // Bootstrap switch
             $('input[data-bootstrap-switch]').each(function(){

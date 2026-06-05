@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Utenti')
+@section('title', __('users.title'))
 @section('content_header')@endsection
 
 @section('content')
@@ -8,16 +8,16 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <h1 class="sg-header-title"><i class="fas fa-users mr-2"></i> Gestione Utenti</h1>
-            <p class="sg-header-subtitle sg-mt-1">Crea utenti, assegna ruoli e permessi individuali</p>
+            <h1 class="sg-header-title"><i class="fas fa-users mr-2"></i> {{ __('users.title') }}</h1>
+            <p class="sg-header-subtitle sg-mt-1">{{ __('users.subtitle') }}</p>
         </div>
         <div class="sg-header-actions">
             <a href="{{ route('admin.roles.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                <i class="fas fa-user-shield"></i> Ruoli & Permessi
+                <i class="fas fa-user-shield"></i> {{ __('users.action_roles') }}
             </a>
             @if(auth()->user()->canCreateUser())
                 <a href="{{ route('admin.users.create') }}" class="sg-btn sg-btn-success sg-btn-sm">
-                    <i class="fas fa-plus"></i> Nuovo utente
+                    <i class="fas fa-plus"></i> {{ __('users.action_new') }}
                 </a>
             @endif
         </div>
@@ -28,11 +28,11 @@
             <table class="sg-table">
                 <thead>
                     <tr>
-                        <th>Utente</th>
-                        <th>Email</th>
-                        <th>Ruolo</th>
-                        <th>Permessi extra</th>
-                        <th class="text-right" style="width:160px;">Azioni</th>
+                        <th>{{ __('users.col_user') }}</th>
+                        <th>{{ __('users.col_email') }}</th>
+                        <th>{{ __('users.col_role') }}</th>
+                        <th>{{ __('users.col_permissions') }}</th>
+                        <th class="text-right" style="width:160px;">{{ __('users.col_actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,7 +66,7 @@
 
                                 @if(auth()->user()->canDeleteUser() && $u->id !== auth()->id())
                                     <form method="POST" action="{{ route('admin.users.destroy', $u) }}"
-                                          class="d-inline" onsubmit="return confirm('Eliminare {{ $u->name }}?')">
+                                          class="d-inline" onsubmit="return confirm('{{ __('users.confirm_delete', ['name' => $u->name]) }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button class="sg-btn-icon delete" title="Elimina">

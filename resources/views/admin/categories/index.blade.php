@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Categorie')
+@section('title', __('categories.title'))
 @section('content_header')@endsection
 
 @section('content')
@@ -8,12 +8,12 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Catalogo</p>
-            <h1 class="sg-header-title"><i class="fas fa-tags mr-2"></i> Categorie</h1>
+            <p class="sg-header-subtitle">{{ __('categories.subtitle') }}</p>
+            <h1 class="sg-header-title"><i class="fas fa-tags mr-2"></i> {{ __('categories.title') }}</h1>
         </div>
         @if(auth()->user()->canCreateCategory())
             <a href="{{ route('admin.categories.create') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                <i class="fas fa-plus"></i> Nuova categoria
+                <i class="fas fa-plus"></i> {{ __('categories.create') }}
             </a>
         @endif
     </div>
@@ -23,14 +23,14 @@
             <table id="categories-table" class="sg-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
+                        <th>{{ __('categories.col_id') }}</th>
+                        <th>{{ __('categories.col_name') }}</th>
                         @if(!auth()->user()->isViewer())
-                            <th>Slug</th>
+                            <th>{{ __('categories.col_slug') }}</th>
                         @endif
-                        <th>Domande</th>
+                        <th>{{ __('categories.col_questions') }}</th>
                         @if(!auth()->user()->isViewer())
-                            <th class="text-right" style="width:160px;">Azioni</th>
+                            <th class="text-right" style="width:160px;">{{ __('categories.col_actions') }}</th>
                         @endif
                     </tr>
                 </thead>
@@ -63,7 +63,7 @@
                                     <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="sg-btn-icon delete" title="Elimina" onclick="return confirm('Sei sicuro?')">
+                                        <button class="sg-btn-icon delete" title="Elimina" onclick="return confirm('{{ __('categories.confirm_delete') }}')">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>

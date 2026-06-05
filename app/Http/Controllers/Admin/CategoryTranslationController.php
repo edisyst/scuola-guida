@@ -21,7 +21,7 @@ class CategoryTranslationController extends Controller
 
         return redirect()
             ->route('admin.categories.edit', $category)
-            ->with('success', 'Traduzione salvata.');
+            ->with('success', __('flash.translation_saved'));
     }
 
     public function update(UpdateCategoryTranslationRequest $request, Category $category, string $locale): RedirectResponse
@@ -32,7 +32,7 @@ class CategoryTranslationController extends Controller
 
         return redirect()
             ->route('admin.categories.edit', $category)
-            ->with('success', 'Traduzione aggiornata.');
+            ->with('success', __('flash.translation_updated'));
     }
 
     public function destroy(Category $category, string $locale): RedirectResponse
@@ -43,6 +43,6 @@ class CategoryTranslationController extends Controller
 
         return redirect()
             ->route('admin.categories.edit', $category)
-            ->with('success', 'Traduzione eliminata.');
+            ->with('success', __('flash.translation_deleted'));
     }
 }

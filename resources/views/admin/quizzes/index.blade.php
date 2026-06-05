@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quiz')
+@section('title', __('quiz.title'))
 @section('content_header')@endsection
 
 @section('content')
@@ -8,18 +8,18 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Catalogo</p>
-            <h1 class="sg-header-title"><i class="fas fa-clipboard-check mr-2"></i> Quiz</h1>
+            <p class="sg-header-subtitle">{{ __('quiz.subtitle') }}</p>
+            <h1 class="sg-header-title"><i class="fas fa-clipboard-check mr-2"></i> {{ __('quiz.title') }}</h1>
         </div>
         @if(auth()->user()->canCreateQuiz())
             <div class="sg-header-actions">
                 <a href="{{ route('admin.quizzes.create') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                    <i class="fas fa-plus"></i> Nuovo Quiz
+                    <i class="fas fa-plus"></i> {{ __('quiz.action_new') }}
                 </a>
                 <form method="POST" action="{{ route('admin.quizzes.random') }}" class="d-inline">
                     @csrf
                     <button class="sg-btn sg-btn-success sg-btn-sm">
-                        <i class="fas fa-random"></i> Quiz Random
+                        <i class="fas fa-random"></i> {{ __('quiz.action_random') }}
                     </button>
                 </form>
             </div>
@@ -27,19 +27,19 @@
     </div>
 
     <div class="sg-card sg-card-body-tight mb-3">
-        <p class="sg-text-muted mb-2"><i class="fas fa-info-circle mr-1"></i> Stati del quiz</p>
+        <p class="sg-text-muted mb-2"><i class="fas fa-info-circle mr-1"></i> {{ __('quiz.states_legend') }}</p>
         <ul class="list-unstyled mb-0 small">
             <li class="mb-1">
-                <span class="sg-badge">Bozza</span>
-                — quiz in preparazione. Visibile e modificabile solo da admin/editor; non giocabile dai viewer.
+                <span class="sg-badge">{{ __('quiz.status_draft') }}</span>
+                — {{ __('quiz.status_draft_desc') }}
             </li>
             <li class="mb-1">
-                <span class="sg-badge sg-badge-success">Pubblicato</span>
-                — disponibile per tutti gli utenti in modalità allenamento. Si può ancora modificare o riportare in bozza.
+                <span class="sg-badge sg-badge-success">{{ __('quiz.status_published') }}</span>
+                — {{ __('quiz.status_published_desc') }}
             </li>
             <li>
-                <span class="sg-badge sg-badge-info"><i class="fas fa-lock"></i> Confermato</span>
-                — quiz bloccato per esame ufficiale. Non più modificabile; i viewer lo svolgono solo dopo iscrizione approvata.
+                <span class="sg-badge sg-badge-info"><i class="fas fa-lock"></i> {{ __('quiz.status_confirmed') }}</span>
+                — {{ __('quiz.status_confirmed_desc') }}
             </li>
         </ul>
     </div>
@@ -49,11 +49,11 @@
             <table class="sg-table" id="quiz-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Titolo</th>
-                        <th>Stato</th>
-                        <th>Domande</th>
-                        <th class="text-right" style="width:360px;">Azioni</th>
+                        <th>{{ __('quiz.col_id') }}</th>
+                        <th>{{ __('quiz.col_title') }}</th>
+                        <th>{{ __('quiz.col_status') }}</th>
+                        <th>{{ __('quiz.col_questions') }}</th>
+                        <th class="text-right" style="width:360px;">{{ __('quiz.col_actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,11 +63,11 @@
                             <td><strong>{{ $quiz->title }}</strong></td>
                             <td>
                                 @if($quiz->isConfirmed())
-                                    <span class="sg-badge sg-badge-info"><i class="fas fa-lock"></i> Confermato</span>
+                                    <span class="sg-badge sg-badge-info"><i class="fas fa-lock"></i> {{ __('quiz.status_confirmed') }}</span>
                                 @elseif($quiz->isPublished())
-                                    <span class="sg-badge sg-badge-success">Pubblicato</span>
+                                    <span class="sg-badge sg-badge-success">{{ __('quiz.status_published') }}</span>
                                 @else
-                                    <span class="sg-badge">Bozza</span>
+                                    <span class="sg-badge">{{ __('quiz.status_draft') }}</span>
                                 @endif
                             </td>
                             <td>
@@ -84,17 +84,17 @@
                                         <i class="fas fa-play"></i>
                                     </a>
                                 @elseif($canPlayHere)
-                                    <span class="sg-btn-icon info sg-btn-icon--disabled" title="Nessuna domanda nel quiz">
+                                    <span class="sg-btn-icon info sg-btn-icon--disabled" title="{{ __('quiz.tooltip_no_questions') }}">
                                         <i class="fas fa-play"></i>
                                     </span>
                                 @endif
 
                                 @if(auth()->user()->canEditQuiz() && !$quiz->isLocked())
-                                    <a href="{{ route('admin.quizzes.questions', $quiz) }}" class="sg-btn-icon info" title="Gestisci domande">
+                                    <a href="{{ route('admin.quizzes.questions', $quiz) }}" class="sg-btn-icon info" title="{{ __('quiz.action_questions') }}">
                                         <i class="fas fa-tasks"></i>
                                     </a>
                                 @else
-                                    <span class="sg-btn-icon info sg-btn-icon--disabled" title="Quiz confermato: domande bloccate">
+                                    <span class="sg-btn-icon info sg-btn-icon--disabled" title="{{ __('quiz.tooltip_questions_locked') }}">
                                         <i class="fas fa-tasks"></i>
                                     </span>
                                 @endif
@@ -103,11 +103,11 @@
                                     <form method="POST" action="{{ route('admin.quizzes.fillRandom', $quiz) }}" class="d-inline">
                                         @csrf
                                         @if(($quiz->questions_count ?? 0) === 0)
-                                            <button class="sg-btn-icon success" title="Aggiungi domande random">
+                                            <button class="sg-btn-icon success" title="{{ __('quiz.action_fill_random') }}">
                                                 <i class="fas fa-random"></i>
                                             </button>
                                         @else
-                                            <span class="sg-btn-icon success sg-btn-icon--disabled" title="Il quiz ha già domande">
+                                            <span class="sg-btn-icon success sg-btn-icon--disabled" title="{{ __('quiz.tooltip_already_has_questions') }}">
                                                 <i class="fas fa-random"></i>
                                             </span>
                                         @endif
@@ -116,11 +116,11 @@
 
                                 @if(auth()->user()->isAdmin() && $quiz->isConfirmed())
                                     <a href="{{ route('admin.quizzes.summary', $quiz) }}"
-                                       class="sg-btn-icon info" title="Riepilogo">
+                                       class="sg-btn-icon info" title="{{ __('quiz.action_summary') }}">
                                         <i class="fas fa-chart-bar"></i>
                                     </a>
                                     <a href="{{ route('admin.quizzes.schedule.edit', $quiz) }}"
-                                       class="sg-btn-icon" title="Schedulazione iscrizioni">
+                                       class="sg-btn-icon" title="{{ __('quiz.action_schedule') }}">
                                         <i class="fas fa-calendar-alt"></i>
                                     </a>
                                 @endif
@@ -129,14 +129,14 @@
                                     @if($quiz->isPublished())
                                         <form method="POST" action="{{ route('admin.quizzes.unpublish', $quiz) }}" class="d-inline">
                                             @csrf
-                                            <button class="sg-btn-icon" title="Riporta in bozza">
+                                            <button class="sg-btn-icon" title="{{ __('quiz.action_unpublish') }}">
                                                 <i class="fas fa-eye-slash"></i>
                                             </button>
                                         </form>
                                     @else
                                         <form method="POST" action="{{ route('admin.quizzes.publish', $quiz) }}" class="d-inline">
                                             @csrf
-                                            <button class="sg-btn-icon success" title="Pubblica">
+                                            <button class="sg-btn-icon success" title="{{ __('quiz.action_publish') }}">
                                                 <i class="fas fa-globe"></i>
                                             </button>
                                         </form>
@@ -146,9 +146,9 @@
                                         <form method="POST"
                                               action="{{ route('admin.quizzes.confirm', $quiz) }}"
                                               class="d-inline"
-                                              onsubmit="return confirm('Una volta confermato il quiz non potrà più essere modificato. Continuare?');">
+                                              onsubmit="return confirm('{{ __('quiz.confirm_confirm_lock') }}');">
                                             @csrf
-                                            <button class="sg-btn-icon info" title="Conferma (lock)">
+                                            <button class="sg-btn-icon info" title="{{ __('quiz.action_confirm') }}">
                                                 <i class="fas fa-lock"></i>
                                             </button>
                                         </form>
@@ -159,7 +159,7 @@
                                     <form method="POST" action="{{ route('admin.quizzes.destroy', $quiz) }}" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="sg-btn-icon delete" title="Elimina" onclick="return confirm('Sei sicuro?')">
+                                        <button class="sg-btn-icon delete" title="{{ __('quiz.action_delete') }}" onclick="return confirm('{{ __('quiz.confirm_delete') }}')">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>

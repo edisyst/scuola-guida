@@ -21,7 +21,7 @@ Funzionalità principali:
 - **[Web Push Notifications](docs/07-pwa.md#web-push-notifications-feature-67)** — quarto canale di notifica nativo (browser chiuso / dispositivo bloccato). Il viewer si iscrive dal profilo; le push affiancano mail e database per approvazione iscrizione, badge guadagnati e promemoria ripasso SM-2 (schedulato alle 08:00).
 - **GDPR portabilità dati (art. 20)** — il viewer scarica un archivio ZIP con tutti i propri dati personali in formato JSON (quiz, bookmark, badge, attività, SM-2, documento d'identità). L'admin/editor può esportare i dati di qualsiasi utente da `/admin/users/{id}/edit`. Ogni export è tracciato nell'audit log; il file ZIP viene eliminato subito dopo l'invio (`deleteFileAfterSend`). Cleanup notturno automatico alle 03:00 via `gdpr:export --cleanup-only`.
 
-- **Interfaccia multilingua (IT/EN/ES)** — menu, navbar e **tutte le pagine del viewer** (quiz, simulatore, modalità studio) sono disponibili in italiano, inglese e spagnolo. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede creare `lang/{code}/menu.php`, `lang/{code}/viewer.php` e aggiungere l'entry in `config/locales.php`.
+- **Interfaccia multilingua (IT/EN/ES)** — menu, navbar, **tutte le pagine del viewer** e **tutta l'area backend** (admin, editor, instructor) sono disponibili in italiano, inglese e spagnolo. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede creare i file in `lang/{code}/` e aggiungere l'entry in `config/locales.php`. Le tabelle DataTables si localizzano automaticamente via `meta[name="datatables-i18n"]` + `public/js/datatables-i18n.js`, senza inline scripts.
 - **Accessibilità DSA — lettura audio TTS** — ogni viewer può attivare la lettura audio delle domande tramite la Web Speech API (zero costo server, funziona offline). Il toggle e l'opzione di avvio automatico sono configurabili dal profilo. Il supporto replica l'ausilio per candidati con DSA previsto dal D.Lgs. 62/2017 e dalle disposizioni MIT sull'esame teorico.
 
 **Stack:** Laravel 11 · Blade · AdminLTE 3 · Bootstrap 5 · Livewire 3 · Alpine.js · MySQL · Redis · `laravel-notification-channels/webpush`
@@ -85,8 +85,11 @@ L'app è raggiungibile su `http://localhost`. Per fermare lo stack: `docker comp
 L'interfaccia supporta **italiano** (default), **inglese** e **spagnolo**. Sono tradotte:
 - Menu/navbar (sidebar, dropdown bandierine)
 - Tutte le pagine del viewer: dashboard, gamification/badge, profilo/iscrizione anagrafica, iscrizioni quiz, notifiche, revisione errori, ripasso SM-2, modalità studio, simulatore, risultati
-- Flash messages dei flussi viewer
+- Flash messages dei flussi viewer ed editor/admin
 - Email e notifiche in-app/webpush inviate ai viewer
+- **Tutta l'area backend** (admin, editor, instructor): titoli pagina, header, filtri, colonne tabelle, action label, confirm dialog, toast di successo/errore
+- **Tabelle DataTables**: stringhe UI (search, paginazione, contatori) localizzate automaticamente via `public/js/datatables-i18n.js`
+- **Notifiche sistema** (`BackupFailed`) renderizzate nella lingua dell'utente destinatario
 
 I dati applicativi (testo domande, categorie) restano in italiano — la traduzione del testo delle domande è un sistema separato (Feature 7.1).
 
@@ -110,11 +113,23 @@ Ogni locale ha i seguenti file in `lang/{locale}/`:
 | `dashboard.php` | KPI, widget, grafici dashboard viewer |
 | `gamification.php` | Badge, streak, progressione |
 | `profile.php` | Form iscrizione anagrafica, campi, stati, TTS, 2FA, password, elimina account, badge stato |
-| `enrollments.php` | Pagina "Le mie iscrizioni", stati |
+| `enrollments.php` | Pagina "Le mie iscrizioni" (viewer) e gestione iscrizioni admin |
 | `flags.php` | Segnalazione errori lato viewer (bottone + form) |
 | `review.php` | Revisione errori, ripasso SM-2 (indice + sessione), diagnostico, piano di studio, domande salvate |
-| `flash.php` | Flash messages viewer |
-| `notifications.php` | Oggetti e corpi notifiche/email viewer |
+| `flash.php` | Flash messages viewer **e backend** (CRUD domande, quiz, categorie, utenti, media, backup, instructor note, …) |
+| `notifications.php` | Oggetti e corpi notifiche/email viewer e sistema (`BackupFailed`, `NewReport`, outcome istruttore) |
+| `questions.php` | Pagine admin/editor domande: indice, filtri, colonne, azioni, versionamento |
+| `quiz.php` | Pagine admin/editor quiz: indice, stati, azioni, confirm, scheduling |
+| `categories.php` | Pagine admin categorie: indice, materiali, colonne, confirm |
+| `users.php` | Pagina admin utenti: colonne, permessi, azioni, confirm |
+| `reports.php` | Pagina admin report: form, preset, azioni generate/export |
+| `audit.php` | Log audit: filtri, tipi evento, colonne, diff panel, export |
+| `media.php` | Media manager: upload, rename, delete (modal con warning refs) |
+| `backup.php` | Health dashboard: stato backup, code, DB, disco, log errori |
+| `instructor.php` | Area instructor: overview, dettaglio studente, KPI, note, badge, tentativi |
+| `editor.php` | Dashboard editor: filtri, KPI, grafici, sezioni report |
+| `nav_admin.php` | Titoli pagina, breadcrumb e voci sidebar area backend |
+| `datatables.php` | Stringhe UI DataTables (search, paginate, info, zero records) |
 | `auth.php` | Messaggi di autenticazione |
 | `validation.php` | Messaggi di validazione form |
 | `passwords.php` | Reset password |
@@ -126,7 +141,7 @@ Ogni locale ha i seguenti file in `lang/{locale}/`:
 2. Aggiungere un'entry in `config/locales.php` (array `supported`) con `label` e `flag`.
 3. Salvare il file SVG della bandiera in `public/images/language_flags/{code}.svg`.
 
-Nessuna modifica al codice applicativo è richiesta. Il fallback è sempre l'italiano.
+Nessuna modifica al codice applicativo è richiesta. Il fallback è sempre l'italiano. I test di copertura i18n sono in `tests/Feature/LocalizationTest.php` (area viewer) e `tests/Feature/LocalizationBackendTest.php` (area admin/editor/instructor).
 
 > **Nota**: la funzionalità non è compatibile con `php artisan config:cache` perché i
 > testi del menu sono tradotti a runtime dal `LangFilter` di AdminLTE, che legge i file
@@ -169,7 +184,7 @@ nel versionamento domande (Feature 6.2).
 
 ## Test
 
-Suite con ~398 Feature test in ~35 classi (Laravel TestCase + `RefreshDatabase`):
+Suite con ~412 Feature test in ~36 classi (Laravel TestCase + `RefreshDatabase`):
 
 ```bash
 php artisan test

@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Stato sistema')
+@section('title', __('backup.title'))
 
 @section('content_header')
-    <h1><i class="fas fa-heartbeat mr-2"></i>Stato sistema</h1>
+    <h1><i class="fas fa-heartbeat mr-2"></i>{{ __('backup.title') }}</h1>
 @endsection
 
 @section('content')
@@ -17,7 +17,7 @@
             $backupAt  = $backupStatus['last_backup_at'] ?? null;
             $healthy   = $backupStatus['is_healthy'] ?? false;
             $boxColor  = $healthy ? 'success' : 'danger';
-            $backupAge = $backupAt ? $backupAt->diffForHumans() : 'Mai eseguito';
+            $backupAge = $backupAt ? $backupAt->diffForHumans() : __('backup.last_backup_never');
         @endphp
         <div class="col-lg-3 col-6">
             <div class="small-box bg-{{ $boxColor }}">
@@ -27,7 +27,7 @@
                 </div>
                 <div class="icon"><i class="fas fa-database"></i></div>
                 <a href="{{ route('admin.health.index') }}" class="small-box-footer">
-                    {{ $backupStatus['count'] ?? 0 }} backup disponibili
+                    {{ __('backup.backup_count', ['count' => $backupStatus['count'] ?? 0]) }}
                     <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
@@ -38,11 +38,11 @@
             <div class="small-box bg-info">
                 <div class="inner">
                     <h3>{{ \App\Services\HealthService::formatBytes($dbSize['total_bytes'] ?? 0) }}</h3>
-                    <p>Dimensione database</p>
+                    <p>{{ __('backup.db_size') }}</p>
                 </div>
                 <div class="icon"><i class="fas fa-server"></i></div>
                 <a href="#card-db" class="small-box-footer">
-                    Vedi dettaglio <i class="fas fa-arrow-circle-right"></i>
+                    {{ __('backup.db_detail') }} <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
         </div>
@@ -56,7 +56,7 @@
                 </div>
                 <div class="icon"><i class="fas fa-images"></i></div>
                 <a href="{{ route('admin.media.index') }}" class="small-box-footer">
-                    Vai a Media Manager <i class="fas fa-arrow-circle-right"></i>
+                    {{ __('backup.goto_media') }} <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
         </div>
@@ -88,7 +88,7 @@
         <div class="col-md-6">
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-layer-group mr-1"></i>Stato code</h3>
+                    <h3 class="card-title"><i class="fas fa-layer-group mr-1"></i>{{ __('backup.queue_title') }}</h3>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-sm table-striped mb-0">
@@ -108,7 +108,7 @@
                                 <tr>
                                     <td colspan="2" class="text-center text-muted py-3">
                                         <i class="fas fa-check-circle text-success mr-1"></i>
-                                        Nessun job in coda
+                                        {{ __('backup.queue_no_pending') }}
                                     </td>
                                 </tr>
                             @endif
@@ -118,17 +118,17 @@
                 @if(($queueStatus['failed_count'] ?? 0) > 0)
                 <div class="card-footer bg-danger text-white">
                     <i class="fas fa-exclamation-circle mr-1"></i>
-                    <strong>{{ $queueStatus['failed_count'] }}</strong> job falliti in <code>failed_jobs</code>
+                    {!! __('backup.queue_failed_footer', ['count' => $queueStatus['failed_count']]) !!}
                     <button class="btn btn-sm btn-outline-light float-right" type="button"
                             data-toggle="collapse" data-target="#failed-jobs-list">
-                        Ispeziona
+                        {{ __('backup.queue_inspect') }}
                     </button>
                 </div>
                 <div class="collapse" id="failed-jobs-list">
                     <div class="card-body p-0">
                         <table class="table table-sm mb-0">
                             <thead><tr>
-                                <th>Job</th><th>Queue</th><th>Fallito</th>
+                                <th>{{ __('backup.jobs_col_job') }}</th><th>{{ __('backup.jobs_col_queue') }}</th><th>{{ __('backup.jobs_col_failed') }}</th>
                             </tr></thead>
                             <tbody>
                                 @foreach($queueStatus['recent_failed'] as $job)
@@ -145,7 +145,7 @@
                 @else
                 <div class="card-footer bg-light text-muted">
                     <i class="fas fa-check-circle text-success mr-1"></i>
-                    Nessun job fallito
+                    {{ __('backup.queue_no_failed') }}
                 </div>
                 @endif
             </div>
@@ -155,13 +155,13 @@
         <div class="col-md-6">
             <div class="card card-outline card-success">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-archive mr-1"></i>Backup disponibili</h3>
+                    <h3 class="card-title"><i class="fas fa-archive mr-1"></i>{{ __('backup.backup_title') }}</h3>
                     <div class="card-tools">
                         <form method="POST" action="{{ route('admin.health.backup-now') }}" class="d-inline">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-success"
-                                    onclick="return confirm('Avviare un backup manuale ora?')">
-                                <i class="fas fa-play mr-1"></i>Esegui ora
+                                    onclick="return confirm('{{ __('backup.backup_confirm') }}')">
+                                <i class="fas fa-play mr-1"></i>{{ __('backup.backup_run_now') }}
                             </button>
                         </form>
                     </div>
@@ -170,12 +170,12 @@
                     @if(empty($backupStatus['files']))
                         <div class="text-center text-muted py-4">
                             <i class="fas fa-database fa-3x mb-2"></i>
-                            <p>Nessun backup disponibile</p>
+                            <p>{{ __('backup.backup_no_files') }}</p>
                         </div>
                     @else
                         <table class="table table-sm table-striped mb-0">
                             <thead><tr>
-                                <th>Data</th><th>Dimensione</th>
+                                <th>{{ __('audit.col_date') }}</th><th>{{ __('backup.db_col_size') }}</th>
                             </tr></thead>
                             <tbody>
                                 @foreach($backupStatus['files'] as $file)
@@ -202,7 +202,7 @@
                     @endif
                 </div>
                 <div class="card-footer text-muted">
-                    Spazio totale backup:
+                    {{ __('backup.backup_total_size') }}
                     <strong>{{ \App\Services\HealthService::formatBytes($backupStatus['total_size_bytes'] ?? 0) }}</strong>
                 </div>
             </div>
@@ -216,17 +216,17 @@
         <div class="col-md-4" id="card-db">
             <div class="card card-outline card-info">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-table mr-1"></i>Top 5 tabelle per dimensione</h3>
+                    <h3 class="card-title"><i class="fas fa-table mr-1"></i>{{ __('backup.db_top_tables') }}</h3>
                 </div>
                 <div class="card-body p-0">
                     @if(empty($dbSize['top_tables']))
                         <div class="text-center text-muted py-3">
-                            <i class="fas fa-exclamation-circle mr-1"></i>Dati non disponibili
+                            <i class="fas fa-exclamation-circle mr-1"></i>{{ __('backup.db_unavailable') }}
                         </div>
                     @else
                         <table class="table table-sm mb-0">
                             <thead><tr>
-                                <th>Tabella</th><th>Righe</th><th>Dim.</th>
+                                <th>{{ __('backup.db_col_table') }}</th><th>{{ __('backup.db_col_rows') }}</th><th>{{ __('backup.db_col_size') }}</th>
                             </tr></thead>
                             <tbody>
                                 @foreach($dbSize['top_tables'] as $table)
@@ -251,7 +251,7 @@
         <div class="col-md-4" id="card-disk">
             <div class="card card-outline card-{{ $diskColor }}">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-hdd mr-1"></i>Spazio disco</h3>
+                    <h3 class="card-title"><i class="fas fa-hdd mr-1"></i>{{ __('backup.disk_title') }}</h3>
                 </div>
                 <div class="card-body">
                     @php $usedPct = $diskSpace['used_pct'] ?? 0; @endphp
@@ -270,11 +270,11 @@
                     </div>
                     <table class="table table-sm table-borderless mb-0">
                         <tr>
-                            <th>Totale</th>
+                            <th>{{ __('backup.disk_total_label') }}</th>
                             <td>{{ \App\Services\HealthService::formatBytes($diskSpace['total_bytes'] ?? 0) }}</td>
                         </tr>
                         <tr>
-                            <th>Libero</th>
+                            <th>{{ __('backup.disk_free_label') }}</th>
                             <td class="text-{{ $diskColor }}">
                                 {{ \App\Services\HealthService::formatBytes($diskSpace['free_bytes'] ?? 0) }}
                                 ({{ $diskSpace['free_pct'] ?? 0 }}%)
@@ -289,19 +289,19 @@
         <div class="col-md-4">
             <div class="card card-outline card-danger">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-bug mr-1"></i>Ultimi errori dal log</h3>
+                    <h3 class="card-title"><i class="fas fa-bug mr-1"></i>{{ __('backup.errors_title') }}</h3>
                 </div>
                 <div class="card-body p-0">
                     @if(empty($recentErrors))
                         <div class="text-center text-muted py-4">
                             <i class="fas fa-check-circle fa-3x text-success mb-2"></i>
-                            <p>Nessun errore recente</p>
+                            <p>{{ __('backup.errors_no_recent') }}</p>
                         </div>
                     @else
                         <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                             <table class="table table-sm mb-0">
                                 <thead><tr>
-                                    <th>Quando</th><th>Livello</th><th>Messaggio</th>
+                                    <th>{{ __('backup.errors_col_when') }}</th><th>{{ __('backup.errors_col_level') }}</th><th>{{ __('backup.errors_col_message') }}</th>
                                 </tr></thead>
                                 <tbody>
                                     @foreach($recentErrors as $err)

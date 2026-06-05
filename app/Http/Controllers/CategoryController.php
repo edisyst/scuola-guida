@@ -28,7 +28,7 @@ class CategoryController extends Controller
         Category::create($request->validated());
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Categoria creata');
+            ->with('success', __('flash.category_created'));
     }
 
     public function edit(Category $category, CategoryTranslationService $service)
@@ -49,7 +49,7 @@ class CategoryController extends Controller
         $category->update($request->validated());
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Categoria aggiornata');
+            ->with('success', __('flash.category_updated'));
     }
 
     public function destroy(Category $category)
@@ -58,6 +58,6 @@ class CategoryController extends Controller
 
         $category->delete();
 
-        return back()->with('success', 'Categoria eliminata');
+        return back()->with('success', __('flash.category_deleted'));
     }
 }
