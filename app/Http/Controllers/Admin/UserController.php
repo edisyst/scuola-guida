@@ -33,7 +33,7 @@ class UserController extends Controller
         $this->service->create($request->validated());
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Utente creato');
+            ->with('success', __('flash.user_created'));
     }
 
     public function edit(User $user)
@@ -51,7 +51,7 @@ class UserController extends Controller
         $this->service->update($user, $request->validated());
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Utente aggiornato');
+            ->with('success', __('flash.user_updated'));
     }
 
     public function downloadPersonalData(User $user, GdprExportService $service): \Symfony\Component\HttpFoundation\BinaryFileResponse
@@ -84,7 +84,7 @@ class UserController extends Controller
 
         $user->delete();
 
-        return back()->with('success', 'Utente eliminato');
+        return back()->with('success', __('flash.user_deleted'));
     }
 
     private function permissionViewData(): array

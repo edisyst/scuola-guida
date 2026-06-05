@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Iscrizioni anagrafiche')
+@section('title', __('enrollments.reg_title'))
 @section('content_header')@endsection
 
 @section('content')
@@ -8,12 +8,12 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Gestione utenti</p>
-            <h1 class="sg-header-title"><i class="fas fa-id-card mr-2"></i> Iscrizioni anagrafiche</h1>
+            <p class="sg-header-subtitle">{{ __('enrollments.reg_subtitle') }}</p>
+            <h1 class="sg-header-title"><i class="fas fa-id-card mr-2"></i> {{ __('enrollments.reg_title') }}</h1>
         </div>
         @if($pendingCount > 0)
             <span class="sg-badge sg-badge-warning">
-                <i class="fas fa-clock"></i> {{ $pendingCount }} in attesa
+                <i class="fas fa-clock"></i> {{ $pendingCount }} {{ __('enrollments.status_pending') }}
             </span>
         @endif
     </div>
@@ -21,7 +21,7 @@
     <div class="sg-card sg-mb-3">
         <div class="sg-card-body sg-flex flex-wrap" style="gap:8px;">
             <a href="{{ route('admin.registrations.index') }}"
-               class="sg-btn sg-btn-sm {{ !$status ? 'sg-btn-primary' : 'sg-btn-light' }}">Tutte</a>
+               class="sg-btn sg-btn-sm {{ !$status ? 'sg-btn-primary' : 'sg-btn-light' }}">{{ __('enrollments.filter_all') }}</a>
             @foreach(\App\Models\User::REG_STATUSES as $key => $label)
                 @if($key === \App\Models\User::REG_NONE) @continue @endif
                 <a href="{{ route('admin.registrations.index', ['status' => $key]) }}"
@@ -34,19 +34,19 @@
 
     <div class="sg-card">
         @if($registrations->isEmpty())
-            <div class="sg-table-empty">Nessuna richiesta di iscrizione trovata.</div>
+            <div class="sg-table-empty">{{ __('enrollments.no_registrations') }}</div>
         @else
             <div class="table-responsive">
                 <table class="sg-table">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Utente</th>
-                            <th>Email</th>
-                            <th>Codice fiscale</th>
-                            <th>Stato</th>
-                            <th>Inviata il</th>
-                            <th class="text-right">Azioni</th>
+                            <th>{{ __('enrollments.col_id') }}</th>
+                            <th>{{ __('enrollments.col_user') }}</th>
+                            <th>{{ __('enrollments.col_email') }}</th>
+                            <th>{{ __('enrollments.col_fiscal') }}</th>
+                            <th>{{ __('enrollments.col_status') }}</th>
+                            <th>{{ __('enrollments.col_submitted') }}</th>
+                            <th class="text-right">{{ __('enrollments.col_actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -65,15 +65,15 @@
                                     <div class="d-inline-flex gap-2 align-items-center">
                                         <a href="{{ route('admin.registrations.show', $u) }}"
                                            class="sg-btn sg-btn-light sg-btn-sm">
-                                            <i class="fas fa-eye"></i> Dettagli
+                                            <i class="fas fa-eye"></i> {{ __('enrollments.action_details') }}
                                         </a>
                                         @if($u->isRegistrationPending())
                                             <form method="POST" action="{{ route('admin.registrations.approve', $u) }}"
                                                   class="d-inline"
-                                                  onsubmit="return confirm('Approvare l\'iscrizione di {{ $u->fullAnagraphicName() }}?');">
+                                                  onsubmit="return confirm('{{ __('enrollments.confirm_approve_reg', ['name' => $u->fullAnagraphicName()]) }}');">
                                                 @csrf
                                                 <button class="sg-btn sg-btn-success sg-btn-sm">
-                                                    <i class="fas fa-check"></i> Approva
+                                                    <i class="fas fa-check"></i> {{ __('enrollments.action_approve') }}
                                                 </button>
                                             </form>
                                         @endif

@@ -51,7 +51,7 @@ class QuizController extends Controller
         $this->service->create($request->validated());
 
         return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Quiz creato');
+            ->with('success', __('flash.quiz_created'));
     }
 
     public function destroy(Quiz $quiz)
@@ -64,7 +64,7 @@ class QuizController extends Controller
 
         $quiz->delete();
 
-        return back()->with('success', 'Quiz eliminato');
+        return back()->with('success', __('flash.quiz_deleted'));
     }
 
     /*
@@ -83,7 +83,7 @@ class QuizController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Quiz pubblicato.');
+        return back()->with('success', __('flash.quiz_published'));
     }
 
     public function unpublish(Quiz $quiz)
@@ -96,7 +96,7 @@ class QuizController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Quiz riportato in bozza.');
+        return back()->with('success', __('flash.quiz_unpublished'));
     }
 
     public function confirm(Quiz $quiz)
@@ -109,7 +109,7 @@ class QuizController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Quiz confermato. Non sarà più modificabile.');
+        return back()->with('success', __('flash.quiz_confirmed'));
     }
 
     /*
@@ -194,7 +194,7 @@ class QuizController extends Controller
 
         return redirect()
             ->route('admin.quizzes.index')
-            ->with('success', 'Quiz creato con ' . $quiz->questions()->count() . ' domande');
+            ->with('success', __('flash.quiz_random_created', ['count' => $quiz->questions()->count()]));
     }
 
     public function play(Quiz $quiz)
@@ -303,7 +303,7 @@ class QuizController extends Controller
         }
 
         return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Schedulazione iscrizioni aggiornata.');
+            ->with('success', __('flash.quiz_schedule_updated'));
     }
 
     /*
@@ -337,7 +337,7 @@ class QuizController extends Controller
             return back()->with('error', $result['error']);
         }
 
-        return back()->with('success', "Aggiunte {$result['added']} domande random al quiz");
+        return back()->with('success', __('flash.quiz_random_filled', ['count' => $result['added']]));
     }
 
     public function updateParams(Request $request, Quiz $quiz)

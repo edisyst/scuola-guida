@@ -1,0 +1,21 @@
+<?php
+return [
+    'title'    => 'Gestión de Usuarios',
+    'subtitle' => 'Crear usuarios, asignar roles y permisos individuales',
+    'create'   => 'Nuevo usuario',
+    'edit'     => 'Editar usuario',
+    'list'     => 'Lista de usuarios',
+    'col_user'        => 'Usuario',
+    'col_email'       => 'Email',
+    'col_role'        => 'Rol',
+    'col_permissions' => 'Permisos extra',
+    'col_actions'     => 'Acciones',
+    'action_roles'     => 'Roles y Permisos',
+    'action_new'       => 'Nuevo usuario',
+    'action_stats'     => 'Estadísticas',
+    'action_edit'      => 'Editar',
+    'action_delete'    => 'Eliminar',
+    'confirm_delete'   => '¿Eliminar a :name?',
+    'instructor_section' => 'Gestión de instructores',
+    'assign_instructor'  => 'Asignar instructor',
+];

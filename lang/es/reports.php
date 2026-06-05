@@ -1,0 +1,20 @@
+<?php
+return [
+    'title'    => 'Informes periódicos',
+    'subtitle' => 'Administración',
+    'label_period'       => 'Período rápido',
+    'label_from'         => 'Fecha inicio',
+    'label_to'           => 'Fecha fin',
+    'label_compare'      => 'Comparar con el período anterior de igual duración',
+    'preset_current_month'   => 'Mes actual',
+    'preset_last_month'      => 'Mes pasado',
+    'preset_current_quarter' => 'Trimestre actual',
+    'preset_last_quarter'    => 'Trimestre pasado',
+    'preset_current_year'    => 'Año actual',
+    'action_generate'    => 'Generar informe',
+    'action_export_pdf'  => 'Exportar PDF',
+    'col_id'      => 'ID',
+    'col_name'    => 'Nombre',
+    'col_period'  => 'Período',
+    'col_actions' => 'Acciones',
+];

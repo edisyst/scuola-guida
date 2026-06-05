@@ -76,7 +76,7 @@ class RegistrationController extends Controller
 
         return redirect()
             ->route('admin.registrations.index')
-            ->with('success', 'Iscrizione approvata per ' . $user->fullAnagraphicName() . '.');
+            ->with('success', __('flash.registration_approved'));
     }
 
     public function reject(Request $request, User $user)
@@ -95,6 +95,6 @@ class RegistrationController extends Controller
 
         return redirect()
             ->route('admin.registrations.index')
-            ->with('success', 'Iscrizione rifiutata per ' . $user->fullAnagraphicName() . '.');
+            ->with('success', __('flash.registration_rejected'));
     }
 }

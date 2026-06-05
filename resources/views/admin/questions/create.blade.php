@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Nuova domanda')
+@section('title', __('questions.create'))
 @section('content_header')@endsection
 
 @section('content')
@@ -8,11 +8,11 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Catalogo</p>
-            <h1 class="sg-header-title"><i class="fas fa-plus mr-2"></i> Nuova domanda</h1>
+            <p class="sg-header-subtitle">{{ __('questions.subtitle') }}</p>
+            <h1 class="sg-header-title"><i class="fas fa-plus mr-2"></i> {{ __('questions.create') }}</h1>
         </div>
         <a href="{{ route('admin.questions.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
-            <i class="fas fa-arrow-left"></i> Indietro
+            <i class="fas fa-arrow-left"></i> {{ __('common.back') }}
         </a>
     </div>
 
@@ -27,7 +27,7 @@
 
         <div class="sg-mt-3 sg-text-center">
             <button class="sg-btn sg-btn-primary">
-                <i class="fas fa-save"></i> Salva
+                <i class="fas fa-save"></i> {{ __('common.save') }}
             </button>
         </div>
     </form>

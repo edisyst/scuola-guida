@@ -1,7 +1,7 @@
 {{-- Tabella popolata via AJAX da admin.questions.data (DataTables) --}}
 @extends('layouts.admin')
 
-@section('title', 'Domande')
+@section('title', __('questions.title'))
 @section('content_header')@endsection
 
 @section('content')
@@ -9,22 +9,22 @@
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Catalogo</p>
-            <h1 class="sg-header-title"><i class="fas fa-question-circle mr-2"></i> Domande</h1>
+            <p class="sg-header-subtitle">{{ __('questions.subtitle') }}</p>
+            <h1 class="sg-header-title"><i class="fas fa-question-circle mr-2"></i> {{ __('questions.title') }}</h1>
         </div>
         @if(auth()->user()->canCreateQuestion())
             <div class="sg-header-actions flex-wrap">
                 <a href="{{ route('admin.questions.create') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                    <i class="fas fa-plus"></i> Nuova
+                    <i class="fas fa-plus"></i> {{ __('questions.action_new') }}
                 </a>
                 <a href="{{ route('admin.questions.export') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                    <i class="fas fa-file-excel"></i> Export
+                    <i class="fas fa-file-excel"></i> {{ __('questions.action_export') }}
                 </a>
                 <a href="{{ route('admin.questions.template') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                    <i class="fas fa-download"></i> Template
+                    <i class="fas fa-download"></i> {{ __('questions.action_template') }}
                 </a>
                 <a href="{{ route('admin.questions.mit-import') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                    <i class="fas fa-file-import"></i> Import MIT
+                    <i class="fas fa-file-import"></i> {{ __('questions.action_import_mit') }}
                 </a>
             </div>
         @endif
@@ -35,10 +35,10 @@
             <div class="sg-card-body" style="padding:1rem 1.25rem;">
                 <form action="{{ route('admin.questions.import') }}" method="POST" enctype="multipart/form-data" class="sg-d-flex sg-gap-2 align-items-center flex-wrap">
                     @csrf
-                    <span class="sg-label sg-mb-0 mr-2"><i class="fas fa-file-import"></i> Import Excel</span>
+                    <span class="sg-label sg-mb-0 mr-2"><i class="fas fa-file-import"></i> {{ __('questions.import_excel') }}</span>
                     <input type="file" name="file" required class="sg-form-control" style="max-width:min(340px, 100%);">
                     <button class="sg-btn sg-btn-primary sg-btn-sm">
-                        <i class="fas fa-upload"></i> Carica
+                        <i class="fas fa-upload"></i> {{ __('questions.action_upload') }}
                     </button>
                 </form>
             </div>
@@ -50,7 +50,7 @@
             <div class="row sg-mb-2">
                 <div class="col-12 col-md-3 sg-mb-1">
                     <select id="filter-category" class="sg-form-control">
-                        <option value="">Tutte le categorie</option>
+                        <option value="">{{ __('questions.filter_all_categories') }}</option>
                         @foreach($categories as $c)
                             <option value="{{ $c->id }}">{{ $c->name }}</option>
                         @endforeach
@@ -59,22 +59,22 @@
                 @if(!auth()->user()->isViewer())
                 <div class="col-12 col-md-3 sg-mb-1">
                     <select id="filter-is-true" class="sg-form-control">
-                        <option value="">Vero / Falso</option>
-                        <option value="1">Vero</option>
-                        <option value="0">Falso</option>
+                        <option value="">{{ __('questions.filter_true_false') }}</option>
+                        <option value="1">{{ __('questions.filter_true') }}</option>
+                        <option value="0">{{ __('questions.filter_false') }}</option>
                     </select>
                 </div>
                 @endif
                 <div class="col-12 col-md-3 sg-mb-1">
                     <select id="filter-image" class="sg-form-control">
-                        <option value="">Tutte</option>
-                        <option value="1">Con immagine</option>
+                        <option value="">{{ __('questions.filter_all') }}</option>
+                        <option value="1">{{ __('questions.filter_with_image') }}</option>
                     </select>
                 </div>
                 @if(auth()->user()->canDeleteQuestion())
                 <div class="col-12 col-md-3 sg-mb-1 sg-text-center">
                     <button id="bulk-delete" class="sg-btn sg-btn-danger sg-btn-sm">
-                        <i class="fas fa-trash"></i> Elimina selezionati
+                        <i class="fas fa-trash"></i> {{ __('questions.bulk_delete') }}
                     </button>
                 </div>
                 @endif
@@ -85,14 +85,14 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Categoria</th>
-                            <th>Domanda</th>
+                            <th>{{ __('questions.col_category') }}</th>
+                            <th>{{ __('questions.col_text') }}</th>
                             @if(!auth()->user()->isViewer())
-                                <th>Risposta</th>
+                                <th>{{ __('questions.col_answer') }}</th>
                             @endif
                             <th>Img</th>
                             @if(!auth()->user()->isViewer())
-                                <th>Azioni</th>
+                                <th>{{ __('questions.col_actions') }}</th>
                             @endif
                             @if(auth()->user()->canDeleteQuestion())
                                 <th><input type="checkbox" id="select-all"></th>
@@ -154,11 +154,11 @@
             });
 
             if (!ids.length) {
-                toastr.warning('Seleziona almeno un elemento');
+                toastr.warning('{{ __('questions.select_at_least_one') }}');
                 return;
             }
 
-            if (!confirm('Sei sicuro?')) return;
+            if (!confirm('{{ __('questions.confirm_bulk_delete') }}')) return;
 
             $.ajax({
                 url: "{{ route('admin.questions.bulkDelete') }}",
@@ -168,7 +168,7 @@
                     ids: ids
                 },
                 success: function() {
-                    toastr.success('Eliminati');
+                    toastr.success('{{ __('questions.deleted_success') }}');
                     $('#questions-table').DataTable().ajax.reload();
                 }
             });

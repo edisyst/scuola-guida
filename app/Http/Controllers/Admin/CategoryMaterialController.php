@@ -38,7 +38,7 @@ class CategoryMaterialController extends Controller
 
         return redirect()
             ->route('admin.categories.materials.index', $category)
-            ->with('success', 'Materiale aggiunto con successo.');
+            ->with('success', __('flash.material_created'));
     }
 
     public function edit(Category $category, CategoryMaterial $material)
@@ -56,7 +56,7 @@ class CategoryMaterialController extends Controller
 
         return redirect()
             ->route('admin.categories.materials.index', $category)
-            ->with('success', 'Materiale aggiornato con successo.');
+            ->with('success', __('flash.material_updated'));
     }
 
     public function destroy(Category $category, CategoryMaterial $material)
@@ -65,7 +65,7 @@ class CategoryMaterialController extends Controller
 
         $this->service->delete($material);
 
-        return back()->with('success', 'Materiale eliminato.');
+        return back()->with('success', __('flash.material_deleted'));
     }
 
     public function reorder(Request $request, Category $category)

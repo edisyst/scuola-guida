@@ -21,7 +21,7 @@ class QuestionTranslationController extends Controller
 
         return redirect()
             ->route('admin.questions.edit', $question)
-            ->with('success', 'Traduzione salvata con successo.');
+            ->with('success', __('flash.translation_saved'));
     }
 
     public function update(UpdateQuestionTranslationRequest $request, Question $question, string $locale): RedirectResponse
@@ -32,7 +32,7 @@ class QuestionTranslationController extends Controller
 
         return redirect()
             ->route('admin.questions.edit', $question)
-            ->with('success', 'Traduzione aggiornata con successo.');
+            ->with('success', __('flash.translation_updated'));
     }
 
     public function destroy(Question $question, string $locale): RedirectResponse
@@ -43,6 +43,6 @@ class QuestionTranslationController extends Controller
 
         return redirect()
             ->route('admin.questions.edit', $question)
-            ->with('success', 'Traduzione eliminata.');
+            ->with('success', __('flash.translation_deleted'));
     }
 }
