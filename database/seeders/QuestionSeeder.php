@@ -11,12 +11,14 @@ class QuestionSeeder extends Seeder
 {
     private const EXCEL_IT   = 'file_con_category_id.xlsx';
     private const EXCEL_EN   = 'file_con_category_id_EN.xlsx';
+    private const EXCEL_ES   = 'file_con_category_id_ES.xlsx';
     private const CHUNK_SIZE = 500;
 
     public function run(): void
     {
         $fileIt = storage_path('app/imports/' . self::EXCEL_IT);
         $fileEn = storage_path('app/imports/' . self::EXCEL_EN);
+        $fileEs = storage_path('app/imports/' . self::EXCEL_ES);
 
         if (!file_exists($fileIt)) {
             $this->command->error("File non trovato: {$fileIt}");
@@ -24,7 +26,7 @@ class QuestionSeeder extends Seeder
         }
 
         // --- IT questions ---
-        // Mappa rowIndex => question_id, per collegare le traduzioni EN.
+        // Mappa rowIndex => question_id, per collegare le traduzioni.
         $rowToId = $this->insertItalianQuestions($fileIt);
 
         $this->command->info('CREATE ' . count($rowToId) . ' DOMANDE (IT)');
@@ -32,10 +34,16 @@ class QuestionSeeder extends Seeder
         // --- EN translations ---
         if (!file_exists($fileEn)) {
             $this->command->warn("File EN non trovato, salto traduzioni: {$fileEn}");
-            return;
+        } else {
+            $this->insertTranslations($fileEn, 'en', $rowToId);
         }
 
-        $this->insertEnglishTranslations($fileEn, $rowToId);
+        // --- ES translations ---
+        if (!file_exists($fileEs)) {
+            $this->command->warn("File ES non trovato, salto traduzioni: {$fileEs}");
+        } else {
+            $this->insertTranslations($fileEs, 'es', $rowToId);
+        }
     }
 
     /**
@@ -115,24 +123,24 @@ class QuestionSeeder extends Seeder
     }
 
     /**
-     * Legge il foglio "Domande" del file EN, matcha per posizione riga,
-     * inserisce le traduzioni EN in bulk.
+     * Legge il foglio "Domande" del file tradotto, matcha per posizione riga,
+     * inserisce le traduzioni nella lingua $locale in bulk.
      *
      * @param array<int,int> $rowToId  rowIndex => question_id
      */
-    private function insertEnglishTranslations(string $filePath, array $rowToId): void
+    private function insertTranslations(string $filePath, string $locale, array $rowToId): void
     {
         $reader = IOFactory::createReader('Xlsx');
         $reader->setReadDataOnly(true);
         $spreadsheet = $reader->load($filePath);
         $worksheet   = $spreadsheet->getSheetByName('Domande');
 
-        $now        = now();
-        $batch      = [];
-        $total      = 0;
-        $skipped    = 0;
+        $now     = now();
+        $batch   = [];
+        $total   = 0;
+        $skipped = 0;
+        $localeUp = strtoupper($locale);
 
-        // Colonne: A=question_EN, B=is_true, C=image, D=category_id (stesso ordine del file IT)
         foreach ($worksheet->getRowIterator(2) as $excelRow) {
             $rowIndex = $excelRow->getRowIndex();
 
@@ -144,20 +152,20 @@ class QuestionSeeder extends Seeder
             $cellIterator = $excelRow->getCellIterator('A', 'A');
             $cellIterator->setIterateOnlyExistingCells(false);
 
-            $questionEn = '';
+            $text = '';
             foreach ($cellIterator as $cell) {
-                $questionEn = trim((string) $cell->getValue());
+                $text = trim((string) $cell->getValue());
             }
 
-            if ($questionEn === '') {
+            if ($text === '') {
                 $skipped++;
                 continue;
             }
 
             $batch[] = [
                 'question_id' => $rowToId[$rowIndex],
-                'locale'      => 'en',
-                'text'        => $questionEn,
+                'locale'      => $locale,
+                'text'        => $text,
                 'created_by'  => null,
                 'created_at'  => $now,
                 'updated_at'  => $now,
@@ -167,7 +175,7 @@ class QuestionSeeder extends Seeder
                 QuestionTranslation::insert($batch);
                 $total  += count($batch);
                 $batch   = [];
-                $this->command->line("  Inserite {$total} traduzioni EN...");
+                $this->command->line("  Inserite {$total} traduzioni {$localeUp}...");
             }
         }
 
@@ -179,6 +187,6 @@ class QuestionSeeder extends Seeder
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
 
-        $this->command->info("CREATE {$total} TRADUZIONI EN DOMANDE (saltate: {$skipped})");
+        $this->command->info("CREATE {$total} TRADUZIONI {$localeUp} DOMANDE (saltate: {$skipped})");
     }
 }
