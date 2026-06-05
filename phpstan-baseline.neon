@@ -1,0 +1,685 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Relation ''enrollments'' is not found in App\\Models\\Quiz model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/CloseExpiredEnrollments.php
+
+		-
+			message: '#^Anonymous function has an unused use \$notificationsCount\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: app/Console/Commands/GdprAnonymize.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$quiz_attempts_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/GdprList.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\User\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Console/Commands/GdprList.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Question\:\:\$category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/DataTables/QuestionsDataTable.php
+
+		-
+			message: '#^Relation ''category'' is not found in App\\Models\\Question model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/DataTables/QuestionsDataTable.php
+
+		-
+			message: '#^Relation ''category'' is not found in App\\Models\\Question model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/DataTables/QuizQuestionsDataTable.php
+
+		-
+			message: '#^Relation ''category'' is not found in App\\Models\\Question model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Exports/QuestionsExport.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizEnrollment\:\:\$quizAttempt\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Exports/QuizResultsExport.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizEnrollment\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Exports/QuizResultsExport.php
+
+		-
+			message: '#^Method App\\Exports\\QuizResultsExport\:\:query\(\) has invalid return type Laravel\\Scout\\Builder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Exports/QuizResultsExport.php
+
+		-
+			message: '#^Relation ''quizAttempt'' is not found in App\\Models\\QuizEnrollment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Exports/QuizResultsExport.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\QuizEnrollment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Exports/QuizResultsExport.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:ordered\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/CategoryMaterialController.php
+
+		-
+			message: '#^Relation ''registrationReviewer'' is not found in App\\Models\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Admin/RegistrationController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Question\:\:\$category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/OfflineController.php
+
+		-
+			message: '#^Empty array passed to foreach\.$#'
+			identifier: foreach.emptyArray
+			count: 1
+			path: app/Http/Controllers/Auth/TwoFactorChallengeController.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 1
+			path: app/Http/Controllers/Auth/TwoFactorChallengeController.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: app/Http/Controllers/Auth/TwoFactorChallengeController.php
+
+		-
+			message: '#^Property App\\Models\\User\:\:\$two_factor_recovery_codes \(string\|null\) does not accept array\.$#'
+			identifier: assign.propertyType
+			count: 2
+			path: app/Http/Controllers/Auth/TwoFactorSetupController.php
+
+		-
+			message: '#^Parameter \#1 \$user of class Illuminate\\Auth\\Events\\Verified constructor expects Illuminate\\Contracts\\Auth\\MustVerifyEmail, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/VerifyEmailController.php
+
+		-
+			message: '#^Relation ''enrollments'' is not found in App\\Models\\Quiz model\.$#'
+			identifier: larastan.relationExistence
+			count: 3
+			path: app/Http/Controllers/CalendarController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$unreadNotifications\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/NotificationController.php
+
+		-
+			message: '#^Relation ''quiz'' is not found in App\\Models\\QuizAttempt model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/QuizAttemptController.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\QuizAttempt model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/QuizAttemptController.php
+
+		-
+			message: '#^Relation ''enrollment'' is not found in App\\Models\\QuizAttempt model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/QuizController.php
+
+		-
+			message: '#^Relation ''quiz'' is not found in App\\Models\\QuizAttempt model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/QuizController.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\QuizAttempt model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/QuizController.php
+
+		-
+			message: '#^Relation ''quiz'' is not found in App\\Models\\QuizEnrollment model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/QuizEnrollmentController.php
+
+		-
+			message: '#^Relation ''reviewer'' is not found in App\\Models\\QuizEnrollment model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/QuizEnrollmentController.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\QuizEnrollment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/QuizEnrollmentController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Question\:\:\$category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StudyController.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Livewire\\Admin\\MediaManager\:\:\$directory\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Livewire/Admin/MediaManager.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Livewire\\Admin\\MediaManager\:\:\$files\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Livewire/Admin/MediaManager.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Livewire\\Admin\\MediaManager\:\:\$folderCounts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Livewire/Admin/MediaManager.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Relations\\Pivot\:\:\$note\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Livewire/BookmarkButton.php
+
+		-
+			message: '#^Relation ''category'' is not found in App\\Models\\Question model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Livewire/DiagnosticTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$unreadNotifications\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Livewire/NotificationBell.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_true\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Livewire/SmartReview.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getLocalizedText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Livewire/SmartReview.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>locale" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Middleware/SetLocale.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Models/Category.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Method App\\Models\\Question\:\:createVersion\(\) should return App\\Models\\QuestionVersion but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Method App\\Models\\Question\:\:currentVersion\(\) should return App\\Models\\QuestionVersion\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Offset ''confirmed''\|''draft''\|''published'' on array\{draft\: ''Bozza'', published\: ''Pubblicato'', confirmed\: ''Confermato''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Quiz.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/QuizAttempt.php
+
+		-
+			message: '#^Offset ''approved''\|''completed''\|''pending''\|''rejected'' on array\{pending\: ''In attesa'', approved\: ''Approvata'', rejected\: ''Rifiutata'', completed\: ''Completata''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/QuizEnrollment.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AuditLog\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AuditLogService.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\AuditLog model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/AuditLogService.php
+
+		-
+			message: '#^Parameter \#1 \$attributes of static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\CategoryMaterial\>\:\:create\(\) expects array\<model property of App\\Models\\CategoryMaterial, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/CategoryMaterialService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AuditLog\:\:\$total\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/EditorMetricsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$quizAttempts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$body\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$marked_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$question_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Instanceof between Carbon\\Carbon and DateTimeInterface will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Instanceof between string and DateTimeInterface will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Instanceof between string\|null and DateTimeInterface will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\UserBadge\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 3
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type string\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/GdprExportService.php
+
+		-
+			message: '#^Method App\\Services\\HealthService\:\:resolveLogPath\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: app/Services/HealthService.php
+
+		-
+			message: '#^Cannot call method toDateTimeString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Services/InstructorService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\UserBadge\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/InstructorService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: array\{id\: int, name\: string, email\: string, last_attempt_at\: mixed, last_score\: array\{score\: mixed, total_questions\: mixed, pct\: float\|null\}\|null, streak\: int, active_today\: bool\}, Closure\(App\\Models\\User\)\: array\{id\: int, name\: string, email\: string, last_attempt_at\: mixed, last_score\: array\{score\: mixed, total_questions\: mixed, pct\: float\|null\}\|null, streak\: int, active_today\: bool\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/InstructorService.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type string\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/InstructorService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MitImportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MitImportService.php
+
+		-
+			message: '#^Method App\\Services\\QuestionTranslationService\:\:upsert\(\) should return App\\Models\\QuestionTranslation but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/QuestionTranslationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/QuestionVersionService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Quiz\:\:\$questions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/QuizAttemptService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/QuizAttemptService.php
+
+		-
+			message: '#^PHPDoc tag @param for parameter \$correctMap with type iterable is not subtype of native type Illuminate\\Support\\Collection\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: app/Services/QuizAttemptService.php
+
+		-
+			message: '#^Relation ''questions'' is not found in App\\Models\\Quiz model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/QuizAttemptService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizEnrollment\:\:\$quiz\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/QuizEnrollmentService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizEnrollment\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/QuizEnrollmentService.php
+
+		-
+			message: '#^Parameter \#1 \$attributes of static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Quiz\>\:\:create\(\) expects array\<model property of App\\Models\\Quiz, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/QuizService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizEnrollment\:\:\$quizAttempt\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/QuizSummaryService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizEnrollment\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/QuizSummaryService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Question\:\:\$category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ReviewErrorsService.php
+
+		-
+			message: '#^Relation ''category'' is not found in App\\Models\\Question model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/ReviewErrorsService.php
+
+		-
+			message: '#^Relation ''category'' is not found in App\\Models\\Question model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/SearchService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/SimulatorService.php
+
+		-
+			message: '#^Relation ''category'' is not found in App\\Models\\Question model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/SimulatorService.php
+
+		-
+			message: '#^Comparison operation "\>" between 2 and 1 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: app/Services/StreakService.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between float and 1 will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Services/StreakService.php
+
+		-
+			message: '#^Relation ''category'' is not found in App\\Models\\Question model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/StudyService.php
+
+		-
+			message: '#^Parameter \#1 \$attributes of method Illuminate\\Database\\Eloquent\\Model\:\:update\(\) expects array\<model property of App\\Models\\User, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/UserService.php
+
+		-
+			message: '#^Parameter \#1 \$attributes of static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\User\>\:\:create\(\) expects array\<model property of App\\Models\\User, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/UserService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$attempts\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$avg_duration\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$avg_pct\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$best_pct\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$first_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$last_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$pct\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$total_correct\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\QuizAttempt\:\:\$total_duration\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Comparison operation "\>" between int\<1, max\> and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\QuizAttempt\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 2
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Relation ''quiz'' is not found in App\\Models\\QuizAttempt model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>title" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/UserStatsService.php
