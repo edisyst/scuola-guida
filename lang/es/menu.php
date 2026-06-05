@@ -51,6 +51,7 @@ return [
     'categorie'               => 'Categorías',
     'domande'                 => 'Preguntas',
     'segnalazioni'            => 'Reportes',
+    'tipi_patente'            => 'Tipos de licencia',
     'quizzes'                 => 'Quizzes',
     'i_miei_studenti'         => 'Mis estudiantes',
     'gestione_istruttori'     => 'Gestión de instructores',

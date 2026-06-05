@@ -5,6 +5,76 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 8.0: Fondamenta multi-patente con entità `LicenseType`
+
+Introduce `LicenseType` come entità di prima classe nel dominio. Ogni tipo di patente
+(B, A, CQC, etc.) ha un'identità esplicita, configurabile in admin, e può avere:
+categorie di domande associate, quiz collegati, formato esame personalizzato.
+Retrocompatibilità: tutte le categorie e quiz esistenti assegnati al tipo B.
+
+### Added
+
+- **Migrations:**
+  - `create_license_types_table` — schema: `code` (unique), `name`, `description`, campi
+    formato esame (`exam_questions`, `exam_minutes`, `exam_max_errors`), ordinamento.
+  - `create_category_license_type_table` — pivot BelongsToMany tra categorie e tipi patente.
+  - `add_license_type_id_to_quizzes_table` — FK nullable verso `LicenseType`.
+  - `assign_existing_data_to_license_type_b` — retrocompatibilità: assegna tutte le
+    categorie e quiz esistenti al tipo B (autonoma, non dipende da seeder).
+
+- **Seeder:**
+  - `LicenseTypeSeeder` — 17 tipi italiani (AM, A1, A2, A, B, B96, BE, C1, C1E, C, CE,
+    D1, D1E, D, DE, CQC Merci, CQC Persone) via `upsert()` su `code` (idempotente).
+    Tipo B pre-compilato: 30 domande, 20 min, 3 errori max.
+
+- **Model:**
+  - `LicenseType` con trait `Auditable` e `HasFactory`.
+  - Relazioni: `categories()` BelongsToMany, `quizzes()` HasMany.
+  - Scope `active()` filtra `is_active = true`.
+
+- **Observer:**
+  - `LicenseTypeObserver` su `updated()` e `deleted()` per audit (trait Auditable).
+
+- **Service:**
+  - `LicenseTypeService`: `all()`, `allForSelect()`, `find()`, `create()`, `update()`,
+    `syncCategories()`, `delete()` con check quiz collegati.
+
+- **Controller:**
+  - `Admin\LicenseTypeController` — CRUD standard + `syncCategories()` per pivot.
+  - Autorizzazione: `canEditLicenseType()` (solo admin).
+
+- **Form Requests:**
+  - `StoreLicenseTypeRequest` e `UpdateLicenseTypeRequest` — validazione code (unique),
+    name, exam format, category sync.
+
+- **Routes:**
+  - `admin.license-types.*` (resource + sync-categories custom).
+  - Middleware: `role:admin` (admin-only).
+
+- **Views:**
+  - `admin/license-types/index.blade.php` — DataTable: codice, nome, categorie, quiz,
+    formato esame, stato, azioni.
+  - `admin/license-types/create.blade.php` — form con sezione categorie (checkbox list).
+  - `admin/license-types/edit.blade.php` — form con pre-compilazione e checkbox categorie.
+
+- **Sidebar & i18n:**
+  - Voce "Tipi di patente" nella sidebar admin (icona `fa-id-card`).
+  - Traduzioni: `menu.tipi_patente` (it/en/es).
+  - Flash messages: `flash.license_type_*` (created/updated/deleted), `categories_synced`.
+
+- **Test:**
+  - `LicenseTypeTest.php` — seeder, migration, retrocompatibilità, CRUD, autorizzazione,
+    cascade delete, reversibilità migration.
+
+### Changed
+
+- `User` model: aggiunto metodo `canEditLicenseType()` (solo admin).
+- `Category` model: relazione `licenseTypes()` BelongsToMany.
+- `Quiz` model: relazione `licenseType()` BelongsTo, colonna `license_type_id` in
+  `$fillable`.
+
+---
+
 ## [Unreleased] — Feature 7.3b: i18n completa area backend (admin / editor / instructor)
 
 Porta la localizzazione a tutta l'area backend: gestione domande, quiz, categorie,

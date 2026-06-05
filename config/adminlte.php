@@ -564,6 +564,13 @@ return [
             'key'  => 'categories',
         ],
         [
+            'text' => 'tipi_patente',
+            'url'  => 'admin/license-types',
+            'icon' => 'fas fa-id-card',
+            'can'  => 'admin-only',
+            'key'  => 'license-types',
+        ],
+        [
             'text' => 'domande',
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question-circle',

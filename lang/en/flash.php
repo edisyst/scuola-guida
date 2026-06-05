@@ -57,6 +57,11 @@ return [
     'category_updated' => 'Category updated.',
     'category_deleted' => 'Category deleted.',
 
+    'license_type_created' => 'License type created.',
+    'license_type_updated' => 'License type updated.',
+    'license_type_deleted' => 'License type deleted.',
+    'categories_synced' => 'Categories synced.',
+
     'material_created' => 'Learning material added.',
     'material_updated' => 'Learning material updated.',
     'material_deleted' => 'Learning material deleted.',

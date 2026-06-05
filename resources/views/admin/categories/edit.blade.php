@@ -34,6 +34,46 @@
     </form>
 
     {{-- ------------------------------------------------------------------ --}}
+    {{-- SEZIONE TIPI DI PATENTE ASSOCIATI                                    --}}
+    {{-- ------------------------------------------------------------------ --}}
+
+    <div class="sg-card sg-mt-4 sg-mb-3">
+        <div class="sg-card-header">
+            <h2 class="sg-card-header-title">
+                <i class="fas fa-id-card mr-2"></i> Tipi di patente associati
+            </h2>
+        </div>
+        <div class="sg-card-body">
+            @if($category->licenseTypes->isNotEmpty())
+                <div class="list-group">
+                    @foreach($category->licenseTypes->sortBy('sort_order') as $licenseType)
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ $licenseType->name }}</h6>
+                                <small class="text-muted">{{ $licenseType->code }}</small>
+                            </div>
+                            @if($licenseType->is_active)
+                                <span class="badge badge-success">Attivo</span>
+                            @else
+                                <span class="badge badge-secondary">Inattivo</span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-id-card fa-3x text-muted mb-3 d-block"></i>
+                    <p class="mb-0">Questa categoria non è ancora associata a nessun tipo di patente.</p>
+                </div>
+            @endif
+            <p class="text-muted small mt-3">
+                <i class="fas fa-info-circle"></i> Le associazioni si gestiscono dalla pagina
+                <a href="{{ route('admin.license-types.index') }}">Tipi di patente</a>.
+            </p>
+        </div>
+    </div>
+
+    {{-- ------------------------------------------------------------------ --}}
     {{-- SEZIONE TRADUZIONI                                                   --}}
     {{-- ------------------------------------------------------------------ --}}
 

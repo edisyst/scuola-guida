@@ -57,6 +57,11 @@ return [
     'category_updated' => 'Categoria aggiornata.',
     'category_deleted' => 'Categoria eliminata.',
 
+    'license_type_created' => 'Tipo di patente creato.',
+    'license_type_updated' => 'Tipo di patente aggiornato.',
+    'license_type_deleted' => 'Tipo di patente eliminato.',
+    'categories_synced' => 'Categorie sincronizzate.',
+
     'material_created' => 'Materiale didattico aggiunto.',
     'material_updated' => 'Materiale didattico aggiornato.',
     'material_deleted' => 'Materiale didattico eliminato.',

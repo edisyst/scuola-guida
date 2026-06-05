@@ -34,6 +34,11 @@ return [
     'category_created' => 'Categoría creada.',
     'category_updated' => 'Categoría actualizada.',
     'category_deleted' => 'Categoría eliminada.',
+
+    'license_type_created' => 'Tipo de licencia creado.',
+    'license_type_updated' => 'Tipo de licencia actualizado.',
+    'license_type_deleted' => 'Tipo de licencia eliminado.',
+    'categories_synced' => 'Categorías sincronizadas.',
     'material_created' => 'Material didáctico añadido.',
     'material_updated' => 'Material didáctico actualizado.',
     'material_deleted' => 'Material didáctico eliminado.',
