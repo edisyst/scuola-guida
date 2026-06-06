@@ -53,6 +53,16 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label for="license_type_id">{{ __('reports.filter_license_type') }}</label>
+                    <select name="license_type_id" id="license_type_id" class="form-control">
+                        <option value="">{{ __('reports.filter_license_type_all') }}</option>
+                        @foreach($licenseTypes as $lt)
+                            <option value="{{ $lt->id }}">{{ $lt->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div>
                     <button type="submit" class="sg-btn sg-btn-primary">
                         <i class="fas fa-chart-pie"></i> {{ __('reports.action_generate') }}
@@ -68,6 +78,7 @@
                 <input type="hidden" id="pdf-from" name="from">
                 <input type="hidden" id="pdf-to" name="to">
                 <input type="hidden" id="pdf-compare" name="compare">
+                <input type="hidden" id="pdf-license-type-id" name="license_type_id">
             </form>
         </div>
     </div>
@@ -128,9 +139,10 @@
         });
 
         document.getElementById('btn-export-pdf').addEventListener('click', function () {
-            document.getElementById('pdf-from').value    = document.getElementById('from').value;
-            document.getElementById('pdf-to').value      = document.getElementById('to').value;
-            document.getElementById('pdf-compare').value = document.getElementById('compare').checked ? '1' : '';
+            document.getElementById('pdf-from').value           = document.getElementById('from').value;
+            document.getElementById('pdf-to').value            = document.getElementById('to').value;
+            document.getElementById('pdf-compare').value       = document.getElementById('compare').checked ? '1' : '';
+            document.getElementById('pdf-license-type-id').value = document.getElementById('license_type_id').value;
             document.getElementById('pdf-form').submit();
         });
     })();

@@ -28,11 +28,13 @@ return [
 
     'pending_badge'    => ':count pending',
     'filter_all'       => 'All',
+    'filter_license_type' => 'License type',
     'no_results'       => 'No enrollments found.',
     'no_registrations' => 'No registration requests found.',
 
     'col_id'        => '#',
     'col_user'      => 'User',
+    'col_license_type' => 'License type',
     'col_fiscal'    => 'Tax code',
     'col_email'     => 'Email',
     'col_submitted' => 'Submitted on',

@@ -4,6 +4,7 @@ namespace App\DataTables;
 
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class QuestionsDataTable
@@ -29,6 +30,12 @@ class QuestionsDataTable
 
         if ($request->filled('has_image')) {
             $query->whereNotNull('image');
+        }
+
+        if ($request->filled('license_type_id')) {
+            $query->whereHas('category.licenseTypes',
+                fn ($q) => $q->where('license_types.id', $request->license_type_id)
+            );
         }
 
         $total    = Question::count();
@@ -65,8 +72,18 @@ class QuestionsDataTable
             'image' => $q->image
                 ? '<img src="' . (str_starts_with($q->image, 'http') ? $q->image : asset('storage/' . $q->image)) . '" width="50" class="question-thumb" style="cursor:zoom-in;" data-full-src="' . (str_starts_with($q->image, 'http') ? $q->image : asset('storage/' . $q->image)) . '" data-question="' . e($q->question) . '">'
                 : '',
+            'license_type' => $this->getLicenseTypeNames($q->category->licenseTypes),
             'actions'  => view('admin.questions.partials.actions', compact('q'))->render(),
             'checkbox' => '<input type="checkbox" class="row-checkbox" value="' . $q->id . '">',
         ];
+    }
+
+    private function getLicenseTypeNames(Collection $licenseTypes): string
+    {
+        if ($licenseTypes->isEmpty()) {
+            return '';
+        }
+
+        return implode(', ', $licenseTypes->pluck('code')->toArray());
     }
 }

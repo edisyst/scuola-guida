@@ -5,6 +5,54 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 8.3: Quiz e reportistica multi-patente
+
+Portare la dimensione `LicenseType` in tutta l'area backend: filtri nelle DataTable
+di gestione, segmentazione della reportistica per tipo di patente, dashboard editor
+con metriche separate per patente.
+
+### Added
+
+- **DataTable Filtri:**
+  - Filtro tipo di patente in DataTable Domande (whereHas su categorie associate).
+  - Filtro tipo di patente in Quiz index (URL-based con form GET).
+  - Filtro tipo di patente in Iscrizioni (URL-based con form GET).
+  - Filtro tipo di patente in Utenti (URL-based su `active_license_type_id`).
+  - Colonna "Patente" in Quiz, Iscrizioni, Utenti.
+
+- **Reportistica:**
+  - Parametri optional `?LicenseType` in `ReportingService::buildPeriodReport()` e `buildComparisonReport()`.
+  - Filtro nei metodi privati `compute()` e `computeAnswerMetrics()` quando tipo specificato.
+  - Campo `license_type_id` validato in `ReportFilterRequest`.
+  - Select "Tipo di patente" nella view reports/index.blade.php.
+  - Header PDF report include il tipo di patente quando filtrato.
+
+- **Dashboard Editor:**
+  - Parametri optional `?LicenseType` in `EditorMetricsService` (getProductionMetrics, getGlobalContentMetrics).
+  - Filtro per tipo di patente con persistenza in sessione.
+  - Select "Tipo di patente" nel form filtri della dashboard.
+
+- **Command `reports:generate-by-license`:**
+  - Signature: `reports:generate-by-license {period : monthly|quarterly} {--license-type=all}`
+  - Generazione report per tipo singolo o tutti i tipi con quiz confermati.
+  - Schedulazione mensile (primo del mese alle 03:30) in routes/console.php.
+
+- **i18n:**
+  - Chiavi di traduzione per filtri tipo patente in: reports.php, quiz.php, questions.php, editor.php, enrollments.php, users.php.
+  - Chiavi PDF: `pdf_license_type`, `pdf_all_license_types`.
+
+- **Tests:**
+  - `tests/Feature/MultiLicenseReportTest.php` — 7 test su filtri DataTable, aggregazione report, retrocompat, PDF header.
+
+### Changed
+
+- `ReportingService` signature: `buildPeriodReport(Carbon, Carbon, ?LicenseType = null)` (retrocompatibile).
+- `EditorMetricsService` signature: `getProductionMetrics(..., ?LicenseType = null)` e `getGlobalContentMetrics(?LicenseType = null)`.
+- `EditorDashboardController::index()` legge `license_type_id` da request e sessione.
+- `ReportController` passa `$licenseType` ai metodi reporting; filename PDF include codice tipo.
+
+---
+
 ## [Unreleased] — Feature 8.2: Import e contenuti multi-patente
 
 Estende il comando `questions:import-mit` e la UI admin di import per supportare

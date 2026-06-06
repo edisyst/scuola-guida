@@ -13,7 +13,12 @@ return [
     'col_title'     => 'Titolo',
     'col_status'    => 'Stato',
     'col_questions' => 'Domande',
+    'col_license_type' => 'Patente',
     'col_actions'   => 'Azioni',
+
+    // Filtri
+    'filter_license_type' => 'Tipo di patente',
+    'filter_license_type_all' => 'Tutti i tipi',
 
     // Stati ciclo di vita
     'status_draft'      => 'Bozza',

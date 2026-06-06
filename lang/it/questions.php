@@ -16,10 +16,13 @@ return [
     'col_text'       => 'Domanda',
     'col_answer'     => 'Risposta',
     'col_image'      => 'Img',
+    'col_license_type' => 'Patente',
     'col_actions'    => 'Azioni',
 
     // Filtri
     'filter_all_categories' => 'Tutte le categorie',
+    'filter_license_type' => 'Tipo di patente',
+    'filter_license_type_all' => 'Tutti i tipi',
     'filter_true_false'     => 'Vero / Falso',
     'filter_all'            => 'Tutte',
     'filter_with_image'     => 'Con immagine',

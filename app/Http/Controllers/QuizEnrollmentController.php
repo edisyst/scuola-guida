@@ -83,16 +83,22 @@ class QuizEnrollmentController extends Controller
         abort_unless(auth()->user()->isAdmin(), 403);
 
         $status = $request->query('status');
+        $licenseTypeId = $request->query('license_type_id');
 
-        $enrollments = QuizEnrollment::with(['quiz', 'user', 'reviewer'])
+        $enrollments = QuizEnrollment::with(['quiz.licenseType', 'user', 'reviewer'])
             ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($licenseTypeId, fn ($q, $v) => $q->whereHas('quiz',
+                fn ($q2) => $q2->where('license_type_id', $v)
+            ))
             ->latest()
             ->paginate(20)
             ->withQueryString();
 
         $pendingCount = QuizEnrollment::pending()->count();
 
-        return view('admin.enrollments.index', compact('enrollments', 'status', 'pendingCount'));
+        $licenseTypes = app(LicenseTypeService::class)->allForSelect();
+
+        return view('admin.enrollments.index', compact('enrollments', 'status', 'licenseTypeId', 'pendingCount', 'licenseTypes'));
     }
 
     public function approve(QuizEnrollment $enrollment)

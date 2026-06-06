@@ -7,6 +7,8 @@ return [
     // Filter form
     'filter_editor'     => 'Editor',
     'filter_editor_all' => 'All editors (aggregate)',
+    'filter_license_type' => 'License type',
+    'filter_license_type_all' => 'All types',
     'filter_period'     => 'Quick period',
     'filter_from'       => 'From',
     'filter_to'         => 'To',

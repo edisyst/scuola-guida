@@ -4,6 +4,8 @@ return [
     'subtitle' => 'Editor',
     'filter_editor'          => 'Editor',
     'filter_editor_all'      => 'Todos los editores (agregado)',
+    'filter_license_type' => 'Tipo de patente',
+    'filter_license_type_all' => 'Todos los tipos',
     'filter_period'          => 'Período rápido',
     'filter_from'            => 'Desde',
     'filter_to'              => 'Hasta',

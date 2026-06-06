@@ -17,6 +17,10 @@ return [
     'preset_last_quarter'    => 'Trimestre scorso',
     'preset_current_year'    => 'Anno corrente',
 
+    // Filtro tipo patente
+    'filter_license_type'     => 'Tipo di patente',
+    'filter_license_type_all' => 'Tutti i tipi',
+
     // Azioni
     'action_generate'   => 'Genera report',
     'action_export_pdf' => 'Esporta PDF',
@@ -26,4 +30,8 @@ return [
     'col_name'    => 'Nome',
     'col_period'  => 'Periodo',
     'col_actions' => 'Azioni',
+
+    // PDF
+    'pdf_license_type'       => 'Tipo di patente',
+    'pdf_all_license_types'  => 'Tutti i tipi',
 ];
