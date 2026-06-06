@@ -87,4 +87,28 @@ return [
     'title_create'          => 'Nuevo módulo',
     'title_edit'            => 'Editar módulo',
 
+    // PDF Atestación — Feature 9.1
+    'pdf_title'             => 'Resumen de Sesiones de Conducción Práctica Obligatorias',
+    'pdf_progress_summary'  => 'Resumen de Progreso',
+    'pdf_col_module'        => 'Módulo',
+    'pdf_col_required'      => 'Horas Requeridas',
+    'pdf_col_completed'     => 'Horas Completadas',
+    'pdf_col_status'        => 'Estado',
+    'pdf_completed'         => 'Completado',
+    'pdf_sessions_detail'   => 'Detalle de Sesiones',
+    'pdf_session_date'      => 'Fecha',
+    'pdf_session_duration'  => 'Duración',
+    'pdf_session_instructor'=> 'Instructor',
+    'pdf_session_notes'     => 'Notas',
+    'pdf_no_sessions'       => 'Sin sesiones registradas.',
+    'pdf_instructors'       => 'Instructores Involucrados',
+    'pdf_disclaimer_title'  => 'Aviso Importante',
+    'pdf_disclaimer_text'   => 'Este documento es un resumen interno generado por :school y no constituye certificación oficial conforme al Decreto MIT 294/2025. Se proporciona para apoyar el registro en la Autoridad de Licencias de Conducir y la gestión administrativa de la autoescuela.',
+    'pdf_signature_label'   => 'Sello y firma de la autoescuela',
+    'pdf_generated_by'      => 'Documento generado por :school',
+
+    // Descargar atestación
+    'download_attestation'  => 'Descargar resumen PDF',
+    'download_attestation_pending' => 'El resumen en PDF estará disponible al completar todas las horas obligatorias.',
+
 ];

@@ -303,6 +303,17 @@
                                 — {{ $drivingProgress['percentage'] }}%
                             </strong>
                         </div>
+
+                        {{-- Pulsante download riepilogo PDF (se completato) --}}
+                        @if($drivingProgress['all_completed'] && isset($drivingSessions) && $drivingSessions->isNotEmpty())
+                            <div class="mt-3">
+                                <a href="{{ route('driving.attestation.download', $student) }}"
+                                   class="sg-btn sg-btn-info sg-btn-sm"
+                                   target="_blank">
+                                    <i class="fas fa-file-pdf mr-1"></i> {{ __('driving.download_attestation') }}
+                                </a>
+                            </div>
+                        @endif
                     @endif
 
                     {{-- Ultime sessioni registrate (variabile $drivingSessions opzionale) --}}

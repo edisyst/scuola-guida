@@ -24,4 +24,9 @@ return [
     'unit_minutes'   => '{1} minuto|[2,*] minutos',
     'unit_days'      => '{1} día|[2,*] días',
     'unit_errors'    => '{1} error|[2,*] errores',
+    'name'           => 'Nombre',
+    'email'          => 'Correo electrónico',
+    'date_of_birth'  => 'Fecha de nacimiento',
+    'generated_on'   => 'Generado el',
+    'total'          => 'Total',
 ];

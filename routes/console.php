@@ -13,6 +13,8 @@ Schedule::command('enrollments:close-expired')->dailyAt('00:05');
 Schedule::command('backup:clean')->dailyAt('01:30');
 Schedule::command('backup:run')->dailyAt('02:00');
 
+Schedule::command('driving:cleanup-attestations')->dailyAt('03:30');
+
 Schedule::command('gdpr:export --cleanup-only')->dailyAt('03:00');
 Schedule::command('reports:generate-by-license monthly')->monthlyOn(1, '03:30');
 

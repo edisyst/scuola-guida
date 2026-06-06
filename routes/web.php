@@ -453,9 +453,13 @@ Route::middleware(['auth', '2fa', 'role:admin,instructor'])
     });
 
 Route::middleware(['auth'])
+    ->prefix('driving')
+    ->name('driving.')
     ->group(function () {
-        Route::get('/driving/progress', [\App\Http\Controllers\DrivingSessionController::class, 'progress'])
-            ->name('driving.progress');
+        Route::get('progress', [\App\Http\Controllers\DrivingSessionController::class, 'progress'])
+            ->name('progress');
+        Route::get('students/{student}/attestation', [\App\Http\Controllers\DrivingAttestationController::class, 'download'])
+            ->name('attestation.download');
     });
 
 /*

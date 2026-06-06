@@ -64,6 +64,20 @@
                 <i class="fas fa-check-circle mr-1"></i>
                 {{ __('driving.progress_all_done') }}
             </div>
+
+            {{-- Pulsante download riepilogo PDF --}}
+            <div class="mb-3">
+                <a href="{{ route('driving.attestation.download', auth()->user()) }}"
+                   class="sg-btn sg-btn-primary"
+                   target="_blank">
+                    <i class="fas fa-file-pdf mr-1"></i> {{ __('driving.download_attestation') }}
+                </a>
+            </div>
+        @else
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle mr-1"></i>
+                {{ __('driving.download_attestation_pending') }}
+            </div>
         @endif
 
         {{-- Dettaglio per modulo --}}

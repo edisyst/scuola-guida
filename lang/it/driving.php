@@ -87,4 +87,28 @@ return [
     'title_create'          => 'Nuovo modulo',
     'title_edit'            => 'Modifica modulo',
 
+    // PDF Attestazione — Feature 9.1
+    'pdf_title'             => 'Riepilogo Guide Pratiche Obbligatorie',
+    'pdf_progress_summary'  => 'Riepilogo Avanzamento',
+    'pdf_col_module'        => 'Modulo',
+    'pdf_col_required'      => 'Ore richieste',
+    'pdf_col_completed'     => 'Ore completate',
+    'pdf_col_status'        => 'Stato',
+    'pdf_completed'         => 'Completato',
+    'pdf_sessions_detail'   => 'Dettaglio Sessioni',
+    'pdf_session_date'      => 'Data',
+    'pdf_session_duration'  => 'Durata',
+    'pdf_session_instructor'=> 'Istruttore',
+    'pdf_session_notes'     => 'Note',
+    'pdf_no_sessions'       => 'Nessuna sessione registrata.',
+    'pdf_instructors'       => 'Istruttori Coinvolti',
+    'pdf_disclaimer_title'  => 'Avvertenza importante',
+    'pdf_disclaimer_text'   => 'Questo documento è un riepilogo interno generato da :school e non costituisce attestazione ufficiale ai sensi del D.M. MIT 294/2025. È fornito a supporto della registrazione sul Portale dell\'Automobilista e della gestione amministrativa della scuola guida.',
+    'pdf_signature_label'   => 'Timbro e firma autoscuola',
+    'pdf_generated_by'      => 'Documento generato da :school',
+
+    // Download attestazione
+    'download_attestation'  => 'Scarica riepilogo PDF',
+    'download_attestation_pending' => 'Il riepilogo PDF sarà disponibile al completamento di tutte le ore obbligatorie.',
+
 ];

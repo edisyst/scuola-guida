@@ -5,6 +5,30 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 9.1: Export PDF attestazione guide pratiche
+
+Export PDF scaricabile con riepilogo sessioni di guida pratica dello studente.
+Utilizzato dalla segreteria per riconciliazione dati Portale Automobilista e
+dall'istruttore come documento di sintesi.
+
+### Added
+
+- **`config/driving.php`** — configurazione dati autoscuola (nome, indirizzo, telefono, email, n. autorizzazione MIT).
+- **Variabili `.env`** — `DRIVING_SCHOOL_*` per dati autoscuola (documentate in `.env.example`).
+- **Metodo `User::canExportDrivingAttestation()`** — autorizzazione per admin e instructor; viewer verificato in controller.
+- **`DrivingAttestationService`** — `buildData()` (aggrega dati per PDF zero N+1), `generatePdf()` (genera e salva PDF in `storage/private/driving-attestations/`).
+- **`DrivingAttestationController::download()`** — GET endpoint con autorizzazione, check completamento ore per viewer, audit log, download con `deleteFileAfterSend(true)`.
+- **Route `GET /driving/students/{student}/attestation`** (auth) — `driving.attestation.download`.
+- **Template PDF `resources/views/driving/pdf/attestation.blade.php`** — intestazione autoscuola, dati studente, riepilogo moduli, dettaglio sessioni per modulo, elenco istruttori, footer disclaimer.
+- **Pulsante download in `instructor/student.blade.php`** — visibile se `all_completed && drivingSessions.isNotEmpty()`.
+- **Pulsante download in `driving/progress.blade.php`** — visibile se `all_completed`; altrimenti messaggio "Disponibile al completamento".
+- **`CleanupDrivingAttestations` command** — rimuove PDF più vecchi di 24h da `storage/private/driving-attestations/`.
+- **Schedulazione cleanup** — `driving:cleanup-attestations` giornaliero alle 03:30 in `routes/console.php`.
+- **Chiavi lang `it/en/es/driving.php`** — `pdf_*`, `download_*` (intestazione, tabelle, disclaimer, pulsante).
+- **`DrivingAttestationTest`** — 8 test (download admin/instructor/viewer, completamento, gestione instructor null, cleanup, Content-Type).
+
+---
+
 ## [Unreleased] — Feature 9.0: Guide pratiche — moduli e sessioni
 
 Tracciamento delle ore di guida pratica obbligatorie per tipo di patente.
