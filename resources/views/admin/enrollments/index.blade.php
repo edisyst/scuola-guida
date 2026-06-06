@@ -23,11 +23,33 @@
             <a href="{{ route('admin.enrollments.index') }}"
                class="sg-btn sg-btn-sm {{ !$status ? 'sg-btn-primary' : 'sg-btn-light' }}">{{ __('enrollments.filter_all') }}</a>
             @foreach(\App\Models\QuizEnrollment::STATUSES as $key => $label)
-                <a href="{{ route('admin.enrollments.index', ['status' => $key]) }}"
+                <a href="{{ route('admin.enrollments.index', ['status' => $key, 'license_type_id' => $licenseTypeId]) }}"
                    class="sg-btn sg-btn-sm {{ $status === $key ? 'sg-btn-primary' : 'sg-btn-light' }}">
                     {{ $label }}
                 </a>
             @endforeach
+        </div>
+    </div>
+
+    <div class="sg-card sg-mb-3">
+        <div class="sg-card-body">
+            <form method="GET" action="{{ route('admin.enrollments.index') }}" class="row align-items-end">
+                <input type="hidden" name="status" value="{{ $status }}">
+                <div class="col-12 col-md-4">
+                    <label class="sg-label mb-2">{{ __('enrollments.filter_license_type') }}</label>
+                    <select name="license_type_id" class="sg-form-control">
+                        <option value="">{{ __('enrollments.filter_all') }}</option>
+                        @foreach($licenseTypes as $lt)
+                            <option value="{{ $lt->id }}" @selected($licenseTypeId == $lt->id)>{{ $lt->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm" style="width:100%;">
+                        <i class="fas fa-filter"></i> {{ __('common.filter') }}
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -43,6 +65,7 @@
                             <th>{{ __('enrollments.col_quiz') }}</th>
                             <th>{{ __('enrollments.col_user') }}</th>
                             <th>{{ __('enrollments.col_status') }}</th>
+                            <th>{{ __('enrollments.col_license_type') }}</th>
                             <th>{{ __('enrollments.col_requested') }}</th>
                             <th>{{ __('enrollments.col_reviewed') }}</th>
                             <th class="text-right">{{ __('enrollments.col_actions') }}</th>
@@ -69,6 +92,13 @@
                                             <span class="sg-badge sg-badge-info">{{ __('enrollments.status_completed') }}</span>
                                             @break
                                     @endswitch
+                                </td>
+                                <td>
+                                    @if($enrollment->quiz?->licenseType)
+                                        <span class="badge badge-secondary">{{ $enrollment->quiz->licenseType->code }}</span>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
                                 </td>
                                 <td class="sg-text-muted">{{ $enrollment->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="sg-text-muted">

@@ -57,6 +57,11 @@
             <td>
                 <div class="logo">ScuolaGUIDA</div>
                 <div class="subtitle">Report periodico — {{ $from->format('d/m/Y') }} / {{ $to->format('d/m/Y') }}</div>
+                @if($licenseType)
+                    <div class="subtitle" style="margin-top:4px;">{{ __('reports.pdf_license_type') }}: {{ $licenseType->name }}</div>
+                @else
+                    <div class="subtitle" style="margin-top:4px;">{{ __('reports.pdf_all_license_types') }}</div>
+                @endif
             </td>
             <td class="meta">
                 Generato il {{ $generated_at->format('d/m/Y H:i') }}<br>

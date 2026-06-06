@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportFilterRequest;
+use App\Services\LicenseTypeService;
 use App\Services\ReportingService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
@@ -12,15 +13,21 @@ use Illuminate\View\View;
 
 class ReportController extends Controller
 {
-    public function __construct(private ReportingService $reporting) {}
+    public function __construct(
+        private ReportingService $reporting,
+        private LicenseTypeService $licenseTypeService,
+    ) {}
 
     public function index(): View
     {
         abort_unless(auth()->user()->canEditQuiz(), 403);
 
+        $licenseTypes = $this->licenseTypeService->allForSelect();
+
         return view('admin.reports.index', [
             'defaultFrom' => now()->startOfMonth()->format('Y-m-d'),
             'defaultTo'   => now()->endOfMonth()->format('Y-m-d'),
+            'licenseTypes' => $licenseTypes,
         ]);
     }
 
@@ -30,18 +37,23 @@ class ReportController extends Controller
 
         [$from, $to] = $this->parseDates($request);
         $compare = $request->boolean('compare');
+        $validated = $request->validated();
+        $licenseType = isset($validated['license_type_id'])
+            ? $this->licenseTypeService->find($validated['license_type_id'])
+            : null;
 
         if ($compare) {
-            $data = $this->reporting->buildComparisonReport($from, $to);
+            $data = $this->reporting->buildComparisonReport($from, $to, $licenseType);
         } else {
-            $data = ['current' => $this->reporting->buildPeriodReport($from, $to)];
+            $data = ['current' => $this->reporting->buildPeriodReport($from, $to, $licenseType)];
         }
 
         return view('admin.reports.show', array_merge($data, [
             'from'    => $from,
             'to'      => $to,
             'compare' => $compare,
-            'filters' => $request->validated(),
+            'licenseType' => $licenseType,
+            'filters' => $validated,
         ]));
     }
 
@@ -51,21 +63,27 @@ class ReportController extends Controller
 
         [$from, $to] = $this->parseDates($request);
         $compare = $request->boolean('compare');
+        $validated = $request->validated();
+        $licenseType = isset($validated['license_type_id'])
+            ? $this->licenseTypeService->find($validated['license_type_id'])
+            : null;
 
         if ($compare) {
-            $data = $this->reporting->buildComparisonReport($from, $to);
+            $data = $this->reporting->buildComparisonReport($from, $to, $licenseType);
         } else {
-            $data = ['current' => $this->reporting->buildPeriodReport($from, $to)];
+            $data = ['current' => $this->reporting->buildPeriodReport($from, $to, $licenseType)];
         }
 
         $pdf = Pdf::loadView('admin.reports.pdf.period', array_merge($data, [
             'from'         => $from,
             'to'           => $to,
             'compare'      => $compare,
+            'licenseType'  => $licenseType,
             'generated_at' => now(),
         ]))->setPaper('a4', 'portrait');
 
-        $filename = "report-{$from->format('Y-m-d')}-{$to->format('Y-m-d')}.pdf";
+        $ltCode = $licenseType?->code ?? 'all';
+        $filename = "report-{$ltCode}-{$from->format('Y-m-d')}-{$to->format('Y-m-d')}.pdf";
 
         return $pdf->download($filename);
     }

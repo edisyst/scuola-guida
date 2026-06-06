@@ -13,7 +13,11 @@ return [
     'col_email'       => 'Email',
     'col_role'        => 'Ruolo',
     'col_permissions' => 'Permessi extra',
+    'col_license_type' => 'Patente in studio',
     'col_actions'     => 'Azioni',
+
+    // Filtri
+    'filter_license_type' => 'Tipo di patente',
 
     // Azioni
     'action_roles'   => 'Ruoli & Permessi',

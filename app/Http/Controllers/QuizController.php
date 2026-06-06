@@ -30,11 +30,16 @@ class QuizController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index()
+    public function index(Request $request)
     {
-        $quizzes = Quiz::withCount('questions')->get();
+        $licenseTypeId = $request->query('license_type_id');
+        $quizzes = Quiz::with('licenseType')->withCount('questions')
+            ->when($licenseTypeId, fn ($q, $v) => $q->where('license_type_id', $v))
+            ->get();
 
-        return view('admin.quizzes.index', compact('quizzes'));
+        $licenseTypes = app(LicenseTypeService::class)->allForSelect();
+
+        return view('admin.quizzes.index', compact('quizzes', 'licenseTypes', 'licenseTypeId'));
     }
 
     public function create()

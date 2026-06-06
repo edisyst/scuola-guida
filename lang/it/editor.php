@@ -7,6 +7,8 @@ return [
     // Form filtri
     'filter_editor'     => 'Editor',
     'filter_editor_all' => 'Tutti gli editor (aggregato)',
+    'filter_license_type' => 'Tipo di patente',
+    'filter_license_type_all' => 'Tutti i tipi',
     'filter_period'     => 'Periodo rapido',
     'filter_from'       => 'Da',
     'filter_to'         => 'A',

@@ -14,11 +14,18 @@ class UserController extends Controller
 {
     public function __construct(private UserService $service) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->paginate(10);
+        $licenseTypeId = $request->query('license_type_id');
+        $users = User::with('activeLicenseType')
+            ->when($licenseTypeId, fn ($q, $v) => $q->where('active_license_type_id', $v))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('admin.users.index', compact('users'));
+        $licenseTypes = app(LicenseTypeService::class)->allForSelect();
+
+        return view('admin.users.index', compact('users', 'licenseTypes', 'licenseTypeId'));
     }
 
     public function create()

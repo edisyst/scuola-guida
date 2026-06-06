@@ -17,6 +17,10 @@ return [
     'preset_last_quarter'    => 'Last quarter',
     'preset_current_year'    => 'Current year',
 
+    // License type filter
+    'filter_license_type'     => 'License type',
+    'filter_license_type_all' => 'All types',
+
     // Actions
     'action_generate'   => 'Generate report',
     'action_export_pdf' => 'Export PDF',
@@ -26,4 +30,8 @@ return [
     'col_name'    => 'Name',
     'col_period'  => 'Period',
     'col_actions' => 'Actions',
+
+    // PDF
+    'pdf_license_type'       => 'License type',
+    'pdf_all_license_types'  => 'All types',
 ];

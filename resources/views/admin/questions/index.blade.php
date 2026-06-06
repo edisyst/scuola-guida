@@ -56,6 +56,14 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="col-12 col-md-3 sg-mb-1">
+                    <select id="filter-license-type" class="sg-form-control">
+                        <option value="">{{ __('questions.filter_license_type_all') }}</option>
+                        @foreach($licenseTypes as $lt)
+                            <option value="{{ $lt->id }}">{{ $lt->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 @if(!auth()->user()->isViewer())
                 <div class="col-12 col-md-3 sg-mb-1">
                     <select id="filter-is-true" class="sg-form-control">
@@ -183,6 +191,7 @@
                     url: "{{ route('admin.questions.data') }}",
                     data: function (d) {
                         d.category_id = $('#filter-category').val();
+                        d.license_type_id = $('#filter-license-type').val();
                         d.is_true = $('#filter-is-true').val();
                         d.has_image = $('#filter-image').val();
                     }
@@ -205,7 +214,7 @@
                 ],
             });
 
-            $('#filter-category, #filter-is-true, #filter-image').change(function() {
+            $('#filter-category, #filter-license-type, #filter-is-true, #filter-image').change(function() {
                 table.draw();
             });
         });

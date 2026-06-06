@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\LicenseType;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\QuizEnrollment;
@@ -14,7 +15,7 @@ class ReportingService
     /** Memoizzata per evitare doppio caricamento in buildComparisonReport(). */
     private ?\Illuminate\Support\Collection $questionMap = null;
 
-    public function buildPeriodReport(Carbon $from, Carbon $to): array
+    public function buildPeriodReport(Carbon $from, Carbon $to, ?LicenseType $licenseType = null): array
     {
         $from = $from->copy()->startOfDay();
         $to   = $to->copy()->endOfDay();
@@ -22,20 +23,21 @@ class ReportingService
         // Periodi completamente passati: TTL 24h. Periodo corrente: TTL 5 min.
         $isPast = $to->lt(now()->startOfDay());
         $ttl    = $isPast ? 86400 : 300;
-        $key    = "report_period_{$from->format('Ymd')}_{$to->format('Ymd')}";
+        $ltKey  = $licenseType?->id ?? 'all';
+        $key    = "report_period_{$from->format('Ymd')}_{$to->format('Ymd')}_{$ltKey}";
 
-        return Cache::remember($key, $ttl, fn () => $this->compute($from, $to));
+        return Cache::remember($key, $ttl, fn () => $this->compute($from, $to, $licenseType));
     }
 
-    public function buildComparisonReport(Carbon $from, Carbon $to): array
+    public function buildComparisonReport(Carbon $from, Carbon $to, ?LicenseType $licenseType = null): array
     {
         // Periodo precedente di pari durata (incluso)
         $days    = $from->diffInDays($to); // es. 30 per un mese di 31 giorni
         $prevTo  = $from->copy()->subDay();
         $prevFrom = $prevTo->copy()->subDays($days);
 
-        $current  = $this->buildPeriodReport($from, $to);
-        $previous = $this->buildPeriodReport($prevFrom, $prevTo);
+        $current  = $this->buildPeriodReport($from, $to, $licenseType);
+        $previous = $this->buildPeriodReport($prevFrom, $prevTo, $licenseType);
 
         $delta = fn (?float $curr, ?float $prev): ?float =>
             ($curr !== null && $prev !== null && $prev != 0)
@@ -60,7 +62,7 @@ class ReportingService
         ];
     }
 
-    private function compute(Carbon $from, Carbon $to): array
+    private function compute(Carbon $from, Carbon $to, ?LicenseType $licenseType = null): array
     {
         // Aggregazioni scalari SQL su quiz confermati
         $agg = DB::table('quiz_attempts as qa')
@@ -68,6 +70,7 @@ class ReportingService
             ->where('q.status', Quiz::STATUS_CONFIRMED)
             ->whereBetween('qa.created_at', [$from, $to])
             ->where('qa.total_questions', '>', 0)
+            ->when($licenseType, fn ($query) => $query->where('q.license_type_id', $licenseType->id))
             ->selectRaw('
                 COUNT(*)                                                                                                       AS total_attempts,
                 COUNT(DISTINCT qa.user_id)                                                                                    AS active_students,
@@ -84,6 +87,7 @@ class ReportingService
         // Iscrizioni approvate/completate nel periodo (data approvazione)
         $enrollmentsCount = QuizEnrollment::whereBetween('reviewed_at', [$from, $to])
             ->whereIn('status', [QuizEnrollment::STATUS_APPROVED, QuizEnrollment::STATUS_COMPLETED])
+            ->when($licenseType, fn ($q) => $q->whereHas('quiz', fn ($q2) => $q2->where('license_type_id', $licenseType->id)))
             ->count();
 
         // Tentativi per giorno (serie temporale per il grafico)
@@ -91,6 +95,7 @@ class ReportingService
             ->join('quizzes as q', 'qa.quiz_id', '=', 'q.id')
             ->where('q.status', Quiz::STATUS_CONFIRMED)
             ->whereBetween('qa.created_at', [$from, $to])
+            ->when($licenseType, fn ($query) => $query->where('q.license_type_id', $licenseType->id))
             ->selectRaw('DATE(qa.created_at) AS date, COUNT(*) AS count')
             ->groupByRaw('DATE(qa.created_at)')
             ->orderBy('date')
@@ -108,7 +113,7 @@ class ReportingService
             $cursor->addDay();
         }
 
-        [$outcomesByCategory, $mostFailedQuestions] = $this->computeAnswerMetrics($from, $to);
+        [$outcomesByCategory, $mostFailedQuestions] = $this->computeAnswerMetrics($from, $to, $licenseType);
 
         return [
             'total_attempts'        => $total,
@@ -128,7 +133,7 @@ class ReportingService
      *
      * @return array{0: list<array>, 1: list<array>}
      */
-    private function computeAnswerMetrics(Carbon $from, Carbon $to): array
+    private function computeAnswerMetrics(Carbon $from, Carbon $to, ?LicenseType $licenseType = null): array
     {
         // Mappa domanda → categoria: caricata una volta, riusata tra le due chiamate
         // di buildComparisonReport() quando la cache è fredda per entrambi i periodi.
@@ -146,6 +151,7 @@ class ReportingService
         QuizAttempt::join('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
             ->where('quizzes.status', Quiz::STATUS_CONFIRMED)
             ->whereBetween('quiz_attempts.created_at', [$from, $to])
+            ->when($licenseType, fn ($query) => $query->where('quizzes.license_type_id', $licenseType->id))
             ->whereNotNull('quiz_attempts.answers')
             ->select('quiz_attempts.*')
             ->orderBy('quiz_attempts.id')
