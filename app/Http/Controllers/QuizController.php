@@ -9,6 +9,7 @@ use App\Http\Requests\StoreQuizRequest;
 use App\Http\Requests\UpdateQuizScheduleRequest;
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Services\LicenseTypeService;
 use App\Services\QuizEnrollmentService;
 use App\Services\QuizService;
 use App\Services\QuizSummaryService;

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\LearnedQuestion;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\QuizAttempt;
 use App\Models\User;
@@ -15,9 +16,20 @@ class ReviewErrorsTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $licenseType;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->licenseType = LicenseType::factory()->create();
+    }
+
     private function viewer(): User
     {
-        return User::factory()->create(['role' => User::ROLE_VIEWER]);
+        return User::factory()->create([
+            'role'                   => User::ROLE_VIEWER,
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     private function admin(): User

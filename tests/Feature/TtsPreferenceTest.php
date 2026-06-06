@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\User;
 use App\Services\StudyService;
@@ -12,14 +14,27 @@ class TtsPreferenceTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $licenseType;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->licenseType = LicenseType::factory()->create();
+    }
+
     private function viewer(): User
     {
-        return User::factory()->create(['role' => 'viewer']);
+        return User::factory()->create([
+            'role'                   => 'viewer',
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     private function startStudySession(User $user): void
     {
-        Question::factory()->count(3)->create();
+        $cat = Category::factory()->create();
+        $cat->licenseTypes()->attach($this->licenseType);
+        Question::factory()->count(3)->create(['category_id' => $cat->id]);
         $this->actingAs($user)->post(route('study.start'), [
             'source' => StudyService::SOURCE_RANDOM,
         ]);

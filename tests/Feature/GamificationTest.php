@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\QuestionReview;
 use App\Models\QuizAttempt;
@@ -21,9 +22,20 @@ class GamificationTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $licenseType;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->licenseType = LicenseType::factory()->create();
+    }
+
     private function viewer(): User
     {
-        return User::factory()->create(['role' => User::ROLE_VIEWER]);
+        return User::factory()->create([
+            'role'                   => User::ROLE_VIEWER,
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     // ──────────────────────────────────────────────────────────────────────────

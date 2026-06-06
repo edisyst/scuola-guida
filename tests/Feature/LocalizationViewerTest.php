@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\LicenseType;
 use App\Models\User;
 use App\Notifications\RegistrazioneApprovataNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,6 +12,14 @@ use Tests\TestCase;
 class LocalizationViewerTest extends TestCase
 {
     use RefreshDatabase;
+
+    private LicenseType $licenseType;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->licenseType = LicenseType::factory()->create();
+    }
 
     protected function tearDown(): void
     {
@@ -25,7 +34,7 @@ class LocalizationViewerTest extends TestCase
 
     public function test_viewer_with_locale_en_sees_english_content(): void
     {
-        $user = User::factory()->create(['role' => User::ROLE_VIEWER, 'locale' => 'en']);
+        $user = User::factory()->create(['role' => User::ROLE_VIEWER, 'locale' => 'en', 'active_license_type_id' => $this->licenseType->id]);
 
         $response = $this->actingAs($user)->get(route('simulator.index'));
 
@@ -36,7 +45,7 @@ class LocalizationViewerTest extends TestCase
 
     public function test_viewer_with_locale_es_sees_spanish_content(): void
     {
-        $user = User::factory()->create(['role' => User::ROLE_VIEWER, 'locale' => 'es']);
+        $user = User::factory()->create(['role' => User::ROLE_VIEWER, 'locale' => 'es', 'active_license_type_id' => $this->licenseType->id]);
 
         $response = $this->actingAs($user)->get(route('simulator.index'));
 
@@ -47,7 +56,7 @@ class LocalizationViewerTest extends TestCase
 
     public function test_viewer_with_locale_null_sees_italian_fallback_content(): void
     {
-        $user = User::factory()->create(['role' => User::ROLE_VIEWER, 'locale' => null]);
+        $user = User::factory()->create(['role' => User::ROLE_VIEWER, 'locale' => null, 'active_license_type_id' => $this->licenseType->id]);
 
         $response = $this->actingAs($user)->get(route('simulator.index'));
 
@@ -85,7 +94,7 @@ class LocalizationViewerTest extends TestCase
     public function test_unsupported_locale_falls_back_to_italian_content(): void
     {
         // Locale 'zh' non è in config/locales.php → fallback a italiano.
-        $user = User::factory()->create(['role' => User::ROLE_VIEWER, 'locale' => 'zh']);
+        $user = User::factory()->create(['role' => User::ROLE_VIEWER, 'locale' => 'zh', 'active_license_type_id' => $this->licenseType->id]);
 
         $response = $this->actingAs($user)->get(route('simulator.index'));
 

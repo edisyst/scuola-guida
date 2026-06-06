@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\User;
 use App\Services\MitImportService;
@@ -17,10 +18,13 @@ class MitImportTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $defaultLicenseType;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+        $this->defaultLicenseType = LicenseType::factory()->create();
     }
 
     private function adminUser(): User
@@ -81,7 +85,7 @@ class MitImportTest extends TestCase
             ['B002-002', 2, 'Domanda due', 'F', ''],
         ]);
 
-        $result = app(MitImportService::class)->import($path);
+        $result = app(MitImportService::class)->import($path, $this->defaultLicenseType);
 
         $this->assertEquals(2, $result->imported);
         $this->assertEquals(0, $result->updated);
@@ -105,7 +109,7 @@ class MitImportTest extends TestCase
             ['B002-001', 2, 'Nuova domanda', 'V', ''],
         ]);
 
-        $result = app(MitImportService::class)->import($path);
+        $result = app(MitImportService::class)->import($path, $this->defaultLicenseType);
 
         $this->assertEquals(0, $result->imported);
         $this->assertEquals(0, $result->updated);
@@ -124,7 +128,7 @@ class MitImportTest extends TestCase
             ['B002-001', 2, 'Aggiornata', 'F', ''],
         ]);
 
-        $result = app(MitImportService::class)->import($path, updateExisting: true);
+        $result = app(MitImportService::class)->import($path, $this->defaultLicenseType, updateExisting: true);
 
         $this->assertEquals(0, $result->imported);
         $this->assertEquals(1, $result->updated);
@@ -143,7 +147,7 @@ class MitImportTest extends TestCase
             ['X099-001', 99, 'Domanda argomento inesistente', 'V', ''],
         ]);
 
-        $result = app(MitImportService::class)->import($path);
+        $result = app(MitImportService::class)->import($path, $this->defaultLicenseType);
 
         $this->assertEquals(0, $result->imported);
         $this->assertEquals(1, $result->skipped);
@@ -164,7 +168,7 @@ class MitImportTest extends TestCase
             ['B002-001', 2, '', 'V', ''],
         ]);
 
-        $result = app(MitImportService::class)->import($path);
+        $result = app(MitImportService::class)->import($path, $this->defaultLicenseType);
 
         $this->assertEquals(0, $result->imported);
         $this->assertEquals(1, $result->skipped);
@@ -188,7 +192,7 @@ class MitImportTest extends TestCase
             ["B002-{$raw}", 2, "Domanda per {$raw}", $raw, ''],
         ]);
 
-        app(MitImportService::class)->import($path);
+        app(MitImportService::class)->import($path, $this->defaultLicenseType);
 
         $this->assertDatabaseHas('questions', ['is_true' => 1, 'question' => "Domanda per {$raw}"]);
 
@@ -211,7 +215,7 @@ class MitImportTest extends TestCase
             ["B002-{$raw}", 2, "Domanda per {$raw}", $raw, ''],
         ]);
 
-        app(MitImportService::class)->import($path);
+        app(MitImportService::class)->import($path, $this->defaultLicenseType);
 
         $this->assertDatabaseHas('questions', ['is_true' => 0, 'question' => "Domanda per {$raw}"]);
 
@@ -235,7 +239,7 @@ class MitImportTest extends TestCase
             ['B002-001', 2, 'Domanda dry run', 'V', ''],
         ]);
 
-        $result = app(MitImportService::class)->import($path, dryRun: true);
+        $result = app(MitImportService::class)->import($path, $this->defaultLicenseType, dryRun: true);
 
         $this->assertEquals(1, $result->imported);
         $this->assertDatabaseMissing('questions', ['mit_code' => 'B002-001']);
@@ -256,7 +260,7 @@ class MitImportTest extends TestCase
             ['B003-001', 3, 'Domanda argomento 3', 'F', ''],
         ]);
 
-        $result = app(MitImportService::class)->import($path, topicFilter: 2);
+        $result = app(MitImportService::class)->import($path, $this->defaultLicenseType, topicFilter: 2);
 
         $this->assertEquals(1, $result->imported);
         $this->assertDatabaseHas('questions', ['mit_code' => 'B002-001']);
@@ -281,7 +285,10 @@ class MitImportTest extends TestCase
         $file = new UploadedFile($path, 'test.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', null, true);
 
         $response = $this->actingAs($this->adminUser())
-            ->post(route('admin.questions.mit-import.store'), ['file' => $file]);
+            ->post(route('admin.questions.mit-import.store'), [
+                'file'            => $file,
+                'license_type_id' => $this->defaultLicenseType->id,
+            ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -363,7 +370,7 @@ class MitImportTest extends TestCase
             ['',         0, '',              'V', ''],    // skipped (vuota)
         ]);
 
-        $result = app(MitImportService::class)->import($path);
+        $result = app(MitImportService::class)->import($path, $this->defaultLicenseType);
 
         $total = $result->imported + $result->updated + $result->skipped;
         $this->assertEquals(3, $total, 'La somma imported+updated+skipped deve coincidere con le righe del file');

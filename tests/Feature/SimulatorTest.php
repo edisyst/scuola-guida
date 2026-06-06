@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\QuizAttempt;
 use App\Models\User;
@@ -15,6 +16,14 @@ class SimulatorTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $licenseType;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->licenseType = LicenseType::factory()->create();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | HELPERS
@@ -23,7 +32,10 @@ class SimulatorTest extends TestCase
 
     private function viewer(): User
     {
-        return User::factory()->create(['role' => User::ROLE_VIEWER]);
+        return User::factory()->create([
+            'role'                   => User::ROLE_VIEWER,
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     /**
@@ -234,6 +246,7 @@ class SimulatorTest extends TestCase
 
         Log::spy();
 
+        $this->actingAs($this->viewer());
         app(SimulatorService::class)->buildQuestionList();
 
         Log::shouldHaveReceived('warning')

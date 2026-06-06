@@ -19,6 +19,7 @@ class ImportMultiLicenseTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
 
         // Verifica che i tipi di patente esistono dal seeder
         if (LicenseType::count() === 0) {

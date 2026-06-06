@@ -5,6 +5,35 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Fix: Test suite verde post-MultiLicense
+
+Ripristino della suite di test dopo l'introduzione del sistema multi-patente
+(Feature 8.x). I test erano rotti per motivi strutturali (nuovi parametri
+obbligatori nei Service, filtri per tipo patente, middleware 2FA e licenza).
+
+### Fixed
+
+- **`QuizController`** — aggiunto `use App\Services\LicenseTypeService;` mancante
+  che causava `ReflectionException` (500) sulla rotta `admin.quizzes.index`.
+- **`MitImportTest`** — aggiunto `LicenseType` obbligatorio (2° parametro) a tutte
+  le chiamate a `MitImportService::import()`.
+- **`DiagnosticFeatureTest`**, **`StudyTest`**, **`TtsPreferenceTest`**,
+  **`SimulatorTest`** — categorie di test collegate al tipo patente dell'utente
+  (`licenseTypes()->attach()`) per superare il filtro introdotto dai Service.
+- **`SimulatorTest::build_question_list_logs_warning`** — aggiunto `actingAs()`
+  prima della chiamata diretta al Service (che richiede `auth()->user()`).
+- **`MultiLicenseReportTest`** — parametri GET passati come query string
+  (`route(...) . '?' . http_build_query([...])`) invece che come headers;
+  asserzione PDF cambiata a controllo `Content-Disposition` (il contenuto
+  dompdf è binario compresso, non ricercabile come stringa UTF-8).
+- **`EditorDashboardTest`** — chiave cache aggiornata con suffisso `_all`
+  introdotto dalla Feature multi-patente.
+- **`ImportMultiLicenseTest`**, e tutti i test viewer — aggiunto bypass 2FA
+  (`withoutMiddleware`) e `active_license_type_id` agli utenti di test.
+- **`.env.testing`** — aggiunto `APP_LOCALE=it` e `APP_FALLBACK_LOCALE=it`.
+
+---
+
 ## [Unreleased] — Feature 9.1: Export PDF attestazione guide pratiche
 
 Export PDF scaricabile con riepilogo sessioni di guida pratica dello studente.

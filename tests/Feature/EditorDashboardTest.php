@@ -250,7 +250,7 @@ class EditorDashboardTest extends TestCase
 
         $this->service->getProductionMetrics($editor, $from, $to);
 
-        $key = "editor_metrics_{$editor->id}_{$from->format('Ymd')}_{$to->format('Ymd')}";
+        $key = "editor_metrics_{$editor->id}_{$from->format('Ymd')}_{$to->format('Ymd')}_all";
         $this->assertTrue(Cache::has($key));
     }
 

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\QuestionVersion;
 use App\Models\Quiz;
@@ -18,10 +19,13 @@ class QuestionVersionTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $licenseType;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+        $this->licenseType = LicenseType::factory()->create();
     }
 
     private function admin(): User
@@ -31,7 +35,10 @@ class QuestionVersionTest extends TestCase
 
     private function viewer(): User
     {
-        return User::factory()->create(['role' => 'viewer']);
+        return User::factory()->create([
+            'role'                   => 'viewer',
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     private function makeQuestion(array $attrs = []): Question

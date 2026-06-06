@@ -12,6 +12,12 @@ class LocalizationBackendTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     protected function tearDown(): void
     {
         app()->setLocale('it');

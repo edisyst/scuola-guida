@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\LearnedQuestion;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\QuestionReview;
 use App\Models\User;
@@ -16,16 +17,21 @@ class SpacedRepetitionTest extends TestCase
     use RefreshDatabase;
 
     private SpacedRepetitionService $service;
+    private LicenseType $licenseType;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = app(SpacedRepetitionService::class);
+        $this->service     = app(SpacedRepetitionService::class);
+        $this->licenseType = LicenseType::factory()->create();
     }
 
     private function viewer(): User
     {
-        return User::factory()->create(['role' => User::ROLE_VIEWER]);
+        return User::factory()->create([
+            'role'                   => User::ROLE_VIEWER,
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     /** Crea un QuestionReview in memoria (senza persistere) con i valori dati. */

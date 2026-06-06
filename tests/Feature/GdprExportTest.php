@@ -13,6 +13,12 @@ class GdprExportTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+    }
+
     private function makeViewer(): User
     {
         return User::factory()->create(['role' => User::ROLE_VIEWER]);

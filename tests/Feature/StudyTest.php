@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\User;
@@ -14,6 +15,14 @@ class StudyTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $licenseType;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->licenseType = LicenseType::factory()->create();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | HELPERS
@@ -22,7 +31,10 @@ class StudyTest extends TestCase
 
     private function viewer(): User
     {
-        return User::factory()->create(['role' => User::ROLE_VIEWER]);
+        return User::factory()->create([
+            'role'                   => User::ROLE_VIEWER,
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     /**
@@ -84,6 +96,7 @@ class StudyTest extends TestCase
     public function test_start_with_category_source_initializes_session(): void
     {
         $category = Category::factory()->create();
+        $category->licenseTypes()->attach($this->licenseType);
         Question::factory()->count(5)->create(['category_id' => $category->id]);
 
         $this->actingAs($this->viewer())->post(route('study.start'), [
@@ -96,7 +109,9 @@ class StudyTest extends TestCase
 
     public function test_start_with_random_source_uses_global_pool(): void
     {
-        Question::factory()->count(10)->create();
+        $cat = Category::factory()->create();
+        $cat->licenseTypes()->attach($this->licenseType);
+        Question::factory()->count(10)->create(['category_id' => $cat->id]);
 
         $this->actingAs($this->viewer())->post(route('study.start'), [
             'source' => StudyService::SOURCE_RANDOM,

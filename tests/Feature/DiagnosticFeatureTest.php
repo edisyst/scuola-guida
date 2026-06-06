@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\DiagnosticResult;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\QuizAttempt;
 use App\Models\User;
@@ -17,9 +18,20 @@ class DiagnosticFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $licenseType;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->licenseType = LicenseType::factory()->create();
+    }
+
     private function viewer(): User
     {
-        return User::factory()->create(['role' => User::ROLE_VIEWER]);
+        return User::factory()->create([
+            'role'                   => User::ROLE_VIEWER,
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     private function admin(): User
@@ -83,6 +95,10 @@ class DiagnosticFeatureTest extends TestCase
         $cat2 = Category::factory()->create();
         $cat3 = Category::factory()->create();
 
+        $cat1->licenseTypes()->attach($this->licenseType);
+        $cat2->licenseTypes()->attach($this->licenseType);
+        $cat3->licenseTypes()->attach($this->licenseType);
+
         Question::factory()->create(['category_id' => $cat1->id]);
         Question::factory()->create(['category_id' => $cat2->id]);
         Question::factory()->create(['category_id' => $cat3->id]);
@@ -104,6 +120,7 @@ class DiagnosticFeatureTest extends TestCase
         $viewer = $this->viewer();
 
         $category = Category::factory()->create();
+        $category->licenseTypes()->attach($this->licenseType);
         Question::factory()->count(5)->create(['category_id' => $category->id]);
 
         $service   = app(DiagnosticService::class);
@@ -120,6 +137,9 @@ class DiagnosticFeatureTest extends TestCase
         $catWithQ    = Category::factory()->create();
         $catWithoutQ = Category::factory()->create();
 
+        $catWithQ->licenseTypes()->attach($this->licenseType);
+        $catWithoutQ->licenseTypes()->attach($this->licenseType);
+
         Question::factory()->create(['category_id' => $catWithQ->id]);
 
         $service   = app(DiagnosticService::class);
@@ -133,6 +153,7 @@ class DiagnosticFeatureTest extends TestCase
     {
         $viewer   = $this->viewer();
         $category = Category::factory()->create();
+        $category->licenseTypes()->attach($this->licenseType);
 
         $q1 = Question::factory()->create(['category_id' => $category->id]);
         $q2 = Question::factory()->create(['category_id' => $category->id]);

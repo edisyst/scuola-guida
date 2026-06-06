@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Question;
+use App\Models\LicenseType;
 use App\Models\QuestionTranslation;
 use App\Models\User;
 use App\Services\QuestionTranslationService;
@@ -15,10 +16,13 @@ class QuestionTranslationTest extends TestCase
 {
     use RefreshDatabase;
 
+    private LicenseType $licenseType;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->withoutMiddleware(\App\Http\Middleware\EnsureTwoFactorAuthenticated::class);
+        $this->licenseType = LicenseType::factory()->create();
     }
 
     private function adminUser(): User
@@ -38,7 +42,11 @@ class QuestionTranslationTest extends TestCase
 
     private function viewerUser(?string $locale = null): User
     {
-        return User::factory()->create(['role' => 'viewer', 'locale' => $locale]);
+        return User::factory()->create([
+            'role'                   => 'viewer',
+            'locale'                 => $locale,
+            'active_license_type_id' => $this->licenseType->id,
+        ]);
     }
 
     /*
