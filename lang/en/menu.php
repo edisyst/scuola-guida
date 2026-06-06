@@ -52,6 +52,7 @@ return [
     'domande'                 => 'Questions',
     'segnalazioni'            => 'Reports',
     'tipi_patente'            => 'License types',
+    'moduli_guida'            => 'Driving practice modules',
     'quizzes'                 => 'Quizzes',
     'i_miei_studenti'         => 'My students',
     'gestione_istruttori'     => 'Instructor management',

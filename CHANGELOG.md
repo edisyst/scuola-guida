@@ -5,6 +5,37 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 9.0: Guide pratiche — moduli e sessioni
+
+Tracciamento delle ore di guida pratica obbligatorie per tipo di patente.
+L'admin configura i moduli (codice, ore richieste, ordine); istruttori e admin
+registrano le sessioni per ogni studente; ogni viewer vede il proprio avanzamento.
+
+### Added
+
+- **Migration `driving_modules`** — tabella con `license_type_id` (cascade), `code`, `name`, `description`, `required_hours`, `sort_order`; unique su `(license_type_id, code)`.
+- **Migration `driving_sessions`** — tabella con `student_id` (cascade), `instructor_id` (null on delete), `driving_module_id` (restrict), `conducted_at`, `duration_minutes`, `notes`, `recorded_by` (null on delete); indice `(student_id, driving_module_id)`.
+- **Model `DrivingModule`** — relazioni `licenseType()`, `drivingSessions()`, scope `ordered()`.
+- **Model `DrivingSession`** — relazioni `student()`, `instructor()`, `drivingModule()`, `recorder()`.
+- **Observer `DrivingModuleObserver` e `DrivingSessionObserver`** — registrati in `AppServiceProvider`.
+- **Relazione `LicenseType::drivingModules()`**.
+- **Metodi `User::canManageDrivingModules()` e `canRegisterDrivingSession()`**.
+- **`DrivingModuleService`** — CRUD + check sessioni su delete.
+- **`DrivingSessionService`** — `record()`, `delete()`, `getProgress()`, `canRegisterForStudent()`.
+- **`DrivingModuleController` (Admin)** — resource controller con filtro per tipo di patente in `index`.
+- **`DrivingSessionController`** — `index()`, `store()`, `destroy()`, `progress()` (viewer).
+- **Form Request `StoreDrivingModuleRequest`, `UpdateDrivingModuleRequest`, `StoreDrivingSessionRequest`**.
+- **Route resource `admin/driving-modules`** (admin-only) e route sessioni (admin + instructor).
+- **Route `GET /driving/progress`** (auth) per il viewer.
+- **`DrivingModuleSeeder`** — 4 moduli MIT per Patente B via `upsert`; aggiunto in `DatabaseSeeder`.
+- **Voce sidebar "Moduli guida pratica"** in `config/adminlte.php`.
+- **File lang `it/en/es/driving.php`** — chiavi complete per moduli, sessioni, avanzamento.
+- **Chiavi flash `driving_module_*` e `driving_session_*`** in `lang/{it,en,es}/flash.php`.
+- **Chiave menu `moduli_guida`** in `lang/{it,en,es}/menu.php`.
+- **`DrivingPracticeTest`** — 14 test (seeder, CRUD, autorizzazioni, calcolo avanzamento, vincoli FK, validazione).
+
+---
+
 ## [Unreleased] — Feature 8.3: Quiz e reportistica multi-patente
 
 Portare la dimensione `LicenseType` in tutta l'area backend: filtri nelle DataTable

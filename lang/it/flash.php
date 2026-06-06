@@ -105,4 +105,11 @@ return [
     'permissions_saved'   => 'Permessi aggiornati.',
     'quiz_random_created' => 'Quiz creato con :count domande.',
     'quiz_random_filled'  => 'Aggiunte :count domande random al quiz.',
+
+    // Feature 9.0 — Guide pratiche
+    'driving_module_created'  => 'Modulo creato con successo.',
+    'driving_module_updated'  => 'Modulo aggiornato con successo.',
+    'driving_module_deleted'  => 'Modulo eliminato con successo.',
+    'driving_session_recorded'=> 'Sessione di guida registrata con successo.',
+    'driving_session_deleted' => 'Sessione eliminata con successo.',
 ];

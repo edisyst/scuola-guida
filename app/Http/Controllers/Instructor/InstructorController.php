@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Instructor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInstructorNoteRequest;
+use App\Models\DrivingSession;
 use App\Models\InstructorNote;
+use App\Models\LicenseType;
 use App\Models\User;
+use App\Services\DrivingSessionService;
 use App\Services\InstructorService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +18,10 @@ use Illuminate\Support\Str;
 
 class InstructorController extends Controller
 {
-    public function __construct(private InstructorService $instructorService) {}
+    public function __construct(
+        private InstructorService $instructorService,
+        private DrivingSessionService $drivingSessionService,
+    ) {}
 
     public function index(Request $request)
     {
@@ -43,7 +49,28 @@ class InstructorController extends Controller
         $progress = $this->instructorService->getStudentProgress($student);
         $notes    = $this->instructorService->getNotesForStudent($user, $student);
 
-        return view('instructor.student', compact('student', 'progress', 'notes'));
+        // Dati guide pratiche — eager loading per evitare N+1
+        $lt              = $student->activeLicenseType ?? LicenseType::first();
+        $drivingProgress = $lt
+            ? $this->drivingSessionService->getProgress($student, $lt)
+            : ['modules' => [], 'total_required' => 0, 'total_completed' => 0, 'percentage' => 0, 'all_completed' => false];
+
+        $drivingSessions = DrivingSession::where('student_id', $student->id)
+            ->with(['drivingModule', 'instructor', 'recorder'])
+            ->orderByDesc('conducted_at')
+            ->limit(20)
+            ->get();
+
+        // Considera "teoria superata" se lo studente ha almeno un tentativo completato con score non nullo
+        $hasPassedTheory = $student->quizAttempts()
+            ->whereNotNull('score')
+            ->where('score', '>', 0)
+            ->exists();
+
+        return view('instructor.student', compact(
+            'student', 'progress', 'notes',
+            'drivingProgress', 'drivingSessions', 'hasPassedTheory', 'lt'
+        ));
     }
 
     public function storeNote(StoreInstructorNoteRequest $request, User $student): RedirectResponse

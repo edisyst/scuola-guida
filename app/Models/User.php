@@ -461,6 +461,9 @@ class User extends Authenticatable implements HasLocalePreference
     public function canEditUser(): bool   { return $this->hasPermission('edit_user'); }
 
     public function canEditLicenseType(): bool { return $this->isAdmin(); }
+
+    public function canManageDrivingModules(): bool { return $this->isAdmin(); }
+    public function canRegisterDrivingSession(): bool { return $this->isAdmin() || $this->isInstructor(); }
     public function canDeleteUser(): bool { return $this->hasPermission('delete_user'); }
     public function canBulkUser(): bool   { return $this->hasPermission('bulk_user'); }
     public function canManageUser(): bool { return $this->hasPermission('manage_user'); }

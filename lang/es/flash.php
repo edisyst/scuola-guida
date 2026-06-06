@@ -74,4 +74,11 @@ return [
     'permissions_saved'   => 'Permisos actualizados.',
     'quiz_random_created' => 'Quiz creado con :count preguntas.',
     'quiz_random_filled'  => 'Añadidas :count preguntas aleatorias al quiz.',
+
+    // Feature 9.0 — Prácticas de conducción
+    'driving_module_created'  => 'Módulo creado correctamente.',
+    'driving_module_updated'  => 'Módulo actualizado correctamente.',
+    'driving_module_deleted'  => 'Módulo eliminado correctamente.',
+    'driving_session_recorded'=> 'Sesión de conducción registrada correctamente.',
+    'driving_session_deleted' => 'Sesión eliminada correctamente.',
 ];
