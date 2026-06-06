@@ -16,10 +16,13 @@ return [
     'col_text'     => 'Question',
     'col_answer'   => 'Answer',
     'col_image'    => 'Img',
+    'col_license_type' => 'License type',
     'col_actions'  => 'Actions',
 
     // Filters
     'filter_all_categories' => 'All categories',
+    'filter_license_type' => 'License type',
+    'filter_license_type_all' => 'All types',
     'filter_true_false'     => 'True / False',
     'filter_all'            => 'All',
     'filter_with_image'     => 'With image',

@@ -37,6 +37,16 @@
                     </div>
                 </div>
 
+                <div class="form-group mb-3">
+                    <label for="license_type_id" class="font-weight-bold">{{ __('editor.filter_license_type') }}</label>
+                    <select name="license_type_id" id="license_type_id" class="form-control" style="max-width:320px;">
+                        <option value="">{{ __('editor.filter_license_type_all') }}</option>
+                        @foreach($licenseTypes as $lt)
+                        <option value="{{ $lt->id }}" @selected($selectedLicenseTypeId == $lt->id)>{{ $lt->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">

@@ -45,6 +45,25 @@
     </div>
 
     <div class="sg-card">
+        <div class="sg-card-body" style="padding:1.25rem;">
+            <form method="GET" action="{{ route('admin.quizzes.index') }}" class="row sg-mb-2 align-items-end">
+                <div class="col-12 col-md-4 sg-mb-1">
+                    <label class="sg-label mb-2">{{ __('quiz.filter_license_type') }}</label>
+                    <select name="license_type_id" class="sg-form-control">
+                        <option value="">{{ __('quiz.filter_license_type_all') }}</option>
+                        @foreach($licenseTypes as $lt)
+                            <option value="{{ $lt->id }}" @selected($licenseTypeId == $lt->id)>{{ $lt->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-12 col-md-2 sg-mb-1">
+                    <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm" style="width:100%;">
+                        <i class="fas fa-filter"></i> {{ __('common.filter') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="table-responsive">
             <table class="sg-table" id="quiz-table">
                 <thead>
@@ -53,6 +72,7 @@
                         <th>{{ __('quiz.col_title') }}</th>
                         <th>{{ __('quiz.col_status') }}</th>
                         <th>{{ __('quiz.col_questions') }}</th>
+                        <th>{{ __('quiz.col_license_type') }}</th>
                         <th class="text-right" style="width:360px;">{{ __('quiz.col_actions') }}</th>
                     </tr>
                 </thead>
@@ -72,6 +92,13 @@
                             </td>
                             <td>
                                 <span class="sg-badge sg-badge-info">{{ $quiz->questions_count ?? 0 }}/{{ $quiz->max_questions ?? 0 }}</span>
+                            </td>
+                            <td>
+                                @if($quiz->licenseType)
+                                    <span class="badge badge-secondary">{{ $quiz->licenseType->code }}</span>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
                             </td>
                             <td class="sg-actions-cell">
                                 @php
@@ -179,7 +206,7 @@
     <script>
         $('#quiz-table').DataTable({
             pageLength: 25,
-            columnDefs: [{ orderable: false, targets: 4 }]
+            columnDefs: [{ orderable: false, targets: 5 }]
         });
     </script>
 @stop

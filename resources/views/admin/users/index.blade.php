@@ -23,6 +23,27 @@
         </div>
     </div>
 
+    <div class="sg-card sg-mb-3">
+        <div class="sg-card-body">
+            <form method="GET" action="{{ route('admin.users.index') }}" class="row align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="sg-label mb-2">{{ __('users.filter_license_type') }}</label>
+                    <select name="license_type_id" class="sg-form-control">
+                        <option value="">{{ __('common.all') }}</option>
+                        @foreach($licenseTypes as $lt)
+                            <option value="{{ $lt->id }}" @selected($licenseTypeId == $lt->id)>{{ $lt->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm" style="width:100%;">
+                        <i class="fas fa-filter"></i> {{ __('common.filter') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="sg-card">
         <div class="table-responsive">
             <table class="sg-table">
@@ -31,6 +52,7 @@
                         <th>{{ __('users.col_user') }}</th>
                         <th>{{ __('users.col_email') }}</th>
                         <th>{{ __('users.col_role') }}</th>
+                        <th>{{ __('users.col_license_type') }}</th>
                         <th>{{ __('users.col_permissions') }}</th>
                         <th class="text-right" style="width:160px;">{{ __('users.col_actions') }}</th>
                     </tr>
@@ -45,6 +67,13 @@
                             <td class="sg-text-muted">{{ $u->email }}</td>
                             <td>
                                 <span class="sg-badge-role role-{{ $u->role }}">{{ $u->role }}</span>
+                            </td>
+                            <td>
+                                @if($u->activeLicenseType)
+                                    <span class="badge badge-secondary">{{ $u->activeLicenseType->code }}</span>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
                             </td>
                             <td>
                                 @if($u->role !== \App\Models\User::ROLE_ADMIN && !empty($u->permissions))

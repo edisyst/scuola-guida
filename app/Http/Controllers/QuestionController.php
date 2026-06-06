@@ -45,7 +45,9 @@ class QuestionController extends Controller
             fn () => Category::select('id', 'name')->get()
         );
 
-        return view('admin.questions.index', compact('categories'));
+        $licenseTypes = app(LicenseTypeService::class)->allForSelect();
+
+        return view('admin.questions.index', compact('categories', 'licenseTypes'));
     }
 
     public function create()

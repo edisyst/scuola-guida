@@ -18,6 +18,7 @@ class ReportFilterRequest extends FormRequest
             'to'      => ['required', 'date', 'after_or_equal:from'],
             'preset'  => ['nullable', 'in:current_month,last_month,current_quarter,last_quarter,current_year,custom'],
             'compare' => ['nullable', 'boolean'],
+            'license_type_id' => ['nullable', 'integer', 'exists:license_types,id'],
         ];
     }
 

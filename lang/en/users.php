@@ -13,7 +13,11 @@ return [
     'col_email'       => 'Email',
     'col_role'        => 'Role',
     'col_permissions' => 'Extra permissions',
+    'col_license_type' => 'License in study',
     'col_actions'     => 'Actions',
+
+    // Filters
+    'filter_license_type' => 'License type',
 
     // Actions
     'action_roles'  => 'Roles & Permissions',

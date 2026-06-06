@@ -13,7 +13,12 @@ return [
     'col_title'     => 'Title',
     'col_status'    => 'Status',
     'col_questions' => 'Questions',
+    'col_license_type' => 'License type',
     'col_actions'   => 'Actions',
+
+    // Filters
+    'filter_license_type' => 'License type',
+    'filter_license_type_all' => 'All types',
 
     // Lifecycle statuses
     'status_draft'     => 'Draft',

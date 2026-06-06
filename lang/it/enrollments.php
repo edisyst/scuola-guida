@@ -28,11 +28,13 @@ return [
 
     'pending_badge'    => ':count in attesa',
     'filter_all'       => 'Tutte',
+    'filter_license_type' => 'Tipo di patente',
     'no_results'       => 'Nessuna iscrizione trovata.',
     'no_registrations' => 'Nessuna richiesta di iscrizione trovata.',
 
     'col_id'       => '#',
     'col_user'     => 'Utente',
+    'col_license_type' => 'Patente',
     'col_fiscal'   => 'Codice fiscale',
     'col_email'    => 'Email',
     'col_submitted'=> 'Inviata il',
