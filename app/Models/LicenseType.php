@@ -41,6 +41,11 @@ class LicenseType extends Model
         return $this->hasMany(Quiz::class);
     }
 
+    public function drivingModules(): HasMany
+    {
+        return $this->hasMany(DrivingModule::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);

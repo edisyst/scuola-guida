@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             UserSeeder::class,
             LicenseTypeSeeder::class,
+            // Feature 9.0 — Moduli guida pratica
+            DrivingModuleSeeder::class,
             CategorySeeder::class,
             QuestionSeeder::class,
             QuizSeeder::class,

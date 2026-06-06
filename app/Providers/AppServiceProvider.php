@@ -25,6 +25,10 @@ use App\Observers\QuestionTranslationObserver;
 use App\Observers\QuizObserver;
 use App\Observers\UserObserver;
 use App\Observers\LicenseTypeObserver;
+use App\Observers\DrivingModuleObserver;
+use App\Observers\DrivingSessionObserver;
+use App\Models\DrivingModule;
+use App\Models\DrivingSession;
 use App\Listeners\SendBackupFailedNotification;
 use Spatie\Backup\Events\BackupHasFailed;
 
@@ -62,6 +66,8 @@ class AppServiceProvider extends ServiceProvider
         InstructorNote::observe(InstructorNoteObserver::class);
         \App\Models\QuestionTranslation::observe(QuestionTranslationObserver::class);
         \App\Models\CategoryTranslation::observe(CategoryTranslationObserver::class);
+        DrivingModule::observe(DrivingModuleObserver::class);
+        DrivingSession::observe(DrivingSessionObserver::class);
 
         /*
         |--------------------------------------------------------------------------

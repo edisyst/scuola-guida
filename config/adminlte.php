@@ -571,6 +571,13 @@ return [
             'key'  => 'license-types',
         ],
         [
+            'text' => 'moduli_guida',
+            'url'  => 'admin/driving-modules',
+            'icon' => 'fas fa-car',
+            'can'  => 'admin-only',
+            'key'  => 'driving-modules',
+        ],
+        [
             'text' => 'domande',
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question-circle',

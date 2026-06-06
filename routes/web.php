@@ -408,6 +408,9 @@ Route::middleware(['auth', '2fa'])
             Route::resource('license-types', LicenseTypeController::class);
             Route::post('license-types/{license_type}/sync-categories', [LicenseTypeController::class, 'syncCategories'])
                 ->name('license-types.sync-categories');
+
+            // MODULI GUIDA PRATICA (Feature 9.0)
+            Route::resource('driving-modules', \App\Http\Controllers\Admin\DrivingModuleController::class);
         });
     });
 
@@ -430,6 +433,29 @@ Route::middleware(['auth', '2fa', 'role:admin,instructor'])
             ->name('students.notes.destroy');
         Route::get('students/{student}/export-pdf', [InstructorController::class, 'exportStudentPdf'])
             ->name('students.export-pdf');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| DRIVING SESSIONS — instructor + admin registrano, viewer legge le proprie
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', '2fa', 'role:admin,instructor'])
+    ->prefix('driving')
+    ->name('driving.')
+    ->group(function () {
+        Route::get('students/{student}/sessions', [\App\Http\Controllers\DrivingSessionController::class, 'index'])
+            ->name('sessions.index');
+        Route::post('students/{student}/sessions', [\App\Http\Controllers\DrivingSessionController::class, 'store'])
+            ->name('sessions.store');
+        Route::delete('students/{student}/sessions/{session}', [\App\Http\Controllers\DrivingSessionController::class, 'destroy'])
+            ->name('sessions.destroy');
+    });
+
+Route::middleware(['auth'])
+    ->group(function () {
+        Route::get('/driving/progress', [\App\Http\Controllers\DrivingSessionController::class, 'progress'])
+            ->name('driving.progress');
     });
 
 /*
