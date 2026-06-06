@@ -61,6 +61,10 @@ class InstructorController extends Controller
             ->limit(20)
             ->get();
 
+        $drivingModules = $lt
+            ? \App\Models\DrivingModule::where('license_type_id', $lt->id)->ordered()->get()
+            : collect();
+
         // Considera "teoria superata" se lo studente ha almeno un tentativo completato con score non nullo
         $hasPassedTheory = $student->quizAttempts()
             ->whereNotNull('score')
@@ -69,7 +73,7 @@ class InstructorController extends Controller
 
         return view('instructor.student', compact(
             'student', 'progress', 'notes',
-            'drivingProgress', 'drivingSessions', 'hasPassedTheory', 'lt'
+            'drivingProgress', 'drivingSessions', 'drivingModules', 'hasPassedTheory', 'lt'
         ));
     }
 

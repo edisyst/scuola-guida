@@ -241,5 +241,180 @@
         </div>
     </div>
 
+    {{-- Guide pratiche --}}
+    {{-- Variabili richieste dal controller: $drivingProgress, $drivingSessions, $drivingModules, $hasPassedTheory --}}
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="sg-card">
+                <div class="sg-card-header">
+                    <h3 class="sg-card-title">
+                        <i class="fas fa-car mr-1"></i> {{ __('driving.card_title') }}
+                    </h3>
+                </div>
+                <div class="p-3">
+
+                    {{-- Avviso teoria non superata --}}
+                    @if(!$hasPassedTheory)
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            {{ __('driving.theory_warning') }}
+                        </div>
+                    @endif
+
+                    {{-- Avanzamento per modulo --}}
+                    @if(empty($drivingProgress['modules']))
+                        <p class="text-muted">{{ __('driving.session_none') }}</p>
+                    @else
+                        @foreach($drivingProgress['modules'] as $item)
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ $item['module']->code }} — {{ $item['module']->name }}</strong>
+                                    <span>
+                                        {{ $item['completed_hours'] }} / {{ $item['required_hours'] }} h
+                                        @if($item['completed'])
+                                            <span class="sg-badge sg-badge-success ml-1">
+                                                {{ __('driving.progress_completed') }}
+                                            </span>
+                                        @endif
+                                    </span>
+                                </div>
+                                @php
+                                    $pct = $item['required_hours'] > 0
+                                        ? min(100, round(($item['completed_hours'] / $item['required_hours']) * 100))
+                                        : 0;
+                                @endphp
+                                <div class="progress mt-1" style="height: 8px;">
+                                    <div class="progress-bar {{ $item['completed'] ? 'bg-success' : 'bg-primary' }}"
+                                         style="width: {{ $pct }}%"
+                                         aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    {{ $item['sessions_count'] }} {{ __('driving.progress_sessions') }}
+                                </small>
+                            </div>
+                        @endforeach
+
+                        {{-- Riepilogo totale --}}
+                        <div class="alert alert-light border mt-2">
+                            <strong>
+                                Totale: {{ $drivingProgress['total_completed'] }} /
+                                {{ $drivingProgress['total_required'] }} h
+                                — {{ $drivingProgress['percentage'] }}%
+                            </strong>
+                        </div>
+                    @endif
+
+                    {{-- Ultime sessioni registrate (variabile $drivingSessions opzionale) --}}
+                    @if(isset($drivingSessions) && $drivingSessions->isNotEmpty())
+                        <h5 class="mt-3">{{ __('driving.title_sessions') }}</h5>
+                        <div class="table-responsive">
+                            <table class="sg-table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ __('driving.session_date') }}</th>
+                                        <th>{{ __('driving.session_module') }}</th>
+                                        <th>{{ __('driving.session_duration') }}</th>
+                                        <th>{{ __('driving.session_notes') }}</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($drivingSessions as $session)
+                                        <tr>
+                                            <td>{{ $session->conducted_at->format('d/m/Y') }}</td>
+                                            <td>{{ $session->drivingModule->code }}</td>
+                                            <td>{{ $session->duration_minutes }} min</td>
+                                            <td>{{ Str::limit($session->notes, 50) }}</td>
+                                            <td>
+                                                <form method="POST"
+                                                      action="{{ route('driving.sessions.destroy', [$student, $session]) }}"
+                                                      style="display: inline;"
+                                                      onsubmit="return confirm('{{ __('driving.session_delete_confirm') }}')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="sg-btn sg-btn-danger sg-btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+
+                    {{-- Form registrazione sessione (visibile solo se lo studente ha moduli disponibili) --}}
+                    @if(isset($drivingModules) && $drivingModules->isNotEmpty())
+                        <h5 class="mt-4">{{ __('driving.register_session') }}</h5>
+                        <form method="POST" action="{{ route('driving.sessions.store', $student) }}">
+                            @csrf
+                            <div class="row">
+                                <div class="col-md-4 form-group">
+                                    <label>{{ __('driving.field_module') }}</label>
+                                    <select name="driving_module_id"
+                                            class="form-control @error('driving_module_id') is-invalid @enderror"
+                                            required>
+                                        <option value="">—</option>
+                                        @foreach($drivingModules as $mod)
+                                            <option value="{{ $mod->id }}"
+                                                {{ old('driving_module_id') == $mod->id ? 'selected' : '' }}>
+                                                {{ $mod->code }} — {{ $mod->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('driving_module_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>{{ __('driving.field_conducted_at') }}</label>
+                                    <input type="date"
+                                           name="conducted_at"
+                                           class="form-control @error('conducted_at') is-invalid @enderror"
+                                           value="{{ old('conducted_at', date('Y-m-d')) }}"
+                                           max="{{ date('Y-m-d') }}"
+                                           required>
+                                    @error('conducted_at')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>{{ __('driving.field_duration') }}</label>
+                                    <input type="number"
+                                           name="duration_minutes"
+                                           class="form-control @error('duration_minutes') is-invalid @enderror"
+                                           value="{{ old('duration_minutes', 60) }}"
+                                           min="15"
+                                           max="120"
+                                           required>
+                                    @error('duration_minutes')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>{{ __('driving.field_notes') }}</label>
+                                    <input type="text"
+                                           name="notes"
+                                           class="form-control"
+                                           value="{{ old('notes') }}"
+                                           maxlength="1000">
+                                </div>
+                            </div>
+                            <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm">
+                                <i class="fas fa-save mr-1"></i> {{ __('driving.register_session') }}
+                            </button>
+                        </form>
+                    @elseif(isset($drivingModules))
+                        {{-- $drivingModules è presente ma vuota: nessun tipo patente associato --}}
+                        <p class="text-muted mt-3">{{ __('driving.no_license_type') }}</p>
+                    @endif
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 @endsection
