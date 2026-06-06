@@ -95,6 +95,24 @@
 
                 <div class="sg-mb-3">
                     <label class="form-label font-weight-bold">
+                        Tipo di patente <span class="text-danger">*</span>
+                    </label>
+                    <select name="license_type_id" class="form-control @error('license_type_id') is-invalid @enderror" required>
+                        <option value="">— Seleziona tipo di patente —</option>
+                        @foreach($licenseTypes as $type)
+                            <option value="{{ $type->id }}"
+                                {{ old('license_type_id', $defaultType?->id) == $type->id ? 'selected' : '' }}>
+                                {{ $type->name }} ({{ $type->code }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('license_type_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="sg-mb-3">
+                    <label class="form-label font-weight-bold">
                         File Excel listato MIT <span class="text-danger">*</span>
                     </label>
                     <input type="file" name="file" class="form-control @error('file') is-invalid @enderror"

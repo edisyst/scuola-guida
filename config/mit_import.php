@@ -71,4 +71,35 @@ return [
      | Dimensione massima file in KB per la validazione del Form Request.
      */
     'max_file_size_kb' => 10240,
+
+    /*
+     | Tipo di patente di default per retrocompatibilità.
+     | Se il comando questions:import-mit viene chiamato senza --license-type,
+     | usa questo valore di default.
+     */
+    'default_license_type_code' => 'B',
+
+    /*
+     | Mappatura codici tipi di patente a configurazioni di import specifiche.
+     | Attualmente il formato Excel MIT è identico per tutti i tipi.
+     | Questa sezione è un placeholder per usi futuri (es. colonne differenti).
+     */
+    'license_types' => [
+        'B' => [
+            'name' => 'Patente B',
+            'description' => 'Auto',
+        ],
+        'A' => [
+            'name' => 'Patente A',
+            'description' => 'Moto',
+        ],
+        'A1' => [
+            'name' => 'Patente A1',
+            'description' => 'Moto leggera',
+        ],
+        'A2' => [
+            'name' => 'Patente A2',
+            'description' => 'Moto media',
+        ],
+    ],
 ];

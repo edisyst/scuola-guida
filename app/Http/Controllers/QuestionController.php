@@ -11,7 +11,9 @@ use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\UpdateQuestionRequest;
 use App\Imports\QuestionsImport;
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
+use App\Services\LicenseTypeService;
 use App\Services\MitImportService;
 use App\Services\QuestionService;
 use App\Services\QuestionTranslationService;
@@ -145,24 +147,28 @@ class QuestionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function showMitImport(): View
+    public function showMitImport(LicenseTypeService $licenseTypeService): View
     {
         abort_unless(auth()->user()->canCreateQuestion(), 403);
 
         return view('admin.questions.mit-import', [
-            'topicMap'   => config('mit_import.topic_map'),
-            'configPath' => config_path('mit_import.php'),
+            'topicMap'    => config('mit_import.topic_map'),
+            'configPath'  => config_path('mit_import.php'),
+            'licenseTypes' => $licenseTypeService->all(),
+            'defaultType' => LicenseType::where('code', config('mit_import.default_license_type_code'))->first(),
         ]);
     }
 
     public function storeMitImport(ImportMitQuestionsRequest $request, MitImportService $service): RedirectResponse
     {
+        $licenseType = LicenseType::findOrFail($request->integer('license_type_id'));
         $stored   = $request->file('file')->store('tmp/mit-import');
         $filePath = Storage::disk('local')->path($stored);
 
         try {
             $result = $service->import(
                 filePath:       $filePath,
+                licenseType:    $licenseType,
                 dryRun:         $request->boolean('dry_run'),
                 updateExisting: $request->boolean('update_existing'),
                 topicFilter:    $request->filled('topic_filter') ? $request->integer('topic_filter') : null,
@@ -172,7 +178,7 @@ class QuestionController extends Controller
             Storage::delete($stored);
         }
 
-        $summary = "Importate: {$result->imported} | Aggiornate: {$result->updated} | Saltate: {$result->skipped}";
+        $summary = "Importazione completata per {$licenseType->name}: {$result->imported} inserite, {$result->updated} aggiornate";
 
         if (!empty($result->errors)) {
             session(['mit_import_errors' => $result->errors]);

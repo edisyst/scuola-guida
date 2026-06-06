@@ -194,10 +194,13 @@ php artisan route:cache
 php artisan view:cache
 
 # Comandi custom del progetto
-php artisan questions:import-mit /path/file.xlsx              # import listato MIT
-php artisan questions:import-mit /path/file.xlsx --dry-run    # anteprima senza scrivere
-php artisan questions:import-mit /path/file.xlsx --topic=2    # solo argomento 2
-php artisan questions:import-mit /path/file.xlsx --update-existing  # aggiorna i duplicati
+php artisan questions:import-mit /path/file.xlsx                      # import listato MIT (tipo B, default)
+php artisan questions:import-mit /path/file.xlsx --license-type=A     # import per tipo A
+php artisan questions:import-mit /path/file.xlsx --dry-run            # anteprima senza scrivere
+php artisan questions:import-mit /path/file.xlsx --topic=2            # solo argomento 2
+php artisan questions:import-mit /path/file.xlsx --update-existing    # aggiorna i duplicati
+
+php artisan license-types:list                   # elenca tipi di patente con statistiche
 
 php artisan enrollments:close-expired           # chiusura manuale iscrizioni scadute
 php artisan 2fa:reset {user_id}                 # azzera il 2FA di un admin/editor (recovery)
