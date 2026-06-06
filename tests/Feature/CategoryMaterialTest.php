@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\CategoryMaterial;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,7 +34,11 @@ class CategoryMaterialTest extends TestCase
 
     private function viewer(): User
     {
-        return User::factory()->create(['role' => 'viewer']);
+        $licenseType = LicenseType::factory()->create(['is_active' => true]);
+        return User::factory()->create([
+            'role' => 'viewer',
+            'active_license_type_id' => $licenseType->id,
+        ]);
     }
 
     // ── Admin/editor can create each type ────────────────────────────────

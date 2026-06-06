@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Livewire\BookmarkButton;
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
 use App\Models\User;
 use App\Services\StudyService;
@@ -17,7 +18,11 @@ class BookmarkTest extends TestCase
 
     private function viewer(): User
     {
-        return User::factory()->create(['role' => User::ROLE_VIEWER]);
+        $licenseType = LicenseType::factory()->create(['is_active' => true]);
+        return User::factory()->create([
+            'role' => User::ROLE_VIEWER,
+            'active_license_type_id' => $licenseType->id,
+        ]);
     }
 
     public function test_viewer_can_add_bookmark(): void

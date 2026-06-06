@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\LicenseType>
@@ -12,7 +13,7 @@ class LicenseTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => $this->faker->unique()->bothify('?-??'),
+            'code' => 'LT_' . substr(md5(uniqid()), 0, 4),
             'name' => $this->faker->words(3, true),
             'description' => $this->faker->optional()->sentence(),
             'exam_questions' => $this->faker->optional(0.5)->numberBetween(25, 40),

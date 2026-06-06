@@ -8,7 +8,9 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Services\GdprExportService;
+use App\Services\LicenseTypeService;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {

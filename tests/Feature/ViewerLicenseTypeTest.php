@@ -38,8 +38,8 @@ class ViewerLicenseTypeTest extends TestCase
 
     public function test_study_filters_questions_by_active_license_type(): void
     {
-        $licenseTypeA = LicenseType::factory()->create(['code' => 'A', 'is_active' => true]);
-        $licenseTypeB = LicenseType::factory()->create(['code' => 'B', 'is_active' => true]);
+        $licenseTypeA = LicenseType::factory()->create(['code' => 'TEST_A', 'is_active' => true]);
+        $licenseTypeB = LicenseType::factory()->create(['code' => 'TEST_B', 'is_active' => true]);
 
         $categoryA = Category::factory()->create(['name' => 'Category A']);
         $categoryB = Category::factory()->create(['name' => 'Category B']);
@@ -104,7 +104,7 @@ class ViewerLicenseTypeTest extends TestCase
 
     public function test_diagnostic_filters_categories_by_active_license_type(): void
     {
-        $licenseTypeB = LicenseType::factory()->create(['code' => 'B', 'is_active' => true]);
+        $licenseTypeB = LicenseType::factory()->create(['code' => 'TEST_DIAG', 'is_active' => true]);
 
         $categoryA = Category::factory()->create();
         $categoryB = Category::factory()->create();
@@ -130,7 +130,7 @@ class ViewerLicenseTypeTest extends TestCase
 
     public function test_spaced_repetition_filters_by_active_license_type(): void
     {
-        $licenseTypeB = LicenseType::factory()->create(['code' => 'B', 'is_active' => true]);
+        $licenseTypeB = LicenseType::factory()->create(['code' => 'TEST_SPACED', 'is_active' => true]);
 
         $categoryA = Category::factory()->create();
         $categoryB = Category::factory()->create();
@@ -148,6 +148,10 @@ class ViewerLicenseTypeTest extends TestCase
         $service = app(\App\Services\SpacedRepetitionService::class);
         $service->recordAnswer($viewer, $questionA->id, true);
         $service->recordAnswer($viewer, $questionB->id, true);
+
+        // Manipula i timestamp per forzare le domande a essere dovute
+        \App\Models\QuestionReview::where('user_id', $viewer->id)
+            ->update(['next_review_at' => now()->subHour()]);
 
         $dueQuestions = $service->getDueQuestions($viewer);
         $dueIds       = $dueQuestions->pluck('question_id')->toArray();
