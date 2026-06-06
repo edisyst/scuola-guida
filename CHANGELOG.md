@@ -5,6 +5,63 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 8.2: Import e contenuti multi-patente
+
+Estende il comando `questions:import-mit` e la UI admin di import per supportare
+l'importazione di domande associate a più tipi di patente. Ogni import specifica il
+tipo di destinazione; le categorie importate vengono associate al tipo selezionato
+tramite `syncWithoutDetaching`, mantenendo associazioni ad altri tipi già presenti.
+
+### Added
+
+- **Config `config/mit_import.php`:**
+  - `license_types` — mappatura codici tipi patente (placeholder per usi futuri).
+  - `default_license_type_code` — default 'B' per retrocompatibilità.
+
+- **Command `questions:import-mit`:**
+  - Opzione `{--license-type=B}` per specificare il tipo di patente destinazione.
+  - Validazione che il tipo esista (abort con messaggio se non trovato).
+  - Sincronizzazione automatica del pivot `category_license_type` con `syncWithoutDetaching`.
+  - Log aggiornato con campo `license_type`.
+
+- **Service `MitImportService`:**
+  - Parametro `LicenseType $licenseType` nel metodo `import()`.
+  - Tracciamento delle categorie elaborate per sincronizzazione pivot.
+  - Return type `?int` in `processRow()` per tracciare categorie sincronizzate.
+
+- **Form Request `ImportQuestionsRequest`:**
+  - Validazione campo `license_type_id` (required, exists, integer).
+  - Custom messages per errori di validazione.
+
+- **UI admin:**
+  - Select "Tipo di patente" nella view `mit-import.blade.php` con i tipi attivi.
+  - Default al tipo B per retrocompatibilità.
+
+- **Controller `QuestionController`:**
+  - Injection `LicenseTypeService` in `showMitImport()`.
+  - Flash message aggiornato con tipo di patente e contatori (inserite/aggiornate).
+
+- **Command `license-types:list`:**
+  - Stampa tabella tipi di patente con: codice, nome, stato, n. categorie, n. domande.
+
+- **Tests:**
+  - `tests/Feature/ImportMultiLicenseTest.php` — 5 test su import multi-tipo, retrocompat,
+    errori, categorie condivise.
+
+### Changed
+
+- `QuestionController::storeMitImport()` usa ora `ImportQuestionsRequest` anziché
+  `ImportMitQuestionsRequest` (consolidamento per multi-tipo).
+- Flash message: da "Importate: N | Aggiornate: N | Saltate: N" a
+  "Importazione completata per {Type}: N inserite, M aggiornate".
+
+### Fixed
+
+- Comando `questions:import-mit` ora preserva associazioni di categorie ad altri tipi
+  durante import multi-patente (grazie a `syncWithoutDetaching`).
+
+---
+
 ## [Unreleased] — Feature 8.1: Esperienza viewer multi-patente
 
 Connette `LicenseType` all'esperienza concreta dello studio. Ogni viewer sceglie

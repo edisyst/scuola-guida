@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\Question;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,7 @@ class MitImportService
      */
     public function import(
         string $filePath,
+        LicenseType $licenseType,
         bool $dryRun = false,
         bool $updateExisting = false,
         ?int $topicFilter = null,
@@ -28,6 +30,7 @@ class MitImportService
         $rows   = $this->readRows($filePath, $config);
 
         $counts = ['imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => []];
+        $syncedCategories = [];
 
         $categories   = Category::all();
         $topicMap     = $this->buildTopicMap($config['topic_map'], $categories);
@@ -40,12 +43,15 @@ class MitImportService
                 $rowNum = $index + ($config['has_header_row'] ? 2 : 1);
 
                 try {
-                    $this->processRow(
+                    $categoryId = $this->processRow(
                         $row, $rowNum, $config,
                         $topicMap, $existingCodes,
                         $updateExisting, $topicFilter,
                         $counts,
                     );
+                    if ($categoryId !== null) {
+                        $syncedCategories[$categoryId] = true;
+                    }
                 } catch (\Throwable $e) {
                     $counts['errors'][] = "Riga {$rowNum}: " . $e->getMessage();
                     $counts['skipped']++;
@@ -53,6 +59,15 @@ class MitImportService
 
                 if ($onProgress) {
                     ($onProgress)();
+                }
+            }
+
+            // Sincronizza il pivot category_license_type per tutte le categorie dell'import
+            // usando syncWithoutDetaching per preservare associazioni ad altri tipi
+            if (!empty($syncedCategories)) {
+                $categoryIds = array_keys($syncedCategories);
+                foreach ($categoryIds as $categoryId) {
+                    $licenseType->categories()->syncWithoutDetaching([$categoryId]);
                 }
             }
 
@@ -78,7 +93,7 @@ class MitImportService
         bool $updateExisting,
         ?int $topicFilter,
         array &$counts,
-    ): void {
+    ): ?int {
         $mitCode      = trim((string) ($this->cell($row, $config['columns']['mit_code']) ?? ''));
         $topicCode    = (int) ($this->cell($row, $config['columns']['topic_code']) ?? 0);
         $questionText = trim((string) ($this->cell($row, $config['columns']['question']) ?? ''));
@@ -88,19 +103,19 @@ class MitImportService
         if (empty($questionText)) {
             $counts['errors'][] = "Riga {$rowNum}: testo domanda vuoto, saltata.";
             $counts['skipped']++;
-            return;
+            return null;
         }
 
         if ($topicFilter !== null && $topicCode !== $topicFilter) {
             $counts['skipped']++;
-            return;
+            return null;
         }
 
         $categoryId = $topicMap[$topicCode] ?? null;
         if (!$categoryId) {
             $counts['errors'][] = "Riga {$rowNum}: argomento MIT {$topicCode} non mappato, saltata.";
             $counts['skipped']++;
-            return;
+            return null;
         }
 
         $isTrue = in_array(strtolower($answerRaw), $config['true_values'], true) ? 1 : 0;
@@ -121,7 +136,7 @@ class MitImportService
             } else {
                 $counts['skipped']++;
             }
-            return;
+            return $categoryId;
         }
 
         // Fallback: deduplicazione per testo quando mit_code è assente
@@ -137,7 +152,7 @@ class MitImportService
                 } else {
                     $counts['skipped']++;
                 }
-                return;
+                return $categoryId;
             }
         }
 
@@ -146,6 +161,7 @@ class MitImportService
             $existingCodes->put($mitCode, $question->id);
         }
         $counts['imported']++;
+        return $categoryId;
     }
 
     private function cell(array $row, int|string $colKey): mixed
