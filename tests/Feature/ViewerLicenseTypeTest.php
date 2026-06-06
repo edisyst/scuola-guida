@@ -130,7 +130,7 @@ class ViewerLicenseTypeTest extends TestCase
 
     public function test_spaced_repetition_filters_by_active_license_type(): void
     {
-        $licenseTypeB = LicenseType::factory()->create(['code' => 'TEST_SPACED', 'is_active' => true]);
+        $licenseTypeB = LicenseType::factory()->create(['code' => 'TST_SPACE', 'is_active' => true]);
 
         $categoryA = Category::factory()->create();
         $categoryB = Category::factory()->create();
