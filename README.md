@@ -187,7 +187,7 @@ nel versionamento domande (Feature 6.2).
 
 ## Test
 
-Suite con ~412 Feature test in ~36 classi (Laravel TestCase + `RefreshDatabase`):
+Suite con ~611 Feature test in ~51 classi (Laravel TestCase + `RefreshDatabase`):
 
 ```bash
 php artisan test

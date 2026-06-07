@@ -205,6 +205,17 @@ php artisan license-types:list                   # elenca tipi di patente con st
 php artisan enrollments:close-expired           # chiusura manuale iscrizioni scadute
 php artisan 2fa:reset {user_id}                 # azzera il 2FA di un admin/editor (recovery)
 
+# Backup e monitoring
+php artisan backup:run                          # esegui un backup manuale
+php artisan backup:clean                        # rimuovi backup scaduti secondo la policy retention
+php artisan backup:check                        # verifica freschezza e integrità ZIP (exit 0 = ok, 1 = problema)
+
+# Guide pratiche
+php artisan driving:cleanup-attestations        # rimuove PDF attestazioni non scaricati più vecchi di 24h
+
+# Web Push
+php artisan push:send-review-reminders          # invia push SM-2 a viewer con domande in scadenza oggi
+
 # GDPR
 php artisan gdpr:list                           # elenco viewer con marker "Anonimizzato"
 php artisan gdpr:list --anonymized              # solo i viewer già anonimizzati
@@ -226,7 +237,22 @@ I comandi GDPR e `enrollments:close-expired` sono disponibili anche dal pannello
 | `MAIL_*` | — | SMTP per le notifiche (vedi sezione 6) |
 | `QUEUE_CONNECTION` | `database` | Driver coda; usata per la coda `emails` |
 | `SESSION_DRIVER` | `database` | Necessario per il logout forzato in `gdpr:anonymize` |
-| `CACHE_STORE` | `database` | Cache `admin_badges` e `user_stats_*` |
+| `CACHE_STORE` | `redis` | Cache `admin_badges`, `user_stats_*`, SM-2, streak, badge |
+| `REDIS_HOST` | `127.0.0.1` | Redis per il cache driver; con Laragon avviare Redis dal tray |
+| `REDIS_PORT` | `6379` | — |
+| `REDIS_CACHE_DB` | `1` | DB Redis separato per la cache (evita collisioni con sessioni) |
+| `VAPID_PUBLIC_KEY` | — | Chiave pubblica VAPID per Web Push (Feature 6.7). Generare con `node -e "const wp = require('web-push'); const keys = wp.generateVAPIDKeys(); console.log(keys);"` |
+| `VAPID_PRIVATE_KEY` | — | Chiave privata VAPID |
+| `VAPID_SUBJECT` | `mailto:admin@example.com` | Email del mittente push (richiesta dal protocollo VAPID) |
+| `BACKUP_KEEP_ALL_DAYS` | `7` | Retention backup: mantieni tutti per N giorni |
+| `BACKUP_KEEP_DAILY` | `16` | Backup giornalieri da conservare |
+| `BACKUP_KEEP_WEEKLY` | `8` | Backup settimanali da conservare |
+| `BACKUP_KEEP_MONTHLY` | `4` | Backup mensili da conservare |
+| `DRIVING_SCHOOL_NAME` | — | Nome autoscuola — usato nell'header del PDF attestazione guide pratiche |
+| `DRIVING_SCHOOL_ADDRESS` | — | Indirizzo autoscuola |
+| `DRIVING_SCHOOL_PHONE` | — | Telefono autoscuola |
+| `DRIVING_SCHOOL_EMAIL` | — | Email autoscuola |
+| `DRIVING_SCHOOL_MIT_AUTH` | — | Numero autorizzazione MIT autoscuola |
 
 ---
 
