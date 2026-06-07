@@ -18,28 +18,6 @@ jobs:
 
     name: PHP ${{ matrix.php }}
 
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: laravel_test
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 3306:3306
-
-    env:
-      DB_CONNECTION: mysql
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
-      DB_DATABASE: laravel_test
-      DB_USERNAME: root
-      DB_PASSWORD: root
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,7 +26,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_mysql, bcmath, gd, xml
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, gd, xml
           coverage: none
 
       - name: Install Composer dependencies
@@ -59,21 +37,6 @@ jobs:
 
       - name: Generate app key
         run: php artisan key:generate
-
-      - name: Wait for MySQL
-        run: |
-          for i in {1..30}; do
-            if mysqladmin ping -h 127.0.0.1 -u root -proot --silent; then
-              echo "MySQL is ready!"
-              exit 0
-            fi
-            echo "Waiting for MySQL... ($i/30)"
-            sleep 1
-          done
-          exit 1
-
-      - name: Run migrations
-        run: php artisan migrate --force
 
       - name: Execute tests
         run: php artisan test
