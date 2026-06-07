@@ -79,7 +79,7 @@
     <div class="sg-header" style="margin-top:1.5rem;">
         <h2 class="sg-card-header-title" style="font-size:1.1rem;">
             @if($editor)
-                <i class="fas fa-user-edit mr-1"></i> {!! __('editor.production_by', ['name' => '<strong>'.$editor->name.'</strong>']) !!}
+                <i class="fas fa-user-edit mr-1"></i> {!! __('editor.production_by', ['name' => '<strong>'.e($editor->name).'</strong>']) !!}
                 &nbsp;<small class="text-muted">{{ $from->format('d/m/Y') }} — {{ $to->format('d/m/Y') }}</small>
             @else
                 <i class="fas fa-users mr-1"></i> {{ __('editor.production_aggregate') }}
