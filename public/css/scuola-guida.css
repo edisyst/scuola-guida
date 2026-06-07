@@ -1988,3 +1988,191 @@ body.dark-mode .text-info { color: #5ddde9 !important; }
 @media (max-width: 767.98px) {
     .sg-sortable-scroll { max-height: 360px; }
 }
+
+/* ============================================================
+   ROLE THEMING — sidebar / topnav / footer per ruolo
+   Il middleware RoleTheme aggiunge al <body> la classe
+   role-admin | role-editor | role-viewer | role-instructor.
+   Tutte le regole qui sotto usano quella classe come selector
+   radice per non inquinare il resto del CSS.
+   ============================================================ */
+
+/* ── Variabili colore per ruolo ───────────────────────────── */
+:root {
+    --rt-admin:      #dc3545;
+    --rt-admin-dk:   #b02a37;
+    --rt-editor:     #17a2b8;
+    --rt-editor-dk:  #117a8b;
+    --rt-viewer:     #ffc107;
+    --rt-viewer-dk:  #d39e00;
+    --rt-instructor: #28a745;
+    --rt-instructor-dk: #1e7e34;
+}
+
+/* ── Mixin-like pattern: tutte le regole comuni ai ruoli
+      vengono ripetute per ogni selettore corpo-ruolo. ──────── */
+
+/* Sidebar background (aside + area brand) */
+body.role-admin      .main-sidebar { background-color: var(--rt-admin)      !important; }
+body.role-editor     .main-sidebar { background-color: var(--rt-editor)     !important; }
+body.role-viewer     .main-sidebar { background-color: var(--rt-viewer)     !important; }
+body.role-instructor .main-sidebar { background-color: var(--rt-instructor) !important; }
+
+/* Brand link (logo area in cima alla sidebar) */
+body.role-admin      .brand-link { background-color: var(--rt-admin-dk)      !important; border-bottom-color: rgba(0,0,0,.15) !important; }
+body.role-editor     .brand-link { background-color: var(--rt-editor-dk)     !important; border-bottom-color: rgba(0,0,0,.15) !important; }
+body.role-viewer     .brand-link { background-color: var(--rt-viewer-dk)     !important; border-bottom-color: rgba(0,0,0,.15) !important; }
+body.role-instructor .brand-link { background-color: var(--rt-instructor-dk) !important; border-bottom-color: rgba(0,0,0,.15) !important; }
+
+/* Testo nella brand link */
+body.role-admin      .brand-link,
+body.role-editor     .brand-link,
+body.role-instructor .brand-link { color: #fff !important; }
+body.role-viewer     .brand-link { color: #212529 !important; }
+
+/* Topnav background */
+body.role-admin      .main-header.navbar { background-color: var(--rt-admin)      !important; }
+body.role-editor     .main-header.navbar { background-color: var(--rt-editor)     !important; }
+body.role-viewer     .main-header.navbar { background-color: var(--rt-viewer)     !important; }
+body.role-instructor .main-header.navbar { background-color: var(--rt-instructor) !important; }
+
+/* Topnav link e icone */
+body.role-admin      .main-header.navbar .nav-link,
+body.role-admin      .main-header.navbar .nav-link *,
+body.role-editor     .main-header.navbar .nav-link,
+body.role-editor     .main-header.navbar .nav-link *,
+body.role-instructor .main-header.navbar .nav-link,
+body.role-instructor .main-header.navbar .nav-link * { color: rgba(255,255,255,.85) !important; }
+
+body.role-viewer .main-header.navbar .nav-link,
+body.role-viewer .main-header.navbar .nav-link * { color: rgba(0,0,0,.75) !important; }
+
+body.role-admin      .main-header.navbar .nav-link:hover *,
+body.role-editor     .main-header.navbar .nav-link:hover *,
+body.role-instructor .main-header.navbar .nav-link:hover * { color: #fff !important; }
+body.role-viewer     .main-header.navbar .nav-link:hover * { color: #000 !important; }
+
+/* Footer background */
+body.role-admin      .main-footer { background-color: var(--rt-admin)      !important; border-top-color: var(--rt-admin-dk)      !important; color: #fff !important; }
+body.role-editor     .main-footer { background-color: var(--rt-editor)     !important; border-top-color: var(--rt-editor-dk)     !important; color: #fff !important; }
+body.role-viewer     .main-footer { background-color: var(--rt-viewer)     !important; border-top-color: var(--rt-viewer-dk)     !important; color: #212529 !important; }
+body.role-instructor .main-footer { background-color: var(--rt-instructor) !important; border-top-color: var(--rt-instructor-dk) !important; color: #fff !important; }
+
+body.role-admin      .main-footer a,
+body.role-editor     .main-footer a,
+body.role-instructor .main-footer a { color: rgba(255,255,255,.8) !important; }
+body.role-viewer     .main-footer a { color: rgba(0,0,0,.7) !important; }
+body.role-admin      .main-footer a:hover,
+body.role-editor     .main-footer a:hover,
+body.role-instructor .main-footer a:hover { color: #fff !important; }
+body.role-viewer     .main-footer a:hover { color: #000 !important; }
+
+/* ── Sidebar nav: testo link ────────────────────────────── */
+body.role-admin      .sidebar .nav-sidebar .nav-link,
+body.role-editor     .sidebar .nav-sidebar .nav-link,
+body.role-instructor .sidebar .nav-sidebar .nav-link { color: rgba(255,255,255,.82) !important; }
+body.role-viewer     .sidebar .nav-sidebar .nav-link { color: rgba(0,0,0,.72) !important; }
+
+body.role-admin      .sidebar .nav-sidebar .nav-link .nav-icon,
+body.role-editor     .sidebar .nav-sidebar .nav-link .nav-icon,
+body.role-instructor .sidebar .nav-sidebar .nav-link .nav-icon { color: rgba(255,255,255,.6) !important; }
+body.role-viewer     .sidebar .nav-sidebar .nav-link .nav-icon { color: rgba(0,0,0,.55) !important; }
+
+/* Hover su voci non attive */
+body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover,
+body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover,
+body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover {
+    background-color: rgba(255,255,255,.12) !important;
+    color: #fff !important;
+}
+body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon,
+body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon,
+body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon { color: #fff !important; }
+
+body.role-viewer .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover {
+    background-color: rgba(0,0,0,.08) !important;
+    color: #000 !important;
+}
+body.role-viewer .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon { color: #000 !important; }
+
+/* ── Voce attiva: sfondo bianco + testo nel colore del ruolo ── */
+body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link.active,
+body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link.active,
+body.role-viewer     .sidebar .nav-sidebar .nav-item > .nav-link.active,
+body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link.active {
+    background-color: #fff !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link.active,
+body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--rt-admin)      !important; }
+body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link.active,
+body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--rt-editor)     !important; }
+body.role-viewer     .sidebar .nav-sidebar .nav-item > .nav-link.active,
+body.role-viewer     .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--rt-viewer-dk)   !important; }
+body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link.active,
+body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--rt-instructor)  !important; }
+
+/* ── Badge sidebar: sfondo bianco + testo nel colore del ruolo ── */
+body.role-admin      .sidebar .badge { background-color: #fff !important; color: var(--rt-admin)      !important; }
+body.role-editor     .sidebar .badge { background-color: #fff !important; color: var(--rt-editor)     !important; }
+body.role-viewer     .sidebar .badge { background-color: #fff !important; color: var(--rt-viewer-dk)   !important; }
+body.role-instructor .sidebar .badge { background-color: #fff !important; color: var(--rt-instructor)  !important; }
+
+/* ── Badge nella topnav ─────────────────────────────────── */
+body.role-admin      .main-header .badge { background-color: #fff !important; color: var(--rt-admin)      !important; }
+body.role-editor     .main-header .badge { background-color: #fff !important; color: var(--rt-editor)     !important; }
+body.role-viewer     .main-header .badge { background-color: #fff !important; color: var(--rt-viewer-dk)   !important; }
+body.role-instructor .main-header .badge { background-color: #fff !important; color: var(--rt-instructor)  !important; }
+
+/* ── Dropdown nella topnav: testo scuro su sfondo bianco ────
+   Il colore bianco ereditato dalla navbar renderebbe il testo
+   illeggibile dentro i dropdown (sfondo #fff). Si sovrascrive
+   esplicitamente per tutti i ruoli con navbar scura.          */
+body.role-admin      .main-header .dropdown-menu,
+body.role-editor     .main-header .dropdown-menu,
+body.role-instructor .main-header .dropdown-menu { color: #212529 !important; }
+
+body.role-admin      .main-header .dropdown-menu .dropdown-item,
+body.role-admin      .main-header .dropdown-menu a:not(.btn),
+body.role-editor     .main-header .dropdown-menu .dropdown-item,
+body.role-editor     .main-header .dropdown-menu a:not(.btn),
+body.role-instructor .main-header .dropdown-menu .dropdown-item,
+body.role-instructor .main-header .dropdown-menu a:not(.btn) { color: #212529 !important; }
+
+body.role-admin      .main-header .dropdown-menu .dropdown-item:hover,
+body.role-editor     .main-header .dropdown-menu .dropdown-item:hover,
+body.role-instructor .main-header .dropdown-menu .dropdown-item:hover { color: #000 !important; }
+
+/* ── Footer del menu utente (Profilo / Logout): stesso colore
+   della navbar/sidebar per ogni ruolo.                        */
+body.role-admin      .main-header .user-footer { background-color: var(--rt-admin)      !important; }
+body.role-editor     .main-header .user-footer { background-color: var(--rt-editor)     !important; }
+body.role-viewer     .main-header .user-footer { background-color: var(--rt-viewer)     !important; }
+body.role-instructor .main-header .user-footer { background-color: var(--rt-instructor) !important; }
+
+body.role-admin      .main-header .user-footer .btn,
+body.role-editor     .main-header .user-footer .btn,
+body.role-instructor .main-header .user-footer .btn {
+    color: #fff !important;
+    border-color: rgba(255,255,255,.35) !important;
+    background-color: rgba(255,255,255,.1) !important;
+}
+body.role-admin      .main-header .user-footer .btn:hover,
+body.role-editor     .main-header .user-footer .btn:hover,
+body.role-instructor .main-header .user-footer .btn:hover {
+    background-color: rgba(255,255,255,.22) !important;
+}
+body.role-viewer .main-header .user-footer .btn {
+    color: #212529 !important;
+    border-color: rgba(0,0,0,.2) !important;
+    background-color: rgba(0,0,0,.06) !important;
+}
+body.role-viewer .main-header .user-footer .btn:hover {
+    background-color: rgba(0,0,0,.14) !important;
+}
+
+/* ── Scrollbar sidebar (os-theme-light su sfondo colorato) ── */
+body[class*="role-"] .sidebar .os-scrollbar-track { background: rgba(255,255,255,.08) !important; }
+body[class*="role-"] .sidebar .os-scrollbar-handle { background: rgba(255,255,255,.25) !important; }
+body.role-viewer     .sidebar .os-scrollbar-track  { background: rgba(0,0,0,.06) !important; }
+body.role-viewer     .sidebar .os-scrollbar-handle { background: rgba(0,0,0,.18) !important; }
