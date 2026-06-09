@@ -144,6 +144,31 @@
     </tbody>
 </table>
 
+{{-- CERTIFICATION STATUS --}}
+<h3>{{ __('driving.pdf_cert_status') }}</h3>
+@if($completion_status['all_completed'])
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+        <tr>
+            <td style="background: #d4edda; color: #155724; padding: 8px; font-weight: bold; font-size: 10px; border: 1px solid #c3e6cb;">
+                ✓ {{ __('driving.pdf_cert_unlocked') }} — {{ $completion_status['completion_date']?->format('d/m/Y') ?? '—' }}
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 6px 8px; font-size: 9px; border: 1px solid #dee2e6;">
+                {{ __('driving.pdf_cert_companion_desc') }}
+            </td>
+        </tr>
+    </table>
+@else
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+        <tr>
+            <td style="background: #fff3cd; color: #856404; padding: 8px; font-weight: bold; font-size: 10px; border: 1px solid #ffeaa7;">
+                {{ __('driving.pdf_cert_in_progress') }} — {{ $completion_status['percentage'] }}%
+            </td>
+        </tr>
+    </table>
+@endif
+
 {{-- SESSIONS DETAIL --}}
 <h3>{{ __('driving.pdf_sessions_detail') }}</h3>
 <div class="sessions-list">

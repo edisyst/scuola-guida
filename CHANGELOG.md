@@ -5,6 +5,43 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 9.2: Sequenzialità moduli e certificazione finale
+
+Vincolo di sequenzialità obbligatorio per i moduli di guida pratica (decreto MIT 294/2025):
+il modulo A è propedeutico a tutti gli altri, il percorso è A → B → C → D.
+Al completamento di tutti i moduli viene sbloccata la "certificazione finale" che autorizza
+lo studente all'esercitazione con accompagnatore privato.
+
+### Added
+
+- **`DrivingSessionService::getCompletionStatus(User, LicenseType): array`** — restituisce stato
+  completo del percorso: `all_completed`, `completed_modules`, `next_required_module_id`,
+  `total_required_hours`, `total_completed_hours`, `percentage`, `completion_date` (sessione
+  che ha raggiunto il 100%) e `modules_detail`. Zero N+1.
+- **`DrivingSessionService::canRegisterForModule(User, User, DrivingModule): bool`** — verifica
+  autorizzazione e sequenzialità; se lo student non ha un tipo patente attivo il vincolo non si applica.
+- **`app/Exceptions/DrivingModuleSequenceException.php`** — eccezione custom per violazione sequenza.
+- **Doppio check di sequenzialità in `DrivingSessionService::record()`** — lato service per
+  sicurezza; lancia `DrivingModuleSequenceException` se `Auth::user()` è presente e il modulo
+  non è registrabile.
+- **Check nel controller `DrivingSessionController::store()`** — `abort_unless(canRegisterForModule, 422, ...)`.
+  Risposta HTTP 422 con messaggio chiaro per violazione sequenza.
+- **Indicatore stato certificazione in `instructor/student.blade.php`** — banner verde
+  "Certificazione sbloccata" se all_completed, banner blu con prossimo modulo se in corso.
+- **Sezione "Stato Certificazione" in `driving/progress.blade.php`** — card con data di
+  certificazione (viewer) o ore restanti e prossimo modulo; fix contestuale `$licenseType` → `$lt`.
+- **Blocco certificazione in PDF `driving/pdf/attestation.blade.php`** — sezione tra riepilogo
+  e dettaglio sessioni: CERTIFICAZIONE SBLOCCATA con data oppure PERCORSO IN CORSO con %.
+- **`DrivingAttestationService::buildData()`** — aggiunta chiave `completion_status` al payload
+  per il template PDF.
+- **Chiavi lang `it/en/es/driving.php`** — `cert_*`, `error_sequence`, `pdf_cert_*`
+  (16 chiavi per lingua).
+- **`tests/Feature/DrivingSequentialityTest.php`** — 13 test: 422 su registrazione fuori ordine,
+  sblocco B dopo completamento A, `getCompletionStatus`, `completion_date`, view viewer,
+  PDF `buildData`.
+
+---
+
 ## [Unreleased] — Fix: Test suite verde post-MultiLicense
 
 Ripristino della suite di test dopo l'introduzione del sistema multi-patente

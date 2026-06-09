@@ -45,11 +45,12 @@ class DrivingAttestationService
                 'email' => $student->email,
                 'dob'   => $student->birth_date,
             ],
-            'license_type' => $lt->name,
-            'generated_at' => now(),
-            'progress'     => $progress,
-            'sessions'     => $sessions,
-            'instructors'  => $instructors,
+            'license_type'      => $lt->name,
+            'generated_at'      => now(),
+            'progress'          => $progress,
+            'sessions'          => $sessions,
+            'instructors'       => $instructors,
+            'completion_status' => $this->sessionService->getCompletionStatus($student, $lt),
         ];
     }
 

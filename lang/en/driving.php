@@ -111,4 +111,19 @@ return [
     'download_attestation'  => 'Download PDF summary',
     'download_attestation_pending' => 'The PDF summary will be available upon completion of all required hours.',
 
+    // Feature 9.2 — Sequentiality and certification (Decree 294/2025)
+    'cert_status_title'       => 'Certification Status',
+    'cert_unlocked'           => 'Certification unlocked',
+    'cert_unlocked_detail'    => 'All driving practice hours are complete. The student may now practise with a private accompanying driver.',
+    'cert_unlocked_on'        => 'Certification unlocked on :date.',
+    'cert_unlocked_desc'      => 'You may now practise with a private accompanying driver who holds a category B licence for at least 10 years.',
+    'cert_in_progress'        => 'In progress',
+    'cert_next_module'        => 'Next required module: :name',
+    'cert_in_progress_detail' => 'In progress. Hours completed: :completed/:required (:pct%). Next module: :module.',
+    'error_sequence'          => 'You cannot record a session for module :module until the preceding modules are completed (Decree 294/2025).',
+    'pdf_cert_status'         => 'Certification Status',
+    'pdf_cert_unlocked'       => 'CERTIFICATION UNLOCKED',
+    'pdf_cert_in_progress'    => 'TRAINING IN PROGRESS',
+    'pdf_cert_companion_desc' => 'The training programme is complete. The student is authorised to practise with a private accompanying driver.',
+
 ];

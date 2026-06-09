@@ -304,6 +304,26 @@
                             </strong>
                         </div>
 
+                        {{-- Stato certificazione --}}
+                        @if($drivingProgress['all_completed'])
+                            <div class="alert alert-success mt-2">
+                                <i class="fas fa-certificate mr-1"></i>
+                                <strong>{{ __('driving.cert_unlocked') }}</strong><br>
+                                {{ __('driving.cert_unlocked_detail') }}
+                            </div>
+                        @else
+                            @php
+                                $nextDrivingItem = collect($drivingProgress['modules'])->firstWhere('completed', false);
+                            @endphp
+                            @if($nextDrivingItem)
+                                <div class="alert alert-info mt-2">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    <strong>{{ __('driving.cert_in_progress') }}</strong>
+                                    {{ __('driving.cert_next_module', ['name' => $nextDrivingItem['module']->name]) }}
+                                </div>
+                            @endif
+                        @endif
+
                         {{-- Pulsante download riepilogo PDF (se completato) --}}
                         @if($drivingProgress['all_completed'] && isset($drivingSessions) && $drivingSessions->isNotEmpty())
                             <div class="mt-3">

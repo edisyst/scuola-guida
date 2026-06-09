@@ -111,4 +111,19 @@ return [
     'download_attestation'  => 'Descargar resumen PDF',
     'download_attestation_pending' => 'El resumen en PDF estará disponible al completar todas las horas obligatorias.',
 
+    // Feature 9.2 — Secuencialidad y certificación (Decreto 294/2025)
+    'cert_status_title'       => 'Estado de Certificación',
+    'cert_unlocked'           => 'Certificación desbloqueada',
+    'cert_unlocked_detail'    => 'Todas las prácticas de conducción están completadas. El alumno puede ahora practicar con un acompañante privado.',
+    'cert_unlocked_on'        => 'Certificación desbloqueada el :date.',
+    'cert_unlocked_desc'      => 'Puedes practicar con un acompañante privado que tenga el permiso B desde hace al menos 10 años.',
+    'cert_in_progress'        => 'En curso',
+    'cert_next_module'        => 'Próximo módulo requerido: :name',
+    'cert_in_progress_detail' => 'En curso. Horas completadas: :completed/:required (:pct%). Próximo módulo: :module.',
+    'error_sequence'          => 'No puedes registrar una sesión del módulo :module hasta que los módulos anteriores estén completados (Decreto 294/2025).',
+    'pdf_cert_status'         => 'Estado de Certificación',
+    'pdf_cert_unlocked'       => 'CERTIFICACIÓN DESBLOQUEADA',
+    'pdf_cert_in_progress'    => 'FORMACIÓN EN CURSO',
+    'pdf_cert_companion_desc' => 'El programa de formación está completo. El alumno está autorizado a practicar con un acompañante privado.',
+
 ];
