@@ -11,6 +11,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // Feature 11.0 — System settings (deve girare prima di qualsiasi seeder che legge i setting)
+            SystemSettingSeeder::class,
             RolePermissionSeeder::class,
             AdminUserSeeder::class,
             UserSeeder::class,

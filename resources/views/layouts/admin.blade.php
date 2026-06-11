@@ -15,6 +15,15 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="{{ asset('css/scuola-guida.css') }}">
+    <style>
+        :root {
+            --sg-accent: {{ setting('appearance.accent_color', '#3c8dbc') }};
+        }
+        .navbar-brand img.school-logo {
+            max-height: 40px;
+            width: auto;
+        }
+    </style>
 
     {{-- DataTables i18n strings injected for current locale --}}
     @php
@@ -36,6 +45,16 @@
     <meta name="datatables-i18n" content="{{ $dtI18nJson }}">
 
     @livewireStyles
+@stop
+
+@section('brand_top')
+    @if(setting('school.logo_path'))
+        <img src="{{ Storage::url(setting('school.logo_path')) }}"
+             alt="{{ setting('school.name', config('app.name')) }}"
+             class="school-logo brand-image elevation-3">
+    @else
+        <b>{{ setting('school.name', 'Scuola') }}</b>GUIDA
+    @endif
 @stop
 
 @section('content_top_nav_right')

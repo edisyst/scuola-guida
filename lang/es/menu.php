@@ -28,6 +28,8 @@ return [
     'audit_log'               => 'Registro de auditoría',
     'comandi_utili'           => 'Comandos útiles',
     'stato_sistema'           => 'Estado del sistema',
+    'stato_servizi'           => 'Estado de servicios',
+    'personalizzazione'       => 'Personalización',
     'utenti_ruoli'            => 'Usuarios & Roles',
     'utenti'                  => 'Usuarios',
     'ruoli_permessi'          => 'Roles & Permisos',

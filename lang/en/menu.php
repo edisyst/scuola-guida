@@ -28,6 +28,8 @@ return [
     'audit_log'               => 'Audit Log',
     'comandi_utili'           => 'Useful commands',
     'stato_sistema'           => 'System status',
+    'stato_servizi'           => 'Service health',
+    'personalizzazione'       => 'Customization',
     'utenti_ruoli'            => 'Users & Roles',
     'utenti'                  => 'Users',
     'ruoli_permessi'          => 'Roles & Permissions',

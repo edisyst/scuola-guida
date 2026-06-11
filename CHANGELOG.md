@@ -5,6 +5,73 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 11.0: Health dashboard e personalizzazione scuola
+
+Pannello admin centralizzato con stato live dei servizi di sistema e configurazione
+dell'identità visiva dell'autoscuola. I dati della scuola diventano fonte di verità
+tramite la tabella `system_settings` e l'helper globale `setting()`.
+
+### Added
+
+- **Migration `create_system_settings_table`** — tabella con `key` (unique), `value`, `type`, `group`, `label`.
+- **`SystemSettingSeeder`** — idempotente via `upsert()` su `key`; preleva i valori iniziali da `config('driving')`.
+- **`App\Models\SystemSetting`** — model con `getCastedValue()` (boolean cast, estendibile).
+- **`App\Services\SettingService`** — `get()` con cache Redis (TTL 3600) e fallback DB; `set()`, `setMany()`, `getGroup()`, `all()`. Mai eccezioni verso il chiamante.
+- **`App\Services\SystemHealthService`** — 6 check: Database, Redis, Queue, Storage, Mail, Twilio (SMS).
+- **Helper globale `setting(string $key, mixed $default)`** in `app/Helpers/helpers.php` — disponibile ovunque (Blade, controller, service).
+- **`Admin\SystemController`** — `health()`, `settings()`, `updateSettings()`. Upload logo su `Storage::disk('public')`.
+- **`UpdateSystemSettingsRequest`** — validazione campi scuola + regex hex per accent color + file upload.
+- **Route `admin/system/health` e `admin/system/settings`** (middleware `role:admin`).
+- **View `admin/system/health.blade.php`** — 6 card con badge Connesso/Warning/Non connesso.
+- **View `admin/system/settings.blade.php`** — form dati scuola + upload logo + color picker Alpine.js sincronizzato.
+- **CSS `--sg-accent`** iniettato nel layout `admin.blade.php` tramite `setting('appearance.accent_color')`.
+- **Logo dinamico navbar** — `@section('brand_top')` con `setting('school.logo_path')`.
+- **Sidebar admin** — voci "Stato servizi" e "Personalizzazione" nel menu Sistema.
+- **Lang `lang/{it,en,es}/system.php`** — tutte le chiavi UI della feature.
+- **`DrivingAttestationService::buildData()`** — legge dati scuola da `SettingService` con fallback a `config('driving')`.
+- **`config/driving.php`** — commento che indica migrazione a `system_settings`.
+- **`tests/Feature/SystemSettingsTest.php`** — 10 test: get/set service, Redis fallback, 403 editor, 6 indicatori, salvataggio, upload logo, validazione hex/filesize, idempotenza seeder.
+
+---
+
+## [Unreleased] — Feature 9.2: Sequenzialità moduli e certificazione finale
+
+Vincolo di sequenzialità obbligatorio per i moduli di guida pratica (decreto MIT 294/2025):
+il modulo A è propedeutico a tutti gli altri, il percorso è A → B → C → D.
+Al completamento di tutti i moduli viene sbloccata la "certificazione finale" che autorizza
+lo studente all'esercitazione con accompagnatore privato.
+
+### Added
+
+- **`DrivingSessionService::getCompletionStatus(User, LicenseType): array`** — restituisce stato
+  completo del percorso: `all_completed`, `completed_modules`, `next_required_module_id`,
+  `total_required_hours`, `total_completed_hours`, `percentage`, `completion_date` (sessione
+  che ha raggiunto il 100%) e `modules_detail`. Zero N+1.
+- **`DrivingSessionService::canRegisterForModule(User, User, DrivingModule): bool`** — verifica
+  autorizzazione e sequenzialità; se lo student non ha un tipo patente attivo il vincolo non si applica.
+- **`app/Exceptions/DrivingModuleSequenceException.php`** — eccezione custom per violazione sequenza.
+- **Doppio check di sequenzialità in `DrivingSessionService::record()`** — lato service per
+  sicurezza; lancia `DrivingModuleSequenceException` se `Auth::user()` è presente e il modulo
+  non è registrabile.
+- **Check nel controller `DrivingSessionController::store()`** — `abort_unless(canRegisterForModule, 422, ...)`.
+  Risposta HTTP 422 con messaggio chiaro per violazione sequenza.
+- **Indicatore stato certificazione in `instructor/student.blade.php`** — banner verde
+  "Certificazione sbloccata" se all_completed, banner blu con prossimo modulo se in corso.
+- **Sezione "Stato Certificazione" in `driving/progress.blade.php`** — card con data di
+  certificazione (viewer) o ore restanti e prossimo modulo; fix contestuale `$licenseType` → `$lt`.
+- **Blocco certificazione in PDF `driving/pdf/attestation.blade.php`** — sezione tra riepilogo
+  e dettaglio sessioni: CERTIFICAZIONE SBLOCCATA con data oppure PERCORSO IN CORSO con %.
+- **`DrivingAttestationService::buildData()`** — aggiunta chiave `completion_status` al payload
+  per il template PDF.
+- **Chiavi lang `it/en/es/driving.php`** — `cert_*`, `error_sequence`, `pdf_cert_*`
+  (16 chiavi per lingua).
+- **`tests/Feature/DrivingSequentialityTest.php`** — 13 test: 422 su registrazione fuori ordine,
+  sblocco B dopo completamento A, `getCompletionStatus`, `completion_date`, view viewer,
+  PDF `buildData`.
+
+---
+
+>>>>>>> Stashed changes
 ## [Unreleased] — Fix: Test suite verde post-MultiLicense
 
 Ripristino della suite di test dopo l'introduzione del sistema multi-patente
