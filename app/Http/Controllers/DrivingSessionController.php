@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDrivingSessionRequest;
+use App\Models\DrivingModule;
 use App\Models\DrivingSession;
 use App\Models\LicenseType;
 use App\Models\User;
@@ -26,9 +27,8 @@ class DrivingSessionController extends Controller
 
         $lt = $student->activeLicenseType ?? LicenseType::first();
 
-        $progress = $lt
-            ? $this->service->getProgress($student, $lt)
-            : null;
+        $progress         = $lt ? $this->service->getProgress($student, $lt) : null;
+        $completionStatus = $lt ? $this->service->getCompletionStatus($student, $lt) : null;
 
         // Ultime 10 sessioni con eager loading per evitare N+1
         $sessions = DrivingSession::where('student_id', $student->id)
@@ -37,7 +37,7 @@ class DrivingSessionController extends Controller
             ->limit(10)
             ->get();
 
-        return view('driving.progress', compact('student', 'progress', 'sessions', 'lt'));
+        return view('driving.progress', compact('student', 'progress', 'sessions', 'lt', 'completionStatus'));
     }
 
     /**
@@ -48,7 +48,16 @@ class DrivingSessionController extends Controller
         abort_unless(auth()->user()->canRegisterDrivingSession(), 403);
         abort_unless($this->service->canRegisterForStudent(auth()->user(), $student), 403);
 
-        $data               = $request->validated();
+        $validated = $request->validated();
+        $module    = DrivingModule::findOrFail($validated['driving_module_id']);
+
+        abort_unless(
+            $this->service->canRegisterForModule(auth()->user(), $student, $module),
+            422,
+            __('driving.error_sequence', ['module' => $module->name])
+        );
+
+        $data               = $validated;
         $data['student_id'] = $student->id;
 
         // Istruttore loggato viene impostato automaticamente se il ruolo è instructor
@@ -86,9 +95,8 @@ class DrivingSessionController extends Controller
 
         $lt = $student->activeLicenseType ?? LicenseType::first();
 
-        $progress = $lt
-            ? $this->service->getProgress($student, $lt)
-            : null;
+        $progress         = $lt ? $this->service->getProgress($student, $lt) : null;
+        $completionStatus = $lt ? $this->service->getCompletionStatus($student, $lt) : null;
 
         $sessions = DrivingSession::where('student_id', $student->id)
             ->with(['drivingModule', 'instructor', 'recorder'])
@@ -96,6 +104,6 @@ class DrivingSessionController extends Controller
             ->limit(10)
             ->get();
 
-        return view('driving.progress', compact('student', 'progress', 'sessions', 'lt'));
+        return view('driving.progress', compact('student', 'progress', 'sessions', 'lt', 'completionStatus'));
     }
 }

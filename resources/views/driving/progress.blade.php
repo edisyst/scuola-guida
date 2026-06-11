@@ -13,14 +13,14 @@
             <h1 class="sg-header-title">
                 <i class="fas fa-car mr-2"></i> {{ __('driving.title_progress') }}
             </h1>
-            @if($licenseType)
-                <p class="sg-header-subtitle sg-mt-1">{{ $licenseType->name }}</p>
+            @if($lt)
+                <p class="sg-header-subtitle sg-mt-1">{{ $lt->name }}</p>
             @endif
         </div>
     </div>
 
     {{-- Stato vuoto: nessun tipo patente o nessun modulo --}}
-    @if(!$licenseType || empty($progress['modules']))
+    @if(!$lt || empty($progress['modules']))
         <div class="text-center py-5">
             <i class="fas fa-car fa-3x text-muted mb-3 d-block"></i>
             <p class="text-muted">{{ __('driving.progress_empty') }}</p>
@@ -126,6 +126,40 @@
                 @endforeach
             </div>
         </div>
+
+        {{-- Stato certificazione --}}
+        @if(isset($completionStatus))
+            <div class="sg-card mt-3">
+                <div class="sg-card-header">
+                    <h3 class="sg-card-title">
+                        <i class="fas fa-certificate mr-1"></i> {{ __('driving.cert_status_title') }}
+                    </h3>
+                </div>
+                <div class="p-3">
+                    @if($completionStatus['all_completed'])
+                        <div class="alert alert-success mb-0">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            <strong>{{ __('driving.cert_unlocked_on', ['date' => $completionStatus['completion_date']?->format('d/m/Y') ?? '—']) }}</strong><br>
+                            {{ __('driving.cert_unlocked_desc') }}
+                        </div>
+                    @else
+                        @php
+                            $nextModuleName = collect($completionStatus['modules_detail'])
+                                ->firstWhere('completed', false)['module']->name ?? '—';
+                        @endphp
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            {{ __('driving.cert_in_progress_detail', [
+                                'completed' => $completionStatus['total_completed_hours'],
+                                'required'  => $completionStatus['total_required_hours'],
+                                'pct'       => $completionStatus['percentage'],
+                                'module'    => $nextModuleName,
+                            ]) }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @endif
 
     @endif
 

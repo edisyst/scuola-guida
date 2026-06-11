@@ -40,15 +40,14 @@ use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\TwoFactorSetupController;
 use App\Http\Controllers\Api\OfflineController;
 use App\Http\Controllers\PushSubscriptionController;
+use App\Http\Controllers\GuestController;
 use App\Http\Controllers\LocaleController;
 // PWA offline fallback — no auth required (served from SW cache)
 Route::get('/offline', fn() => view('offline'))->name('offline');
 
 Route::post('/locale/switch', [LocaleController::class, 'switch'])->name('locale.switch');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [GuestController::class, 'index'])->name('guest.home');
 
 /*
 |--------------------------------------------------------------------------

@@ -5,6 +5,31 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 11.1: Homepage guest
+
+Landing page per visitatori non autenticati, coerente con il tema AdminLTE/Bootstrap 5
+del resto del sito. Personalizzabile dall'admin senza toccare il codice: legge nome scuola,
+tagline, logo e colore accent dalla tabella `system_settings` tramite l'helper `setting()`.
+
+### Added
+
+- **Layout `resources/views/layouts/guest.blade.php`** — navbar sticky senza sidebar, footer
+  con dati contatto da `setting()`, CSS `--sg-accent` iniettato, dark mode via Alpine.js
+  (`prefers-color-scheme`), meta tag SEO e Open Graph.
+- **`GuestController::index()`** — redirect per ruolo se autenticato (admin → `admin.stats`,
+  editor → `editor.dashboard`, altri → `dashboard`); 4 query precaricate (3 count + 1
+  `LicenseType::active()->orderBy('sort_order')->get()`).
+- **View `resources/views/guest/home.blade.php`** — 5 sezioni: hero con gradiente
+  `--sg-accent`, statistiche (nascosta se tutti i contatori 0), feature highlights,
+  tipi di patente (nascosta se ≤ 1), CTA finale.
+- **Route `GET /` → `GuestController@index`** con nome `guest.home`.
+- **`lang/{it,en,es}/guest.php`** — tutte le stringhe i18n della homepage guest.
+- **`tests/Feature/GuestHomeTest.php`** — 12 test: nome scuola, tagline, redirect per ruolo,
+  sezione statistiche nascosta, sezione patenti nascosta, view senza logo, view senza tagline,
+  chiavi i18n presenti nei tre file locale.
+
+---
+
 ## [Unreleased] — Feature 11.0: Health dashboard e personalizzazione scuola
 
 Pannello admin centralizzato con stato live dei servizi di sistema e configurazione

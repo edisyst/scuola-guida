@@ -111,4 +111,19 @@ return [
     'download_attestation'  => 'Scarica riepilogo PDF',
     'download_attestation_pending' => 'Il riepilogo PDF sarà disponibile al completamento di tutte le ore obbligatorie.',
 
+    // Feature 9.2 — Sequenzialità e certificazione (decreto 294/2025)
+    'cert_status_title'       => 'Stato Certificazione',
+    'cert_unlocked'           => 'Certificazione sbloccata',
+    'cert_unlocked_detail'    => 'Tutte le guide pratiche sono completate. Lo studente può ora esercitarsi con un accompagnatore privato.',
+    'cert_unlocked_on'        => 'Certificazione sbloccata il :date.',
+    'cert_unlocked_desc'      => 'Puoi ora esercitarti con un accompagnatore privato che abbia la patente B da almeno 10 anni.',
+    'cert_in_progress'        => 'In corso',
+    'cert_next_module'        => 'Prossimo modulo richiesto: :name',
+    'cert_in_progress_detail' => 'In corso. Ore completate: :completed/:required (:pct%). Prossimo modulo: :module.',
+    'error_sequence'          => 'Non puoi registrare una sessione del modulo :module finché i moduli precedenti non sono completati (decreto 294/2025).',
+    'pdf_cert_status'         => 'Stato Certificazione',
+    'pdf_cert_unlocked'       => 'CERTIFICAZIONE SBLOCCATA',
+    'pdf_cert_in_progress'    => 'PERCORSO IN CORSO',
+    'pdf_cert_companion_desc' => 'Il percorso formativo è completo. Lo studente è autorizzato a esercitarsi con accompagnatore privato.',
+
 ];
