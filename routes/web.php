@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\HealthController;
+use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\InstructorAssignmentController;
 use App\Http\Controllers\Editor\EditorDashboardController;
 use App\Http\Controllers\Instructor\InstructorController;
@@ -39,15 +40,14 @@ use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Auth\TwoFactorSetupController;
 use App\Http\Controllers\Api\OfflineController;
 use App\Http\Controllers\PushSubscriptionController;
+use App\Http\Controllers\GuestController;
 use App\Http\Controllers\LocaleController;
 // PWA offline fallback — no auth required (served from SW cache)
 Route::get('/offline', fn() => view('offline'))->name('offline');
 
 Route::post('/locale/switch', [LocaleController::class, 'switch'])->name('locale.switch');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [GuestController::class, 'index'])->name('guest.home');
 
 /*
 |--------------------------------------------------------------------------
@@ -393,6 +393,13 @@ Route::middleware(['auth', '2fa'])
                 ->name('health.index');
             Route::post('health/backup-now', [HealthController::class, 'runBackupNow'])
                 ->name('health.backup-now');
+
+            // SYSTEM — service health checks + personalizzazione scuola (Feature 11.0)
+            Route::prefix('system')->name('system.')->group(function () {
+                Route::get('health',    [SystemController::class, 'health'])->name('health');
+                Route::get('settings', [SystemController::class, 'settings'])->name('settings');
+                Route::post('settings', [SystemController::class, 'updateSettings'])->name('settings.update');
+            });
 
             // GESTIONE ISTRUTTORI (assegnazione studenti)
             Route::get('instructors', [InstructorAssignmentController::class, 'index'])

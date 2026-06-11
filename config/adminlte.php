@@ -431,6 +431,20 @@ return [
                     'can'  => 'admin-only',
                     'key'  => 'health',
                 ],
+                [
+                    'text' => 'stato_servizi',
+                    'url'  => 'admin/system/health',
+                    'icon' => 'fas fa-check-circle',
+                    'can'  => 'admin-only',
+                    'key'  => 'system-health',
+                ],
+                [
+                    'text' => 'personalizzazione',
+                    'url'  => 'admin/system/settings',
+                    'icon' => 'fas fa-paint-brush',
+                    'can'  => 'admin-only',
+                    'key'  => 'system-settings',
+                ],
             ],
         ],
         [

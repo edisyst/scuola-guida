@@ -38,7 +38,14 @@ class DrivingAttestationService
             ->values();
 
         return [
-            'school'    => config('driving'),
+            'school'    => [
+                'school_name'    => setting('school.name',           config('driving.school_name')),
+                'school_address' => setting('school.address',        config('driving.school_address')),
+                'school_phone'   => setting('school.phone',          config('driving.school_phone')),
+                'school_email'   => setting('school.email',          config('driving.school_email')),
+                'school_license' => setting('school.license_number', config('driving.school_license')),
+                'logo_path'      => setting('school.logo_path', ''),
+            ],
             'student'   => [
                 'id'    => $student->id,
                 'name'  => $student->name,

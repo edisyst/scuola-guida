@@ -5,6 +5,60 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 11.1: Homepage guest
+
+Landing page per visitatori non autenticati, coerente con il tema AdminLTE/Bootstrap 5
+del resto del sito. Personalizzabile dall'admin senza toccare il codice: legge nome scuola,
+tagline, logo e colore accent dalla tabella `system_settings` tramite l'helper `setting()`.
+
+### Added
+
+- **Layout `resources/views/layouts/guest.blade.php`** — navbar sticky senza sidebar, footer
+  con dati contatto da `setting()`, CSS `--sg-accent` iniettato, dark mode via Alpine.js
+  (`prefers-color-scheme`), meta tag SEO e Open Graph.
+- **`GuestController::index()`** — redirect per ruolo se autenticato (admin → `admin.stats`,
+  editor → `editor.dashboard`, altri → `dashboard`); 4 query precaricate (3 count + 1
+  `LicenseType::active()->orderBy('sort_order')->get()`).
+- **View `resources/views/guest/home.blade.php`** — 5 sezioni: hero con gradiente
+  `--sg-accent`, statistiche (nascosta se tutti i contatori 0), feature highlights,
+  tipi di patente (nascosta se ≤ 1), CTA finale.
+- **Route `GET /` → `GuestController@index`** con nome `guest.home`.
+- **`lang/{it,en,es}/guest.php`** — tutte le stringhe i18n della homepage guest.
+- **`tests/Feature/GuestHomeTest.php`** — 12 test: nome scuola, tagline, redirect per ruolo,
+  sezione statistiche nascosta, sezione patenti nascosta, view senza logo, view senza tagline,
+  chiavi i18n presenti nei tre file locale.
+
+---
+
+## [Unreleased] — Feature 11.0: Health dashboard e personalizzazione scuola
+
+Pannello admin centralizzato con stato live dei servizi di sistema e configurazione
+dell'identità visiva dell'autoscuola. I dati della scuola diventano fonte di verità
+tramite la tabella `system_settings` e l'helper globale `setting()`.
+
+### Added
+
+- **Migration `create_system_settings_table`** — tabella con `key` (unique), `value`, `type`, `group`, `label`.
+- **`SystemSettingSeeder`** — idempotente via `upsert()` su `key`; preleva i valori iniziali da `config('driving')`.
+- **`App\Models\SystemSetting`** — model con `getCastedValue()` (boolean cast, estendibile).
+- **`App\Services\SettingService`** — `get()` con cache Redis (TTL 3600) e fallback DB; `set()`, `setMany()`, `getGroup()`, `all()`. Mai eccezioni verso il chiamante.
+- **`App\Services\SystemHealthService`** — 6 check: Database, Redis, Queue, Storage, Mail, Twilio (SMS).
+- **Helper globale `setting(string $key, mixed $default)`** in `app/Helpers/helpers.php` — disponibile ovunque (Blade, controller, service).
+- **`Admin\SystemController`** — `health()`, `settings()`, `updateSettings()`. Upload logo su `Storage::disk('public')`.
+- **`UpdateSystemSettingsRequest`** — validazione campi scuola + regex hex per accent color + file upload.
+- **Route `admin/system/health` e `admin/system/settings`** (middleware `role:admin`).
+- **View `admin/system/health.blade.php`** — 6 card con badge Connesso/Warning/Non connesso.
+- **View `admin/system/settings.blade.php`** — form dati scuola + upload logo + color picker Alpine.js sincronizzato.
+- **CSS `--sg-accent`** iniettato nel layout `admin.blade.php` tramite `setting('appearance.accent_color')`.
+- **Logo dinamico navbar** — `@section('brand_top')` con `setting('school.logo_path')`.
+- **Sidebar admin** — voci "Stato servizi" e "Personalizzazione" nel menu Sistema.
+- **Lang `lang/{it,en,es}/system.php`** — tutte le chiavi UI della feature.
+- **`DrivingAttestationService::buildData()`** — legge dati scuola da `SettingService` con fallback a `config('driving')`.
+- **`config/driving.php`** — commento che indica migrazione a `system_settings`.
+- **`tests/Feature/SystemSettingsTest.php`** — 10 test: get/set service, Redis fallback, 403 editor, 6 indicatori, salvataggio, upload logo, validazione hex/filesize, idempotenza seeder.
+
+---
+
 ## [Unreleased] — Feature 9.2: Sequenzialità moduli e certificazione finale
 
 Vincolo di sequenzialità obbligatorio per i moduli di guida pratica (decreto MIT 294/2025):
@@ -42,6 +96,7 @@ lo studente all'esercitazione con accompagnatore privato.
 
 ---
 
+>>>>>>> Stashed changes
 ## [Unreleased] — Fix: Test suite verde post-MultiLicense
 
 Ripristino della suite di test dopo l'introduzione del sistema multi-patente
