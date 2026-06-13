@@ -16,6 +16,8 @@ e profili specialistici del progetto.
   aggiornate per Blade/AdminLTE, design system `sg-*`, Livewire e i18n.
 - **`.codex/README.md` e `.codex/agents/README.md`** — spiegano come usare i
   profili specialistici locali.
+- **`.codex/docs/*.md`** — riferimenti rapidi per domain model, services map,
+  ruoli/permessi, notifiche e comandi schedulati.
 - **Profili `.codex/agents/*.toml` allineati al progetto** — Laravel, Livewire,
   Alpine, testing, review, Docker, CI/CD e Ansible con convenzioni Scuola Guida.
 
