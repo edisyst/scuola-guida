@@ -5,6 +5,22 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Tooling Codex
+
+Configurazione locale per aiutare Codex a conoscere convenzioni, documentazione
+e profili specialistici del progetto.
+
+### Added
+
+- **`AGENTS.md` per Codex** — mappa documentazione, workflow operativo e regole
+  aggiornate per Blade/AdminLTE, design system `sg-*`, Livewire e i18n.
+- **`.codex/README.md` e `.codex/agents/README.md`** — spiegano come usare i
+  profili specialistici locali.
+- **Profili `.codex/agents/*.toml` allineati al progetto** — Laravel, Livewire,
+  Alpine, testing, review, Docker, CI/CD e Ansible con convenzioni Scuola Guida.
+
+---
+
 ## [Unreleased] — Feature 11.1: Homepage guest
 
 Landing page per visitatori non autenticati, coerente con il tema AdminLTE/Bootstrap 5

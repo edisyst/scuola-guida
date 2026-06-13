@@ -76,7 +76,7 @@ app/
   Services/               # Business logic (9 service)
 resources/
   views/
-    layouts/              # app.blade.php, partials
+    layouts/              # admin.blade.php, guest.blade.php, partials
     livewire/             # View dei componenti Livewire
     components/           # Blade components riutilizzabili
 config/                   # File di config dedicati per feature configurabili
@@ -179,15 +179,22 @@ per click handler banali.
 ### View e frontend
 
 - Nessun `<script>` inline nel body: tutto via `@push('scripts')`
-- Nessun `<style>` inline: solo classi Bootstrap 5 e AdminLTE 3
-- Zero CSS custom
-- Layout: `@extends('layouts.app')`, `@section('page-title', '...')`
+- Nessun `<style>` inline: usare classi Bootstrap 5, AdminLTE 3 e design
+  system `sg-*`
+- Evitare nuovo CSS custom; se davvero necessario, estendere
+  `public/css/scuola-guida.css` rispettando variabili `--sg-*` e dark mode
+- Layout backend: `@extends('layouts.admin')`,
+  `@section('title', '...')`, `@section('content_header')@endsection`,
+  contenuto dentro `sg-wrapper`
+- Layout guest: `@extends('layouts.guest')`
 - Empty state: icona `fa-3x text-muted` + testo esplicativo + CTA
 - Non riscrivere le view esistenti: aggiungi solo i blocchi necessari
   nel punto corretto, identificato leggendo la view prima di modificarla
 - `Storage::url()` per tutti i path file pubblici
 - Output sempre escaped con `{{ }}`. Usare `{!! !!}` solo per HTML fidato
   generato dal codice, mai per input utente
+- Stringhe visibili all'utente: usare `__()` / `@lang()` e aggiornare i file
+  in `lang/{it,en,es}` pertinenti
 
 ### Migration
 

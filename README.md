@@ -5,7 +5,7 @@ Applicazione web per la gestione di quiz della patente di guida. Gli amministrat
 Funzionalità principali:
 - **[Modalità Studio](docs/06-study-and-simulator.md#modalità-studio)** — esercitazione libera senza timer né punteggio, con materiale didattico per categoria (PDF, video YouTube, note). Filtrata per il tipo di patente in studio scelto dal viewer.
 - **[Simulatore Esame](docs/06-study-and-simulator.md#simulatore-esame)** — riproduce il formato ufficiale ministeriale (30 domande, 20 minuti, max 3 errori), personalizzato per il tipo di patente. Domande filtrate per le categorie della patente scelta.
-- **[Multi-patente](docs/03-features.md#area-admin)** — supporto completo di tutti i tipi di patente italiano (AM, A1, A2, A, B, B96, BE, C1, C1E, C, CE, D1, D1E, D, DE, CQC); ogni tipo ha categoria associate e formato esame configurabile. Ogni viewer sceglie il tipo per cui sta studiando (profilo → "Patente in studio"); studio, simulatore, diagnostico e ripasso SM-2 vengono filtrati di conseguenza.
+- **[Multi-patente](docs/03-features.md#area-admin--editor)** — supporto completo di tutti i tipi di patente italiano (AM, A1, A2, A, B, B96, BE, C1, C1E, C, CE, D1, D1E, D, DE, CQC); ogni tipo ha categoria associate e formato esame configurabile. Ogni viewer sceglie il tipo per cui sta studiando (profilo → "Patente in studio"); studio, simulatore, diagnostico e ripasso SM-2 vengono filtrati di conseguenza.
 - **[Domande salvate](docs/03-features.md#area-utente-viewer)** — bookmark persistente con nota personale opzionale.
 - **[Segnalazione errori](docs/03-features.md#area-utente-viewer)** — il viewer può segnalare problemi sulle domande; l'admin modera.
 - **[Revisione errori](docs/03-features.md#area-utente-viewer)** — aggregato delle domande sbagliate con toggle "imparata".
@@ -183,7 +183,8 @@ nel versionamento domande (Feature 6.2).
 | [docs/09-testing.md](docs/09-testing.md) | Copertura test (~380 test in ~34 classi Feature) e pattern ricorrenti |
 | [docs/10-backup-health.md](docs/10-backup-health.md) | Backup automatico, scheduler, cron produzione, Health dashboard, ripristino |
 | [CHANGELOG.md](CHANGELOG.md) | Storico modifiche per feature/release (Keep a Changelog) |
-| [CLAUDE.md](CLAUDE.md) | Convenzioni operative e architetturali del progetto |
+| [AGENTS.md](AGENTS.md) | Convenzioni operative per Codex e mappa della documentazione |
+| [CLAUDE.md](CLAUDE.md) | Convenzioni operative per Claude Code |
 
 ---
 
