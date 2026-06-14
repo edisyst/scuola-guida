@@ -62,7 +62,7 @@ class SettingService
     {
         DB::transaction(function () use ($data) {
             foreach ($data as $key => $value) {
-                SystemSetting::where('key', $key)->update(['value' => $value]);
+                SystemSetting::updateOrCreate(['key' => $key], ['value' => $value]);
 
                 try {
                     Redis::del(self::PREFIX . $key);

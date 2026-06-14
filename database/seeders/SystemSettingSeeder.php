@@ -73,6 +73,13 @@ class SystemSettingSeeder extends Seeder
                 'label' => 'Colore accent (hex)',
                 'value' => '#3c8dbc',
             ],
+            [
+                'key'   => 'school.carousel_images',
+                'type'  => 'json',
+                'group' => 'school',
+                'label' => 'Immagini carosello homepage (max 4)',
+                'value' => '[]',
+            ],
         ];
 
         $now = now();

@@ -43,6 +43,43 @@
 </section>
 
 {{-- ============================================================
+     Sezione 1b — Carosello immagini (solo se presenti)
+     ============================================================ --}}
+@php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
+@if(count($carouselImages) > 0)
+<section>
+    <div id="homepageCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @foreach($carouselImages as $i => $_)
+                <button type="button" data-bs-target="#homepageCarousel"
+                        data-bs-slide-to="{{ $i }}"
+                        class="{{ $i === 0 ? 'active' : '' }}"
+                        aria-label="Slide {{ $i + 1 }}"></button>
+            @endforeach
+        </div>
+        <div class="carousel-inner">
+            @foreach($carouselImages as $i => $imgPath)
+                <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+                    <img src="{{ Storage::url($imgPath) }}"
+                         class="d-block w-100"
+                         alt="Slide {{ $i + 1 }}"
+                         style="max-height:420px;object-fit:cover;">
+                </div>
+            @endforeach
+        </div>
+        @if(count($carouselImages) > 1)
+            <button class="carousel-control-prev" type="button" data-bs-target="#homepageCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#homepageCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        @endif
+    </div>
+</section>
+@endif
+
+{{-- ============================================================
      Sezione 2 — Statistiche (solo se almeno uno > 0)
      ============================================================ --}}
 @if($stats['quiz_count'] > 0 || $stats['question_count'] > 0 || $stats['license_types_count'] > 0)

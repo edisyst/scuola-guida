@@ -78,10 +78,38 @@ class SystemController extends Controller
             $data['school.logo_dark_path'] = $path;
         }
 
+        if ($request->hasFile('carousel_images')) {
+            $existing = json_decode($this->settingService->get('school.carousel_images', '[]'), true) ?? [];
+            $slots    = max(0, 4 - count($existing));
+
+            foreach (array_slice($request->file('carousel_images'), 0, $slots) as $file) {
+                $existing[] = $file->store('school/carousel', 'public');
+            }
+
+            $data['school.carousel_images'] = json_encode(array_values($existing));
+        }
+
         $this->settingService->setMany($data);
 
         return redirect()
             ->route('admin.system.settings')
             ->with('success', __('system.settings_saved'));
+    }
+
+    public function deleteCarouselImage(int $index): RedirectResponse
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        $images = json_decode($this->settingService->get('school.carousel_images', '[]'), true) ?? [];
+
+        if (isset($images[$index])) {
+            Storage::disk('public')->delete($images[$index]);
+            array_splice($images, $index, 1);
+            $this->settingService->setMany(['school.carousel_images' => json_encode(array_values($images))]);
+        }
+
+        return redirect()
+            ->route('admin.system.settings')
+            ->with('success', __('system.carousel_image_deleted'));
     }
 }

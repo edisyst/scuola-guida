@@ -399,6 +399,7 @@ Route::middleware(['auth', '2fa'])
                 Route::get('health',    [SystemController::class, 'health'])->name('health');
                 Route::get('settings', [SystemController::class, 'settings'])->name('settings');
                 Route::post('settings', [SystemController::class, 'updateSettings'])->name('settings.update');
+                Route::delete('settings/carousel/{index}', [SystemController::class, 'deleteCarouselImage'])->name('settings.carousel.delete');
             });
 
             // GESTIONE ISTRUTTORI (assegnazione studenti)
