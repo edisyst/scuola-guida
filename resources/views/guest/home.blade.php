@@ -5,9 +5,11 @@
 {{-- ============================================================
      Sezione 1 — Hero (sfondo accent solid)
      ============================================================ --}}
-<section class="d-flex align-items-center text-white"
-         style="min-height:40vh; background-color:var(--sg-accent);">
-    <div class="container text-center py-5">
+<section class="py-4" style="background:#f4f6f9;">
+    <div style="width:80%;margin:0 auto;">
+        <div class="d-flex align-items-center justify-content-center text-white"
+             style="min-height:40vh;background-color:var(--sg-accent);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);">
+    <div class="text-center py-5">
         @if(setting('school.logo_path'))
             <img src="{{ Storage::url(setting('school.logo_path')) }}"
                  alt="{{ setting('school.name', config('app.name')) }}"
@@ -38,6 +40,8 @@
                class="btn btn-outline-light btn-lg px-4">
                 {{ __('guest.cta_login') }}
             </a>
+        </div>
+    </div>
         </div>
     </div>
 </section>
