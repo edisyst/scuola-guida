@@ -5,6 +5,29 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Fix e miglioramenti homepage guest (2026-06-14)
+
+### Fixed
+
+- **Bootstrap non caricato nel layout guest** — `layouts/guest.blade.php` includeva `@vite` che bundla solo Tailwind reset; Bootstrap 5.3 e Alpine.js aggiunti via CDN. Tutte le classi Bootstrap (navbar, btn, container, ecc.) ora funzionano.
+- **Dark mode rimossa dalla homepage pubblica** — rimosso `x-data` Alpine e tutti i binding `:class` dark; la pagina pubblica è sempre in light mode.
+- **`SettingService::setMany()` usava `update()` invece di `updateOrCreate()`** — su tabella `system_settings` vuota le impostazioni non venivano mai salvate.
+- **Delete immagine carosello non funzionava** — il form eliminazione era annidato nel form principale (HTML vieta form annidati); card carosello spostata fuori dal `<form>`.
+
+### Added
+
+- **Carosello immagini homepage** — max 4 slide (JPG/PNG/WEBP, max 2 MB, 1920×600 px consigliati) gestibili da `admin/system/settings`. Upload multiplo, anteprima thumbnail, eliminazione singola con pulizia file da disco.
+- **Hero + carosello unificati nell'80% box** — riquadro centrato con border-radius 12px e box-shadow; le immagini del carosello fanno da sfondo; fallback sfondo solid `--sg-accent` se nessuna immagine caricata.
+- **Route `DELETE admin/system/settings/carousel/{index}`** per rimozione singola.
+- **Stringhe i18n `it/en/es`** per tutte le nuove label carosello (`section_carousel`, `carousel_upload`, `carousel_hint`, `carousel_full`, `carousel_delete_confirm`, `carousel_image_deleted`, `carousel_add_btn`).
+
+### Changed
+
+- **Homepage guest — palette visiva** — sfondo pagina `#f4f6f9`; card statistiche bianche con bordo top `--sg-accent`; sezione features su `#eef2ff`; CTA finale sfondo solid `--sg-accent` testo bianco.
+- **Testi hero** — ogni elemento (logo, nome scuola, slogan, pulsantiera) ha il proprio backdrop `rgba(0,0,0,~0.4)` con `backdrop-filter:blur(2px)` per leggibilità sulle immagini del carosello.
+
+---
+
 ## [Unreleased] — Tooling Codex
 
 Configurazione locale per aiutare Codex a conoscere convenzioni, documentazione
