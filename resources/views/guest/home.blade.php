@@ -45,31 +45,39 @@
                      style="background-color:var(--sg-accent);z-index:0;"></div>
             @endif
 
-            {{-- Contenuto hero con backdrop semitrasparente per leggibilità --}}
+            {{-- Contenuto hero: sfondo semitrasparente su ogni singolo elemento --}}
             <div class="position-relative d-flex align-items-center justify-content-center"
                  style="min-height:40vh;z-index:2;">
-                <div class="text-center py-5 px-4"
-                     style="background:rgba(0,0,0,0.45);border-radius:10px;backdrop-filter:blur(2px);">
+                <div class="text-center py-5 px-4 d-flex flex-column align-items-center gap-3">
+
+                    {{-- Logo o icona --}}
                     @if(setting('school.logo_path'))
-                        <img src="{{ Storage::url(setting('school.logo_path')) }}"
-                             alt="{{ setting('school.name', config('app.name')) }}"
-                             class="mb-4"
-                             style="max-height:96px;width:auto;">
+                        <div style="background:rgba(0,0,0,0.45);border-radius:12px;padding:10px 18px;backdrop-filter:blur(2px);">
+                            <img src="{{ Storage::url(setting('school.logo_path')) }}"
+                                 alt="{{ setting('school.name', config('app.name')) }}"
+                                 style="max-height:80px;width:auto;">
+                        </div>
                     @else
-                        <div class="mb-4">
-                            <i class="fas fa-car fa-4x opacity-75"></i>
+                        <div style="background:rgba(0,0,0,0.45);border-radius:50%;width:72px;height:72px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+                            <i class="fas fa-car fa-2x text-white opacity-75"></i>
                         </div>
                     @endif
 
-                    <h1 class="display-5 fw-bold">
+                    {{-- Nome scuola --}}
+                    <h1 class="display-5 fw-bold mb-0 text-white px-4 py-2"
+                        style="background:rgba(0,0,0,0.45);border-radius:10px;backdrop-filter:blur(2px);">
                         {{ setting('school.name', config('app.name')) }}
                     </h1>
 
-                    <p class="lead mb-4">
+                    {{-- Slogan --}}
+                    <p class="lead mb-0 text-white px-4 py-2"
+                       style="background:rgba(0,0,0,0.40);border-radius:10px;backdrop-filter:blur(2px);">
                         {{ setting('school.tagline', __('guest.hero_tagline_default')) }}
                     </p>
 
-                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                    {{-- Pulsantiera --}}
+                    <div class="d-flex flex-wrap justify-content-center gap-3 px-4 py-3"
+                         style="background:rgba(0,0,0,0.35);border-radius:10px;backdrop-filter:blur(2px);">
                         @if(Route::has('register'))
                             <a href="{{ route('register') }}"
                                class="btn btn-light btn-lg fw-semibold px-4">
@@ -81,6 +89,7 @@
                             {{ __('guest.cta_login') }}
                         </a>
                     </div>
+
                 </div>
             </div>
 
