@@ -151,41 +151,49 @@
                 </div>
             </div>
 
-            {{-- Carosello homepage --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">{{ __('system.section_carousel') }}</h3>
-                </div>
-                <div class="card-body">
-                    @php
-                        $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? [];
-                    @endphp
+            <div class="mb-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save mr-1"></i>{{ __('system.save_settings') }}
+                </button>
+            </div>
 
-                    @if(count($carouselImages) > 0)
-                        <p class="text-muted small mb-2">{{ __('system.carousel_current') }}</p>
-                        <div class="d-flex flex-wrap mb-3" style="gap:12px;">
-                            @foreach($carouselImages as $idx => $imgPath)
-                                <div class="position-relative" style="width:200px;">
-                                    <img src="{{ Storage::url($imgPath) }}"
-                                         alt="Slide {{ $idx + 1 }}"
-                                         style="width:200px;height:63px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;">
-                                    <form action="{{ route('admin.system.settings.carousel.delete', $idx) }}"
-                                          method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="btn btn-danger btn-sm position-absolute"
-                                                style="top:2px;right:2px;padding:1px 5px;font-size:.7rem;"
-                                                onclick="return confirm('{{ __('system.carousel_delete_confirm') }}')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
+        </form>
 
-                    @if(count($carouselImages) < 4)
+        {{-- Carosello homepage — FUORI dal form principale per evitare form annidati --}}
+        @php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ __('system.section_carousel') }}</h3>
+            </div>
+            <div class="card-body">
+
+                @if(count($carouselImages) > 0)
+                    <p class="text-muted small mb-2">{{ __('system.carousel_current') }}</p>
+                    <div class="d-flex flex-wrap mb-3" style="gap:12px;">
+                        @foreach($carouselImages as $idx => $imgPath)
+                            <div class="position-relative" style="width:200px;">
+                                <img src="{{ Storage::url($imgPath) }}"
+                                     alt="Slide {{ $idx + 1 }}"
+                                     style="width:200px;height:63px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;">
+                                <form action="{{ route('admin.system.settings.carousel.delete', $idx) }}"
+                                      method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm position-absolute"
+                                            style="top:2px;right:2px;padding:1px 5px;font-size:.7rem;"
+                                            onclick="return confirm('{{ __('system.carousel_delete_confirm') }}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if(count($carouselImages) < 4)
+                    <form action="{{ route('admin.system.settings.update') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
                         <div class="form-group">
                             <label>{{ __('system.carousel_upload', ['n' => 4 - count($carouselImages)]) }}</label>
                             <input type="file" name="carousel_images[]"
@@ -195,20 +203,17 @@
                             <small class="text-muted">{{ __('system.carousel_hint') }}</small>
                         </div>
                         @error('carousel_images.*')
-                            <div class="text-danger small">{{ $message }}</div>
+                            <div class="text-danger small mb-2">{{ $message }}</div>
                         @enderror
-                    @else
-                        <p class="text-muted small">{{ __('system.carousel_full') }}</p>
-                    @endif
-                </div>
+                        <button type="submit" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-upload mr-1"></i>{{ __('system.carousel_add_btn') }}
+                        </button>
+                    </form>
+                @else
+                    <p class="text-muted small mb-0">{{ __('system.carousel_full') }}</p>
+                @endif
             </div>
+        </div>
 
-            <div class="mb-4">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save mr-1"></i>{{ __('system.save_settings') }}
-                </button>
-            </div>
-
-        </form>
     </div>
 @stop

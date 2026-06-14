@@ -38,4 +38,5 @@ return [
     'carousel_full'             => 'Hai già 4 immagini. Elimina una per aggiungerne un\'altra.',
     'carousel_delete_confirm'   => 'Eliminare questa immagine dal carosello?',
     'carousel_image_deleted'    => 'Immagine eliminata dal carosello.',
+    'carousel_add_btn'          => 'Carica immagini',
 ];
