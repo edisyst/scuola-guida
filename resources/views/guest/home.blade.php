@@ -84,13 +84,13 @@
      Sezione 2 — Statistiche (solo se almeno uno > 0)
      ============================================================ --}}
 @if($stats['quiz_count'] > 0 || $stats['question_count'] > 0 || $stats['license_types_count'] > 0)
-<section class="py-5" :class="dark ? 'bg-dark' : 'bg-white'">
+<section class="py-5" class="bg-white">
     <div class="container">
         <div class="row g-4 justify-content-center">
             @if($stats['quiz_count'] > 0)
             <div class="col-md-4">
                 <div class="card text-center h-100 border-0 shadow-sm"
-                     :class="dark ? 'bg-secondary text-white' : ''">
+                     class="">
                     <div class="card-body py-4">
                         <i class="fas fa-book fa-2x mb-3 text-primary"></i>
                         <div class="display-6 fw-bold">{{ number_format($stats['quiz_count']) }}</div>
@@ -102,7 +102,7 @@
             @if($stats['question_count'] > 0)
             <div class="col-md-4">
                 <div class="card text-center h-100 border-0 shadow-sm"
-                     :class="dark ? 'bg-secondary text-white' : ''">
+                     class="">
                     <div class="card-body py-4">
                         <i class="fas fa-question-circle fa-2x mb-3 text-success"></i>
                         <div class="display-6 fw-bold">{{ number_format($stats['question_count']) }}</div>
@@ -114,7 +114,7 @@
             @if($stats['license_types_count'] > 0)
             <div class="col-md-4">
                 <div class="card text-center h-100 border-0 shadow-sm"
-                     :class="dark ? 'bg-secondary text-white' : ''">
+                     class="">
                     <div class="card-body py-4">
                         <i class="fas fa-id-card fa-2x mb-3 text-warning"></i>
                         <div class="display-6 fw-bold">{{ $stats['license_types_count'] }}</div>
@@ -131,7 +131,7 @@
 {{-- ============================================================
      Sezione 3 — Feature highlights
      ============================================================ --}}
-<section class="py-5" :class="dark ? 'bg-dark text-white' : 'bg-light'">
+<section class="py-5" class="bg-light">
     <div class="container">
         <h2 class="text-center mb-5">
             {{ __('guest.features_title', ['name' => setting('school.name', config('app.name'))]) }}
@@ -139,7 +139,7 @@
         <div class="row g-4">
             <div class="col-sm-6 col-md-3">
                 <div class="card h-100 border-0 shadow-sm text-center"
-                     :class="dark ? 'bg-secondary text-white' : ''">
+                     class="">
                     <div class="card-body py-4">
                         <i class="fas fa-graduation-cap fa-2x text-primary mb-3"></i>
                         <h5 class="card-title">{{ __('guest.feature_quiz_title') }}</h5>
@@ -149,7 +149,7 @@
             </div>
             <div class="col-sm-6 col-md-3">
                 <div class="card h-100 border-0 shadow-sm text-center"
-                     :class="dark ? 'bg-secondary text-white' : ''">
+                     class="">
                     <div class="card-body py-4">
                         <i class="fas fa-stopwatch fa-2x text-danger mb-3"></i>
                         <h5 class="card-title">{{ __('guest.feature_simulator_title') }}</h5>
@@ -159,7 +159,7 @@
             </div>
             <div class="col-sm-6 col-md-3">
                 <div class="card h-100 border-0 shadow-sm text-center"
-                     :class="dark ? 'bg-secondary text-white' : ''">
+                     class="">
                     <div class="card-body py-4">
                         <i class="fas fa-car fa-2x text-success mb-3"></i>
                         <h5 class="card-title">{{ __('guest.feature_driving_title') }}</h5>
@@ -169,7 +169,7 @@
             </div>
             <div class="col-sm-6 col-md-3">
                 <div class="card h-100 border-0 shadow-sm text-center"
-                     :class="dark ? 'bg-secondary text-white' : ''">
+                     class="">
                     <div class="card-body py-4">
                         <i class="fas fa-chart-line fa-2x text-info mb-3"></i>
                         <h5 class="card-title">{{ __('guest.feature_progress_title') }}</h5>
@@ -185,7 +185,7 @@
      Sezione 4 — Tipi di patente (solo se > 1)
      ============================================================ --}}
 @if($licenseTypes->count() > 1)
-<section class="py-5" :class="dark ? 'bg-dark text-white' : 'bg-white'">
+<section class="py-5" class="bg-white">
     <div class="container text-center">
         <h2 class="mb-4">{{ __('guest.license_types_title') }}</h2>
         <div>
@@ -200,7 +200,7 @@
 {{-- ============================================================
      Sezione 5 — CTA finale
      ============================================================ --}}
-<section class="py-5 text-center" :class="dark ? 'bg-dark text-white' : 'bg-light'">
+<section class="py-5 text-center" class="bg-light">
     <div class="container">
         <h2 class="mb-3">{{ __('guest.final_cta_title') }}</h2>
         <p class="lead text-muted mb-4">{{ __('guest.final_cta_subtitle') }}</p>

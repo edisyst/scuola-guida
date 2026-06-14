@@ -30,13 +30,10 @@
         }
     </style>
 </head>
-<body x-data="{ dark: window.matchMedia('(prefers-color-scheme: dark)').matches }"
-      :class="{ 'dark-mode': dark }"
-      class="guest-page">
+<body class="guest-page">
 
     {{-- Navbar minimale --}}
-    <nav class="navbar navbar-expand-md sticky-top"
-         :class="dark ? 'navbar-dark bg-dark' : 'navbar-light bg-white shadow-sm'">
+    <nav class="navbar navbar-expand-md sticky-top navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('guest.home') }}">
                 @if(setting('school.logo_path'))
@@ -66,7 +63,7 @@
     @yield('content')
 
     {{-- Footer --}}
-    <footer class="py-4 mt-5" :class="dark ? 'bg-dark text-white-50' : 'bg-light text-muted'">
+    <footer class="py-4 mt-5 bg-light text-muted">
         <div class="container text-center small">
             @if(setting('school.name'))
                 <div class="fw-semibold mb-1">{{ setting('school.name') }}</div>
