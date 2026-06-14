@@ -30,7 +30,7 @@
         }
     </style>
 </head>
-<body class="guest-page">
+<body class="guest-page" style="background:#f4f6f9;">
 
     {{-- Navbar minimale --}}
     <nav class="navbar navbar-expand-md sticky-top navbar-light bg-white shadow-sm">
