@@ -3,49 +3,11 @@
 @section('content')
 
 {{-- ============================================================
-     Sezione 1 — Hero con carosello come sfondo
+     Sezione 1 — Hero (sfondo accent solid)
      ============================================================ --}}
-@php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
-<section class="position-relative d-flex align-items-center text-white overflow-hidden"
-         style="min-height:60vh;">
-
-    {{-- Sfondo: carosello se ci sono immagini, altrimenti colore accent --}}
-    @if(count($carouselImages) > 0)
-        <div id="homepageCarousel"
-             class="carousel slide carousel-fade position-absolute top-0 start-0 w-100 h-100"
-             style="z-index:0;"
-             data-bs-ride="carousel">
-            <div class="carousel-inner h-100">
-                @foreach($carouselImages as $i => $imgPath)
-                    <div class="carousel-item h-100 {{ $i === 0 ? 'active' : '' }}">
-                        <img src="{{ Storage::url($imgPath) }}"
-                             class="d-block w-100 h-100"
-                             style="object-fit:cover;"
-                             alt="">
-                    </div>
-                @endforeach
-            </div>
-            @if(count($carouselImages) > 1)
-                <button class="carousel-control-prev" type="button"
-                        data-bs-target="#homepageCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button"
-                        data-bs-target="#homepageCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
-            @endif
-        </div>
-        {{-- overlay scuro per leggibilità testo --}}
-        <div class="position-absolute top-0 start-0 w-100 h-100"
-             style="background:rgba(0,0,0,0.45);z-index:1;"></div>
-    @else
-        <div class="position-absolute top-0 start-0 w-100 h-100"
-             style="background-color:var(--sg-accent);z-index:0;"></div>
-    @endif
-
-    {{-- Contenuto hero --}}
-    <div class="container text-center py-5 position-relative" style="z-index:2;">
+<section class="d-flex align-items-center text-white"
+         style="min-height:40vh; background-color:var(--sg-accent);">
+    <div class="container text-center py-5">
         @if(setting('school.logo_path'))
             <img src="{{ Storage::url(setting('school.logo_path')) }}"
                  alt="{{ setting('school.name', config('app.name')) }}"
@@ -79,6 +41,49 @@
         </div>
     </div>
 </section>
+
+{{-- ============================================================
+     Sezione 1b — Carosello immagini centrato 80% (solo se presenti)
+     ============================================================ --}}
+@php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
+@if(count($carouselImages) > 0)
+<section class="py-4" style="background:#f4f6f9;">
+    <div style="width:80%;margin:0 auto;">
+        <div id="homepageCarousel"
+             class="carousel slide carousel-fade"
+             data-bs-ride="carousel">
+            <div class="carousel-inner" style="border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15);">
+                @foreach($carouselImages as $i => $imgPath)
+                    <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+                        <img src="{{ Storage::url($imgPath) }}"
+                             class="d-block w-100"
+                             style="max-height:420px;object-fit:cover;"
+                             alt="Slide {{ $i + 1 }}">
+                    </div>
+                @endforeach
+            </div>
+            @if(count($carouselImages) > 1)
+                <div class="carousel-indicators">
+                    @foreach($carouselImages as $i => $_)
+                        <button type="button" data-bs-target="#homepageCarousel"
+                                data-bs-slide-to="{{ $i }}"
+                                class="{{ $i === 0 ? 'active' : '' }}"
+                                aria-label="Slide {{ $i + 1 }}"></button>
+                    @endforeach
+                </div>
+                <button class="carousel-control-prev" type="button"
+                        data-bs-target="#homepageCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button"
+                        data-bs-target="#homepageCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            @endif
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- ============================================================
      Sezione 2 — Statistiche (solo se almeno uno > 0)
