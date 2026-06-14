@@ -3,91 +3,90 @@
 @section('content')
 
 {{-- ============================================================
-     Sezione 1 — Hero (sfondo accent solid)
-     ============================================================ --}}
-<section class="py-4" style="background:#f4f6f9;">
-    <div style="width:80%;margin:0 auto;">
-        <div class="d-flex align-items-center justify-content-center text-white"
-             style="min-height:40vh;background-color:var(--sg-accent);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);">
-    <div class="text-center py-5">
-        @if(setting('school.logo_path'))
-            <img src="{{ Storage::url(setting('school.logo_path')) }}"
-                 alt="{{ setting('school.name', config('app.name')) }}"
-                 class="mb-4"
-                 style="max-height:96px;width:auto;">
-        @else
-            <div class="mb-4">
-                <i class="fas fa-car fa-4x opacity-75"></i>
-            </div>
-        @endif
-
-        <h1 class="display-5 fw-bold">
-            {{ setting('school.name', config('app.name')) }}
-        </h1>
-
-        <p class="lead mb-4">
-            {{ setting('school.tagline', __('guest.hero_tagline_default')) }}
-        </p>
-
-        <div class="d-flex flex-wrap justify-content-center gap-3">
-            @if(Route::has('register'))
-                <a href="{{ route('register') }}"
-                   class="btn btn-light btn-lg fw-semibold px-4">
-                    <i class="fas fa-rocket me-2"></i>{{ __('guest.cta_start') }}
-                </a>
-            @endif
-            <a href="{{ route('login') }}"
-               class="btn btn-outline-light btn-lg px-4">
-                {{ __('guest.cta_login') }}
-            </a>
-        </div>
-    </div>
-        </div>
-    </div>
-</section>
-
-{{-- ============================================================
-     Sezione 1b — Carosello immagini centrato 80% (solo se presenti)
+     Sezione 1 — Hero con carosello come sfondo (80% larghezza)
      ============================================================ --}}
 @php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
-@if(count($carouselImages) > 0)
 <section class="py-4" style="background:#f4f6f9;">
     <div style="width:80%;margin:0 auto;">
-        <div id="homepageCarousel"
-             class="carousel slide carousel-fade"
-             data-bs-ride="carousel">
-            <div class="carousel-inner" style="border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15);">
-                @foreach($carouselImages as $i => $imgPath)
-                    <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
-                        <img src="{{ Storage::url($imgPath) }}"
-                             class="d-block w-100"
-                             style="max-height:420px;object-fit:cover;"
-                             alt="Slide {{ $i + 1 }}">
+
+        {{-- Wrapper posizionato: carosello sfondo + contenuto sopra --}}
+        <div class="position-relative overflow-hidden text-white"
+             style="min-height:40vh;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);">
+
+            {{-- Sfondo: carosello o accent solid --}}
+            @if(count($carouselImages) > 0)
+                <div id="homepageCarousel"
+                     class="carousel slide carousel-fade position-absolute top-0 start-0 w-100 h-100"
+                     style="z-index:0;"
+                     data-bs-ride="carousel">
+                    <div class="carousel-inner h-100">
+                        @foreach($carouselImages as $i => $imgPath)
+                            <div class="carousel-item h-100 {{ $i === 0 ? 'active' : '' }}">
+                                <img src="{{ Storage::url($imgPath) }}"
+                                     class="d-block w-100 h-100"
+                                     style="object-fit:cover;"
+                                     alt="">
+                            </div>
+                        @endforeach
                     </div>
-                @endforeach
-            </div>
-            @if(count($carouselImages) > 1)
-                <div class="carousel-indicators">
-                    @foreach($carouselImages as $i => $_)
-                        <button type="button" data-bs-target="#homepageCarousel"
-                                data-bs-slide-to="{{ $i }}"
-                                class="{{ $i === 0 ? 'active' : '' }}"
-                                aria-label="Slide {{ $i + 1 }}"></button>
-                    @endforeach
+                    @if(count($carouselImages) > 1)
+                        <button class="carousel-control-prev" type="button"
+                                data-bs-target="#homepageCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button"
+                                data-bs-target="#homepageCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    @endif
                 </div>
-                <button class="carousel-control-prev" type="button"
-                        data-bs-target="#homepageCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button"
-                        data-bs-target="#homepageCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
+            @else
+                <div class="position-absolute top-0 start-0 w-100 h-100"
+                     style="background-color:var(--sg-accent);z-index:0;"></div>
             @endif
+
+            {{-- Contenuto hero con backdrop semitrasparente per leggibilità --}}
+            <div class="position-relative d-flex align-items-center justify-content-center"
+                 style="min-height:40vh;z-index:2;">
+                <div class="text-center py-5 px-4"
+                     style="background:rgba(0,0,0,0.45);border-radius:10px;backdrop-filter:blur(2px);">
+                    @if(setting('school.logo_path'))
+                        <img src="{{ Storage::url(setting('school.logo_path')) }}"
+                             alt="{{ setting('school.name', config('app.name')) }}"
+                             class="mb-4"
+                             style="max-height:96px;width:auto;">
+                    @else
+                        <div class="mb-4">
+                            <i class="fas fa-car fa-4x opacity-75"></i>
+                        </div>
+                    @endif
+
+                    <h1 class="display-5 fw-bold">
+                        {{ setting('school.name', config('app.name')) }}
+                    </h1>
+
+                    <p class="lead mb-4">
+                        {{ setting('school.tagline', __('guest.hero_tagline_default')) }}
+                    </p>
+
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        @if(Route::has('register'))
+                            <a href="{{ route('register') }}"
+                               class="btn btn-light btn-lg fw-semibold px-4">
+                                <i class="fas fa-rocket me-2"></i>{{ __('guest.cta_start') }}
+                            </a>
+                        @endif
+                        <a href="{{ route('login') }}"
+                           class="btn btn-outline-light btn-lg px-4">
+                            {{ __('guest.cta_login') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>
-@endif
 
 {{-- ============================================================
      Sezione 2 — Statistiche (solo se almeno uno > 0)
