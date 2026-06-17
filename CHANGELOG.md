@@ -5,6 +5,31 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 10.2: StudyContent / ADAS (2026-06-17)
+
+### Added
+
+- **Model `StudyContent`** — contenuto formativo HTML collegato polimorfico a `Category` (solo EU) e `DrivingModule`. Campo `body` longtext, flag `is_published`, ordinamento via `order`. Trait `Auditable`, scope `published()` e `ordered()`, metodo `isReadBy(User)`.
+- **Migration `create_study_contents_table`** — `studyable_type`, `studyable_id`, `title`, `body`, `is_published`, `order`, `created_by` (nullOnDelete), `updated_by` (nullOnDelete), indice composto su `(studyable_type, studyable_id)`.
+- **Migration `create_study_content_user_table`** — pivot lettura utente: `study_content_id` (cascadeOnDelete), `user_id` (cascadeOnDelete), `read_at`, unique su `(study_content_id, user_id)`.
+- **Migration `add_is_eu_directive_to_categories_table`** — campo `boolean is_eu_directive default false` su `categories`; scope `Category::euDirective()`.
+- **`StudyContentService`** — `create()`, `update()`, `delete()`, `markAsRead()` (idempotente), `getForStudyable()` (zero N+1).
+- **`StudyContentController`** resource — autorizzazione con `canEditStudyContent()`, flash messages su ogni redirect.
+- **`StoreStudyContentRequest` / `UpdateStudyContentRequest`** — validazione con `exists` dinamico sul tipo dichiarato.
+- **Livewire `StudyContentViewer`** — carica contenuti pubblicati per un morfable, bottone "Segna come letto" con `wire:loading`, empty state con icona `fa-3x`.
+- **View admin** `study-contents/{index,create,edit,_form}` — TinyMCE 6 CDN (solo in queste view), integrazione Media Manager via iframe/postMessage, switch pubblicazione.
+- **View `admin/categories/show`** — pagina dettaglio categoria con lista domande e componente `StudyContentViewer` (visibile solo se `is_eu_directive`).
+- **View `admin/driving-modules/show`** — pagina dettaglio modulo con `StudyContentViewer` prima della lista sessioni.
+- **Voce menu AdminLTE** "Contenuti formativi" (gate `content-editor`, key `study-contents`).
+- **Metodo `User::canEditStudyContent(?StudyContent)`** — admin/editor: sempre true; instructor: solo DrivingModule; altri: false.
+- **Observer cascade** — `CategoryObserver::deleting` e `DrivingModuleObserver::deleting` eliminano i `StudyContent` collegati prima del parent (polimorfismo non supporta FK cascade DB).
+- **`StudyContentFactory`** con stati `published()`, `forCategory()`, `forModule()`.
+- **`DrivingModuleFactory`** — aggiunta per supporto test.
+- **`StudyContentTest`** — 9 test: CRUD per ruolo, markAsRead/isReadBy, cascade delete.
+- **i18n** — `lang/{it,en,es}/study_content.php`; chiavi flash `study_content_{created,updated,deleted}` in tutti e tre i locale; chiave `menu.contenuti_formativi`; `common.select`; `categories.no_questions`.
+
+---
+
 ## [12.0] — Technical Debt Cleanup (2026-06-17)
 
 ### Fixed

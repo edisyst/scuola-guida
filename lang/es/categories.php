@@ -12,6 +12,7 @@ return [
     'col_name'      => 'Nombre',
     'col_slug'      => 'Slug',
     'col_questions' => 'Preguntas',
+    'no_questions'  => 'No hay preguntas en esta categoría.',
     'col_actions'   => 'Acciones',
     'confirm_delete' => '¿Estás seguro?',
 ];

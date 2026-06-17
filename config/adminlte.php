@@ -592,6 +592,13 @@ return [
             'key'  => 'driving-modules',
         ],
         [
+            'text' => 'contenuti_formativi',
+            'url'  => 'study-contents',
+            'icon' => 'fas fa-book',
+            'can'  => 'content-editor',
+            'key'  => 'study-contents',
+        ],
+        [
             'text' => 'domande',
             'url'  => 'admin/questions',
             'icon' => 'fas fa-question-circle',

@@ -58,6 +58,7 @@ return [
     'quizzes'                 => 'Quizzes',
     'i_miei_studenti'         => 'Mis estudiantes',
     'gestione_istruttori'     => 'Gestión de instructores',
+    'contenuti_formativi'     => 'Contenido formativo',
 
     // Mensaje flash al cambiar idioma
     'locale_changed'          => 'Idioma actualizado.',

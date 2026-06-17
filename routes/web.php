@@ -422,6 +422,10 @@ Route::middleware(['auth', '2fa'])
         });
     });
 
+// CONTENUTI FORMATIVI ADAS (Feature 10.2)
+Route::resource('study-contents', \App\Http\Controllers\StudyContentController::class)
+    ->middleware(['auth', 'verified']);
+
 /*
 |--------------------------------------------------------------------------
 | INSTRUCTOR AREA — sola lettura progressi studenti assegnati

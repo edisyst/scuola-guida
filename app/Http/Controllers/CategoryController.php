@@ -16,6 +16,13 @@ class CategoryController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
+    public function show(Category $category)
+    {
+        $category->load('questions')->loadCount('questions');
+
+        return view('admin.categories.show', compact('category'));
+    }
+
     public function create()
     {
         abort_unless(auth()->user()->canCreateCategory(), 403);

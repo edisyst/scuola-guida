@@ -18,6 +18,7 @@ return [
     'col_name'      => 'Nome',
     'col_slug'      => 'Slug',
     'col_questions' => 'Domande',
+    'no_questions'  => 'Nessuna domanda in questa categoria.',
     'col_actions'   => 'Azioni',
 
     // Conferme

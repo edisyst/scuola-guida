@@ -75,6 +75,11 @@ return [
     'quiz_random_created' => 'Quiz creado con :count preguntas.',
     'quiz_random_filled'  => 'Añadidas :count preguntas aleatorias al quiz.',
 
+    // Feature 10.2 — Contenido formativo ADAS
+    'study_content_created' => 'Contenido formativo creado.',
+    'study_content_updated' => 'Contenido formativo actualizado.',
+    'study_content_deleted' => 'Contenido formativo eliminado.',
+
     // Feature 9.0 — Prácticas de conducción
     'driving_module_created'  => 'Módulo creado correctamente.',
     'driving_module_updated'  => 'Módulo actualizado correctamente.',

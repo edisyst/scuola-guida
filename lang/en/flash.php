@@ -106,6 +106,11 @@ return [
     'quiz_random_created' => 'Quiz created with :count questions.',
     'quiz_random_filled'  => 'Added :count random questions to the quiz.',
 
+    // Feature 10.2 — Educational content ADAS
+    'study_content_created' => 'Educational content created.',
+    'study_content_updated' => 'Educational content updated.',
+    'study_content_deleted' => 'Educational content deleted.',
+
     // Feature 9.0 — Driving practice
     'driving_module_created'  => 'Module created successfully.',
     'driving_module_updated'  => 'Module updated successfully.',

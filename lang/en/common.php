@@ -29,4 +29,5 @@ return [
     'date_of_birth'  => 'Date of Birth',
     'generated_on'   => 'Generated on',
     'total'          => 'Total',
+    'select'         => 'Select',
 ];

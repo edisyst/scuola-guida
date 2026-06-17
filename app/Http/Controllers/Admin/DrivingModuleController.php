@@ -56,6 +56,13 @@ class DrivingModuleController extends Controller
             ->with('success', __('flash.driving_module_created'));
     }
 
+    public function show(DrivingModule $drivingModule): View
+    {
+        $module = $drivingModule->load(['licenseType', 'drivingSessions']);
+
+        return view('admin.driving-modules.show', compact('module'));
+    }
+
     public function edit(DrivingModule $drivingModule): View
     {
         abort_unless(auth()->user()->canManageDrivingModules(), 403);

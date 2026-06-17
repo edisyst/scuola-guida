@@ -18,6 +18,7 @@ return [
     'col_name'      => 'Name',
     'col_slug'      => 'Slug',
     'col_questions' => 'Questions',
+    'no_questions'  => 'No questions in this category.',
     'col_actions'   => 'Actions',
 
     // Confirmations
