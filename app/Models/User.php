@@ -227,6 +227,12 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->belongsTo(LicenseType::class, 'active_license_type_id');
     }
 
+    public function studyContentProgress(): BelongsToMany
+    {
+        return $this->belongsToMany(StudyContent::class, 'study_content_user')
+                    ->withPivot('read_at');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | REGISTRAZIONE DEFINITIVA (viewer)
@@ -467,6 +473,22 @@ class User extends Authenticatable implements HasLocalePreference
 
     // Viewer check è nel controller (verifica DrivingSessionService::getProgress()->all_completed)
     public function canExportDrivingAttestation(): bool { return $this->isAdmin() || $this->isInstructor(); }
+
+    public function canEditStudyContent(?StudyContent $content = null): bool
+    {
+        if (in_array($this->role, ['admin', 'editor'])) {
+            return true;
+        }
+
+        if ($this->role === 'instructor') {
+            if ($content === null) {
+                return true;
+            }
+            return $content->studyable_type === DrivingModule::class;
+        }
+
+        return false;
+    }
     public function canDeleteUser(): bool { return $this->hasPermission('delete_user'); }
     public function canBulkUser(): bool   { return $this->hasPermission('bulk_user'); }
     public function canManageUser(): bool { return $this->hasPermission('manage_user'); }

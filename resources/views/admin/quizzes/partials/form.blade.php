@@ -10,13 +10,30 @@
 @endif
 
 <div class="sg-form-group">
-    <label class="sg-form-label">Titolo</label>
+    <label class="sg-form-label">Titolo <span class="text-danger">*</span></label>
     <input name="title"
            class="sg-form-control @error('title') is-invalid @enderror"
            value="{{ old('title', $quiz->title ?? '') }}">
     @error('title')
         <div class="sg-form-error">{{ $message }}</div>
     @enderror
+</div>
+
+<div class="sg-form-group">
+    <label class="sg-form-label">Tipo di patente</label>
+    <select id="license_type_id" name="license_type_id" class="sg-form-control @error('license_type_id') is-invalid @enderror">
+        <option value="">— Nessuno —</option>
+        @foreach($licenseTypes as $lt)
+            <option value="{{ $lt->id }}"
+                @selected(old('license_type_id', $quiz->license_type_id ?? '') == $lt->id)>
+                {{ $lt->name }} ({{ $lt->code }})
+            </option>
+        @endforeach
+    </select>
+    @error('license_type_id')
+        <div class="sg-form-error">{{ $message }}</div>
+    @enderror
+    <small class="sg-form-hint">Il filtro categorie nella pagina domande verrà ristretto al tipo selezionato.</small>
 </div>
 
 @if(auth()->user()->isAdmin())
@@ -33,27 +50,6 @@
     <small class="sg-form-hint">La conferma può essere applicata solo dopo la creazione, dalla lista.</small>
 </div>
 @endif
-
-<div class="sg-form-group">
-    <label class="sg-form-label">Domande</label>
-
-    <select name="questions[]"
-            class="sg-form-control @error('questions') is-invalid @enderror"
-            multiple size="20">
-        @foreach($questions as $q)
-            <option value="{{ $q->id }}"
-                    @if(isset($quiz) && $quiz->questions->contains($q->id)) selected @endif>
-                {{ Str::limit($q->question, 60) }}
-            </option>
-        @endforeach
-    </select>
-
-    @error('questions')
-        <div class="sg-form-error">{{ $message }}</div>
-    @enderror
-
-    <small class="sg-form-hint">Tieni premuto CTRL per selezione multipla</small>
-</div>
 
 <div class="sg-form-group">
     <label class="sg-form-label">Max domande</label>

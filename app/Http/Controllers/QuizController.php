@@ -7,7 +7,6 @@ use App\Exports\QuizResultsExport;
 use App\Http\Requests\BulkQuizQuestionsRequest;
 use App\Http\Requests\StoreQuizRequest;
 use App\Http\Requests\UpdateQuizScheduleRequest;
-use App\Models\Question;
 use App\Models\Quiz;
 use App\Services\LicenseTypeService;
 use App\Services\QuizEnrollmentService;
@@ -47,16 +46,17 @@ class QuizController extends Controller
     {
         abort_unless(auth()->user()->canCreateQuiz(), 403);
 
-        $questions = Question::limit(200)->get();
+        $licenseTypes = app(LicenseTypeService::class)->withCategories();
 
-        return view('admin.quizzes.create', compact('questions'));
+        return view('admin.quizzes.create', compact('licenseTypes'));
     }
 
     public function store(StoreQuizRequest $request)
     {
-        $this->service->create($request->validated());
+        $quiz = $this->service->create($request->validated());
 
-        return redirect()->route('admin.quizzes.index')
+        return redirect()
+            ->route('admin.quizzes.questions', $quiz)
             ->with('success', __('flash.quiz_created'));
     }
 
@@ -151,15 +151,18 @@ class QuizController extends Controller
 
     public function manageQuestions(Quiz $quiz)
     {
-        $quiz->load('questions');
+        $quiz->load('questions', 'licenseType');
 
-        // $questions rimossa: la tabella carica via AJAX (admin.quizzes.questions.data).
-        // $categories serve solo per il filtro dropdown nella view.
-        $categories   = \App\Models\Category::orderBy('name')->get(['id', 'name']);
+        $categoriesQuery = \App\Models\Category::orderBy('name');
+        if ($quiz->license_type_id) {
+            $categoriesQuery->whereHas('licenseTypes', fn ($q) => $q->where('license_types.id', $quiz->license_type_id));
+        }
+        $categories   = $categoriesQuery->get(['id', 'name']);
         $currentCount = $quiz->questions()->count();
         $max          = $quiz->max_questions;
+        $licenseType  = $quiz->licenseType;
 
-        return view('admin.quizzes.questions', compact('quiz', 'categories', 'currentCount', 'max'));
+        return view('admin.quizzes.questions', compact('quiz', 'categories', 'currentCount', 'max', 'licenseType'));
     }
 
     public function addQuestion(Request $request, Quiz $quiz)
@@ -325,25 +328,14 @@ class QuizController extends Controller
         try {
             $result = $this->service->fillWithRandom($quiz);
         } catch (RuntimeException $e) {
-            if (request()->wantsJson()) {
-                return response()->json(['error' => $e->getMessage()], 422);
-            }
-            return back()->with('error', $e->getMessage());
-        }
-
-        if (request()->wantsJson()) {
-            if (!$result['ok']) {
-                return response()->json(['error' => $result['error']], 422);
-            }
-
-            return response()->json($result);
+            return response()->json(['error' => $e->getMessage()], 422);
         }
 
         if (!$result['ok']) {
-            return back()->with('error', $result['error']);
+            return response()->json(['error' => $result['error']], 422);
         }
 
-        return back()->with('success', __('flash.quiz_random_filled', ['count' => $result['added']]));
+        return response()->json($result);
     }
 
     public function updateParams(Request $request, Quiz $quiz)

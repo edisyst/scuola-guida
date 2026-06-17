@@ -94,9 +94,19 @@
 
                     @php
                         $appearanceMap = $appearance->keyBy('key');
-                        $currentLogo     = $schoolMap->get('school.logo_path')?->value;
-                        $currentLogoDark = $schoolMap->get('school.logo_dark_path')?->value;
-                        $currentAccent   = $appearanceMap->get('appearance.accent_color')?->value ?? '#3c8dbc';
+                        $currentLogo       = $schoolMap->get('school.logo_path')?->value;
+                        $currentLogoDark   = $schoolMap->get('school.logo_dark_path')?->value;
+                        $currentAccent     = $appearanceMap->get('appearance.accent_color')?->value ?? '#3c8dbc';
+                        $currentAccentDark = $appearanceMap->get('appearance.accent_color_dark')?->value ?? '#4aa3d4';
+                        $currentFont       = $appearanceMap->get('appearance.font_family')?->value ?? 'system';
+                        $currentRadius     = $appearanceMap->get('appearance.border_radius')?->value ?? 'default';
+                        $skinAdmin      = $appearanceMap->get('appearance.sidebar_skin_admin')?->value ?? 'sidebar-dark-danger';
+                        $skinEditor     = $appearanceMap->get('appearance.sidebar_skin_editor')?->value ?? 'sidebar-dark-primary';
+                        $skinViewer     = $appearanceMap->get('appearance.sidebar_skin_viewer')?->value ?? 'sidebar-dark-warning';
+                        $skinInstructor = $appearanceMap->get('appearance.sidebar_skin_instructor')?->value ?? 'sidebar-dark-success';
+                        $skinOptions    = \App\Http\Requests\UpdateSystemSettingsRequest::sidebarSkins();
+                        $fontOptions    = ['system', 'inter', 'roboto', 'open-sans'];
+                        $radiusOptions  = ['square', 'default', 'rounded'];
                     @endphp
 
                     {{-- Logo chiaro --}}
@@ -146,6 +156,88 @@
                         @error('accent_color')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    {{-- Colore accent dark mode --}}
+                    <div class="form-group" x-data="{ color: '{{ $currentAccentDark }}' }">
+                        <label>{{ __('system.accent_color_dark') }}</label>
+                        <div class="d-flex align-items-center" style="gap: 12px;">
+                            <input type="color" x-model="color"
+                                   style="width:48px; height:38px; padding:2px; border:1px solid #ccc; border-radius:4px; cursor:pointer;"
+                                   @input="$refs.colorDarkText.value = color">
+                            <input type="text" name="accent_color_dark" x-ref="colorDarkText"
+                                   class="form-control @error('accent_color_dark') is-invalid @enderror"
+                                   x-model="color" maxlength="7" style="width:120px;"
+                                   pattern="^#[0-9A-Fa-f]{6}$">
+                        </div>
+                        <small class="text-muted">{{ __('system.accent_color_dark_hint') }}</small>
+                        @error('accent_color_dark')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="row">
+                        {{-- Font --}}
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('system.font_family') }}</label>
+                                <select name="font_family" class="form-control @error('font_family') is-invalid @enderror">
+                                    @foreach($fontOptions as $opt)
+                                        <option value="{{ $opt }}" @selected($currentFont === $opt)>
+                                            {{ __('system.font_' . str_replace('-', '_', $opt)) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('font_family')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- Border radius --}}
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('system.border_radius') }}</label>
+                                <select name="border_radius" class="form-control @error('border_radius') is-invalid @enderror">
+                                    @foreach($radiusOptions as $opt)
+                                        <option value="{{ $opt }}" @selected($currentRadius === $opt)>
+                                            {{ __('system.radius_' . $opt) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('border_radius')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Skin sidebar per ruolo --}}
+                    <label class="font-weight-bold mt-2">{{ __('system.sidebar_skins') }}</label>
+                    <div class="row">
+                        @php
+                            $skinFields = [
+                                'sidebar_skin_admin'      => $skinAdmin,
+                                'sidebar_skin_editor'     => $skinEditor,
+                                'sidebar_skin_viewer'     => $skinViewer,
+                                'sidebar_skin_instructor' => $skinInstructor,
+                            ];
+                        @endphp
+                        @foreach($skinFields as $name => $current)
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>{{ __('system.' . $name) }}</label>
+                                    <select name="{{ $name }}" class="form-control @error($name) is-invalid @enderror">
+                                        @foreach($skinOptions as $skin)
+                                            <option value="{{ $skin }}" @selected($current === $skin)>{{ $skin }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error($name)
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
 
                 </div>

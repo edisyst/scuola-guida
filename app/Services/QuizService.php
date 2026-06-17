@@ -254,11 +254,18 @@ class QuizService
             return ['ok' => false, 'error' => 'Nessuna domanda disponibile da aggiungere', 'current' => $quiz->questions()->count(), 'added' => 0];
         }
 
+        $questions = Question::whereIn('id', $newIds)->get(['id', 'question']);
+
         $before = $quiz->questions()->count();
         $quiz->questions()->attach($newIds);
         $after = $quiz->questions()->count();
 
-        return ['ok' => true, 'current' => $after, 'added' => $after - $before];
+        return [
+            'ok'        => true,
+            'current'   => $after,
+            'added'     => $after - $before,
+            'questions' => $questions->map(fn ($q) => ['id' => $q->id, 'question' => $q->question])->values(),
+        ];
     }
 
     public function reorderQuestions(Quiz $quiz, array $orderedIds): void

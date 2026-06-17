@@ -6,5 +6,10 @@ use App\Models\DrivingModule;
 
 class DrivingModuleObserver
 {
-    // L'audit è gestito dal trait Auditable — nessuna logica aggiuntiva necessaria.
+    public function deleting(DrivingModule $drivingModule): void
+    {
+        \App\Models\StudyContent::where('studyable_type', DrivingModule::class)
+                                ->where('studyable_id', $drivingModule->id)
+                                ->each(fn ($c) => $c->delete());
+    }
 }

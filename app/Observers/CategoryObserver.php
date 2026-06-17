@@ -14,6 +14,13 @@ class CategoryObserver
         clearDashboardKpiCache();
     }
 
+    public function deleting(Category $category): void
+    {
+        \App\Models\StudyContent::where('studyable_type', Category::class)
+                                ->where('studyable_id', $category->id)
+                                ->each(fn ($c) => $c->delete());
+    }
+
     public function deleted(Category $category): void
     {
         Cache::forget('categories_list');

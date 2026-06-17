@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
+use App\Services\FormFieldService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,28 +19,20 @@ class SubmitRegistrationRequest extends FormRequest
         $userId = $this->user()->id;
         $hasExistingDocument = !empty($this->user()->id_document_path);
 
-        return [
-            'first_name'  => ['required', 'string', 'max:100'],
-            'last_name'   => ['required', 'string', 'max:100'],
-            'address'     => ['required', 'string', 'max:255'],
-            'birth_date'  => ['required', 'date', 'before:today'],
-            'birth_place' => ['required', 'string', 'max:150'],
-            'fiscal_code' => [
-                'required',
-                'string',
-                'regex:/^[A-Za-z0-9]{11,16}$/',
-                Rule::unique(User::class, 'fiscal_code')->ignore($userId),
-            ],
-            // Il documento è obbligatorio al primo invio. Se l'utente sta
-            // ri-inviando dati già caricati può lasciare il campo vuoto e
-            // tenere il file esistente.
-            'id_document' => [
-                $hasExistingDocument ? 'nullable' : 'required',
-                'file',
-                'mimes:pdf,jpg,jpeg,png',
-                'max:5120',
-            ],
-        ];
+        $rules = app(FormFieldService::class)->validationRules('enrollment');
+
+        // Augment fiscal_code with unique + regex constraints if enabled
+        if (isset($rules['fiscal_code'])) {
+            $rules['fiscal_code'][] = 'regex:/^[A-Za-z0-9]{11,16}$/';
+            $rules['fiscal_code'][] = Rule::unique(User::class, 'fiscal_code')->ignore($userId);
+        }
+
+        // id_document is required only on first submit; nullable if file already uploaded
+        if (isset($rules['id_document'])) {
+            $rules['id_document'][0] = $hasExistingDocument ? 'nullable' : 'required';
+        }
+
+        return $rules;
     }
 
     public function messages(): array

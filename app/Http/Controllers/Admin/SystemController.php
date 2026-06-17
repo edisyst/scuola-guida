@@ -43,6 +43,13 @@ class SystemController extends Controller
         ]);
     }
 
+    public function formFields(): Response
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        return response()->view('admin.system.form-fields');
+    }
+
     public function updateSettings(UpdateSystemSettingsRequest $request): RedirectResponse
     {
         abort_unless(auth()->user()->isAdmin(), 403);
@@ -56,8 +63,21 @@ class SystemController extends Controller
             'school.license_number'=> $request->input('school_license_number'),
         ];
 
-        if ($request->input('accent_color')) {
-            $data['appearance.accent_color'] = $request->input('accent_color');
+        $appearanceMap = [
+            'accent_color'            => 'appearance.accent_color',
+            'accent_color_dark'       => 'appearance.accent_color_dark',
+            'font_family'             => 'appearance.font_family',
+            'border_radius'           => 'appearance.border_radius',
+            'sidebar_skin_admin'      => 'appearance.sidebar_skin_admin',
+            'sidebar_skin_editor'     => 'appearance.sidebar_skin_editor',
+            'sidebar_skin_viewer'     => 'appearance.sidebar_skin_viewer',
+            'sidebar_skin_instructor' => 'appearance.sidebar_skin_instructor',
+        ];
+
+        foreach ($appearanceMap as $input => $settingKey) {
+            if ($request->filled($input)) {
+                $data[$settingKey] = $request->input($input);
+            }
         }
 
         if ($request->hasFile('logo')) {

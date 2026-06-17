@@ -445,6 +445,13 @@ return [
                     'can'  => 'admin-only',
                     'key'  => 'system-settings',
                 ],
+                [
+                    'text' => 'campi_moduli',
+                    'url'  => 'admin/system/form-fields',
+                    'icon' => 'fas fa-sliders-h',
+                    'can'  => 'admin-only',
+                    'key'  => 'form-fields',
+                ],
             ],
         ],
         [
@@ -590,6 +597,13 @@ return [
             'icon' => 'fas fa-car',
             'can'  => 'admin-only',
             'key'  => 'driving-modules',
+        ],
+        [
+            'text' => 'contenuti_formativi',
+            'url'  => 'study-contents',
+            'icon' => 'fas fa-book',
+            'can'  => 'content-editor',
+            'key'  => 'study-contents',
         ],
         [
             'text' => 'domande',

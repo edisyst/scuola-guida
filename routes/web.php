@@ -400,6 +400,7 @@ Route::middleware(['auth', '2fa'])
                 Route::get('settings', [SystemController::class, 'settings'])->name('settings');
                 Route::post('settings', [SystemController::class, 'updateSettings'])->name('settings.update');
                 Route::delete('settings/carousel/{index}', [SystemController::class, 'deleteCarouselImage'])->name('settings.carousel.delete');
+                Route::get('form-fields', [SystemController::class, 'formFields'])->name('form-fields');
             });
 
             // GESTIONE ISTRUTTORI (assegnazione studenti)
@@ -421,6 +422,10 @@ Route::middleware(['auth', '2fa'])
             Route::resource('driving-modules', \App\Http\Controllers\Admin\DrivingModuleController::class);
         });
     });
+
+// CONTENUTI FORMATIVI ADAS (Feature 10.2)
+Route::resource('study-contents', \App\Http\Controllers\StudyContentController::class)
+    ->middleware(['auth', 'verified']);
 
 /*
 |--------------------------------------------------------------------------

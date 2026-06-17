@@ -5,6 +5,59 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 13.1: Personalizzazioni grafiche da back office (2026-06-18)
+
+### Added
+
+- **Nuove chiavi `system_settings` gruppo `appearance`** — `appearance.accent_color_dark` (`#4aa3d4`), `appearance.font_family` (`system`), `appearance.border_radius` (`default`), `appearance.sidebar_skin_{admin,editor,viewer,instructor}` con i default dei rispettivi ruoli.
+- **Migration `seed_appearance_settings`** — popola le nuove chiavi via `upsert` senza sovrascrivere `appearance.accent_color` se già presente; `down()` reversibile.
+- **Partial `layouts/partials/appearance-css.blade.php`** — blocco `:root` con `--sg-accent`, `--sg-accent-dark`, `--sg-font`, `--sg-radius` letti da `setting()`; include il `<link>` Google Fonts solo se `font_family` ≠ `system`. Incluso in `layouts/admin.blade.php` e `layouts/guest.blade.php`.
+- **Pannello `/admin/system/settings` gruppo Aspetto** — color picker per accent dark, select per font, border radius e le quattro skin sidebar per ruolo.
+- **`AppearanceSettingsTest`** — 5 test: salvataggio nuove chiavi, validazione font, rendering `--sg-accent`, skin sidebar configurata, accesso non-admin negato.
+- **i18n** — nuove chiavi `system.*` (accent dark, font, radius, skin) in `lang/{it,en,es}`.
+
+### Changed
+
+- **`RoleTheme` middleware** — la skin sidebar per ruolo è letta da `setting('appearance.sidebar_skin_*')` invece dei valori hardcodati.
+
+---
+
+## [Unreleased] — Feature 10.2: StudyContent / ADAS (2026-06-17)
+
+### Added
+
+- **Model `StudyContent`** — contenuto formativo HTML collegato polimorfico a `Category` (solo EU) e `DrivingModule`. Campo `body` longtext, flag `is_published`, ordinamento via `order`. Trait `Auditable`, scope `published()` e `ordered()`, metodo `isReadBy(User)`.
+- **Migration `create_study_contents_table`** — `studyable_type`, `studyable_id`, `title`, `body`, `is_published`, `order`, `created_by` (nullOnDelete), `updated_by` (nullOnDelete), indice composto su `(studyable_type, studyable_id)`.
+- **Migration `create_study_content_user_table`** — pivot lettura utente: `study_content_id` (cascadeOnDelete), `user_id` (cascadeOnDelete), `read_at`, unique su `(study_content_id, user_id)`.
+- **Migration `add_is_eu_directive_to_categories_table`** — campo `boolean is_eu_directive default false` su `categories`; scope `Category::euDirective()`.
+- **`StudyContentService`** — `create()`, `update()`, `delete()`, `markAsRead()` (idempotente), `getForStudyable()` (zero N+1).
+- **`StudyContentController`** resource — autorizzazione con `canEditStudyContent()`, flash messages su ogni redirect.
+- **`StoreStudyContentRequest` / `UpdateStudyContentRequest`** — validazione con `exists` dinamico sul tipo dichiarato.
+- **Livewire `StudyContentViewer`** — carica contenuti pubblicati per un morfable, bottone "Segna come letto" con `wire:loading`, empty state con icona `fa-3x`.
+- **View admin** `study-contents/{index,create,edit,_form}` — TinyMCE 6 CDN (solo in queste view), integrazione Media Manager via iframe/postMessage, switch pubblicazione.
+- **View `admin/categories/show`** — pagina dettaglio categoria con lista domande e componente `StudyContentViewer` (visibile solo se `is_eu_directive`).
+- **View `admin/driving-modules/show`** — pagina dettaglio modulo con `StudyContentViewer` prima della lista sessioni.
+- **Voce menu AdminLTE** "Contenuti formativi" (gate `content-editor`, key `study-contents`).
+- **Metodo `User::canEditStudyContent(?StudyContent)`** — admin/editor: sempre true; instructor: solo DrivingModule; altri: false.
+- **Observer cascade** — `CategoryObserver::deleting` e `DrivingModuleObserver::deleting` eliminano i `StudyContent` collegati prima del parent (polimorfismo non supporta FK cascade DB).
+- **`StudyContentFactory`** con stati `published()`, `forCategory()`, `forModule()`.
+- **`DrivingModuleFactory`** — aggiunta per supporto test.
+- **`StudyContentTest`** — 9 test: CRUD per ruolo, markAsRead/isReadBy, cascade delete.
+- **i18n** — `lang/{it,en,es}/study_content.php`; chiavi flash `study_content_{created,updated,deleted}` in tutti e tre i locale; chiave `menu.contenuti_formativi`; `common.select`; `categories.no_questions`.
+
+---
+
+## [12.0] — Technical Debt Cleanup (2026-06-17)
+
+### Fixed
+
+- **Migration `drop_quiz_results_table`** — aggiunta migration con `up()` che esegue `Schema::dropIfExists('quiz_results')` e `down()` che ricrea la tabella con struttura originale completa (`user_id` FK con `cascadeOnDelete`, `score`, `total`, `timestamps`).
+- **Return type su `Quiz::hasQuestion()`** — aggiunto tipo di ritorno `bool` (metodo già presente, mancava la dichiarazione esplicita).
+- **Return type su `QuizAttemptService::scoreAnswers()`** — aggiunto tipo di ritorno `int` (metodo privato che calcola il punteggio confrontando le risposte con la mappa di verità).
+- **Return type su `RoleMiddleware::handle()`** — aggiunto tipo di ritorno `\Symfony\Component\HttpFoundation\Response` con relativo `use` import.
+
+---
+
 ## [Unreleased] — Fix e miglioramenti homepage guest (2026-06-14)
 
 ### Fixed

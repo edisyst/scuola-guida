@@ -106,10 +106,18 @@ return [
     'quiz_random_created' => 'Quiz creato con :count domande.',
     'quiz_random_filled'  => 'Aggiunte :count domande random al quiz.',
 
+    // Feature 10.2 — Contenuti formativi ADAS
+    'study_content_created' => 'Contenuto formativo creato.',
+    'study_content_updated' => 'Contenuto formativo aggiornato.',
+    'study_content_deleted' => 'Contenuto formativo eliminato.',
+
     // Feature 9.0 — Guide pratiche
     'driving_module_created'  => 'Modulo creato con successo.',
     'driving_module_updated'  => 'Modulo aggiornato con successo.',
     'driving_module_deleted'  => 'Modulo eliminato con successo.',
     'driving_session_recorded'=> 'Sessione di guida registrata con successo.',
     'driving_session_deleted' => 'Sessione eliminata con successo.',
+
+    // Feature 13.0 — Campi configurabili
+    'form_fields_saved' => 'Configurazione campi moduli salvata.',
 ];

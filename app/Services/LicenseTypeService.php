@@ -20,6 +20,14 @@ class LicenseTypeService
         return $this->all();
     }
 
+    public function withCategories(): Collection
+    {
+        return LicenseType::active()
+            ->whereHas('categories')
+            ->orderBy('sort_order')
+            ->get();
+    }
+
     public function find(int $id): LicenseType
     {
         return LicenseType::findOrFail($id);

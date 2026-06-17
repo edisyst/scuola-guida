@@ -30,6 +30,7 @@ return [
     'stato_sistema'           => 'Estado del sistema',
     'stato_servizi'           => 'Estado de servicios',
     'personalizzazione'       => 'Personalización',
+    'campi_moduli'            => 'Campos de formulario',
     'utenti_ruoli'            => 'Usuarios & Roles',
     'utenti'                  => 'Usuarios',
     'ruoli_permessi'          => 'Roles & Permisos',
@@ -58,6 +59,7 @@ return [
     'quizzes'                 => 'Quizzes',
     'i_miei_studenti'         => 'Mis estudiantes',
     'gestione_istruttori'     => 'Gestión de instructores',
+    'contenuti_formativi'     => 'Contenido formativo',
 
     // Mensaje flash al cambiar idioma
     'locale_changed'          => 'Idioma actualizado.',

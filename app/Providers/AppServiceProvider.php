@@ -68,6 +68,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\CategoryTranslation::observe(CategoryTranslationObserver::class);
         DrivingModule::observe(DrivingModuleObserver::class);
         DrivingSession::observe(DrivingSessionObserver::class);
+        \App\Models\StudyContent::observe(\App\Observers\StudyContentObserver::class);
 
         /*
         |--------------------------------------------------------------------------

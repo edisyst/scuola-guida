@@ -15,10 +15,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="{{ asset('css/scuola-guida.css') }}">
+    @include('layouts.partials.appearance-css')
     <style>
-        :root {
-            --sg-accent: {{ setting('appearance.accent_color', '#3c8dbc') }};
-        }
         .navbar-brand img.school-logo {
             max-height: 40px;
             width: auto;
@@ -160,5 +158,5 @@
         });
     </script>
     @livewireScripts
-    @vite(['resources/js/pwa.js'])
+    @vite(['resources/js/app.js'])
 @stop

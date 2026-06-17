@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DrivingModule extends Model
 {
@@ -33,6 +34,11 @@ class DrivingModule extends Model
     public function licenseType(): BelongsTo
     {
         return $this->belongsTo(LicenseType::class);
+    }
+
+    public function studyContents(): MorphMany
+    {
+        return $this->morphMany(StudyContent::class, 'studyable');
     }
 
     public function drivingSessions(): HasMany

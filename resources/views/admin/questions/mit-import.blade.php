@@ -97,7 +97,7 @@
                     <label class="form-label font-weight-bold">
                         Tipo di patente <span class="text-danger">*</span>
                     </label>
-                    <select name="license_type_id" class="form-control @error('license_type_id') is-invalid @enderror" required>
+                    <select name="license_type_id" class="sg-form-control @error('license_type_id') is-invalid @enderror" required>
                         <option value="">— Seleziona tipo di patente —</option>
                         @foreach($licenseTypes as $type)
                             <option value="{{ $type->id }}"
@@ -115,7 +115,7 @@
                     <label class="form-label font-weight-bold">
                         File Excel listato MIT <span class="text-danger">*</span>
                     </label>
-                    <input type="file" name="file" class="form-control @error('file') is-invalid @enderror"
+                    <input type="file" name="file" class="sg-form-control @error('file') is-invalid @enderror"
                            accept=".xlsx,.xls,.csv" required>
                     <small class="form-text text-muted">
                         Formati: .xlsx, .xls, .csv — Max {{ config('mit_import.max_file_size_kb') / 1024 }} MB
@@ -127,7 +127,7 @@
 
                 <div class="sg-mb-3">
                     <label class="form-label font-weight-bold">Filtra per argomento MIT (opzionale)</label>
-                    <select name="topic_filter" class="form-control">
+                    <select name="topic_filter" class="sg-form-control">
                         <option value="">Tutti gli argomenti ({{ count($topicMap) }})</option>
                         @foreach($topicMap as $code => $name)
                             <option value="{{ $code }}" {{ old('topic_filter') == $code ? 'selected' : '' }}>
