@@ -14,6 +14,10 @@ class QuizQuestionsDataTable
     {
         $query = Question::with('category')->select('questions.*');
 
+        if ($quiz->license_type_id) {
+            $query->whereHas('category.licenseTypes', fn ($q) => $q->where('license_types.id', $quiz->license_type_id));
+        }
+
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
         }

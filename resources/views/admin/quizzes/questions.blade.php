@@ -51,18 +51,27 @@
     .quiz-q-progress .bar.danger { background: linear-gradient(90deg, #dc3545, #e83e8c); }
     .sg-sortable-scroll { max-height: 800px; overflow-y: auto; padding: 14px; }
     .sg-q-text { font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #questions-table th:last-child,
+    #questions-table td:last-child { padding-right: 16px; }
 </style>
 @stop
 
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div>
 
     <div class="sg-header sg-flex-between">
         <div>
-            <p class="sg-header-subtitle">Quiz / {{ $quiz->title }}</p>
-            <h1 class="sg-header-title"><i class="fas fa-tasks mr-2"></i> Gestione domande</h1>
+            <p class="sg-header-subtitle">
+                Quiz
+                @if($licenseType)
+                    — <span class="sg-badge sg-badge-info" style="font-size:.75rem;vertical-align:middle;">
+                        <i class="fas fa-id-card mr-1"></i>{{ $licenseType->name }} ({{ $licenseType->code }})
+                    </span>
+                @endif
+            </p>
+            <h1 class="sg-header-title"><i class="fas fa-tasks mr-2"></i> {{ $quiz->title }}</h1>
         </div>
         <a href="{{ route('admin.quizzes.index') }}" class="sg-btn sg-btn-light sg-btn-sm">
             <i class="fas fa-arrow-left"></i> Indietro
@@ -122,16 +131,22 @@
                     </div>
 
                     {{-- FILTRI --}}
-                    <div class="row sg-mb-2">
-                        <div class="col-12 col-md-6">
+                    <div class="row sg-mb-2 align-items-center">
+                        <div class="col-12 col-md-5">
                             <select id="filter-category" class="sg-form-control">
-                                <option value="">— Tutte le categorie —</option>
-                                {{-- $categories è passata dal controller (manageQuestions) --}}
+                                <option value="">— Tutte le categorie{{ $licenseType ? ' (' . $categories->count() . ')' : '' }} —</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                 @endforeach
                             </select>
                         </div>
+                        @if($licenseType)
+                        <div class="col-auto">
+                            <small class="text-muted">
+                                <i class="fas fa-filter mr-1"></i>Filtrate per <strong>{{ $licenseType->code }}</strong>
+                            </small>
+                        </div>
+                        @endif
                     </div>
 
                     {{-- BULK ACTIONS --}}

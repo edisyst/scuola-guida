@@ -33,3 +33,15 @@
     </form>
 </div>
 @endsection
+
+@section('js')
+@parent
+<script>
+    const licenseExamQuestions = @json($licenseTypes->pluck('exam_questions', 'id'));
+
+    document.getElementById('license_type_id').addEventListener('change', function () {
+        const examQ = licenseExamQuestions[this.value];
+        document.getElementById('max_questions').value = examQ ?? 30;
+    });
+</script>
+@stop

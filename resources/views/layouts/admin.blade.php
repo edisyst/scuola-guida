@@ -160,5 +160,5 @@
         });
     </script>
     @livewireScripts
-    @vite(['resources/js/pwa.js'])
+    @vite(['resources/js/app.js'])
 @stop

@@ -16,13 +16,12 @@ class StoreQuizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'         => 'required|string|max:255',
-            'max_questions' => 'required|integer|min:1|max:100',
-            'time_limit'    => 'nullable|integer|min:0',
-            'max_errors'    => 'nullable|integer|min:0',
+            'title'            => 'required|string|max:255',
+            'license_type_id'  => 'nullable|exists:license_types,id',
+            'max_questions'    => 'required|integer|min:1|max:100',
+            'time_limit'       => 'nullable|integer|min:0',
+            'max_errors'       => 'nullable|integer|min:0',
             'status'               => ['nullable', Rule::in([Quiz::STATUS_DRAFT, Quiz::STATUS_PUBLISHED])],
-            'questions'            => 'nullable|array',
-            'questions.*'          => 'exists:questions,id',
             'enrollments_open_at'  => ['nullable', 'date'],
             'enrollments_close_at' => ['nullable', 'date', 'after:enrollments_open_at'],
         ];
@@ -40,19 +39,4 @@ class StoreQuizRequest extends FormRequest
         $this->merge(['status' => $status]);
     }
 
-    public function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-
-            $questions = $this->input('questions', []);
-            $max = (int) $this->input('max_questions');
-
-            if (count($questions) > $max) {
-                $validator->errors()->add(
-                    'questions',
-                    "Hai selezionato troppe domande (" . count($questions) . "). Max consentito: $max"
-                );
-            }
-        });
-    }
 }

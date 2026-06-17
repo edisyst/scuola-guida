@@ -55,8 +55,9 @@
             <input type="file"
                    id="file"
                    name="file"
-                   class="form-control-file @error('file') is-invalid @enderror"
-                   accept=".pdf">
+                   class="sg-form-control @error('file') is-invalid @enderror"
+                   accept=".pdf"
+                   :required="type === 'pdf'">
             <small class="text-muted">Max 10 MB, solo PDF.</small>
             @error('file')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
         </div>
@@ -67,7 +68,8 @@
             <input type="url"
                    id="url_or_path"
                    name="url_or_path"
-                   class="form-control @error('url_or_path') is-invalid @enderror"
+                   class="sg-form-control @error('url_or_path') is-invalid @enderror"
+                   :required="type === 'link'"
                    value="{{ old('url_or_path', $material->url_or_path ?? '') }}"
                    maxlength="1000"
                    placeholder="https://...">
@@ -80,8 +82,9 @@
             <label for="content">Testo <span class="text-danger" x-show="type === 'note'" x-cloak>*</span></label>
             <textarea id="content"
                       name="content"
-                      class="form-control @error('content') is-invalid @enderror"
+                      class="sg-form-control @error('content') is-invalid @enderror"
                       rows="8"
+                      :required="type === 'note'"
                       placeholder="Scrivi il testo del materiale didattico...">{{ old('content', $material->content ?? '') }}</textarea>
             <small class="text-muted">Testo semplice. Il contenuto viene mostrato ai viewer nella pagina di studio.</small>
             @error('content')<div class="invalid-feedback">{{ $message }}</div>@enderror
