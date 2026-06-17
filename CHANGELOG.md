@@ -5,6 +5,23 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 13.1: Personalizzazioni grafiche da back office (2026-06-18)
+
+### Added
+
+- **Nuove chiavi `system_settings` gruppo `appearance`** — `appearance.accent_color_dark` (`#4aa3d4`), `appearance.font_family` (`system`), `appearance.border_radius` (`default`), `appearance.sidebar_skin_{admin,editor,viewer,instructor}` con i default dei rispettivi ruoli.
+- **Migration `seed_appearance_settings`** — popola le nuove chiavi via `upsert` senza sovrascrivere `appearance.accent_color` se già presente; `down()` reversibile.
+- **Partial `layouts/partials/appearance-css.blade.php`** — blocco `:root` con `--sg-accent`, `--sg-accent-dark`, `--sg-font`, `--sg-radius` letti da `setting()`; include il `<link>` Google Fonts solo se `font_family` ≠ `system`. Incluso in `layouts/admin.blade.php` e `layouts/guest.blade.php`.
+- **Pannello `/admin/system/settings` gruppo Aspetto** — color picker per accent dark, select per font, border radius e le quattro skin sidebar per ruolo.
+- **`AppearanceSettingsTest`** — 5 test: salvataggio nuove chiavi, validazione font, rendering `--sg-accent`, skin sidebar configurata, accesso non-admin negato.
+- **i18n** — nuove chiavi `system.*` (accent dark, font, radius, skin) in `lang/{it,en,es}`.
+
+### Changed
+
+- **`RoleTheme` middleware** — la skin sidebar per ruolo è letta da `setting('appearance.sidebar_skin_*')` invece dei valori hardcodati.
+
+---
+
 ## [Unreleased] — Feature 10.2: StudyContent / ADAS (2026-06-17)
 
 ### Added
