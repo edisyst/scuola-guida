@@ -5,6 +5,17 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [12.0] — Technical Debt Cleanup (2026-06-17)
+
+### Fixed
+
+- **Migration `drop_quiz_results_table`** — aggiunta migration con `up()` che esegue `Schema::dropIfExists('quiz_results')` e `down()` che ricrea la tabella con struttura originale completa (`user_id` FK con `cascadeOnDelete`, `score`, `total`, `timestamps`).
+- **Return type su `Quiz::hasQuestion()`** — aggiunto tipo di ritorno `bool` (metodo già presente, mancava la dichiarazione esplicita).
+- **Return type su `QuizAttemptService::scoreAnswers()`** — aggiunto tipo di ritorno `int` (metodo privato che calcola il punteggio confrontando le risposte con la mappa di verità).
+- **Return type su `RoleMiddleware::handle()`** — aggiunto tipo di ritorno `\Symfony\Component\HttpFoundation\Response` con relativo `use` import.
+
+---
+
 ## [Unreleased] — Fix e miglioramenti homepage guest (2026-06-14)
 
 ### Fixed
