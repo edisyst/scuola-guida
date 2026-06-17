@@ -117,4 +117,7 @@ return [
     'driving_module_deleted'  => 'Module deleted successfully.',
     'driving_session_recorded'=> 'Driving session recorded successfully.',
     'driving_session_deleted' => 'Session deleted successfully.',
+
+    // Feature 13.0 — Configurable fields
+    'form_fields_saved' => 'Form fields configuration saved.',
 ];

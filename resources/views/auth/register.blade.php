@@ -29,6 +29,20 @@
             <x-input-error :messages="$errors->get('password_confirmation')" />
         </div>
 
+        @foreach ($extraFields ?? [] as $field)
+        <div class="sg-form-group">
+            <x-input-label for="{{ $field['key'] }}" :value="__($field['label_key']) . ($field['required'] ? ' *' : '')" />
+            <x-text-input
+                id="{{ $field['key'] }}"
+                type="{{ $field['type'] === 'date' ? 'date' : ($field['type'] === 'tel' ? 'tel' : 'text') }}"
+                name="{{ $field['key'] }}"
+                :value="old($field['key'])"
+                :required="$field['required']"
+                autocomplete="{{ $field['key'] }}" />
+            <x-input-error :messages="$errors->get($field['key'])" />
+        </div>
+        @endforeach
+
         <x-primary-button class="sg-btn-block sg-mt-2">
             {{ __('Registrati') }}
         </x-primary-button>

@@ -117,4 +117,7 @@ return [
     'driving_module_deleted'  => 'Modulo eliminato con successo.',
     'driving_session_recorded'=> 'Sessione di guida registrata con successo.',
     'driving_session_deleted' => 'Sessione eliminata con successo.',
+
+    // Feature 13.0 — Campi configurabili
+    'form_fields_saved' => 'Configurazione campi moduli salvata.',
 ];

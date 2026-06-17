@@ -30,4 +30,5 @@ return [
     'generated_on'   => 'Generado el',
     'total'          => 'Total',
     'select'         => 'Seleccionar',
+    'saving'         => 'Guardando...',
 ];

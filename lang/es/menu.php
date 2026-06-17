@@ -30,6 +30,7 @@ return [
     'stato_sistema'           => 'Estado del sistema',
     'stato_servizi'           => 'Estado de servicios',
     'personalizzazione'       => 'Personalización',
+    'campi_moduli'            => 'Campos de formulario',
     'utenti_ruoli'            => 'Usuarios & Roles',
     'utenti'                  => 'Usuarios',
     'ruoli_permessi'          => 'Roles & Permisos',

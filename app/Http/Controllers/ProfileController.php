@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateAccessibilityPreferencesRequest;
 use App\Http\Requests\UpdateActiveLicenseTypeRequest;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Services\FormFieldService;
 use App\Services\GdprExportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,8 +22,13 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $enrollFields = collect(app(FormFieldService::class)->getEnrollmentFields())
+            ->keyBy('key')
+            ->toArray();
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user'         => $request->user(),
+            'enrollFields' => $enrollFields,
         ]);
     }
 

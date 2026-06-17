@@ -445,6 +445,13 @@ return [
                     'can'  => 'admin-only',
                     'key'  => 'system-settings',
                 ],
+                [
+                    'text' => 'campi_moduli',
+                    'url'  => 'admin/system/form-fields',
+                    'icon' => 'fas fa-sliders-h',
+                    'can'  => 'admin-only',
+                    'key'  => 'form-fields',
+                ],
             ],
         ],
         [

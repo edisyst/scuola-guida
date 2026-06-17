@@ -86,4 +86,7 @@ return [
     'driving_module_deleted'  => 'Módulo eliminado correctamente.',
     'driving_session_recorded'=> 'Sesión de conducción registrada correctamente.',
     'driving_session_deleted' => 'Sesión eliminada correctamente.',
+
+    // Feature 13.0 — Campos configurables
+    'form_fields_saved' => 'Configuración de campos de formulario guardada.',
 ];
