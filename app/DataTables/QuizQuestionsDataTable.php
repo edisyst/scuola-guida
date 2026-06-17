@@ -24,6 +24,10 @@ class QuizQuestionsDataTable
 
         $quizQuestionIds = $quiz->questions()->pluck('questions.id')->toArray();
 
+        if ($request->only_in_quiz) {
+            $query->whereIn('questions.id', $quizQuestionIds);
+        }
+
         return DataTables::of($query)
             ->addColumn('category', fn (Question $q) => $q->category->name ?? '-')
             ->addColumn('is_in_quiz', fn (Question $q) => in_array($q->id, $quizQuestionIds) ? 'added' : 'pending')

@@ -328,25 +328,14 @@ class QuizController extends Controller
         try {
             $result = $this->service->fillWithRandom($quiz);
         } catch (RuntimeException $e) {
-            if (request()->wantsJson()) {
-                return response()->json(['error' => $e->getMessage()], 422);
-            }
-            return back()->with('error', $e->getMessage());
-        }
-
-        if (request()->wantsJson()) {
-            if (!$result['ok']) {
-                return response()->json(['error' => $result['error']], 422);
-            }
-
-            return response()->json($result);
+            return response()->json(['error' => $e->getMessage()], 422);
         }
 
         if (!$result['ok']) {
-            return back()->with('error', $result['error']);
+            return response()->json(['error' => $result['error']], 422);
         }
 
-        return back()->with('success', __('flash.quiz_random_filled', ['count' => $result['added']]));
+        return response()->json($result);
     }
 
     public function updateParams(Request $request, Quiz $quiz)

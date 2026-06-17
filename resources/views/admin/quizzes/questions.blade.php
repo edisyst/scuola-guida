@@ -131,7 +131,7 @@
                     </div>
 
                     {{-- FILTRI --}}
-                    <div class="row sg-mb-2 align-items-center">
+                    <div class="row sg-mb-2 align-items-center g-2">
                         <div class="col-12 col-md-5">
                             <select id="filter-category" class="sg-form-control">
                                 <option value="">— Tutte le categorie{{ $licenseType ? ' (' . $categories->count() . ')' : '' }} —</option>
@@ -139,6 +139,11 @@
                                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="col-auto">
+                            <button id="filter-in-quiz" class="sg-btn sg-btn-light sg-btn-sm" title="Mostra solo le domande presenti nel quiz">
+                                <i class="fas fa-list-check mr-1"></i>Solo nel quiz
+                            </button>
                         </div>
                         @if($licenseType)
                         <div class="col-auto">
@@ -156,9 +161,6 @@
                         </button>
                         <button id="bulk-remove" class="sg-btn sg-btn-danger sg-btn-sm">
                             <i class="fas fa-minus"></i> Rimuovi selezionate
-                        </button>
-                        <button id="select-all-filtered" class="sg-btn sg-btn-light sg-btn-sm">
-                            <i class="fas fa-check-double"></i> Seleziona tutti (filtrati)
                         </button>
                         @if(auth()->user()->canBulkQuiz())
                         <button id="btn-add-random" class="sg-btn sg-btn-warning sg-btn-sm">
@@ -247,6 +249,7 @@
     });
 
     let table = null;
+    let filterInQuiz = false;
 
     $(document).ready(function() {
         updateProgress({{ $currentCount }}, {{ $max }});
@@ -259,6 +262,7 @@
                 url: "{{ route('admin.quizzes.questions.data', $quiz) }}",
                 data: function(d) {
                     d.category_id = $('#filter-category').val();
+                    d.only_in_quiz = filterInQuiz ? 1 : 0;
                 }
             },
             columns: [
@@ -332,8 +336,16 @@
             });
         }
 
-        // filtro
+        // filtro categoria
         $('#filter-category').change(function() {
+            table.ajax.reload();
+        });
+
+        // toggle "Solo nel quiz"
+        $('#filter-in-quiz').on('click', function() {
+            filterInQuiz = !filterInQuiz;
+            $(this).toggleClass('sg-btn-light', !filterInQuiz)
+                   .toggleClass('sg-btn-info',  filterInQuiz);
             table.ajax.reload();
         });
     });
@@ -432,17 +444,6 @@
                 selectedIds.delete($(this).val());
             }
         });
-
-    });
-
-    $('#select-all-filtered').on('click', function() {
-
-        selectionMode = 'all';
-        selectedIds.clear();
-
-        $('.row-checkbox').prop('checked', true);
-
-        toastr.info('Selezionate tutte le righe filtrate');
 
     });
 
@@ -711,9 +712,9 @@
         $.post("{{ route('admin.quizzes.fillRandom', $quiz) }}", {
             _token: "{{ csrf_token() }}"
         }, function(res) {
-            toastr.success('Aggiunte ' + res.added + ' domande random');
+            (res.questions ?? []).forEach(q => addToQuizList(q.id, q.question));
             updateProgress(res.current, parseInt($('#max-count').text()));
-            reloadQuizList();
+            toastr.success('Aggiunte ' + res.added + ' domande random');
             table.ajax.reload(null, false);
         }).fail(function(xhr) {
             toastr.error(xhr.responseJSON?.error ?? 'Errore');
