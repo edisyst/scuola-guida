@@ -5,6 +5,14 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 14.0: Audit grafico generale (2026-06-18)
+
+### Added
+
+- **`docs/audit/graphic-audit-2026.md`** — report di audit grafico completo delle view Blade del progetto. Copre: inventario delle 150+ view per area (admin, guest, auth, viewer, editor, instructor, Livewire, Blade components, errori); analisi di 8 dimensioni grafiche (leggibilità, impaginazione, spaziature, contrasto WCAG AA, uniformità struttura, uniformità box/div, font, CSS sparso); censimento token e duplicazioni; 17 problemi prioritizzati con severità (alta/media/bassa) e tipo di intervento; roadmap di 5 lotti di refactoring. Nessuna modifica al codice.
+
+---
+
 ## [Unreleased] — Feature 13.3: Pagine auth in linea con la homepage guest (2026-06-18)
 
 ### Changed
