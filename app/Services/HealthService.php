@@ -73,7 +73,7 @@ class HealthService
             $total = DB::select("
                 SELECT ROUND(SUM(data_length + index_length)) AS size_bytes
                 FROM information_schema.tables
-                WHERE table_schema = ?
+                WHERE table_schema = ? AND table_type = 'BASE TABLE'
             ", [$dbName]);
 
             $topTables = DB::select("
@@ -81,8 +81,8 @@ class HealthService
                        ROUND(data_length + index_length) AS size_bytes,
                        table_rows
                 FROM information_schema.tables
-                WHERE table_schema = ?
-                ORDER BY size_bytes DESC
+                WHERE table_schema = ? AND table_type = 'BASE TABLE'
+                ORDER BY table_rows DESC
                 LIMIT 5
             ", [$dbName]);
 
