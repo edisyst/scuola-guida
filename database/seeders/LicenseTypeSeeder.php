@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\LicenseType;
 use Illuminate\Database\Seeder;
 
@@ -38,5 +39,39 @@ class LicenseTypeSeeder extends Seeder
         }
 
         $this->command->info('Seeded ' . count($types) . ' license types');
+
+        // Associa categorie alle patenti
+        $this->attachCategories();
+    }
+
+    private function attachCategories(): void
+    {
+        $categories = Category::pluck('id')->all();
+
+        if (empty($categories)) {
+            $this->command->warn('Nessuna categoria trovata, salto associazioni');
+            return;
+        }
+
+        // Patente B: tutte le categorie
+        $licenseB = LicenseType::where('code', 'B')->first();
+        if ($licenseB) {
+            $licenseB->categories()->sync($categories);
+            $this->command->info("Patente B: associato " . count($categories) . " categorie");
+        }
+
+        // Patenti A, C, D: 2 categorie random
+        foreach (['A', 'C', 'D'] as $code) {
+            $license = LicenseType::where('code', $code)->first();
+            if ($license) {
+                $randomCategories = array_rand($categories, min(2, count($categories)));
+                $randomCategories = is_array($randomCategories)
+                    ? array_map(fn($idx) => $categories[$idx], $randomCategories)
+                    : [$categories[$randomCategories]];
+
+                $license->categories()->sync($randomCategories);
+                $this->command->info("Patente {$code}: associato " . count($randomCategories) . " categorie");
+            }
+        }
     }
 }
