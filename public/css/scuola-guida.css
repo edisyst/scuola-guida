@@ -2124,6 +2124,13 @@ body.role-editor     .main-header .badge { background-color: #fff !important; co
 body.role-viewer     .main-header .badge { background-color: #fff !important; color: var(--rt-viewer-dk)   !important; }
 body.role-instructor .main-header .badge { background-color: #fff !important; color: var(--rt-instructor)  !important; }
 
+/* ── Badge numerini (navbar-badge) nella topnav: testo scuro su sfondo trasparente ── */
+.navbar-badge { background-color: transparent !important; border: 1px solid rgba(0,0,0,.2) !important; }
+body.role-admin      .main-header .navbar-badge { color: var(--rt-admin)      !important; border-color: var(--rt-admin)      !important; }
+body.role-editor     .main-header .navbar-badge { color: var(--rt-editor)     !important; border-color: var(--rt-editor)     !important; }
+body.role-viewer     .main-header .navbar-badge { color: var(--rt-viewer-dk)  !important; border-color: var(--rt-viewer-dk)  !important; }
+body.role-instructor .main-header .navbar-badge { color: var(--rt-instructor) !important; border-color: var(--rt-instructor) !important; }
+
 /* ── Dropdown nella topnav: testo scuro su sfondo bianco ────
    Il colore bianco ereditato dalla navbar renderebbe il testo
    illeggibile dentro i dropdown (sfondo #fff). Si sovrascrive
