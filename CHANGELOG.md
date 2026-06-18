@@ -5,7 +5,7 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
-## [Unreleased] — Feature 14.3: CSS sparso e token centralizzati (2026-06-19)
+## [14.3] — Feature 14.3: CSS sparso e token centralizzati (2026-06-19)
 
 ### Changed
 
