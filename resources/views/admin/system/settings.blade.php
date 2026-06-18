@@ -182,8 +182,17 @@
                             <div class="form-group">
                                 <label>{{ __('system.font_family') }}</label>
                                 <select name="font_family" class="form-control @error('font_family') is-invalid @enderror">
+                                    @php
+                                        $fontMap = [
+                                            'system' => 'system-ui, -apple-system, sans-serif',
+                                            'inter' => '"Inter", sans-serif',
+                                            'roboto' => '"Roboto", sans-serif',
+                                            'open-sans' => '"Open Sans", sans-serif',
+                                        ];
+                                    @endphp
                                     @foreach($fontOptions as $opt)
-                                        <option value="{{ $opt }}" @selected($currentFont === $opt)>
+                                        <option value="{{ $opt }}" @selected($currentFont === $opt)
+                                                style="font-family: {{ $fontMap[$opt] ?? 'inherit' }};">
                                             {{ __('system.font_' . str_replace('-', '_', $opt)) }}
                                         </option>
                                     @endforeach
@@ -222,6 +231,20 @@
                                 'sidebar_skin_viewer'     => $skinViewer,
                                 'sidebar_skin_instructor' => $skinInstructor,
                             ];
+                            $skinColorMap = [
+                                'sidebar-dark-primary'   => '#007bff',
+                                'sidebar-dark-danger'    => '#dc3545',
+                                'sidebar-dark-success'   => '#28a745',
+                                'sidebar-dark-warning'   => '#ffc107',
+                                'sidebar-dark-info'      => '#17a2b8',
+                                'sidebar-dark-indigo'    => '#6610f2',
+                                'sidebar-dark-navy'      => '#001f3f',
+                                'sidebar-light-primary'  => '#007bff',
+                                'sidebar-light-danger'   => '#dc3545',
+                                'sidebar-light-success'  => '#28a745',
+                                'sidebar-light-warning'  => '#ffc107',
+                                'sidebar-light-info'     => '#17a2b8',
+                            ];
                         @endphp
                         @foreach($skinFields as $name => $current)
                             <div class="col-md-6">
@@ -229,7 +252,10 @@
                                     <label>{{ __('system.' . $name) }}</label>
                                     <select name="{{ $name }}" class="form-control @error($name) is-invalid @enderror">
                                         @foreach($skinOptions as $skin)
-                                            <option value="{{ $skin }}" @selected($current === $skin)>{{ $skin }}</option>
+                                            <option value="{{ $skin }}" @selected($current === $skin)
+                                                    style="background-color: {{ $skinColorMap[$skin] ?? '#999' }}; color: white; font-weight: 500;">
+                                                {{ $skin }}
+                                            </option>
                                         @endforeach
                                     </select>
                                     @error($name)
