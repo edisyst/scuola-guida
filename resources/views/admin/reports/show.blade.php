@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Report periodico')
+@section('title', $licenseType ? 'Report periodico — Patente ' . $licenseType->name : 'Report periodico')
 @section('content_header')@endsection
 
 @section('content')
@@ -15,7 +15,13 @@
                     <span class="sg-badge sg-badge-info ml-1">Confronto attivo</span>
                 @endif
             </p>
-            <h1 class="sg-header-title"><i class="fas fa-chart-pie mr-2"></i> Report periodico</h1>
+            <h1 class="sg-header-title">
+                <i class="fas fa-chart-pie mr-2"></i>
+                Report periodico
+                @if($licenseType)
+                    <span class="sg-badge sg-badge-info ml-2">{{ $licenseType->name }}</span>
+                @endif
+            </h1>
         </div>
         <div class="sg-header-actions">
             <a href="{{ route('admin.reports.index') }}" class="sg-btn sg-btn-light sg-btn-sm">

@@ -1,14 +1,5 @@
 @php
-    $sidebarClasses = 'sidebar-dark-primary elevation-4';
-    if (auth()->check()) {
-        if (auth()->user()->isAdmin()) {
-            $sidebarClasses = 'sidebar-dark-primary elevation-4';
-        } elseif (auth()->user()->isEditor()) {
-            $sidebarClasses = 'sidebar-dark-danger elevation-4';
-        } elseif (auth()->user()->isViewer()) {
-            $sidebarClasses = 'sidebar-dark-warning elevation-4';
-        }
-    }
+    $sidebarClasses = config('adminlte.classes_sidebar', 'sidebar-dark-primary elevation-4');
 @endphp
 
 <aside class="main-sidebar {{ $sidebarClasses }}">

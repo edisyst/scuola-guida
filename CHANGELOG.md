@@ -5,6 +5,15 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Fix: Colore sidebar non persiste dopo salvataggio
+
+### Fixed
+
+- **Applicazione colore sidebar** — il template `resources/views/vendor/adminlte/partials/sidebar/left-sidebar.blade.php` leggeva valori hardcodificati per ruolo anziché il config impostato dal middleware `RoleTheme`. Ora legge `config('adminlte.classes_sidebar')` impostato dal middleware, permettendo ai colori salvati tramite `/admin/system/settings` di essere applicati correttamente.
+- **Seeder `SystemSettingSeeder`** — aggiunto record di default per i colori della sidebar mancanti: `appearance.sidebar_skin_admin`, `appearance.sidebar_skin_editor`, `appearance.sidebar_skin_viewer`, `appearance.sidebar_skin_instructor`, `appearance.accent_color_dark`, `appearance.font_family`, `appearance.border_radius`.
+
+---
+
 ## [Unreleased] — Feature 13.3: Pagine auth in linea con la homepage guest (2026-06-18)
 
 ### Changed
