@@ -2,21 +2,24 @@
 
 @section('title', __('system.settings_title'))
 
-@section('content_header')
-    <h1>{{ __('system.settings_title') }}</h1>
-@stop
+@section('content_header')@endsection
 
 @section('content')
-    <div class="container-fluid">
+    <div class="sg-wrapper">
+
+        <div class="sg-header">
+            <h1 class="sg-header-title">{{ __('system.settings_title') }}</h1>
+        </div>
+
         <form action="{{ route('admin.system.settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             {{-- Dati scuola --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">{{ __('system.section_school') }}</h3>
+            <div class="sg-card">
+                <div class="sg-card-header">
+                    <h3 class="sg-card-title">{{ __('system.section_school') }}</h3>
                 </div>
-                <div class="card-body">
+                <div class="sg-card-body">
 
                     @php
                         $schoolMap = $school->keyBy('key');
@@ -86,11 +89,11 @@
             </div>
 
             {{-- Aspetto --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">{{ __('system.section_appearance') }}</h3>
+            <div class="sg-card">
+                <div class="sg-card-header">
+                    <h3 class="sg-card-title">{{ __('system.section_appearance') }}</h3>
                 </div>
-                <div class="card-body">
+                <div class="sg-card-body">
 
                     @php
                         $appearanceMap = $appearance->keyBy('key');
@@ -184,7 +187,7 @@
                                 <div x-data="{ font: '{{ $currentFont }}' }" class="d-flex align-items-center gap-2">
                                     <select name="font_family" class="form-control @error('font_family') is-invalid @enderror"
                                             x-model="font"
-                                            style="font-family: var(--font-family);"
+                                            style="font-family: var(--sg-font);"
                                             :style="{
                                                 'font-family': font === 'system' ? 'system-ui, -apple-system, sans-serif' :
                                                                font === 'inter' ? '\"Inter\", sans-serif' :
@@ -312,11 +315,11 @@
 
         {{-- Carosello homepage — FUORI dal form principale per evitare form annidati --}}
         @php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">{{ __('system.section_carousel') }}</h3>
+        <div class="sg-card">
+            <div class="sg-card-header">
+                <h3 class="sg-card-title">{{ __('system.section_carousel') }}</h3>
             </div>
-            <div class="card-body">
+            <div class="sg-card-body">
 
                 @if(count($carouselImages) > 0)
                     <p class="text-muted small mb-2">{{ __('system.carousel_current') }}</p>

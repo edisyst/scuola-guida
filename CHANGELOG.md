@@ -5,6 +5,24 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 14.2: Uniformità struttura pagine admin (2026-06-19)
+
+### Changed
+
+- **P04 — Wrapper root uniformato a `sg-wrapper`**: le 9 view che usavano `container-fluid` come elemento root migrano al pattern `sg-wrapper` + `sg-header` + `sg-card`: `admin/audit-log/index`, `admin/audit-log/show`, `admin/health/index`, `admin/license-types/index`, `admin/license-types/create`, `admin/license-types/edit`, `admin/system/settings`, `admin/system/form-fields`, `admin/system/health`. Le view license-types ridotta anche il doppio livello di nidificazione (`content-header` + `section.content` + `container-fluid`) al pattern piatto `sg-wrapper`.
+- **P05 — `admin/system/settings.blade.php`**: rimosso `@section('content_header')` con `<h1>` che generava doppio titolo AdminLTE; titolo spostato in `sg-header` dentro `@section('content')`; tutte le card `.card/.card-header/.card-body` migrate a `.sg-card/.sg-card-header/.sg-card-body` (scuola, aspetto, carosello).
+- **P06 — Card risultato quiz/simulatore**: `quiz/attempt.blade.php` e `simulator/result.blade.php` — il card di riepilogo (`card-success`/`card-danger` con header colorato) migra a `sg-card` con header neutro; il segnale esito (superato/bocciato) spostato in un badge colorato nell'`sg-card-header`; il `card-body` migra a `sg-card-body`.
+
+### Fixed
+
+- **P08 — Typo variabile CSS font**: in `admin/system/settings.blade.php`, lo `style` inline del select font usava `var(--font-family)` (variabile inesistente). Corretto in `var(--sg-font)`.
+
+### Added
+
+- **`AdminPagesStructureTest`** — 12 test: le 9 rotte migrate rispondono 200 per un admin; `admin/system/settings` non contiene `var(--font-family)`; `quiz.attempts.show` e `simulator.result` rispondono 200 e mostrano la pagina.
+
+---
+
 ## [Unreleased] — Feature 14.1: Contrasto colori e accessibilità WCAG AA (2026-06-18)
 
 ### Fixed

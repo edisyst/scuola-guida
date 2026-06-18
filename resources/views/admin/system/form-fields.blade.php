@@ -2,18 +2,21 @@
 
 @section('title', __('forms.page_title'))
 
-@section('content_header')
-    <h1>{{ __('forms.page_title') }}</h1>
-@stop
+@section('content_header')@endsection
 
 @section('content')
-    <div class="container-fluid">
-        <p class="text-muted sg-mb-4">{{ __('forms.page_subtitle') }}</p>
+    <div class="sg-wrapper">
 
-        <div class="card">
-            <div class="card-body">
+        <div class="sg-header">
+            <h1 class="sg-header-title">{{ __('forms.page_title') }}</h1>
+            <p class="text-muted sg-mb-4">{{ __('forms.page_subtitle') }}</p>
+        </div>
+
+        <div class="sg-card">
+            <div class="sg-card-body">
                 @livewire('admin.form-fields-manager')
             </div>
         </div>
+
     </div>
 @endsection

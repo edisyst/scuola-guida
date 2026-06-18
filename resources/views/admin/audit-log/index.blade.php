@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+<div class="sg-wrapper">
 
     {{-- ── FILTRI ──────────────────────────────────────────────────────────── --}}
     <div class="card card-default collapsed-card">

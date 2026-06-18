@@ -30,22 +30,17 @@
     </div>
 
     {{-- Riepilogo --}}
-    <div class="card {{ $stats['passed'] ? 'card-success' : 'card-danger' }} mb-4">
-        <div class="card-header">
-            <h3 class="card-title">
+    <div class="sg-card mb-4">
+        <div class="sg-card-header sg-flex-between">
+            <h3 class="sg-card-title">
                 <i class="fas {{ $stats['passed'] ? 'fa-check-circle' : 'fa-times-circle' }} mr-2"></i>
                 {{ __('viewer.summary') }}
             </h3>
+            <span class="badge {{ $stats['passed'] ? 'badge-success' : 'badge-danger' }}" style="font-size:0.9rem;">
+                {{ $stats['passed'] ? __('viewer.passed') : __('viewer.failed_quiz') }}
+            </span>
         </div>
-        <div class="card-body">
-
-            <div class="text-center mb-4">
-                @if($stats['passed'])
-                    <span class="badge badge-success" style="font-size:1.3rem;padding:0.5rem 1.2rem;">{{ __('viewer.passed') }}</span>
-                @else
-                    <span class="badge badge-danger" style="font-size:1.3rem;padding:0.5rem 1.2rem;">{{ __('viewer.failed_quiz') }}</span>
-                @endif
-            </div>
+        <div class="sg-card-body">
 
             <div class="row text-center">
                 <div class="col-6 col-md-4 col-lg-2 mb-3">

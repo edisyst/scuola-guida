@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+<div class="sg-wrapper">
 
     <div class="mb-3">
         <a href="{{ url()->previous(route('admin.audit.index')) }}" class="btn btn-sm btn-secondary">

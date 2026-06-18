@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+<div class="sg-wrapper">
 
     {{-- ── SMALL BOXES: metriche principali ─────────────────────────────── --}}
     <div class="row">
@@ -333,7 +333,7 @@
 
     </div>{{-- /.row --}}
 
-</div>{{-- /.container-fluid --}}
+</div>{{-- /.sg-wrapper --}}
 @endsection
 
 @push('js')

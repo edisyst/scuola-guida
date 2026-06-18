@@ -2,17 +2,18 @@
 
 @section('title', __('system.service_health_title'))
 
-@section('content_header')
-    <h1>{{ __('system.service_health_title') }}</h1>
-@stop
+@section('content_header')@endsection
 
 @section('content')
-    <div class="container-fluid">
+    <div class="sg-wrapper">
 
-        <div class="mb-3">
-            <a href="{{ route('admin.system.health') }}" class="btn btn-secondary btn-sm">
-                <i class="fas fa-sync-alt mr-1"></i>{{ __('system.refresh') }}
-            </a>
+        <div class="sg-header sg-flex-between">
+            <h1 class="sg-header-title">{{ __('system.service_health_title') }}</h1>
+            <div class="sg-header-actions">
+                <a href="{{ route('admin.system.health') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-sync-alt mr-1"></i>{{ __('system.refresh') }}
+                </a>
+            </div>
         </div>
 
         <div class="row">
