@@ -6,7 +6,7 @@
      Sezione 1 — Hero con carosello come sfondo (80% larghezza)
      ============================================================ --}}
 @php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
-<section class="py-4" style="background:#f4f6f9;">
+<section class="py-4 bg-body-secondary">
     <div style="width:80%;margin:0 auto;">
 
         {{-- Wrapper posizionato: carosello sfondo + contenuto sopra --}}
@@ -101,7 +101,7 @@
      Sezione 2 — Statistiche (solo se almeno uno > 0)
      ============================================================ --}}
 @if($stats['quiz_count'] > 0 || $stats['question_count'] > 0 || $stats['license_types_count'] > 0)
-<section class="py-5" style="background:#f4f6f9;">
+<section class="py-5 bg-body-secondary">
     <div class="container">
         <div class="row g-4 justify-content-center">
             @if($stats['quiz_count'] > 0)
@@ -148,7 +148,7 @@
 {{-- ============================================================
      Sezione 3 — Feature highlights
      ============================================================ --}}
-<section class="py-5" style="background:#eef2ff;">
+<section class="py-5 bg-body-tertiary">
     <div class="container">
         <h2 class="text-center mb-5">
             {{ __('guest.features_title', ['name' => setting('school.name', config('app.name'))]) }}
@@ -198,7 +198,7 @@
      Sezione 4 — Tipi di patente (solo se > 1)
      ============================================================ --}}
 @if($licenseTypes->count() > 1)
-<section class="py-5" style="background:#f4f6f9;">
+<section class="py-5 bg-body-secondary">
     <div class="container text-center">
         <h2 class="mb-4">{{ __('guest.license_types_title') }}</h2>
         <div>

@@ -35,7 +35,7 @@
 
     @include('layouts.partials.appearance-css')
 </head>
-<body class="guest-page" :style="darkMode ? '' : 'background:#f4f6f9;'">
+<body class="guest-page" :style="darkMode ? 'background:#2b3035;' : 'background:#f4f6f9;'">
 
     {{-- Navbar --}}
     <nav class="navbar navbar-expand-md sticky-top shadow-sm"
