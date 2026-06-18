@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Quiz;
 use App\Models\QuizEnrollment;
 use App\Models\User;
+use App\Services\LicenseTypeService;
 use App\Services\QuizEnrollmentService;
 use Illuminate\Http\Request;
 use RuntimeException;
