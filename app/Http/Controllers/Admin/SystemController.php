@@ -50,6 +50,13 @@ class SystemController extends Controller
         return response()->view('admin.system.form-fields');
     }
 
+    public function features(): Response
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        return response()->view('admin.system.features');
+    }
+
     public function updateSettings(UpdateSystemSettingsRequest $request): RedirectResponse
     {
         abort_unless(auth()->user()->isAdmin(), 403);

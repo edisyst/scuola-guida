@@ -57,6 +57,7 @@
 
 @section('content_top_nav_right')
     {{-- Language switcher --}}
+    @if(feature('exam_translations_enabled'))
     <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#" aria-label="{{ config('locales.supported')[App::getLocale()]['label'] }}">
             <img src="{{ asset('images/language_flags/' . config('locales.supported')[App::getLocale()]['flag']) }}"
@@ -81,6 +82,7 @@
             @endforeach
         </div>
     </li>
+    @endif
     @if(auth()->check() && auth()->user()->isViewer() && auth()->user()->getActiveLicenseType())
         <li class="nav-item">
             <a href="{{ route('profile.edit') }}" class="nav-link" title="{{ __('profile.license_type_title') }}">

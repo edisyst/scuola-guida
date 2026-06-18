@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Feature 11.0 — System settings (deve girare prima di qualsiasi seeder che legge i setting)
             SystemSettingSeeder::class,
+            // Feature 13.2 — Feature toggles
+            FeatureSettingSeeder::class,
             RolePermissionSeeder::class,
             AdminUserSeeder::class,
             UserSeeder::class,

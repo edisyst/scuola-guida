@@ -10,6 +10,14 @@ if (!function_exists('setting')) {
     }
 }
 
+if (!function_exists('feature')) {
+
+    function feature(string $name): bool
+    {
+        return app(\App\Services\FeatureToggleService::class)->isEnabled($name);
+    }
+}
+
 if (!function_exists('clearAdminBadgesCache')) {
 
     function clearAdminBadgesCache(): void

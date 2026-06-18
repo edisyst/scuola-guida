@@ -13,6 +13,7 @@ class ProfileBadgesController extends Controller
     public function index()
     {
         abort_unless(auth()->user()->isViewer(), 403);
+        abort_if(!feature('gamification_enabled'), 404);
 
         $user = auth()->user();
 

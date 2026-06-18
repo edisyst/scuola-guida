@@ -40,6 +40,10 @@ class StudyController extends Controller
             $categoryQuery->whereHas('licenseTypes', fn($q) => $q->where('license_types.id', $licenseType->id));
         }
 
+        if (!feature('eu_categories_visible')) {
+            $categoryQuery->where('is_eu_directive', false);
+        }
+
         $categories = $categoryQuery->get();
 
         return view('study.index', [

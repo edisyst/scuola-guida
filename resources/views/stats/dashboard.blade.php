@@ -101,7 +101,7 @@
         </a>
     @endif
 
-    @if(!$isAdminView && isset($currentStreak))
+    @if(!$isAdminView && isset($currentStreak) && feature('gamification_enabled'))
         @php
             $hasActivityToday = $currentStreak > 0 && isset($activityToday) && $activityToday;
             $atRisk = ($currentStreak > 0) && !($activityToday ?? false);

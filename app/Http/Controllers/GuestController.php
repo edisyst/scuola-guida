@@ -13,6 +13,10 @@ class GuestController extends Controller
 {
     public function index(): View|RedirectResponse
     {
+        if (!auth()->check() && !feature('guest_homepage_enabled')) {
+            return redirect()->route('login');
+        }
+
         if (auth()->check()) {
             $user = auth()->user();
 

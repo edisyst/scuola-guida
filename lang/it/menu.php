@@ -31,6 +31,7 @@ return [
     'stato_servizi'           => 'Stato servizi',
     'personalizzazione'       => 'Personalizzazione',
     'campi_moduli'            => 'Campi moduli',
+    'funzionalita'            => 'Funzionalità',
     'utenti_ruoli'            => 'Utenti & Ruoli',
     'utenti'                  => 'Utenti',
     'ruoli_permessi'          => 'Ruoli & Permessi',

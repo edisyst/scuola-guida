@@ -5,6 +5,30 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 13.2: Feature toggle gestibili da back office (2026-06-18)
+
+### Added
+
+- **`FeatureToggleService`** — `isEnabled(string $feature): bool` (wrapper su `setting()` con `filter_var` boolean), `all(): array`, `configManaged(): array` con valore e hint per i flag config-gestiti.
+- **Helper globale `feature(string $name): bool`** in `app/Helpers/helpers.php` — delega a `FeatureToggleService::isEnabled()`.
+- **`FeatureSettingSeeder`** — popola 7 chiavi `features.*` in `system_settings` (tipo `boolean`, gruppo `features`) con default `1`. Idempotente via `upsert`.
+- **Livewire `Admin\FeatureToggles`** (`app/Http/Livewire/Admin/FeatureToggles.php`) — toggle on/off via `wire:change`, salvataggio immediato via `SettingService::set()`, dispatch browser event `feature-notify` per toastr. Validazione whitelist su `FeatureToggleService::TOGGLES` prima di ogni toggle.
+- **View `admin/system/features.blade.php`** — sezione 1 "Gestite dalla piattaforma" (switch per ogni toggle DB), sezione 2 "Gestite da configurazione" (tabella read-only con badge valore e hint i18n). Listener `feature-notify` → toastr via `@section('js') @parent`.
+- **Rotta `GET admin/system/features`** → `SystemController::features()` → `admin.system.features`.
+- **Voce menu AdminLTE** "Funzionalità" (`fas fa-toggle-on`) nel dropdown Sistema, solo `admin`.
+- **Applicazione toggle nei punti di integrazione:**
+  - `gamification_enabled` — dashboard streak widget (`stats/dashboard.blade.php`), `ProfileBadgesController::index()` → 404.
+  - `web_push_enabled` — card push in `profile/edit.blade.php`, `PushSubscriptionController::store/destroy()` → 404.
+  - `guest_homepage_enabled` — `GuestController::index()` → redirect login se off e utente non autenticato.
+  - `exam_translations_enabled` — dropdown lingua in `layouts/admin.blade.php` wrappato con `@if(feature(...))`.
+  - `driving_practice_enabled` — `DrivingModuleController::index()`, `DrivingSessionController::{index,store,destroy,progress}()`, `DrivingAttestationController::download()` → 404.
+  - `eu_categories_visible` — `StudyController::index()` filtra `where('is_eu_directive', false)` se off.
+  - `study_content_enabled` — tutti i metodi di `StudyContentController` → 404; `livewire/study-content-viewer.blade.php` wrappato con `@if(feature(...))`.
+- **i18n** — `lang/{it,en,es}/features.php` con label, descrizione, hint per tutti i toggle e i flag config-gestiti. Chiave `menu.funzionalita` in `lang/{it,en,es}/menu.php`.
+- **`FeatureToggleTest`** — 10 test: toggle on/off via Livewire, `guest_homepage_enabled = false` → redirect login, `gamification_enabled = false` → badge 404, tentativo toggle su flag config → 422, accesso pagina admin/non-admin, fallback default=true, comportamento con setting=0, chiavi config-managed attese.
+
+---
+
 ## [Unreleased] — Feature 13.1: Personalizzazioni grafiche da back office (2026-06-18)
 
 ### Added

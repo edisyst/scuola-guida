@@ -17,6 +17,7 @@ class StudyContentController extends Controller
 
     public function index(): View
     {
+        abort_if(!feature('study_content_enabled'), 404);
         abort_unless(auth()->user()->canEditStudyContent(), 403);
 
         $contents = StudyContent::with(['studyable', 'creator'])->ordered()->get();
@@ -26,6 +27,7 @@ class StudyContentController extends Controller
 
     public function create(): View
     {
+        abort_if(!feature('study_content_enabled'), 404);
         abort_unless(auth()->user()->canEditStudyContent(), 403);
 
         $categories    = Category::orderBy('name')->get();
@@ -36,6 +38,7 @@ class StudyContentController extends Controller
 
     public function store(StoreStudyContentRequest $request): RedirectResponse
     {
+        abort_if(!feature('study_content_enabled'), 404);
         abort_unless(auth()->user()->canEditStudyContent(), 403);
 
         $this->service->create($request->validated(), auth()->user());
@@ -47,6 +50,7 @@ class StudyContentController extends Controller
 
     public function edit(StudyContent $studyContent): View
     {
+        abort_if(!feature('study_content_enabled'), 404);
         abort_unless(auth()->user()->canEditStudyContent($studyContent), 403);
 
         $categories = Category::orderBy('name')->get();
@@ -57,6 +61,7 @@ class StudyContentController extends Controller
 
     public function update(UpdateStudyContentRequest $request, StudyContent $studyContent): RedirectResponse
     {
+        abort_if(!feature('study_content_enabled'), 404);
         abort_unless(auth()->user()->canEditStudyContent($studyContent), 403);
 
         $this->service->update($studyContent, $request->validated(), auth()->user());
@@ -68,6 +73,7 @@ class StudyContentController extends Controller
 
     public function destroy(StudyContent $studyContent): RedirectResponse
     {
+        abort_if(!feature('study_content_enabled'), 404);
         abort_unless(auth()->user()->canEditStudyContent($studyContent), 403);
 
         $this->service->delete($studyContent);

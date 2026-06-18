@@ -452,6 +452,13 @@ return [
                     'can'  => 'admin-only',
                     'key'  => 'form-fields',
                 ],
+                [
+                    'text' => 'funzionalita',
+                    'url'  => 'admin/system/features',
+                    'icon' => 'fas fa-toggle-on',
+                    'can'  => 'admin-only',
+                    'key'  => 'features',
+                ],
             ],
         ],
         [

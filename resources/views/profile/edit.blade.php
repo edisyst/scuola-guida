@@ -151,6 +151,7 @@
         </div>
     </div>
 
+    @if(feature('web_push_enabled'))
     <div class="sg-card sg-mb-3" x-data="pushSubscription()" x-init="init()" x-cloak>
         <div class="sg-card-header sg-flex-between">
             <h2 class="sg-card-header-title">
@@ -190,6 +191,7 @@
             </div>
         </div>
     </div>
+    @endif {{-- feature('web_push_enabled') --}}
     @endif
 
     <div class="sg-card sg-mb-3">

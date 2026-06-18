@@ -11,6 +11,7 @@ class PushSubscriptionController extends Controller
     public function store(Request $request): JsonResponse
     {
         abort_unless(auth()->user()->isViewer(), 403);
+        abort_if(!feature('web_push_enabled'), 404);
 
         $data = $request->validate([
             'endpoint'         => ['required', 'string', 'max:500'],
@@ -32,6 +33,7 @@ class PushSubscriptionController extends Controller
     public function destroy(Request $request): Response
     {
         abort_unless(auth()->user()->isViewer(), 403);
+        abort_if(!feature('web_push_enabled'), 404);
 
         $data = $request->validate([
             'endpoint' => ['required', 'string'],

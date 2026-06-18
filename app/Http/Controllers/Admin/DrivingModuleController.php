@@ -19,6 +19,7 @@ class DrivingModuleController extends Controller
     public function index(Request $request): View
     {
         abort_unless(auth()->user()->canManageDrivingModules(), 403);
+        abort_if(!feature('driving_practice_enabled'), 404);
 
         $licenseTypes = LicenseType::active()->orderBy('sort_order')->get();
 

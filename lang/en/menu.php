@@ -31,6 +31,7 @@ return [
     'stato_servizi'           => 'Service health',
     'personalizzazione'       => 'Customization',
     'campi_moduli'            => 'Form fields',
+    'funzionalita'            => 'Features',
     'utenti_ruoli'            => 'Users & Roles',
     'utenti'                  => 'Users',
     'ruoli_permessi'          => 'Roles & Permissions',

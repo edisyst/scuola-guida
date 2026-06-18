@@ -20,6 +20,7 @@ class DrivingSessionController extends Controller
      */
     public function index(User $student): View
     {
+        abort_if(!feature('driving_practice_enabled'), 404);
         abort_unless(
             auth()->user()->canRegisterDrivingSession() || auth()->id() === $student->id,
             403
@@ -45,6 +46,7 @@ class DrivingSessionController extends Controller
      */
     public function store(StoreDrivingSessionRequest $request, User $student): RedirectResponse
     {
+        abort_if(!feature('driving_practice_enabled'), 404);
         abort_unless(auth()->user()->canRegisterDrivingSession(), 403);
         abort_unless($this->service->canRegisterForStudent(auth()->user(), $student), 403);
 
@@ -77,6 +79,7 @@ class DrivingSessionController extends Controller
      */
     public function destroy(User $student, DrivingSession $session): RedirectResponse
     {
+        abort_if(!feature('driving_practice_enabled'), 404);
         abort_unless(auth()->user()->canRegisterDrivingSession(), 403);
         abort_unless($this->service->canRegisterForStudent(auth()->user(), $student), 403);
 
@@ -90,6 +93,8 @@ class DrivingSessionController extends Controller
      */
     public function progress(): View
     {
+        abort_if(!feature('driving_practice_enabled'), 404);
+
         /** @var User $student */
         $student = auth()->user();
 

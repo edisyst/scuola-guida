@@ -1,4 +1,5 @@
 @auth
+@if(feature('study_content_enabled'))
 <div>
     @if($contents->isEmpty())
         <div class="text-center py-4">
@@ -40,4 +41,5 @@
         @endforeach
     @endif
 </div>
+@endif
 @endauth

@@ -16,6 +16,8 @@ class DrivingAttestationController extends Controller
 
     public function download(User $student)
     {
+        abort_if(!feature('driving_practice_enabled'), 404);
+
         // Resolve active license type
         $licenseType = $student->activeLicenseType;
         if (!$licenseType) {

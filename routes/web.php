@@ -401,6 +401,7 @@ Route::middleware(['auth', '2fa'])
                 Route::post('settings', [SystemController::class, 'updateSettings'])->name('settings.update');
                 Route::delete('settings/carousel/{index}', [SystemController::class, 'deleteCarouselImage'])->name('settings.carousel.delete');
                 Route::get('form-fields', [SystemController::class, 'formFields'])->name('form-fields');
+                Route::get('features', [SystemController::class, 'features'])->name('features');
             });
 
             // GESTIONE ISTRUTTORI (assegnazione studenti)
