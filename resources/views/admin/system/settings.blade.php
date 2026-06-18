@@ -181,22 +181,40 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('system.font_family') }}</label>
-                                <select name="font_family" class="form-control @error('font_family') is-invalid @enderror">
-                                    @php
-                                        $fontMap = [
-                                            'system' => 'system-ui, -apple-system, sans-serif',
-                                            'inter' => '"Inter", sans-serif',
-                                            'roboto' => '"Roboto", sans-serif',
-                                            'open-sans' => '"Open Sans", sans-serif',
-                                        ];
-                                    @endphp
-                                    @foreach($fontOptions as $opt)
-                                        <option value="{{ $opt }}" @selected($currentFont === $opt)
-                                                style="font-family: {{ $fontMap[$opt] ?? 'inherit' }};">
-                                            {{ __('system.font_' . str_replace('-', '_', $opt)) }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <div x-data="{ font: '{{ $currentFont }}' }" class="d-flex align-items-center gap-2">
+                                    <select name="font_family" class="form-control @error('font_family') is-invalid @enderror"
+                                            x-model="font"
+                                            style="font-family: var(--font-family);"
+                                            :style="{
+                                                'font-family': font === 'system' ? 'system-ui, -apple-system, sans-serif' :
+                                                               font === 'inter' ? '\"Inter\", sans-serif' :
+                                                               font === 'roboto' ? '\"Roboto\", sans-serif' :
+                                                               '\"Open Sans\", sans-serif'
+                                            }">
+                                        @php
+                                            $fontMap = [
+                                                'system' => 'system-ui, -apple-system, sans-serif',
+                                                'inter' => '"Inter", sans-serif',
+                                                'roboto' => '"Roboto", sans-serif',
+                                                'open-sans' => '"Open Sans", sans-serif',
+                                            ];
+                                        @endphp
+                                        @foreach($fontOptions as $opt)
+                                            <option value="{{ $opt }}" @selected($currentFont === $opt)>
+                                                {{ __('system.font_' . str_replace('-', '_', $opt)) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted" style="white-space: nowrap;"
+                                           :style="{
+                                               'font-family': font === 'system' ? 'system-ui, -apple-system, sans-serif' :
+                                                              font === 'inter' ? '\"Inter\", sans-serif' :
+                                                              font === 'roboto' ? '\"Roboto\", sans-serif' :
+                                                              '\"Open Sans\", sans-serif'
+                                           }">
+                                        (preview)
+                                    </small>
+                                </div>
                                 @error('font_family')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -250,14 +268,29 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>{{ __('system.' . $name) }}</label>
-                                    <select name="{{ $name }}" class="form-control @error($name) is-invalid @enderror">
-                                        @foreach($skinOptions as $skin)
-                                            <option value="{{ $skin }}" @selected($current === $skin)
-                                                    style="background-color: {{ $skinColorMap[$skin] ?? '#999' }}; color: white; font-weight: 500;">
-                                                {{ $skin }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <div x-data="{
+                                        skin: '{{ $current }}',
+                                        skinColors: {
+                                            @foreach($skinColorMap as $skinName => $color)
+                                                '{{ $skinName }}': '{{ $color }}',
+                                            @endforeach
+                                        }
+                                    }">
+                                        <select name="{{ $name }}" class="form-control @error($name) is-invalid @enderror"
+                                                x-model="skin"
+                                                :style="{
+                                                    'background-color': skin && skinColors[skin] ? skinColors[skin] : '#999',
+                                                    'color': 'white',
+                                                    'font-weight': '500'
+                                                }">
+                                            @foreach($skinOptions as $skin)
+                                                <option value="{{ $skin }}" @selected($current === $skin)
+                                                        style="background-color: {{ $skinColorMap[$skin] ?? '#999' }}; color: white; font-weight: 500;">
+                                                    {{ $skin }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     @error($name)
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
