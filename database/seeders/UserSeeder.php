@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\LicenseType;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -61,8 +62,9 @@ class UserSeeder extends Seeder
             ],
         ];
 
+        $viewers = [];
         foreach ($registrations as $data) {
-            User::create([
+            $viewers[] = User::create([
                 ...$data,
                 'password' => Hash::make('password'),
                 'role' => User::ROLE_VIEWER,
@@ -73,5 +75,22 @@ class UserSeeder extends Seeder
         }
 
         $this->command->info("CREATI 3 ISCRIZIONI ANAGRAFICHE IN ATTESA");
+
+        // Associa 3 viewer a patenti attive per lo studio
+        $licenseB = LicenseType::where('code', 'B')->first();
+        $licenseC = LicenseType::where('code', 'C')->first();
+        $licenseD = LicenseType::where('code', 'D')->first();
+
+        if ($licenseB && $viewers[0]) {
+            $viewers[0]->update(['active_license_type_id' => $licenseB->id]);
+        }
+        if ($licenseC && $viewers[1]) {
+            $viewers[1]->update(['active_license_type_id' => $licenseC->id]);
+        }
+        if ($licenseD && $viewers[2]) {
+            $viewers[2]->update(['active_license_type_id' => $licenseD->id]);
+        }
+
+        $this->command->info("ASSOCIATI 3 VIEWER A PATENTI (B, C, D)");
     }
 }
