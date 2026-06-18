@@ -92,17 +92,19 @@
     {{-- Colonna destra: azione --}}
     <div class="ms-3 d-flex flex-column align-items-end gap-1">
         @if(in_array($quiz->enrollment_status, ['open', 'not_scheduled']) && !$enrollment)
-            @if($canEnroll)
-                <form method="POST" action="{{ route('quiz.enrollments.store', $quiz) }}">
-                    @csrf
-                    <button type="submit" class="sg-btn sg-btn-outline sg-btn-sm">
-                        <i class="fas fa-paper-plane"></i> Richiedi iscrizione
-                    </button>
-                </form>
-            @else
-                <a href="{{ route('profile.edit') }}" class="sg-btn sg-btn-light sg-btn-sm">
-                    <i class="fas fa-id-card"></i> Completa profilo
-                </a>
+            @if(auth()->user()->isViewer())
+                @if($canEnroll)
+                    <form method="POST" action="{{ route('quiz.enrollments.store', $quiz) }}">
+                        @csrf
+                        <button type="submit" class="sg-btn sg-btn-outline sg-btn-sm">
+                            <i class="fas fa-paper-plane"></i> Richiedi iscrizione
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('profile.edit') }}" class="sg-btn sg-btn-light sg-btn-sm">
+                        <i class="fas fa-id-card"></i> Completa profilo
+                    </a>
+                @endif
             @endif
         @elseif($quiz->enrollment_status === 'upcoming')
             <span class="text-muted small">Disponibile a breve</span>

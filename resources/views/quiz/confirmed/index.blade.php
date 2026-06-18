@@ -11,7 +11,13 @@
         <h1 class="sg-header-title"><i class="fas fa-clipboard-check mr-2"></i> {{ __('viewer.quiz.available') }}</h1>
     </div>
 
-    @if($user->isViewer() && !$canEnroll)
+    @if(!$user->isViewer())
+        <div class="alert alert-info sg-mb-3">
+            <i class="fas fa-eye"></i>
+            <strong>Accesso in sola lettura.</strong>
+            Solo i candidati possono iscriversi agli esami ufficiali.
+        </div>
+    @elseif($user->isViewer() && !$canEnroll)
         <div class="alert alert-warning sg-mb-3">
             <i class="fas fa-exclamation-triangle"></i>
             <strong>{{ __('viewer.quiz.registration_required') }}</strong>
@@ -23,12 +29,6 @@
                 {{ __('viewer.quiz.registration_rejected') }}
             @endif
             {!! __('viewer.quiz.practice_meanwhile') !!}
-        </div>
-    @elseif(!$user->isViewer())
-        <div class="alert alert-info sg-mb-3">
-            <i class="fas fa-eye"></i>
-            <strong>{{ __('viewer.quiz.readonly_admin') }}</strong>
-            {{ $user->isAdmin() ? __('viewer.quiz.readonly_note_admin') : __('viewer.quiz.readonly_note_editor') }}
         </div>
     @endif
 

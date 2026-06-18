@@ -11,7 +11,13 @@
         <h1 class="sg-header-title"><i class="fas fa-calendar-alt mr-2"></i> Calendario sessioni</h1>
     </div>
 
-    @if($user->isViewer() && !$canEnroll)
+    @if(!$user->isViewer())
+        <div class="alert alert-info sg-mb-3">
+            <i class="fas fa-eye"></i>
+            <strong>Accesso in sola lettura.</strong>
+            Solo i candidati possono iscriversi agli esami ufficiali.
+        </div>
+    @elseif($user->isViewer() && !$canEnroll)
         <div class="alert alert-warning sg-mb-3">
             <i class="fas fa-exclamation-triangle"></i>
             <strong>Iscrizione anagrafica necessaria.</strong>
