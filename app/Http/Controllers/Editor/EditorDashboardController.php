@@ -62,7 +62,6 @@ class EditorDashboardController extends Controller
         $licenseTypes = $this->licenseTypeService->allForSelect();
 
         $productionMetrics = $this->metrics->getProductionMetrics($targetEditor, $from, $to, $licenseType);
-        $globalMetrics     = $this->metrics->getGlobalContentMetrics($licenseType);
 
         return view('editor.dashboard', [
             'editor'           => $targetEditor,
@@ -71,7 +70,6 @@ class EditorDashboardController extends Controller
             'licenseTypes'     => $licenseTypes,
             'selectedLicenseTypeId' => $licenseType?->id,
             'productionMetrics' => $productionMetrics,
-            'globalMetrics'    => $globalMetrics,
             'from'             => $from,
             'to'               => $to,
         ]);

@@ -6,6 +6,7 @@ use App\Models\Quiz;
 use App\Models\User;
 use App\Services\DashboardStatsService;
 use App\Services\DiagnosticService;
+use App\Services\EditorMetricsService;
 use App\Services\ReviewErrorsService;
 use App\Services\SpacedRepetitionService;
 use App\Services\StreakService;
@@ -17,6 +18,7 @@ class UserStatsController extends Controller
     public function __construct(
         private readonly UserStatsService $service,
         private readonly DashboardStatsService $dashboardStats,
+        private readonly EditorMetricsService $metrics,
         private readonly ReviewErrorsService $reviewErrorsService,
         private readonly DiagnosticService $diagnosticService,
         private readonly SpacedRepetitionService $spacedRepetitionService,
@@ -36,6 +38,7 @@ class UserStatsController extends Controller
                 'stats'          => $this->dashboardStats->kpi(),
                 'questionsChart' => $this->dashboardStats->dailyCreated(\App\Models\Question::class),
                 'usersChart'     => $this->dashboardStats->dailyCreated(\App\Models\User::class),
+                'globalMetrics'  => $this->metrics->getGlobalContentMetrics(),
             ]);
         }
 

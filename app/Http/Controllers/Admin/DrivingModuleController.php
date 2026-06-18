@@ -25,24 +25,25 @@ class DrivingModuleController extends Controller
 
         // Filtra per tipo di patente se specificato in query string
         $query = DrivingModule::with('licenseType')->ordered();
+        $selectedLicenseTypeId = $request->integer('license_type_id') ?: null;
 
-        if ($licenseTypeId = $request->integer('license_type_id') ?: null) {
-            $query->where('license_type_id', $licenseTypeId);
+        if ($selectedLicenseTypeId) {
+            $query->where('license_type_id', $selectedLicenseTypeId);
         }
 
         $modules = $query->get();
 
-        return view('admin.driving-modules.index', compact('licenseTypes', 'modules'));
+        return view('admin.driving-modules.index', compact('licenseTypes', 'modules', 'selectedLicenseTypeId'));
     }
 
     public function create(Request $request): View
     {
         abort_unless(auth()->user()->canManageDrivingModules(), 403);
 
-        $licenseTypes        = LicenseType::active()->orderBy('sort_order')->get();
-        $selectedLicenseType = $request->integer('license_type_id') ?: null;
+        $licenseTypes = LicenseType::active()->orderBy('sort_order')->get();
+        $selectedLicenseTypeId = $request->integer('license_type_id') ?: null;
 
-        return view('admin.driving-modules.create', compact('licenseTypes', 'selectedLicenseType'));
+        return view('admin.driving-modules.create', compact('licenseTypes', 'selectedLicenseTypeId'));
     }
 
     public function store(StoreDrivingModuleRequest $request): RedirectResponse
