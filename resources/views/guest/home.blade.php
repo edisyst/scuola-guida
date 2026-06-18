@@ -203,7 +203,7 @@
         <h2 class="mb-4">{{ __('guest.license_types_title') }}</h2>
         <div>
             @foreach($licenseTypes as $type)
-                <span class="badge m-1 fs-6" style="background:var(--sg-accent);">{{ $type->name }}</span>
+                <span class="badge m-1 fs-6" style="background:var(--sg-accent);color:var(--sg-accent-text);">{{ $type->name }}</span>
             @endforeach
         </div>
     </div>
@@ -213,7 +213,7 @@
 {{-- ============================================================
      Sezione 5 — CTA finale
      ============================================================ --}}
-<section class="py-5 text-center text-white" style="background:var(--sg-accent);">
+<section class="py-5 text-center" style="background:var(--sg-accent);color:var(--sg-accent-text);">
     <div class="container">
         <h2 class="mb-3">{{ __('guest.final_cta_title') }}</h2>
         <p class="lead mb-4" style="opacity:.9;">{{ __('guest.final_cta_subtitle') }}</p>

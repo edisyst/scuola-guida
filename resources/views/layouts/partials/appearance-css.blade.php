@@ -7,6 +7,8 @@
 @php
     $accent      = setting('appearance.accent_color', '#3c8dbc');
     $accentDark  = setting('appearance.accent_color_dark', '#4aa3d4');
+    $accentText     = readableTextColor($accent);
+    $accentDarkText = readableTextColor($accentDark);
     $fontFamily  = setting('appearance.font_family', 'system');
     $radiusKey   = setting('appearance.border_radius', 'default');
 
@@ -44,6 +46,8 @@
     :root {
         --sg-accent: {{ $accent }};
         --sg-accent-dark: {{ $accentDark }};
+        --sg-accent-text: {{ $accentText }};
+        --sg-accent-dark-text: {{ $accentDarkText }};
         --sg-font: {{ $fontStack }};
         --sg-radius: {{ $radius }};
     }

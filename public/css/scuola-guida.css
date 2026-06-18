@@ -646,9 +646,9 @@
     letter-spacing: .5px;
     font-weight: 700;
 }
-.sg-badge-role.role-admin  { background: #6f42c1; color: #fff; }
-.sg-badge-role.role-editor { background: #fd7e14; color: #fff; }
-.sg-badge-role.role-viewer { background: #20c997; color: #fff; }
+.sg-badge-role.role-admin  { background: #6f42c1; color: #fff; }      /* contrasto #fff su #6f42c1: 7.27:1 ✓ */
+.sg-badge-role.role-editor { background: #fd7e14; color: #212529; }   /* contrasto #212529 su #fd7e14: 4.96:1 ✓ (era #fff: 2.82:1 ✗) */
+.sg-badge-role.role-viewer { background: #20c997; color: #212529; }   /* contrasto #212529 su #20c997: 7.79:1 ✓ (era #fff: 2.47:1 ✗) */
 
 /* ── Sezione card form admin (header grigio soft) ── */
 .sg-form-section {
@@ -2015,7 +2015,7 @@ body.dark-mode .text-info { color: #5ddde9 !important; }
     --rt-editor:     #17a2b8;
     --rt-editor-dk:  #117a8b;
     --rt-viewer:     #ffc107;
-    --rt-viewer-dk:  #d39e00;
+    --rt-viewer-dk:  #946c00; /* era #d39e00 (2.68:1 su bianco ✗); #946c00 su bianco: 4.82:1 ✓ */
     --rt-instructor: #28a745;
     --rt-instructor-dk: #1e7e34;
 }

@@ -108,8 +108,8 @@
                     {{ __('guest.nav_login') }}
                 </a>
                 @if(Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn btn-sm text-white"
-                       style="background-color:var(--sg-accent);">
+                    <a href="{{ route('register') }}" class="btn btn-sm"
+                       style="background-color:var(--sg-accent);color:var(--sg-accent-text);">
                         {{ __('guest.nav_register') }}
                     </a>
                 @endif

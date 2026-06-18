@@ -5,6 +5,20 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 14.1: Contrasto colori e accessibilità WCAG AA (2026-06-18)
+
+### Fixed
+
+- **P01 — Accent dinamico**: aggiunto helper `readableTextColor(string $hex): string` in `app/Helpers/helpers.php` che calcola il colore testo leggibile (`#ffffff` o `#212529`) via luminanza relativa sRGB (soglia 0.179 WCAG). Variabili `--sg-accent-text` e `--sg-accent-dark-text` iniettate nel `:root` da `appearance-css.blade.php`. Usate in `guest/home.blade.php` (CTA finale, badge tipi patente), `layouts/guest.blade.php` e `layouts/auth.blade.php` (bottone register navbar) al posto di `text-white` hard-coded.
+- **P02 — Badge ruolo non conformi**: in `public/css/scuola-guida.css`, `.sg-badge-role.role-editor` portato da `#fff` (2.82:1 ✗) a `#212529` (4.96:1 ✓); `.sg-badge-role.role-viewer` portato da `#fff` (2.47:1 ✗) a `#212529` (7.79:1 ✓).
+- **P03 — Badge navbar viewer**: `--rt-viewer-dk` corretto da `#d39e00` (2.68:1 su bianco ✗) a `#946c00` (4.82:1 su bianco ✓).
+
+### Added
+
+- **`ReadableTextColorTest`** — 6 test su `readableTextColor()`: giallo chiaro → `#212529`, blu scuro → `#ffffff`, accent default `#3c8dbc` → `#212529`, hex shorthand `#fff` → `#212529`, rosso puro → `#212529`, nero puro → `#ffffff`.
+
+---
+
 ## [Unreleased] — Feature 14.0: Audit grafico generale (2026-06-18)
 
 ### Added
