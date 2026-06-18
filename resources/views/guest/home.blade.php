@@ -7,7 +7,7 @@
      ============================================================ --}}
 @php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
 <section class="py-4 bg-body-secondary">
-    <div style="width:80%;margin:0 auto;">
+    <div class="container">
 
         {{-- Wrapper posizionato: carosello sfondo + contenuto sopra --}}
         <div class="position-relative overflow-hidden text-white"
@@ -52,32 +52,29 @@
 
                     {{-- Logo o icona --}}
                     @if(setting('school.logo_path'))
-                        <div style="background:rgba(0,0,0,0.45);border-radius:12px;padding:10px 18px;backdrop-filter:blur(2px);">
+                        <div class="sg-hero-overlay">
                             <img src="{{ Storage::url(setting('school.logo_path')) }}"
                                  alt="{{ setting('school.name', config('app.name')) }}"
                                  style="max-height:80px;width:auto;">
                         </div>
                     @else
-                        <div style="background:rgba(0,0,0,0.45);border-radius:50%;width:72px;height:72px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+                        <div class="sg-hero-overlay-circle">
                             <i class="fas fa-car fa-2x text-white opacity-75"></i>
                         </div>
                     @endif
 
                     {{-- Nome scuola --}}
-                    <h1 class="display-5 fw-bold mb-0 text-white px-4 py-2"
-                        style="background:rgba(0,0,0,0.45);border-radius:10px;backdrop-filter:blur(2px);">
+                    <h1 class="display-5 fw-bold mb-0 text-white px-4 py-2 sg-hero-overlay-text">
                         {{ setting('school.name', config('app.name')) }}
                     </h1>
 
                     {{-- Slogan --}}
-                    <p class="lead mb-0 text-white px-4 py-2"
-                       style="background:rgba(0,0,0,0.40);border-radius:10px;backdrop-filter:blur(2px);">
+                    <p class="lead mb-0 text-white px-4 py-2 sg-hero-overlay-soft">
                         {{ setting('school.tagline', __('guest.hero_tagline_default')) }}
                     </p>
 
                     {{-- Pulsantiera --}}
-                    <div class="d-flex flex-wrap justify-content-center gap-3 px-4 py-3"
-                         style="background:rgba(0,0,0,0.35);border-radius:10px;backdrop-filter:blur(2px);">
+                    <div class="d-flex flex-wrap justify-content-center gap-3 px-4 py-3 sg-hero-overlay-cta">
                         @if(Route::has('register'))
                             <a href="{{ route('register') }}"
                                class="btn btn-light btn-lg fw-semibold px-4">

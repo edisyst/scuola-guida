@@ -256,8 +256,7 @@
 
             if (q.image) {
                 $('#question-image').html(
-                    `<img src="${q.image}" class="img-fluid rounded shadow-sm"
-                          style="max-height:220px; cursor:pointer;">`
+                    `<img src="${q.image}" class="img-fluid rounded shadow-sm sg-question-img">`
                 );
             } else {
                 $('#question-image').html('');

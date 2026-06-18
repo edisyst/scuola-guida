@@ -2,58 +2,6 @@
 
 @section('css')
 @parent
-
-<style>
-    #sortable-questions li {
-        font-size: 13px;
-        padding: 10px 12px;
-        border: 1px solid var(--sg-border-light);
-        border-radius: var(--sg-radius-sm);
-        margin-bottom: 6px;
-        background: #fff;
-        transition: background .15s, box-shadow .15s;
-    }
-    #sortable-questions li:hover {
-        background: var(--sg-bg-soft);
-        box-shadow: var(--sg-shadow-card);
-    }
-    body.dark-mode #sortable-questions li {
-        background: #2d3436;
-        border-color: #495057;
-        color: #f8f9fa;
-    }
-    body.dark-mode #sortable-questions li:hover {
-        background: #3d4349;
-    }
-    .index-badge {
-        min-width: 28px;
-        text-align: center;
-        font-size: .7rem;
-        padding: 4px 8px;
-        background: var(--sg-gradient-dark) !important;
-        color: #fff;
-        border-radius: var(--sg-radius-pill);
-        font-weight: 700;
-    }
-    .quiz-q-progress {
-        height: 10px;
-        border-radius: 5px;
-        background: var(--sg-border);
-        overflow: hidden;
-    }
-    .quiz-q-progress .bar {
-        height: 100%;
-        border-radius: 5px;
-        transition: width .35s ease, background .15s;
-        background: var(--sg-gradient-success);
-    }
-    .quiz-q-progress .bar.warn   { background: linear-gradient(90deg, #ffc107, #fd7e14); }
-    .quiz-q-progress .bar.danger { background: linear-gradient(90deg, #dc3545, #e83e8c); }
-    .sg-sortable-scroll { max-height: 800px; overflow-y: auto; padding: 14px; }
-    .sg-q-text { font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #questions-table th:last-child,
-    #questions-table td:last-child { padding-right: 16px; }
-</style>
 @stop
 
 @section('content_header')@endsection

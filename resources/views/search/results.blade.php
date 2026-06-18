@@ -5,9 +5,6 @@
 
 @section('css')
 @parent
-<style>
-    .sg-status-dot-xs { font-size: .55rem; vertical-align: middle; margin-right: 8px; }
-</style>
 @stop
 
 @section('content')

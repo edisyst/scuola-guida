@@ -16,12 +16,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="{{ asset('css/scuola-guida.css') }}">
     @include('layouts.partials.appearance-css')
-    <style>
-        .navbar-brand img.school-logo {
-            max-height: 40px;
-            width: auto;
-        }
-    </style>
 
     {{-- DataTables i18n strings injected for current locale --}}
     @php

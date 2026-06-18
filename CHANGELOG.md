@@ -5,6 +5,25 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 14.3: CSS sparso e token centralizzati (2026-06-19)
+
+### Changed
+
+- **P11 — `[x-cloak]` centralizzato**: aggiunto `[x-cloak] { display: none !important; }` a `scuola-guida.css`; rimosso il blocco `<style>` inline da `study/play.blade.php` e `admin/categories/materials/partials/form.blade.php`.
+- **P12 — Logo navbar**: `.navbar-brand img.school-logo { max-height: 40px; width: auto; }` spostato in `scuola-guida.css`; rimosso `<style>` inline da `layouts/admin.blade.php`.
+- **P13 — Sortable e status dot**: stili `#sortable-questions`, `.index-badge`, `.quiz-q-progress`, `.sg-sortable-scroll`, `.sg-q-text` spostati in `scuola-guida.css` (dark-mode override già presenti); `.sg-status-dot-xs` spostato da `search/results.blade.php` a `scuola-guida.css`; rimossi i blocchi `<style>` dalle due view.
+- **P07 — Hero overlay**: creato `.sg-hero-overlay` e varianti (`.sg-hero-overlay-circle`, `.sg-hero-overlay-text`, `.sg-hero-overlay-soft`, `.sg-hero-overlay-cta`) in `scuola-guida.css`; rimossi i 5 `style="background:rgba..."` inline da `guest/home.blade.php`.
+- **P15 — Variabile altezza navbar**: aggiunto `--sg-navbar-height: 56px` al blocco `:root` e classe `.sg-auth-center` in `scuola-guida.css`; `style="min-height:calc(100vh - 56px - 80px);"` rimosso da `layouts/auth.blade.php` e sostituito con `.sg-auth-center`.
+- **P17 — Container hero non standard**: `style="width:80%;margin:0 auto;"` in `guest/home.blade.php` sostituito con `class="container"` Bootstrap standard.
+- **Immagini domanda**: `.sg-question-img { max-height: 220px; cursor: pointer; }` aggiunto a `scuola-guida.css`; `style="max-height:220px; cursor:pointer;"` rimosso dai template literal JS in `quiz/play.blade.php` e `simulator/play.blade.php`.
+- **P09 — `welcome.blade.php` orfana**: rimossa — la rotta `/` punta a `GuestController::index` → `guest/home.blade.php`; la view Laravel default non era raggiungibile.
+
+### Added
+
+- **`CssCentralizationTest`** — 13 test: homepage 200, assenza inline overhead, view toccate 200, CSS esistente con tutte le classi/variabili nuove, `welcome.blade.php` eliminata.
+
+---
+
 ## [Unreleased] — Feature 14.2: Uniformità struttura pagine admin (2026-06-19)
 
 ### Changed

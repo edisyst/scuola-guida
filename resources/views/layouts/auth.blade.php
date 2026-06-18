@@ -107,8 +107,7 @@
     </nav>
 
     {{-- Contenitore card centrata --}}
-    <div class="d-flex align-items-center justify-content-center py-5"
-         style="min-height:calc(100vh - 56px - 80px);">
+    <div class="sg-auth-center">
         <div class="sg-auth-card">
             <div class="sg-auth-brand">
                 @if(setting('school.logo_path'))
