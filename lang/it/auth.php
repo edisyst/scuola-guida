@@ -13,8 +13,12 @@ return [
     |
     */
 
-    'failed' => 'Queste credenziali non corrispondono ai nostri archivi.',
-    'password' => 'La password fornita non è corretta.',
-    'throttle' => 'Troppi tentativi di accesso. Riprova tra :seconds secondi.',
+    'failed'     => 'Queste credenziali non corrispondono ai nostri archivi.',
+    'password'   => 'La password fornita non è corretta.',
+    'throttle'   => 'Troppi tentativi di accesso. Riprova tra :seconds secondi.',
+
+    'theme_dark'  => 'Passa a tema scuro',
+    'theme_light' => 'Passa a tema chiaro',
+    'language'    => 'Cambia lingua',
 
 ];

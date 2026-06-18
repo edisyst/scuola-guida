@@ -5,6 +5,18 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 13.3: Pagine auth in linea con la homepage guest (2026-06-18)
+
+### Changed
+
+- **`layouts/auth.blade.php`** (componente `<x-guest-layout>`) — sostituisce il layout Breeze con sfondo a gradiente scuro con il medesimo layout visivo della homepage guest: sfondo `#f4f6f9`, navbar con logo `setting('school.logo_path')`, variabili CSS `--sg-accent`/`--sg-font`/`--sg-radius` via `layouts/partials/appearance-css`, footer con info di contatto dalla scuola, Bootstrap 5 CDN + Alpine.js CDN (identici a `layouts/guest.blade.php`). Nessuna modifica alle view auth né ai controller Breeze.
+
+### Added
+
+- **`AuthPagesLayoutTest`** — 11 test: rotte `/login`, `/register`, `/forgot-password` rispondono 200; presenza marker `guest-page` e `sg-auth-card` nelle pagine auth; logo configurato visibile; flusso login utente valido funzionante; autenticazione con password errata rigettata; utente autenticato rediretto da `/login`.
+
+---
+
 ## [Unreleased] — Docs: estrazione sezione Configurazione (2026-06-18)
 
 ### Added
