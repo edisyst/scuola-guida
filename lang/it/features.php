@@ -37,4 +37,7 @@ return [
     'hint_debug'       => 'Mai <code>true</code> in produzione. Modificabile solo da <code>.env</code> (chiave <code>APP_DEBUG</code>).',
     'hint_queue'       => 'Cambiare il backend code richiede riavvio dei worker. Chiave <code>.env</code>: <code>QUEUE_CONNECTION</code>.',
     'hint_session'     => 'Cambiare il driver sessioni disconnette gli utenti attivi. Chiave <code>.env</code>: <code>SESSION_DRIVER</code>.',
+    'hint_simulator_questions' => 'Numero domande per esame. Modificabile in <code>config/simulator.php</code>. Default: 30.',
+    'hint_simulator_time_limit' => 'Tempo limite in minuti per l\'esame. Modificabile in <code>config/simulator.php</code>. Default: 20.',
+    'hint_simulator_max_errors' => 'Errori massimi consentiti. Modificabile in <code>config/simulator.php</code>. Default: 3.',
 ];

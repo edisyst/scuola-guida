@@ -39,6 +39,18 @@ class FeatureToggleService
             'config'   => 'session.driver',
             'hint_key' => 'features.hint_session',
         ],
+        'SIMULATOR_QUESTIONS' => [
+            'config'   => 'simulator.questions',
+            'hint_key' => 'features.hint_simulator_questions',
+        ],
+        'SIMULATOR_TIME_LIMIT' => [
+            'config'   => 'simulator.time_limit',
+            'hint_key' => 'features.hint_simulator_time_limit',
+        ],
+        'SIMULATOR_MAX_ERRORS' => [
+            'config'   => 'simulator.max_errors',
+            'hint_key' => 'features.hint_simulator_max_errors',
+        ],
     ];
 
     public function isEnabled(string $feature): bool

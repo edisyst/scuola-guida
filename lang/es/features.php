@@ -37,4 +37,7 @@ return [
     'hint_debug'       => 'Nunca <code>true</code> en producción. Solo editable desde <code>.env</code> (clave <code>APP_DEBUG</code>).',
     'hint_queue'       => 'Cambiar el backend de colas requiere reiniciar los workers. Clave <code>.env</code>: <code>QUEUE_CONNECTION</code>.',
     'hint_session'     => 'Cambiar el driver de sesión desconecta a los usuarios activos. Clave <code>.env</code>: <code>SESSION_DRIVER</code>.',
+    'hint_simulator_questions' => 'Número de preguntas por examen. Editable en <code>config/simulator.php</code>. Predeterminado: 30.',
+    'hint_simulator_time_limit' => 'Límite de tiempo en minutos para el examen. Editable en <code>config/simulator.php</code>. Predeterminado: 20.',
+    'hint_simulator_max_errors' => 'Errores máximos permitidos. Editable en <code>config/simulator.php</code>. Predeterminado: 3.',
 ];
