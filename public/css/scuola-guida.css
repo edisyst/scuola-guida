@@ -37,6 +37,10 @@
     max-width: 1100px;
     margin: 0 auto;
 }
+.sg-wrapper-fluid {
+    max-width: none;
+    margin: 0;
+}
 .sg-wrapper-sm { max-width: 720px; margin: 0 auto; }
 
 /* ── Header con gradient scuro (come quiz/play) ──────────── */

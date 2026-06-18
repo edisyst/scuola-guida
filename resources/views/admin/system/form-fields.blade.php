@@ -5,7 +5,7 @@
 @section('content_header')@endsection
 
 @section('content')
-    <div class="sg-wrapper">
+    <div class="sg-wrapper-fluid">
 
         <div class="sg-header">
             <h1 class="sg-header-title">{{ __('forms.page_title') }}</h1>
