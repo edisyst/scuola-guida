@@ -37,6 +37,18 @@ class DatabaseSeeder extends Seeder
             AuditLogSeeder::class,
             // Feature 6.5 — Segnalazioni per metriche globali
             QuestionReportSeeder::class,
+            // Feature 6.6 — Assegnazione studenti all'istruttore
+            InstructorStudentSeeder::class,
+            // Feature 6.8 — Note istruttore per studente (dipende da InstructorStudentSeeder)
+            InstructorNoteSeeder::class,
+            // Feature 9.0 — Sessioni guida pratica (dipende da InstructorStudentSeeder + DrivingModuleSeeder)
+            DrivingSessionSeeder::class,
+            // Contenuti studio per categoria con tracking letture
+            StudyContentSeeder::class,
+            // Segnalibri domande per i viewer
+            BookmarkSeeder::class,
+            // Materiali (link/note) per categorie
+            CategoryMaterialSeeder::class,
         ]);
     }
 }
