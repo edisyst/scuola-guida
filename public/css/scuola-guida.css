@@ -2023,9 +2023,11 @@ body.dark-mode .text-info { color: #5ddde9 !important; }
 /* ── Mixin-like pattern: tutte le regole comuni ai ruoli
       vengono ripetute per ogni selettore corpo-ruolo. ──────── */
 
-/* Sidebar background: controlled by AdminLTE skin classes */
-/* Removed hardcoded role colors to allow dynamic appearance.sidebar_skin_* settings */
-/* from database via RoleTheme middleware (e.g. sidebar-dark-info, sidebar-light-success) */
+/* Sidebar background (aside + area brand) */
+body.role-admin      .main-sidebar { background-color: var(--rt-admin)      !important; }
+body.role-editor     .main-sidebar { background-color: var(--rt-editor)     !important; }
+body.role-viewer     .main-sidebar { background-color: var(--rt-viewer)     !important; }
+body.role-instructor .main-sidebar { background-color: var(--rt-instructor) !important; }
 
 /* Brand link (logo area in cima alla sidebar) */
 body.role-admin      .brand-link { background-color: var(--rt-admin-dk)      !important; border-bottom-color: rgba(0,0,0,.15) !important; }
