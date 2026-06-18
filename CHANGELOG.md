@@ -5,6 +5,20 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Docs: estrazione sezione Configurazione (2026-06-18)
+
+### Added
+
+- **`docs/11-configuration.md`** — nuova pagina con la documentazione completa di configurazione: variabili `.env`, file `config/` e pannelli di sistema (`/admin/system/settings`, `/admin/system/form-fields`, `/admin/system/features`, `/admin/system/health`, `/admin/commands`).
+- **Documentazione pannello `/admin/system/form-fields`** (Feature 13.0) — gruppo `system_settings` `forms` con chiavi `forms.registration_fields` e `forms.enrollment_fields`, struttura JSON dei campi e regole di validazione dinamiche.
+- **Documentazione pannello `/admin/system/features`** (Feature 13.2) — le 7 chiavi `features.*` con default e funzionalità controllata.
+
+### Changed
+
+- **`README.md`** — la sezione "Configurazione e personalizzazione" (~287 righe) è ora un riepilogo sintetico con rimando a `docs/11-configuration.md`; il README passa da ~532 a ~262 righe. Aggiornati indice Documentazione del README e mappa documentazione in `AGENTS.md`.
+
+---
+
 ## [Unreleased] — Feature 13.2: Feature toggle gestibili da back office (2026-06-18)
 
 ### Added

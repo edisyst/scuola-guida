@@ -62,6 +62,7 @@ la regola prevalente.
 | `docs/08-ui-patterns.md` | Design system `sg-*`, Blade, AdminLTE, i18n UI |
 | `docs/09-testing.md` | Mappa test, pattern Feature/Livewire, fake side effect |
 | `docs/10-backup-health.md` | Backup, health dashboard, scheduler produzione |
+| `docs/11-configuration.md` | Variabili `.env`, file `config/`, pannelli di sistema (settings, form-fields, features, health, commands) |
 
 ---
 
