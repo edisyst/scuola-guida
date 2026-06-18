@@ -5,7 +5,7 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     <div class="sg-header sg-flex-between">
         <h1 class="sg-header-title">Tipi di patente</h1>

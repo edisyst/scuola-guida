@@ -5,7 +5,7 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     {{-- Intestazione con titolo e bottone nuovo modulo --}}
     <div class="sg-header sg-flex-between mb-3">

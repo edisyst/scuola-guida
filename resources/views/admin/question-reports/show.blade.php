@@ -10,7 +10,7 @@
         : null;
 @endphp
 
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     <div class="sg-header sg-flex-between">
         <div>
