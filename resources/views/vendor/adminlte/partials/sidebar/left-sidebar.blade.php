@@ -1,17 +1,4 @@
-@php
-    $sidebarClasses = 'sidebar-dark-primary elevation-4';
-    if (auth()->check()) {
-        if (auth()->user()->isAdmin()) {
-            $sidebarClasses = 'sidebar-dark-primary elevation-4';
-        } elseif (auth()->user()->isEditor()) {
-            $sidebarClasses = 'sidebar-dark-danger elevation-4';
-        } elseif (auth()->user()->isViewer()) {
-            $sidebarClasses = 'sidebar-dark-warning elevation-4';
-        }
-    }
-@endphp
-
-<aside class="main-sidebar {{ $sidebarClasses }}">
+<aside class="main-sidebar {{ config('adminlte.classes_sidebar', 'sidebar-dark-primary elevation-4') }}">
 
     {{-- Sidebar brand logo --}}
     @if(config('adminlte.logo_img_xl'))
@@ -19,6 +6,13 @@
     @else
         @include('adminlte::partials.common.brand-logo-xs')
     @endif
+
+    {{-- Badge ruolo: pill con icona e label sotto il logo --}}
+    @auth
+    <div class="sg-sidebar-role-area">
+        @include('layouts.partials.role-badge')
+    </div>
+    @endauth
 
     {{-- Sidebar menu --}}
     <div class="sidebar">

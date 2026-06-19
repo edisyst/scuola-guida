@@ -32,4 +32,8 @@ return [
     'select'         => 'Seleziona',
     'saving'         => 'Salvataggio...',
     'all'            => 'Tutti',
+    'role_admin'      => 'Admin',
+    'role_editor'     => 'Editor',
+    'role_viewer'     => 'Studente',
+    'role_instructor' => 'Istruttore',
 ];

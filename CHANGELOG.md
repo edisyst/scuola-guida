@@ -5,6 +5,25 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 15.1: Redesign shell — sidebar, navbar, page-header (2026-06-19)
+
+### Changed
+
+- **Shell uniforme navy** — sidebar e navbar usano ora `--sg-shell-bg` (#1e2a38) per tutti i ruoli. Eliminata la "vernice piena" saturata che differenziava i ruoli (admin=rosso, editor=blu, viewer=giallo, instructor=verde) su entrambe le superfici.
+- **Identità di ruolo localizzata** — il colore di ruolo (`--sg-role-{ruolo}`) compare ora solo in: striscia verticale di 3 px sul bordo destro della sidebar; bordo sinistro della voce di menu attiva; badge pill con icona FontAwesome nell'header della sidebar e nella navbar, verificati WCAG AA.
+- **`RoleTheme` middleware** — semplificato: imposta `classes_sidebar = 'sidebar-dark-primary elevation-4'` e `classes_topnav = 'navbar-dark sg-navbar'` uniformi per tutti i ruoli; mantiene `classes_body = 'role-{ruolo}'` come unico selettore discriminatore per il CSS di accento.
+- **Partial centralizzato `layouts/partials/role-badge.blade.php`** — mappa ruolo → (icona FA, label i18n) in un punto unico; incluso nel sidebar override e in `admin.blade.php`. Icone: `fa-user-shield` (admin), `fa-user-pen` (editor), `fa-user-graduate` (viewer), `fa-chalkboard-user` (instructor).
+- **`left-sidebar.blade.php`** (override vendor) — rimossa la logica PHP per classe ruolo; usa `config('adminlte.classes_sidebar')` uniforme; aggiunge `.sg-sidebar-role-area` con il badge sotto il brand logo.
+- **Page-header compatto** — `.sg-header` ridisegnato: sfondo `--sg-surface-muted`, border-bottom `--sg-border`, padding ridotto (14px 24px); eliminato il gradiente navy. Titolo in `--sg-fs-2xl` semibold su `--sg-text`. Contrasto leggibile su sfondo chiaro.
+- **CSS `scuola-guida.css`** — blocco ROLE THEMING (13.1) sostituito con SHELL 15.1: regole `.sg-navbar`, `.sg-role-badge`, `.sg-sidebar-role-area`, hover/active nav, footer uniforme navy, page-header compatto.
+- **Chiavi i18n `common.role_*`** — aggiunte in `lang/{it,en,es}/common.php` per label badge ruolo.
+
+### Added
+
+- **`RedesignShellTest`** — 11 test: assenza classi saturate, presenza badge ruolo per ogni ruolo, classe `sg-navbar` uniforme, `role-{ruolo}` sul body, pagine principali 200 per tutti i ruoli.
+
+---
+
 ## [Unreleased] — Feature 15.0: Design system — fondamenta palette e tipografia (2026-06-19)
 
 ### Changed

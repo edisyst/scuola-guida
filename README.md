@@ -176,7 +176,7 @@ dall'interfaccia admin.
 
 - **Variabili `.env`** — identità app, sicurezza/2FA, cache, code, email, Twilio, VAPID, backup, storage, dati autoscuola
 - **File `config/`** — `simulator`, `mit_import`, `locales`, `badges`, `backup`
-- **`/admin/system/settings`** — dati autoscuola (nome, tagline, indirizzo, contatti, logo, carosello) persistiti su `system_settings`. I colori (palette, accent, skin sidebar) e il font sono costanti del design system (`public/css/scuola-guida.css`) e non sono più configurabili dall'admin da Feature 15.0.
+- **`/admin/system/settings`** — dati autoscuola (nome, tagline, indirizzo, contatti, logo, carosello) persistiti su `system_settings`. I colori (palette, accent) e il font sono costanti del design system (`public/css/scuola-guida.css`) e non sono configurabili dall'admin (da Feature 15.0). Sidebar e navbar usano uno shell navy uniforme per tutti i ruoli (Feature 15.1): il colore di ruolo compare come striscia laterale, voce attiva e badge pill.
 - **`/admin/system/form-fields`** — campi dei form di registrazione/iscrizione (abilita/disabilita, obbligatorio/opzionale)
 - **`/admin/system/features`** — feature toggle gestibili da back office
 - **`/admin/system/health`** — dashboard di monitoraggio in sola lettura
