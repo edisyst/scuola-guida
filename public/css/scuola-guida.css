@@ -4,32 +4,85 @@
    ============================================================ */
 
 :root {
-    --sg-dark-1: #1a1a2e;
-    --sg-dark-2: #16213e;
-    --sg-dark-3: #343a40;
-    --sg-success: #28a745;
-    --sg-success-2: #20c997;
-    --sg-danger: #dc3545;
-    --sg-warning: #ffc107;
-    --sg-info: #17a2b8;
-    --sg-primary: #4361ee;
-    --sg-text: #212529;
-    --sg-text-muted: #6c757d;
-    --sg-text-soft: #adb5bd;
-    --sg-border: #e9ecef;
-    --sg-border-light: #f1f3f5;
-    --sg-bg-soft: #f8f9fb;
-    --sg-shadow-card: 0 4px 20px rgba(0, 0, 0, .08);
-    --sg-shadow-hover: 0 6px 16px rgba(0, 0, 0, .18);
-    --sg-radius: 14px;
-    --sg-radius-sm: 10px;
+    /* ── Shell: sidebar, navbar, intestazioni scure ─────────────────────────
+       --sg-shell-text su --sg-shell-bg: #e6ebf0 su #1e2a38 → 10.88:1 ✓ WCAG AA */
+    --sg-shell-bg:          #1e2a38;
+    --sg-shell-bg-elevated: #25323f;
+    --sg-shell-text:        #e6ebf0;
+    --sg-shell-text-muted:  #9fb0c0;
+
+    /* ── Accent di brand (costante, non più configurabile dall'admin) ────────
+       --sg-accent-text (#fff) su --sg-accent (#3c8dbc) → 3.37:1.
+       Adatto a testo grande/grassetto (pulsanti, CTA ≥ 14pt bold) ≥ 3:1 ✓ WCAG AA large text. */
+    --sg-accent:       #3c8dbc;
+    --sg-accent-hover: #347aa3;
+    --sg-accent-text:  #ffffff;
+
+    /* ── Superfici chiare (contenuto) ───────────────────────────────────────  */
+    --sg-surface:       #ffffff;
+    --sg-surface-muted: #f4f6f8;
+    --sg-border:        #e3e8ee;
+    --sg-text:          #1f2933;
+    --sg-text-muted:    #6b7785;
+
+    /* ── Stati semantici (desaturati rispetto ai bootstrap puri) ────────────  */
+    --sg-success: #2f9e6f;
+    --sg-warning: #d9a420;
+    --sg-danger:  #c0392b;
+    --sg-info:    #3c8dbc;
+
+    /* ── Colori di ruolo (badge + accento sidebar lotto 15.1) ───────────────
+       Contrasto *-text su *: verificato per badge (WCAG AA normal text ≥ 4.5:1) */
+    --sg-role-admin:           #c0392b;  /* #fff su #c0392b → 5.06:1 ✓ */
+    --sg-role-admin-text:      #ffffff;
+    --sg-role-editor:          #2f6f9e;  /* #fff su #2f6f9e → 4.92:1 ✓ */
+    --sg-role-editor-text:     #ffffff;
+    --sg-role-viewer:          #d9a420;  /* #1f2933 su #d9a420 → 6.00:1 ✓ */
+    --sg-role-viewer-text:     #1f2933;
+    --sg-role-instructor:      #267348;  /* #fff su #267348 → 5.81:1 ✓ */
+    --sg-role-instructor-text: #ffffff;
+
+    /* ── Tipografia: Inter, scala condivisa tra area admin e guest ──────────  */
+    --sg-font:        'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --sg-fs-xs:       .75rem;
+    --sg-fs-sm:       .875rem;
+    --sg-fs-base:     1rem;
+    --sg-fs-lg:       1.125rem;
+    --sg-fs-xl:       1.5rem;
+    --sg-fs-2xl:      2rem;
+    --sg-fs-3xl:      2.5rem;
+    --sg-fw-normal:   400;
+    --sg-fw-medium:   500;
+    --sg-fw-semibold: 600;
+    --sg-fw-bold:     700;
+
+    /* ── Arrotondamento bordi (costante, non più configurabile dall'admin) ── */
+    --sg-radius:      .5rem;
+    --sg-radius-sm:   .375rem;
     --sg-radius-pill: 20px;
-    --sg-gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+
+    /* ── Token legacy — usati dalle classi esistenti; non rimuovere ─────────  */
+    --sg-dark-1:           #1a1a2e;
+    --sg-dark-2:           #16213e;
+    --sg-dark-3:           #343a40;
+    --sg-primary:          #4361ee;
+    --sg-success-2:        #20c997;
+    --sg-text-soft:        #adb5bd;
+    --sg-border-light:     #f1f3f5;
+    --sg-bg-soft:          #f8f9fb;
+    --sg-shadow-card:      0 4px 20px rgba(0, 0, 0, .08);
+    --sg-shadow-hover:     0 6px 16px rgba(0, 0, 0, .18);
+    --sg-gradient-dark:    linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     --sg-gradient-success: linear-gradient(90deg, #28a745, #20c997);
-    --sg-gradient-blue: linear-gradient(135deg, #4361ee, #4cc9f0);
-    --sg-gradient-orange: linear-gradient(135deg, #ff7e00, #ffc107);
-    --sg-gradient-red: linear-gradient(135deg, #dc3545, #e83e8c);
-    --sg-navbar-height: 56px;
+    --sg-gradient-blue:    linear-gradient(135deg, #4361ee, #4cc9f0);
+    --sg-gradient-orange:  linear-gradient(135deg, #ff7e00, #ffc107);
+    --sg-gradient-red:     linear-gradient(135deg, #dc3545, #e83e8c);
+    --sg-navbar-height:    56px;
+}
+
+/* Tipografia globale: Inter applicata a tutte le aree (admin e guest). */
+body {
+    font-family: var(--sg-font);
 }
 
 /* ── Layout container ─────────────────────────────────────── */

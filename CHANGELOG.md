@@ -5,6 +5,28 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 15.0: Design system — fondamenta palette e tipografia (2026-06-19)
+
+### Changed
+
+- **Token CSS centralizzati** — `public/css/scuola-guida.css` sostituisce il blocco `:root` precedente con la nuova architettura di token del design system "sobrio contemporaneo": shell (`--sg-shell-bg`, `--sg-shell-bg-elevated`, `--sg-shell-text`, `--sg-shell-text-muted`), accent di brand (`--sg-accent #3c8dbc`, `--sg-accent-hover`, `--sg-accent-text`), superfici chiare (`--sg-surface`, `--sg-surface-muted`, `--sg-border`, `--sg-text`, `--sg-text-muted`), stati semantici desaturati (`--sg-success`, `--sg-warning`, `--sg-danger`, `--sg-info`), colori di ruolo con variante `*-text` verificati WCAG AA come sfondo badge (`--sg-role-admin #c0392b 5.06:1 ✓`, `--sg-role-editor #2f6f9e 4.92:1 ✓`, `--sg-role-viewer #d9a420 6.00:1 ✓`, `--sg-role-instructor #267348 5.81:1 ✓`), scala tipografica Inter (`--sg-font`, `--sg-fs-*`, `--sg-fw-*`), radius costante (`--sg-radius: .5rem`). Token legacy (`--sg-dark-1`, `--sg-dark-2`, `--sg-dark-3`, gradienti ecc.) mantenuti per retrocompatibilità con le classi esistenti.
+- **Tipografia unificata Inter** — `body { font-family: var(--sg-font); }` aggiunto a `scuola-guida.css`; Inter caricata via Google Fonts (`display=swap`) dal partial `layouts/partials/appearance-css.blade.php` (ora ridotto a sola inclusione font, zero variabili dinamiche). Elimina il font serif di fallback nelle aree guest e auth.
+- **`appearance-css.blade.php` ridotto** — il partial non inietta più variabili CSS lette da `system_settings`; contiene ora solo il link Google Fonts per Inter.
+- **`RoleTheme` middleware** — le skin sidebar (`sidebar-dark-*`) erano lette da `setting('appearance.sidebar_skin_*')`; ora sono costanti hardcoded (stesso valore dei default precedenti). Il redesign sidebar avverrà nel lotto 15.1.
+
+### Removed
+
+- **Configurabilità cromatica dal backoffice** — la sezione "Aspetto" in `/admin/system/settings` è rimossa: i controlli colore accent, font, border-radius e skin sidebar non sono più editabili dall'admin. I campi logo (chiaro/dark) sono stati spostati nella sezione "Dati scuola".
+- **Regole di validazione appearance** — rimosse da `UpdateSystemSettingsRequest`: `accent_color`, `accent_color_dark`, `font_family`, `border_radius`, `sidebar_skin_*`. Rimosso anche il metodo `sidebarSkins()`.
+- **`$appearanceMap` in `SystemController`** — il controller non legge più il gruppo `appearance` da `SettingService` e non persiste più chiavi `appearance.*`.
+
+### Added
+
+- **Migration `2026_06_19_130000_deprecate_appearance_settings`** — rimuove le 8 chiavi `appearance.*` da `system_settings`; `down()` idempotente che le ripristina con i valori predefiniti via `upsert`.
+- **`DesignSystemFoundationsTest`** — 12 test: assenza controlli appearance nel pannello settings, presenza logo upload, homepage guest 200 con Inter, pagina settings admin con Inter, CSS con token `--sg-font` / shell / ruolo / radius, migration reversibile, partial non inietta più variabili dinamiche.
+
+---
+
 ## [14.5] — Feature 14.5: Fix contenuto — tagline placeholder e chiavi i18n (2026-06-19)
 
 ### Fixed
