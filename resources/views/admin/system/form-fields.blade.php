@@ -5,11 +5,11 @@
 @section('content_header')@endsection
 
 @section('content')
-    <div class="sg-wrapper-fluid">
+    <div class="sg-wrapper">
 
         <div class="sg-header">
             <h1 class="sg-header-title">{{ __('forms.page_title') }}</h1>
-            <p class="text-muted sg-mb-4">{{ __('forms.page_subtitle') }}</p>
+            <p class="sg-header-subtitle sg-mt-1">{{ __('forms.page_subtitle') }}</p>
         </div>
 
         <div class="sg-card">

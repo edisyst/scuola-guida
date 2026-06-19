@@ -9,6 +9,7 @@
 
     <div class="sg-header">
         <h1 class="sg-header-title"><i class="fas fa-history mr-2"></i>Dettaglio evento audit</h1>
+        <p class="sg-header-subtitle sg-mt-1">Dettaglio completo dell'evento registrato nel log di audit.</p>
     </div>
 
     <div class="mb-3">

@@ -5,13 +5,14 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     <div class="sg-header sg-flex-between mb-3">
         <div>
             <h1 class="sg-header-title">
                 <i class="fas fa-book mr-2"></i> {{ __('study_content.title_index') }}
             </h1>
+            <p class="sg-header-subtitle sg-mt-1">Gestisci i contenuti di studio disponibili per gli iscritti.</p>
         </div>
         <div>
             <a href="{{ route('study-contents.create') }}" class="sg-btn sg-btn-primary">

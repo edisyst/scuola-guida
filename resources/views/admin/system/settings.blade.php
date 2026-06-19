@@ -9,6 +9,7 @@
 
         <div class="sg-header">
             <h1 class="sg-header-title">{{ __('system.settings_title') }}</h1>
+            <p class="sg-header-subtitle sg-mt-1">Parametri generali dell'applicazione, logo e configurazione e-mail.</p>
         </div>
 
         <form action="{{ route('admin.system.settings.update') }}" method="POST" enctype="multipart/form-data">

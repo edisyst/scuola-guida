@@ -9,6 +9,7 @@
 
     <div class="sg-header">
         <h1 class="sg-header-title"><i class="fas fa-heartbeat mr-2"></i>{{ __('backup.title') }}</h1>
+        <p class="sg-header-subtitle sg-mt-1">Stato dei backup e delle operazioni pianificate del sistema.</p>
     </div>
 
     {{-- ── SMALL BOXES: metriche principali ─────────────────────────────── --}}

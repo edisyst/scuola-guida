@@ -9,6 +9,7 @@
 
     <div class="sg-header">
         <h1 class="sg-header-title"><i class="fas fa-history mr-2"></i>{{ __('audit.title') }}</h1>
+        <p class="sg-header-subtitle sg-mt-1">Traccia delle operazioni effettuate dagli utenti sulle entità del sistema.</p>
     </div>
 
     {{-- ── FILTRI ──────────────────────────────────────────────────────────── --}}

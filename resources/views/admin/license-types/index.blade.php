@@ -8,7 +8,10 @@
 <div class="sg-wrapper-fluid">
 
     <div class="sg-header sg-flex-between">
-        <h1 class="sg-header-title">Tipi di patente</h1>
+        <div>
+            <h1 class="sg-header-title">Tipi di patente</h1>
+            <p class="sg-header-subtitle sg-mt-1">Definisci le categorie di patente disponibili per le iscrizioni.</p>
+        </div>
         <div class="sg-header-actions">
             <a href="{{ route('admin.license-types.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Aggiungi tipo
