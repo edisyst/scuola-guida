@@ -5,6 +5,26 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 15.3: Redesign area guest — hero, feature card, auth (2026-06-19)
+
+### Changed
+
+- **Hero homepage** — eliminata la struttura "a scatole dentro scatole" (tre box semitrasparenti annidati: `sg-hero-overlay-text`, `sg-hero-overlay-soft`, `sg-hero-overlay-cta`). Nuova struttura: sezione `.sg-hero` con `.sg-hero-bg` (carosello assoluto), `.sg-hero-overlay` (gradiente unico per leggibilità WCAG AA), `.sg-hero-content` (titolo, tagline e bottoni direttamente sul bg, nessun box contenitore). `min-height: 58vh`, padding generoso, contenuto centrato.
+- **Bottoni hero** — classi dedicate `sg-btn-hero-primary` (accent, ombra tenue, hover con `translateY(-2px)`) e `sg-btn-hero-secondary` (outline bianco, backdrop-blur). Nessun inline style.
+- **Feature card** — sostituite card Bootstrap generiche con `.sg-feature-card` (surface, border token, radius, ombra tenue, hover `translateY(-4px)`). Icona in chip tondo a bassa opacità con varianti semantiche `sg-feature-icon--blue/red/green/teal`. Titolo `sg-feature-title` in `--sg-fs-lg` semibold, testo `sg-feature-text` in `--sg-fs-sm` muted.
+- **Badge tipi patente** — sostituito `badge` Bootstrap con `sg-badge-license`: pill accent tenuito, hover riempie con `--sg-accent`. Titolo sezione con `sg-section-heading` su scala tipografica Inter.
+- **Stat card homepage** — sostituita card Bootstrap inline con `sg-guest-stat-card` su token (`--sg-surface`, bordo-top accent, radius, ombra `--sg-shadow-sm`). Valore in `--sg-fs-2xl` bold, label in `--sg-fs-sm` muted.
+- **CTA finale** — sezione `.sg-cta-section` su `--sg-accent` con titolo `sg-cta-title`, sottotitolo `sg-cta-subtitle`, bottone `sg-btn-cta` bianco con ombra e hover. Rimosso inline `style="background:..."`.
+- **Auth card dark mode** — aggiunto override `[data-bs-theme='dark'] .sg-auth-card` (sfondo `--sg-shell-bg-elevated`, testo shell token) per il meccanismo Bootstrap/Alpine usato nell'area guest; il precedente `body.dark-mode .sg-auth-card` copriva solo l'area admin.
+- **`sg-auth-card`** — background aggiornato da `#fff` hardcoded a `var(--sg-surface)`; border-radius su token `calc(var(--sg-radius) * 2.25)`.
+- **`scuola-guida.css`** — aggiunto token `--sg-transition: all .2s ease;` in `:root`. Nuova sezione "GUEST REDESIGN 15.3": classi hero, feature card, badge patente, CTA, stat guest, dark mode via `[data-bs-theme='dark']` per tutta l'area guest. Classi legacy `sg-hero-overlay-*` sostituite da commento stub.
+
+### Added
+
+- **`RedesignGuestTest`** — 10 test: homepage 200, hero con `sg-hero`/`sg-hero-content`/`sg-hero-title`, assenza box annidati (`sg-hero-overlay-text/soft/cta`), feature card `sg-feature-card`, CTA `sg-cta-section`/`sg-btn-cta`, login 200 con `sg-auth-card`, register 200, flusso login valido, flusso login errato.
+
+---
+
 ## [Unreleased] — Feature 15.2: Redesign componenti area admin — card, stat box, badge (2026-06-19)
 
 ### Changed
