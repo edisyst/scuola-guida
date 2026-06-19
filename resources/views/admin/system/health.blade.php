@@ -8,7 +8,10 @@
     <div class="sg-wrapper">
 
         <div class="sg-header sg-flex-between">
-            <h1 class="sg-header-title">{{ __('system.service_health_title') }}</h1>
+            <div>
+                <h1 class="sg-header-title">{{ __('system.service_health_title') }}</h1>
+                <p class="sg-header-subtitle sg-mt-1">Stato dei servizi e delle dipendenze esterne dell'applicazione.</p>
+            </div>
             <div class="sg-header-actions">
                 <a href="{{ route('admin.system.health') }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-sync-alt mr-1"></i>{{ __('system.refresh') }}

@@ -1,13 +1,16 @@
-@extends('adminlte::page')
+@extends('layouts.admin')
 
 @section('title', __('backup.title'))
 
-@section('content_header')
-    <h1><i class="fas fa-heartbeat mr-2"></i>{{ __('backup.title') }}</h1>
-@endsection
+@section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
+
+    <div class="sg-header">
+        <h1 class="sg-header-title"><i class="fas fa-heartbeat mr-2"></i>{{ __('backup.title') }}</h1>
+        <p class="sg-header-subtitle sg-mt-1">Stato dei backup e delle operazioni pianificate del sistema.</p>
+    </div>
 
     {{-- ── SMALL BOXES: metriche principali ─────────────────────────────── --}}
     <div class="row">

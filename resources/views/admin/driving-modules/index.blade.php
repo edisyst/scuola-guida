@@ -5,7 +5,7 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     {{-- Intestazione con titolo e bottone nuovo modulo --}}
     <div class="sg-header sg-flex-between mb-3">
@@ -13,6 +13,7 @@
             <h1 class="sg-header-title">
                 <i class="fas fa-car mr-2"></i> {{ __('driving.title_modules') }}
             </h1>
+            <p class="sg-header-subtitle sg-mt-1">Organizza i moduli didattici per tipo di patente.</p>
         </div>
         <div>
             <a href="{{ route('admin.driving-modules.create', ['license_type_id' => $selectedLicenseTypeId]) }}"

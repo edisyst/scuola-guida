@@ -4,7 +4,7 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     <div class="sg-header sg-flex-between">
         <div>
@@ -70,9 +70,9 @@
                             </td>
                             <td>
                                 @if($u->activeLicenseType)
-                                    <span class="badge badge-secondary">{{ $u->activeLicenseType->code }}</span>
+                                    <span class="sg-badge">{{ $u->activeLicenseType->code }}</span>
                                 @else
-                                    <span class="text-muted">—</span>
+                                    <span class="sg-text-muted">—</span>
                                 @endif
                             </td>
                             <td>

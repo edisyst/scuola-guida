@@ -1,13 +1,16 @@
-@extends('adminlte::page')
+@extends('layouts.admin')
 
 @section('title', 'Dettaglio evento audit')
 
-@section('content_header')
-    <h1><i class="fas fa-history mr-2"></i>Dettaglio evento audit</h1>
-@endsection
+@section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
+
+    <div class="sg-header">
+        <h1 class="sg-header-title"><i class="fas fa-history mr-2"></i>Dettaglio evento audit</h1>
+        <p class="sg-header-subtitle sg-mt-1">Dettaglio completo dell'evento registrato nel log di audit.</p>
+    </div>
 
     <div class="mb-3">
         <a href="{{ url()->previous(route('admin.audit.index')) }}" class="btn btn-sm btn-secondary">

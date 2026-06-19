@@ -4,7 +4,7 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     {{-- Banner sola lettura --}}
     <div class="alert alert-info mb-3">

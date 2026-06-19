@@ -4,7 +4,7 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     {{-- Header --}}
     <div class="sg-header sg-flex-between">

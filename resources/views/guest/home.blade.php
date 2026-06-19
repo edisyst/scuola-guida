@@ -2,95 +2,76 @@
 
 @section('content')
 
-{{-- ============================================================
-     Sezione 1 — Hero con carosello come sfondo (80% larghezza)
-     ============================================================ --}}
 @php $carouselImages = json_decode(setting('school.carousel_images', '[]'), true) ?? []; @endphp
-<section class="py-4 bg-body-secondary">
-    <div class="container">
 
-        {{-- Wrapper posizionato: carosello sfondo + contenuto sopra --}}
-        <div class="position-relative overflow-hidden text-white"
-             style="min-height:40vh;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);">
+{{-- ============================================================
+     Sezione 1 — Hero arioso senza annidamento a box (15.3)
+     ============================================================ --}}
+<section class="sg-hero">
 
-            {{-- Sfondo: carosello o accent solid --}}
-            @if(count($carouselImages) > 0)
-                <div id="homepageCarousel"
-                     class="carousel slide carousel-fade position-absolute top-0 start-0 w-100 h-100"
-                     style="z-index:0;"
-                     data-bs-ride="carousel">
-                    <div class="carousel-inner h-100">
-                        @foreach($carouselImages as $i => $imgPath)
-                            <div class="carousel-item h-100 {{ $i === 0 ? 'active' : '' }}">
-                                <img src="{{ Storage::url($imgPath) }}"
-                                     class="d-block w-100 h-100"
-                                     style="object-fit:cover;"
-                                     alt="">
-                            </div>
-                        @endforeach
-                    </div>
-                    @if(count($carouselImages) > 1)
-                        <button class="carousel-control-prev" type="button"
-                                data-bs-target="#homepageCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button"
-                                data-bs-target="#homepageCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    @endif
-                </div>
-            @else
-                <div class="position-absolute top-0 start-0 w-100 h-100"
-                     style="background-color:var(--sg-accent);z-index:0;"></div>
-            @endif
-
-            {{-- Contenuto hero: sfondo semitrasparente su ogni singolo elemento --}}
-            <div class="position-relative d-flex align-items-center justify-content-center"
-                 style="min-height:40vh;z-index:2;">
-                <div class="text-center py-5 px-4 d-flex flex-column align-items-center gap-3">
-
-                    {{-- Logo o icona --}}
-                    @if(setting('school.logo_path'))
-                        <div class="sg-hero-overlay">
-                            <img src="{{ Storage::url(setting('school.logo_path')) }}"
-                                 alt="{{ setting('school.name', config('app.name')) }}"
-                                 style="max-height:80px;width:auto;">
+    {{-- Sfondo: carosello o accent solido via CSS --}}
+    <div class="sg-hero-bg">
+        @if(count($carouselImages) > 0)
+            <div id="homepageCarousel"
+                 class="carousel slide carousel-fade"
+                 data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @foreach($carouselImages as $i => $imgPath)
+                        <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+                            <img src="{{ Storage::url($imgPath) }}"
+                                 class="d-block w-100"
+                                 alt="">
                         </div>
-                    @else
-                        <div class="sg-hero-overlay-circle">
-                            <i class="fas fa-car fa-2x text-white opacity-75"></i>
-                        </div>
-                    @endif
-
-                    {{-- Nome scuola --}}
-                    <h1 class="display-5 fw-bold mb-0 text-white px-4 py-2 sg-hero-overlay-text">
-                        {{ setting('school.name', config('app.name')) }}
-                    </h1>
-
-                    {{-- Slogan --}}
-                    <p class="lead mb-0 text-white px-4 py-2 sg-hero-overlay-soft">
-                        {{ setting('school.tagline', __('guest.hero_tagline_default')) }}
-                    </p>
-
-                    {{-- Pulsantiera --}}
-                    <div class="d-flex flex-wrap justify-content-center gap-3 px-4 py-3 sg-hero-overlay-cta">
-                        @if(Route::has('register'))
-                            <a href="{{ route('register') }}"
-                               class="btn btn-light btn-lg fw-semibold px-4">
-                                <i class="fas fa-rocket me-2"></i>{{ __('guest.cta_start') }}
-                            </a>
-                        @endif
-                        <a href="{{ route('login') }}"
-                           class="btn btn-outline-light btn-lg px-4">
-                            {{ __('guest.cta_login') }}
-                        </a>
-                    </div>
-
+                    @endforeach
                 </div>
+                @if(count($carouselImages) > 1)
+                    <button class="carousel-control-prev" type="button"
+                            data-bs-target="#homepageCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button"
+                            data-bs-target="#homepageCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                @endif
             </div>
+        @endif
+    </div>
 
+    {{-- Overlay gradiente per leggibilità WCAG --}}
+    <div class="sg-hero-overlay" aria-hidden="true"></div>
+
+    {{-- Contenuto direttamente sul bg, nessun box contenitore annidato --}}
+    <div class="sg-hero-content">
+
+        {{-- Logo o icona discreta --}}
+        @if(setting('school.logo_path'))
+            <img src="{{ Storage::url(setting('school.logo_path')) }}"
+                 alt="{{ setting('school.name', config('app.name')) }}"
+                 class="sg-hero-logo">
+        @else
+            <span class="sg-hero-icon"><i class="fas fa-car"></i></span>
+        @endif
+
+        <h1 class="sg-hero-title">
+            {{ setting('school.name', config('app.name')) }}
+        </h1>
+
+        <p class="sg-hero-tagline">
+            {{ setting('school.tagline', __('guest.hero_tagline_default')) }}
+        </p>
+
+        <div class="sg-hero-actions">
+            @if(Route::has('register'))
+                <a href="{{ route('register') }}" class="sg-btn-hero-primary">
+                    <i class="fas fa-rocket me-2"></i>{{ __('guest.cta_start') }}
+                </a>
+            @endif
+            <a href="{{ route('login') }}" class="sg-btn-hero-secondary">
+                {{ __('guest.cta_login') }}
+            </a>
         </div>
+
     </div>
 </section>
 
@@ -98,42 +79,33 @@
      Sezione 2 — Statistiche (solo se almeno uno > 0)
      ============================================================ --}}
 @if($stats['quiz_count'] > 0 || $stats['question_count'] > 0 || $stats['license_types_count'] > 0)
-<section class="py-5 bg-body-secondary">
+<section class="py-5">
     <div class="container">
         <div class="row g-4 justify-content-center">
             @if($stats['quiz_count'] > 0)
             <div class="col-md-4">
-                <div class="card text-center h-100 border-0 shadow-sm"
-                     style="border-top:3px solid var(--sg-accent) !important;">
-                    <div class="card-body py-4">
-                        <i class="fas fa-book fa-2x mb-3 text-primary"></i>
-                        <div class="display-6 fw-bold">{{ number_format($stats['quiz_count']) }}</div>
-                        <div class="text-muted">{{ __('guest.stat_quiz') }}</div>
-                    </div>
+                <div class="sg-guest-stat-card text-center">
+                    <i class="fas fa-book fa-2x mb-3" style="color:var(--sg-accent);"></i>
+                    <div class="sg-guest-stat-value">{{ number_format($stats['quiz_count']) }}</div>
+                    <div class="sg-guest-stat-label">{{ __('guest.stat_quiz') }}</div>
                 </div>
             </div>
             @endif
             @if($stats['question_count'] > 0)
             <div class="col-md-4">
-                <div class="card text-center h-100 border-0 shadow-sm"
-                     style="border-top:3px solid var(--sg-accent) !important;">
-                    <div class="card-body py-4">
-                        <i class="fas fa-question-circle fa-2x mb-3 text-success"></i>
-                        <div class="display-6 fw-bold">{{ number_format($stats['question_count']) }}</div>
-                        <div class="text-muted">{{ __('guest.stat_questions') }}</div>
-                    </div>
+                <div class="sg-guest-stat-card text-center">
+                    <i class="fas fa-question-circle fa-2x mb-3" style="color:var(--sg-success);"></i>
+                    <div class="sg-guest-stat-value">{{ number_format($stats['question_count']) }}</div>
+                    <div class="sg-guest-stat-label">{{ __('guest.stat_questions') }}</div>
                 </div>
             </div>
             @endif
             @if($stats['license_types_count'] > 0)
             <div class="col-md-4">
-                <div class="card text-center h-100 border-0 shadow-sm"
-                     style="border-top:3px solid var(--sg-accent) !important;">
-                    <div class="card-body py-4">
-                        <i class="fas fa-id-card fa-2x mb-3 text-warning"></i>
-                        <div class="display-6 fw-bold">{{ $stats['license_types_count'] }}</div>
-                        <div class="text-muted">{{ __('guest.stat_license_types') }}</div>
-                    </div>
+                <div class="sg-guest-stat-card text-center">
+                    <i class="fas fa-id-card fa-2x mb-3" style="color:var(--sg-warning);"></i>
+                    <div class="sg-guest-stat-value">{{ $stats['license_types_count'] }}</div>
+                    <div class="sg-guest-stat-label">{{ __('guest.stat_license_types') }}</div>
                 </div>
             </div>
             @endif
@@ -145,46 +117,46 @@
 {{-- ============================================================
      Sezione 3 — Feature highlights
      ============================================================ --}}
-<section class="py-5 bg-body-tertiary">
+<section class="py-5 sg-features-section">
     <div class="container">
-        <h2 class="text-center mb-5">
+        <h2 class="text-center mb-5 sg-section-heading">
             {{ __('guest.features_title', ['name' => setting('school.name', config('app.name'))]) }}
         </h2>
         <div class="row g-4">
             <div class="col-sm-6 col-md-3">
-                <div class="card h-100 border-0 shadow-sm text-center">
-                    <div class="card-body py-4">
-                        <i class="fas fa-graduation-cap fa-2x text-primary mb-3"></i>
-                        <h5 class="card-title">{{ __('guest.feature_quiz_title') }}</h5>
-                        <p class="card-text small text-muted">{{ __('guest.feature_quiz_text') }}</p>
+                <div class="sg-feature-card">
+                    <div class="sg-feature-icon sg-feature-icon--blue">
+                        <i class="fas fa-graduation-cap"></i>
                     </div>
+                    <h3 class="sg-feature-title">{{ __('guest.feature_quiz_title') }}</h3>
+                    <p class="sg-feature-text">{{ __('guest.feature_quiz_text') }}</p>
                 </div>
             </div>
             <div class="col-sm-6 col-md-3">
-                <div class="card h-100 border-0 shadow-sm text-center">
-                    <div class="card-body py-4">
-                        <i class="fas fa-stopwatch fa-2x text-danger mb-3"></i>
-                        <h5 class="card-title">{{ __('guest.feature_simulator_title') }}</h5>
-                        <p class="card-text small text-muted">{{ __('guest.feature_simulator_text') }}</p>
+                <div class="sg-feature-card">
+                    <div class="sg-feature-icon sg-feature-icon--red">
+                        <i class="fas fa-stopwatch"></i>
                     </div>
+                    <h3 class="sg-feature-title">{{ __('guest.feature_simulator_title') }}</h3>
+                    <p class="sg-feature-text">{{ __('guest.feature_simulator_text') }}</p>
                 </div>
             </div>
             <div class="col-sm-6 col-md-3">
-                <div class="card h-100 border-0 shadow-sm text-center">
-                    <div class="card-body py-4">
-                        <i class="fas fa-car fa-2x text-success mb-3"></i>
-                        <h5 class="card-title">{{ __('guest.feature_driving_title') }}</h5>
-                        <p class="card-text small text-muted">{{ __('guest.feature_driving_text') }}</p>
+                <div class="sg-feature-card">
+                    <div class="sg-feature-icon sg-feature-icon--green">
+                        <i class="fas fa-car"></i>
                     </div>
+                    <h3 class="sg-feature-title">{{ __('guest.feature_driving_title') }}</h3>
+                    <p class="sg-feature-text">{{ __('guest.feature_driving_text') }}</p>
                 </div>
             </div>
             <div class="col-sm-6 col-md-3">
-                <div class="card h-100 border-0 shadow-sm text-center">
-                    <div class="card-body py-4">
-                        <i class="fas fa-chart-line fa-2x text-info mb-3"></i>
-                        <h5 class="card-title">{{ __('guest.feature_progress_title') }}</h5>
-                        <p class="card-text small text-muted">{{ __('guest.feature_progress_text') }}</p>
+                <div class="sg-feature-card">
+                    <div class="sg-feature-icon sg-feature-icon--teal">
+                        <i class="fas fa-chart-line"></i>
                     </div>
+                    <h3 class="sg-feature-title">{{ __('guest.feature_progress_title') }}</h3>
+                    <p class="sg-feature-text">{{ __('guest.feature_progress_text') }}</p>
                 </div>
             </div>
         </div>
@@ -195,12 +167,12 @@
      Sezione 4 — Tipi di patente (solo se > 1)
      ============================================================ --}}
 @if($licenseTypes->count() > 1)
-<section class="py-5 bg-body-secondary">
+<section class="py-5">
     <div class="container text-center">
-        <h2 class="mb-4">{{ __('guest.license_types_title') }}</h2>
+        <h2 class="sg-section-heading mb-4">{{ __('guest.license_types_title') }}</h2>
         <div>
             @foreach($licenseTypes as $type)
-                <span class="badge m-1 fs-6" style="background:var(--sg-accent);color:var(--sg-accent-text);">{{ $type->name }}</span>
+                <span class="sg-badge-license">{{ $type->name }}</span>
             @endforeach
         </div>
     </div>
@@ -210,13 +182,12 @@
 {{-- ============================================================
      Sezione 5 — CTA finale
      ============================================================ --}}
-<section class="py-5 text-center" style="background:var(--sg-accent);color:var(--sg-accent-text);">
+<section class="sg-cta-section">
     <div class="container">
-        <h2 class="mb-3">{{ __('guest.final_cta_title') }}</h2>
-        <p class="lead mb-4" style="opacity:.9;">{{ __('guest.final_cta_subtitle') }}</p>
+        <h2 class="sg-cta-title">{{ __('guest.final_cta_title') }}</h2>
+        <p class="sg-cta-subtitle">{{ __('guest.final_cta_subtitle') }}</p>
         @if(Route::has('register'))
-            <a href="{{ route('register') }}"
-               class="btn btn-light btn-lg fw-semibold px-5">
+            <a href="{{ route('register') }}" class="sg-btn-cta">
                 <i class="fas fa-user-plus me-2"></i>{{ __('guest.final_cta_button') }}
             </a>
         @endif

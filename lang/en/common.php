@@ -31,4 +31,9 @@ return [
     'total'          => 'Total',
     'select'         => 'Select',
     'saving'         => 'Saving...',
+    'all'            => 'All',
+    'role_admin'      => 'Admin',
+    'role_editor'     => 'Editor',
+    'role_viewer'     => 'Student',
+    'role_instructor' => 'Instructor',
 ];

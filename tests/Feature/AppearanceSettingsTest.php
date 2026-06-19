@@ -5,10 +5,17 @@ namespace Tests\Feature;
 use App\Http\Middleware\EnsureTwoFactorAuthenticated;
 use App\Models\SystemSetting;
 use App\Models\User;
+use Database\Seeders\SystemSettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
+/**
+ * Feature 15.0: la configurabilità appearance è stata rimossa.
+ * I colori e il font sono costanti del design system in scuola-guida.css.
+ * I test che validavano il salvataggio di accent/font/radius/skin sono stati
+ * rimossi; rimangono i test di autorizzazione e di assenza configurabilità.
+ */
 class AppearanceSettingsTest extends TestCase
 {
     use RefreshDatabase;
@@ -17,6 +24,7 @@ class AppearanceSettingsTest extends TestCase
     {
         parent::setUp();
         $this->withoutMiddleware(EnsureTwoFactorAuthenticated::class);
+        $this->seed(SystemSettingSeeder::class);
 
         // Bypass Redis cache so reads always hit the DB
         Redis::shouldReceive('get')->andReturn(null);
@@ -24,82 +32,44 @@ class AppearanceSettingsTest extends TestCase
         Redis::shouldReceive('del')->andReturn(1);
     }
 
-    private function seedAppearance(): void
+    public function test_submitting_appearance_fields_does_not_persist_them(): void
     {
-        $this->seed(\Database\Seeders\SystemSettingSeeder::class);
-        $this->artisan('migrate', [
-            '--path' => 'database/migrations/2026_06_18_000000_seed_appearance_settings.php',
-        ]);
-    }
-
-    public function test_admin_can_save_new_appearance_settings(): void
-    {
-        $this->seedAppearance();
         $admin = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($admin)
             ->post(route('admin.system.settings.update'), [
-                'accent_color'            => '#112233',
-                'accent_color_dark'       => '#445566',
-                'font_family'             => 'inter',
-                'border_radius'           => 'rounded',
-                'sidebar_skin_admin'      => 'sidebar-dark-indigo',
-                'sidebar_skin_editor'     => 'sidebar-dark-primary',
-                'sidebar_skin_viewer'     => 'sidebar-light-info',
-                'sidebar_skin_instructor' => 'sidebar-dark-success',
+                'accent_color'       => '#112233',
+                'font_family'        => 'inter',
+                'border_radius'      => 'rounded',
+                'sidebar_skin_admin' => 'sidebar-dark-indigo',
             ])
             ->assertRedirect(route('admin.system.settings'));
 
-        $this->assertSame('#445566', SystemSetting::where('key', 'appearance.accent_color_dark')->value('value'));
-        $this->assertSame('inter', SystemSetting::where('key', 'appearance.font_family')->value('value'));
-        $this->assertSame('rounded', SystemSetting::where('key', 'appearance.border_radius')->value('value'));
-        $this->assertSame('sidebar-dark-indigo', SystemSetting::where('key', 'appearance.sidebar_skin_admin')->value('value'));
+        // I valori appearance.* non devono essere stati modificati dal form
+        $this->assertNotSame('#112233', SystemSetting::where('key', 'appearance.accent_color')->value('value'));
+        $this->assertNotSame('inter', SystemSetting::where('key', 'appearance.font_family')->value('value'));
+        $this->assertNotSame('rounded', SystemSetting::where('key', 'appearance.border_radius')->value('value'));
+        $this->assertNotSame('sidebar-dark-indigo', SystemSetting::where('key', 'appearance.sidebar_skin_admin')->value('value'));
     }
 
-    public function test_invalid_font_family_is_rejected(): void
+    public function test_accent_color_is_now_a_css_constant_not_dynamic(): void
     {
-        $this->seedAppearance();
         $admin = User::factory()->create(['role' => 'admin']);
 
-        $this->actingAs($admin)
-            ->post(route('admin.system.settings.update'), ['font_family' => 'comic-sans'])
-            ->assertSessionHasErrors('font_family');
-    }
-
-    public function test_accent_color_is_rendered_as_css_variable(): void
-    {
-        $this->seedAppearance();
-        $admin = User::factory()->create(['role' => 'admin']);
-
-        $this->actingAs($admin)
-            ->post(route('admin.system.settings.update'), ['accent_color' => '#abcdef']);
-
-        $this->actingAs($admin)
+        $response = $this->actingAs($admin)
             ->get(route('admin.system.settings'))
-            ->assertOk()
-            ->assertSee('--sg-accent: #abcdef', false);
+            ->assertOk();
+
+        // --sg-accent non deve essere iniettato dinamicamente nella risposta HTTP
+        $response->assertDontSee('--sg-accent: #', false);
     }
 
-    public function test_sidebar_skin_reflects_configured_value(): void
-    {
-        $this->seedAppearance();
-        $admin = User::factory()->create(['role' => 'admin']);
-
-        $this->actingAs($admin)
-            ->post(route('admin.system.settings.update'), ['sidebar_skin_admin' => 'sidebar-dark-indigo']);
-
-        $this->actingAs($admin)
-            ->get(route('admin.system.settings'))
-            ->assertOk()
-            ->assertSee('sidebar-dark-indigo', false);
-    }
-
-    public function test_non_admin_cannot_update_appearance(): void
+    public function test_non_admin_cannot_update_settings(): void
     {
         $editor = User::factory()->create(['role' => 'editor']);
 
         $this->actingAs($editor)
-            ->post(route('admin.system.settings.update'), ['accent_color' => '#000000'])
+            ->post(route('admin.system.settings.update'), ['school_name' => 'Hack'])
             ->assertForbidden();
     }
 }

@@ -1,13 +1,16 @@
-@extends('adminlte::page')
+@extends('layouts.admin')
 
 @section('title', __('audit.title'))
 
-@section('content_header')
-    <h1><i class="fas fa-history mr-2"></i>{{ __('audit.title') }}</h1>
-@endsection
+@section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
+
+    <div class="sg-header">
+        <h1 class="sg-header-title"><i class="fas fa-history mr-2"></i>{{ __('audit.title') }}</h1>
+        <p class="sg-header-subtitle sg-mt-1">Traccia delle operazioni effettuate dagli utenti sulle entità del sistema.</p>
+    </div>
 
     {{-- ── FILTRI ──────────────────────────────────────────────────────────── --}}
     <div class="card card-default collapsed-card">

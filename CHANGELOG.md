@@ -5,6 +5,74 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [15.3] — Design system "sobrio contemporaneo" — palette, shell, componenti, guest (2026-06-20)
+
+Lotto di quattro feature (15.0 → 15.3) che porta l'intero sistema visivo a un design
+system coerente basato su token CSS, tipografia Inter e look "sobrio contemporaneo".
+
+### Changed
+
+#### 15.0 — Fondamenta palette e tipografia
+- **Token CSS centralizzati** — `public/css/scuola-guida.css` sostituisce il blocco `:root` precedente con la nuova architettura di token: shell (`--sg-shell-bg`, `--sg-shell-bg-elevated`, `--sg-shell-text`, `--sg-shell-text-muted`), accent (`--sg-accent #3c8dbc`, `--sg-accent-hover`, `--sg-accent-text`), superfici (`--sg-surface`, `--sg-surface-muted`, `--sg-border`, `--sg-text`, `--sg-text-muted`), stati semantici desaturati (`--sg-success/warning/danger/info`), colori di ruolo WCAG AA (`--sg-role-admin #c0392b 5.06:1 ✓`, `--sg-role-editor #2f6f9e 4.92:1 ✓`, `--sg-role-viewer #d9a420 6.00:1 ✓`, `--sg-role-instructor #267348 5.81:1 ✓`), scala tipografica Inter (`--sg-font`, `--sg-fs-*`, `--sg-fw-*`), radius costante (`--sg-radius: .5rem`). Token legacy mantenuti per retrocompatibilità.
+- **Tipografia unificata Inter** — `body { font-family: var(--sg-font); }` applicato globalmente; Inter caricata via Google Fonts in `appearance-css.blade.php` (ridotto a solo link font, zero variabili dinamiche). Elimina il font serif di fallback nelle aree guest e auth.
+- **`RoleTheme` middleware** — skin sidebar ora costanti hardcoded (rimossa lettura da `setting('appearance.sidebar_skin_*')`).
+
+#### 15.1 — Shell — sidebar, navbar, page-header
+- **Shell uniforme navy** — sidebar e navbar usano `--sg-shell-bg` (#1e2a38) per tutti i ruoli. Eliminata la "vernice piena" saturata per ruolo su entrambe le superfici.
+- **Identità di ruolo localizzata** — `--sg-role-{ruolo}` compare solo in: striscia 3 px bordo destro sidebar, bordo sinistro voce attiva, badge pill navbar verificati WCAG AA.
+- **Partial `layouts/partials/role-badge.blade.php`** — mappa ruolo → (icona FA, label i18n) in un punto unico. Icone: `fa-user-shield` (admin), `fa-user-pen` (editor), `fa-user-graduate` (viewer), `fa-chalkboard-user` (instructor).
+- **Page-header compatto** — `.sg-header`: sfondo `--sg-surface-muted`, border-bottom `--sg-border`, padding 14px 24px; eliminato il gradiente navy. Titolo `--sg-fs-2xl` semibold su `--sg-text`.
+- **Chiavi i18n `common.role_*`** — aggiunte in `lang/{it,en,es}/common.php`.
+
+#### 15.2 — Componenti area admin — card, stat box, badge
+- **Stat icon chip tenuito** — `.sg-stat-icon` usa chip tondo a bassa opacità (≈12%) invece del blocco gradiente saturo. Classi semantiche `sg-stat-icon--accent/success/warning/danger/muted`; `grad-*` ridefinite a tint per retrocompatibilità.
+- **Box KPI segnalazioni** — `admin/question-reports/index` usa `.sg-status-box` (surface, bordo sinistro semantico, numero `--sg-fs-3xl`, label muted) al posto di `small-box bg-*` AdminLTE.
+- **Badge di stato unificati** — `.sg-badge--pending/accepted/rejected/draft/published/confirmed` (sfondo tenuito, testo WCAG AA ≥ 4.5:1). View `question-reports` e `quizzes/users/index` aggiornate.
+- **Righe tabella segnalazioni** — rimossa `table-warning` saturata; stato leggibile dal solo badge in colonna.
+- **`question-reports/show`** — card Bootstrap convertite a `.sg-card/sg-card-header/sg-card-body/sg-card-footer`.
+
+#### 15.3 — Area guest — hero, feature card, auth
+- **Hero homepage** — eliminata struttura "a scatole dentro scatole" (tre box semitrasparenti: `sg-hero-overlay-text/soft/cta`). Nuova struttura: `.sg-hero` con `.sg-hero-bg` (carosello assoluto), `.sg-hero-overlay` (gradiente unico WCAG AA), `.sg-hero-content` (titolo, tagline, bottoni direttamente sul bg). `min-height: 58vh`, contenuto centrato.
+- **Bottoni hero** — `sg-btn-hero-primary` (accent, ombra, hover `translateY(-2px)`) e `sg-btn-hero-secondary` (outline bianco, backdrop-blur). Nessun inline style.
+- **Feature card** — `.sg-feature-card` (surface, border token, radius, hover `translateY(-4px)`). Icona chip tondo `sg-feature-icon--blue/red/green/teal`. Titolo `--sg-fs-lg` semibold, testo `--sg-fs-sm` muted.
+- **Badge tipi patente** — `sg-badge-license`: pill accent tenuito, hover riempie con `--sg-accent`.
+- **Stat card guest** — `sg-guest-stat-card` su token (surface, bordo-top accent, radius, ombra `--sg-shadow-sm`).
+- **CTA finale** — `.sg-cta-section` + `.sg-btn-cta`; rimosso inline `style="background:..."`.
+- **Auth card** — `sg-auth-card` background da `#fff` a `var(--sg-surface)`, radius su token. Dark mode corretta via `[data-bs-theme='dark']` (Alpine/Bootstrap guest); il precedente `body.dark-mode` copriva solo l'area admin.
+- **`scuola-guida.css`** — token `--sg-transition: all .2s ease;` in `:root`. Sezione "GUEST REDESIGN 15.3" con tutte le classi guest + dark mode via `[data-bs-theme='dark']`.
+
+### Removed
+
+- **Configurabilità cromatica dal backoffice** (15.0) — sezione "Aspetto" in `/admin/system/settings` rimossa: accent color, font, border-radius, skin sidebar non più editabili dall'admin. Logo spostato nella sezione "Dati scuola".
+- **Regole di validazione appearance** (15.0) — rimosse da `UpdateSystemSettingsRequest`; rimosso `sidebarSkins()` e `$appearanceMap` da `SystemController`.
+
+### Added
+
+- **Migration `2026_06_19_130000_deprecate_appearance_settings`** (15.0) — rimuove le 8 chiavi `appearance.*` da `system_settings`; `down()` reversibile.
+- **`DesignSystemFoundationsTest`** (15.0) — 12 test: assenza controlli appearance, token CSS, Inter, migration reversibile.
+- **`RedesignShellTest`** (15.1) — 11 test: shell navy uniforme, badge ruolo, classe `sg-navbar`, `role-{ruolo}` sul body.
+- **`RedesignComponentsTest`** (15.2) — 6 test: stat icon senza `grad-*`, `sg-status-box`, `sg-badge--pending`, assenza `table-warning`.
+- **`RedesignGuestTest`** (15.3) — 11 test: homepage 200, struttura `sg-hero`, assenza box annidati, feature card, CTA, login/register 200, flusso login.
+
+---
+
+## [14.5] — Feature 14.5: Fix contenuto — tagline placeholder e chiavi i18n (2026-06-19)
+
+### Fixed
+
+- **Tagline placeholder inglese**: il seeder di `system_settings` aveva `school.tagline` già vuoto; aggiunta migration idempotente `2026_06_19_000000_fix_school_tagline_placeholder` che azzera il valore se contiene il testo placeholder inglese (`Edoardo is building ScuolaGUIDA…`) eventualmente persistito in DB.
+- **Chiavi i18n scoperte** — aggiunte in `lang/{it,en,es}/editor.php`:
+  - `reports_col_type` (IT: "Tipo", EN: "Type", ES: "Tipo")
+  - `reports_col_reporter` (IT: "Segnalante", EN: "Reporter", ES: "Informante")
+  - `reports_col_date` (IT: "Data", EN: "Date", ES: "Fecha")
+- **`common.all` mancante** — aggiunto in `lang/{it,en,es}/common.php` (IT: "Tutti", EN: "All", ES: "Todos"); risolveva la chiave grezza nel dropdown "Tipo di patente" in Gestione Utenti.
+
+### Added
+
+- **`I18nContentFixTest`** — 5 test: le tre chiavi `editor.reports_col_*` risolvono in locale `it`; `common.all` ritorna "Tutti"; homepage guest non contiene il placeholder inglese.
+
+---
+
 ## [14.3] — Feature 14.3: CSS sparso e token centralizzati (2026-06-19)
 
 ### Changed

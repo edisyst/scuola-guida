@@ -4,32 +4,89 @@
    ============================================================ */
 
 :root {
-    --sg-dark-1: #1a1a2e;
-    --sg-dark-2: #16213e;
-    --sg-dark-3: #343a40;
-    --sg-success: #28a745;
-    --sg-success-2: #20c997;
-    --sg-danger: #dc3545;
-    --sg-warning: #ffc107;
-    --sg-info: #17a2b8;
-    --sg-primary: #4361ee;
-    --sg-text: #212529;
-    --sg-text-muted: #6c757d;
-    --sg-text-soft: #adb5bd;
-    --sg-border: #e9ecef;
-    --sg-border-light: #f1f3f5;
-    --sg-bg-soft: #f8f9fb;
-    --sg-shadow-card: 0 4px 20px rgba(0, 0, 0, .08);
-    --sg-shadow-hover: 0 6px 16px rgba(0, 0, 0, .18);
-    --sg-radius: 14px;
-    --sg-radius-sm: 10px;
+    /* ── Shell: sidebar, navbar, intestazioni scure ─────────────────────────
+       --sg-shell-text su --sg-shell-bg: #e6ebf0 su #1e2a38 → 10.88:1 ✓ WCAG AA */
+    --sg-shell-bg:          #1e2a38;
+    --sg-shadow-sm:         0 1px 4px rgba(0, 0, 0, .06);
+    --sg-shell-bg-elevated: #25323f;
+    --sg-shell-text:        #e6ebf0;
+    --sg-shell-text-muted:  #9fb0c0;
+
+    /* ── Accent di brand (costante, non più configurabile dall'admin) ────────
+       --sg-accent-text (#fff) su --sg-accent (#3c8dbc) → 3.37:1.
+       Adatto a testo grande/grassetto (pulsanti, CTA ≥ 14pt bold) ≥ 3:1 ✓ WCAG AA large text. */
+    --sg-accent:       #3c8dbc;
+    --sg-accent-hover: #347aa3;
+    --sg-accent-text:  #ffffff;
+
+    /* ── Superfici chiare (contenuto) ───────────────────────────────────────  */
+    --sg-surface:       #ffffff;
+    --sg-surface-muted: #f4f6f8;
+    --sg-border:        #e3e8ee;
+    --sg-text:          #1f2933;
+    --sg-text-muted:    #6b7785;
+
+    /* ── Stati semantici (desaturati rispetto ai bootstrap puri) ────────────  */
+    --sg-success: #2f9e6f;
+    --sg-warning: #d9a420;
+    --sg-danger:  #c0392b;
+    --sg-info:    #3c8dbc;
+
+    /* ── Colori di ruolo (badge + accento sidebar lotto 15.1) ───────────────
+       Contrasto *-text su *: verificato per badge (WCAG AA normal text ≥ 4.5:1) */
+    --sg-role-admin:           #c0392b;  /* #fff su #c0392b → 5.06:1 ✓ */
+    --sg-role-admin-text:      #ffffff;
+    --sg-role-editor:          #2f6f9e;  /* #fff su #2f6f9e → 4.92:1 ✓ */
+    --sg-role-editor-text:     #ffffff;
+    --sg-role-viewer:          #d9a420;  /* #1f2933 su #d9a420 → 6.00:1 ✓ */
+    --sg-role-viewer-text:     #1f2933;
+    --sg-role-instructor:      #267348;  /* #fff su #267348 → 5.81:1 ✓ */
+    --sg-role-instructor-text: #ffffff;
+
+    /* ── Tipografia: Inter, scala condivisa tra area admin e guest ──────────  */
+    --sg-font:        'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --sg-fs-xs:       .75rem;
+    --sg-fs-sm:       .875rem;
+    --sg-fs-base:     1rem;
+    --sg-fs-lg:       1.125rem;
+    --sg-fs-xl:       1.5rem;
+    --sg-fs-2xl:      2rem;
+    --sg-fs-3xl:      2.5rem;
+    --sg-fw-normal:   400;
+    --sg-fw-medium:   500;
+    --sg-fw-semibold: 600;
+    --sg-fw-bold:     700;
+
+    /* ── Arrotondamento bordi (costante, non più configurabile dall'admin) ── */
+    --sg-radius:      .5rem;
+    --sg-radius-sm:   .375rem;
     --sg-radius-pill: 20px;
-    --sg-gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+
+    /* ── Transizione micro-interazioni ──────────────────────────────────────  */
+    --sg-transition: all .2s ease;
+
+    /* ── Token legacy — usati dalle classi esistenti; non rimuovere ─────────  */
+    --sg-dark-1:           #1a1a2e;
+    --sg-dark-2:           #16213e;
+    --sg-dark-3:           #343a40;
+    --sg-primary:          #4361ee;
+    --sg-success-2:        #20c997;
+    --sg-text-soft:        #adb5bd;
+    --sg-border-light:     #f1f3f5;
+    --sg-bg-soft:          #f8f9fb;
+    --sg-shadow-card:      0 4px 20px rgba(0, 0, 0, .08);
+    --sg-shadow-hover:     0 6px 16px rgba(0, 0, 0, .18);
+    --sg-gradient-dark:    linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     --sg-gradient-success: linear-gradient(90deg, #28a745, #20c997);
-    --sg-gradient-blue: linear-gradient(135deg, #4361ee, #4cc9f0);
-    --sg-gradient-orange: linear-gradient(135deg, #ff7e00, #ffc107);
-    --sg-gradient-red: linear-gradient(135deg, #dc3545, #e83e8c);
-    --sg-navbar-height: 56px;
+    --sg-gradient-blue:    linear-gradient(135deg, #4361ee, #4cc9f0);
+    --sg-gradient-orange:  linear-gradient(135deg, #ff7e00, #ffc107);
+    --sg-gradient-red:     linear-gradient(135deg, #dc3545, #e83e8c);
+    --sg-navbar-height:    56px;
+}
+
+/* Tipografia globale: Inter applicata a tutte le aree (admin e guest). */
+body {
+    font-family: var(--sg-font);
 }
 
 /* ── Layout container ─────────────────────────────────────── */
@@ -37,29 +94,34 @@
     max-width: 1100px;
     margin: 0 auto;
 }
+.sg-wrapper-fluid {
+    max-width: none;
+    margin: 0;
+}
 .sg-wrapper-sm { max-width: 720px; margin: 0 auto; }
 
-/* ── Header con gradient scuro (come quiz/play) ──────────── */
+/* ── Page header compatto (15.1) ─────────────────────────── */
 .sg-header {
-    background: var(--sg-gradient-dark);
-    border-radius: 12px;
-    padding: 22px 26px;
-    margin-bottom: 22px;
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(26, 26, 46, .15);
+    background: var(--sg-surface-muted);
+    border-radius: var(--sg-radius) var(--sg-radius) 0 0;
+    padding: 14px 24px 16px;
+    margin-bottom: 0;
+    color: var(--sg-text);
+    box-shadow: none;
+    border-bottom: 2px solid var(--sg-border);
 }
-.sg-header.compact { padding: 16px 22px; }
+.sg-header.compact { padding: 10px 20px 12px; }
 .sg-header-title {
-    font-size: 1.35rem;
-    font-weight: 700;
-    letter-spacing: .3px;
+    font-size: var(--sg-fs-2xl);
+    font-weight: var(--sg-fw-semibold);
+    letter-spacing: -.2px;
     margin: 0;
-    color: #fff;
+    color: var(--sg-text);
 }
 .sg-header-subtitle,
 .sg-header .sg-subtle {
-    font-size: .8rem;
-    color: rgba(255, 255, 255, .65);
+    font-size: var(--sg-fs-sm);
+    color: var(--sg-text-muted);
     margin-bottom: 4px;
     letter-spacing: .2px;
 }
@@ -921,9 +983,9 @@
     position: relative;
     width: 100%;
     max-width: 460px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+    background: var(--sg-surface);
+    border-radius: calc(var(--sg-radius) * 2.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
     padding: 38px 36px;
     z-index: 1;
 }
@@ -2028,38 +2090,8 @@ body.dark-mode .text-info { color: #5ddde9 !important; }
 /* ── Status dot ricerca (search/results) ── */
 .sg-status-dot-xs { font-size: .55rem; vertical-align: middle; margin-right: 8px; }
 
-/* ── Overlay semitrasparente hero homepage (guest/home) ── */
-.sg-hero-overlay {
-    background: rgba(0, 0, 0, 0.45);
-    border-radius: 12px;
-    padding: 10px 18px;
-    backdrop-filter: blur(2px);
-}
-.sg-hero-overlay-circle {
-    background: rgba(0, 0, 0, 0.45);
-    border-radius: 50%;
-    width: 72px;
-    height: 72px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(2px);
-}
-.sg-hero-overlay-text {
-    background: rgba(0, 0, 0, 0.45);
-    border-radius: 10px;
-    backdrop-filter: blur(2px);
-}
-.sg-hero-overlay-soft {
-    background: rgba(0, 0, 0, 0.40);
-    border-radius: 10px;
-    backdrop-filter: blur(2px);
-}
-.sg-hero-overlay-cta {
-    background: rgba(0, 0, 0, 0.35);
-    border-radius: 10px;
-    backdrop-filter: blur(2px);
-}
+/* ── Classi hero legacy (rimosse in 15.3, tenute per eventuali dipendenze esterne) ── */
+/* sg-hero-overlay-* sostituite da .sg-hero / .sg-hero-overlay in 15.3 */
 
 /* ── Sortable lista domande quiz (admin/quizzes/questions) ── */
 #sortable-questions li {
@@ -2105,196 +2137,597 @@ body.dark-mode .text-info { color: #5ddde9 !important; }
 #questions-table td:last-child { padding-right: 16px; }
 
 /* ============================================================
-   ROLE THEMING — sidebar / topnav / footer per ruolo
+   SHELL 15.1 — sidebar e navbar uniformi, accento di ruolo localizzato.
    Il middleware RoleTheme aggiunge al <body> la classe
    role-admin | role-editor | role-viewer | role-instructor.
-   Tutte le regole qui sotto usano quella classe come selector
-   radice per non inquinare il resto del CSS.
+   Il colore di ruolo non vernicia più le superfici: compare solo
+   come striscia laterale, bordo voce attiva e badge pill.
    ============================================================ */
 
-/* ── Variabili colore per ruolo ───────────────────────────── */
-:root {
-    --rt-admin:      #dc3545;
-    --rt-admin-dk:   #b02a37;
-    --rt-editor:     #17a2b8;
-    --rt-editor-dk:  #117a8b;
-    --rt-viewer:     #ffc107;
-    --rt-viewer-dk:  #946c00; /* era #d39e00 (2.68:1 su bianco ✗); #946c00 su bianco: 4.82:1 ✓ */
-    --rt-instructor: #28a745;
-    --rt-instructor-dk: #1e7e34;
+/* Navbar uniforme navy per tutti i ruoli */
+.sg-navbar,
+.main-header.navbar {
+    background-color: var(--sg-shell-bg) !important;
+    border-bottom: 1px solid rgba(255,255,255,.06) !important;
 }
 
-/* ── Mixin-like pattern: tutte le regole comuni ai ruoli
-      vengono ripetute per ogni selettore corpo-ruolo. ──────── */
+/* Sidebar uniforme navy per tutti i ruoli */
+.main-sidebar {
+    background-color: var(--sg-shell-bg) !important;
+}
+.brand-link {
+    background-color: var(--sg-shell-bg-elevated) !important;
+    border-bottom-color: rgba(255,255,255,.08) !important;
+    color: var(--sg-shell-text) !important;
+}
+.brand-link:hover {
+    background-color: var(--sg-shell-bg-elevated) !important;
+    color: var(--sg-shell-text) !important;
+}
 
-/* Sidebar background (aside + area brand) */
-body.role-admin      .main-sidebar { background-color: var(--rt-admin)      !important; }
-body.role-editor     .main-sidebar { background-color: var(--rt-editor)     !important; }
-body.role-viewer     .main-sidebar { background-color: var(--rt-viewer)     !important; }
-body.role-instructor .main-sidebar { background-color: var(--rt-instructor) !important; }
+/* Striscia verticale colore ruolo sul bordo destro della sidebar */
+body.role-admin      .main-sidebar { border-right: 3px solid var(--sg-role-admin)      !important; }
+body.role-editor     .main-sidebar { border-right: 3px solid var(--sg-role-editor)     !important; }
+body.role-viewer     .main-sidebar { border-right: 3px solid var(--sg-role-viewer)     !important; }
+body.role-instructor .main-sidebar { border-right: 3px solid var(--sg-role-instructor) !important; }
 
-/* Brand link (logo area in cima alla sidebar) */
-body.role-admin      .brand-link { background-color: var(--rt-admin-dk)      !important; border-bottom-color: rgba(0,0,0,.15) !important; }
-body.role-editor     .brand-link { background-color: var(--rt-editor-dk)     !important; border-bottom-color: rgba(0,0,0,.15) !important; }
-body.role-viewer     .brand-link { background-color: var(--rt-viewer-dk)     !important; border-bottom-color: rgba(0,0,0,.15) !important; }
-body.role-instructor .brand-link { background-color: var(--rt-instructor-dk) !important; border-bottom-color: rgba(0,0,0,.15) !important; }
+/* Badge ruolo: pill con icona e label (sidebar + navbar) */
+.sg-role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: var(--sg-radius-pill);
+    font-size: var(--sg-fs-xs);
+    font-weight: var(--sg-fw-semibold);
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+.sg-role-badge.role-admin      { background-color: var(--sg-role-admin);      color: var(--sg-role-admin-text); }
+.sg-role-badge.role-editor     { background-color: var(--sg-role-editor);     color: var(--sg-role-editor-text); }
+.sg-role-badge.role-viewer     { background-color: var(--sg-role-viewer);     color: var(--sg-role-viewer-text); }
+.sg-role-badge.role-instructor { background-color: var(--sg-role-instructor); color: var(--sg-role-instructor-text); }
 
-/* Testo nella brand link */
-body.role-admin      .brand-link,
-body.role-editor     .brand-link,
-body.role-instructor .brand-link { color: #fff !important; }
-body.role-viewer     .brand-link { color: #212529 !important; }
+/* Contenitore badge sotto il brand nella sidebar */
+.sg-sidebar-role-area {
+    padding: 8px 16px 10px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
 
-/* Topnav background */
-body.role-admin      .main-header.navbar { background-color: var(--rt-admin)      !important; }
-body.role-editor     .main-header.navbar { background-color: var(--rt-editor)     !important; }
-body.role-viewer     .main-header.navbar { background-color: var(--rt-viewer)     !important; }
-body.role-instructor .main-header.navbar { background-color: var(--rt-instructor) !important; }
+/* Navbar: link e icone in shell-text */
+.main-header.navbar .nav-link,
+.main-header.navbar .nav-link * {
+    color: var(--sg-shell-text) !important;
+}
+.main-header.navbar .nav-link:hover,
+.main-header.navbar .nav-link:hover * {
+    color: var(--sg-accent) !important;
+}
 
-/* Topnav link e icone */
-body.role-admin      .main-header.navbar .nav-link,
-body.role-admin      .main-header.navbar .nav-link *,
-body.role-editor     .main-header.navbar .nav-link,
-body.role-editor     .main-header.navbar .nav-link *,
-body.role-instructor .main-header.navbar .nav-link,
-body.role-instructor .main-header.navbar .nav-link * { color: rgba(255,255,255,.85) !important; }
+/* Dropdown dentro navbar: testo scuro su sfondo bianco */
+.main-header .dropdown-menu { color: #212529 !important; }
+.main-header .dropdown-menu .dropdown-item,
+.main-header .dropdown-menu a:not(.btn) { color: #212529 !important; }
+.main-header .dropdown-menu .dropdown-item:hover { color: #000 !important; }
 
-body.role-viewer .main-header.navbar .nav-link,
-body.role-viewer .main-header.navbar .nav-link * { color: rgba(0,0,0,.75) !important; }
+/* Footer del menu utente */
+.main-header .user-footer {
+    background-color: var(--sg-shell-bg-elevated) !important;
+}
+.main-header .user-footer .btn {
+    color: var(--sg-shell-text) !important;
+    border-color: rgba(255,255,255,.25) !important;
+    background-color: rgba(255,255,255,.08) !important;
+}
+.main-header .user-footer .btn:hover {
+    background-color: rgba(255,255,255,.18) !important;
+}
 
-body.role-admin      .main-header.navbar .nav-link:hover *,
-body.role-editor     .main-header.navbar .nav-link:hover *,
-body.role-instructor .main-header.navbar .nav-link:hover * { color: #fff !important; }
-body.role-viewer     .main-header.navbar .nav-link:hover * { color: #000 !important; }
+/* Badge numerini nella topnav */
+.navbar-badge {
+    background-color: transparent !important;
+    border: 1px solid var(--sg-accent) !important;
+    color: var(--sg-accent) !important;
+}
 
-/* Footer background */
-body.role-admin      .main-footer { background-color: var(--rt-admin)      !important; border-top-color: var(--rt-admin-dk)      !important; color: #fff !important; }
-body.role-editor     .main-footer { background-color: var(--rt-editor)     !important; border-top-color: var(--rt-editor-dk)     !important; color: #fff !important; }
-body.role-viewer     .main-footer { background-color: var(--rt-viewer)     !important; border-top-color: var(--rt-viewer-dk)     !important; color: #212529 !important; }
-body.role-instructor .main-footer { background-color: var(--rt-instructor) !important; border-top-color: var(--rt-instructor-dk) !important; color: #fff !important; }
+/* Badge generici nella topnav (esclusi sg-role-badge e navbar-badge) */
+.main-header .badge:not(.navbar-badge):not(.sg-role-badge) {
+    background-color: rgba(255,255,255,.15) !important;
+    color: var(--sg-shell-text) !important;
+}
 
-body.role-admin      .main-footer a,
-body.role-editor     .main-footer a,
-body.role-instructor .main-footer a { color: rgba(255,255,255,.8) !important; }
-body.role-viewer     .main-footer a { color: rgba(0,0,0,.7) !important; }
-body.role-admin      .main-footer a:hover,
-body.role-editor     .main-footer a:hover,
-body.role-instructor .main-footer a:hover { color: #fff !important; }
-body.role-viewer     .main-footer a:hover { color: #000 !important; }
+/* Footer applicazione */
+.main-footer {
+    background-color: var(--sg-shell-bg-elevated) !important;
+    border-top-color: rgba(255,255,255,.06) !important;
+    color: var(--sg-shell-text-muted) !important;
+}
+.main-footer a { color: var(--sg-accent) !important; }
+.main-footer a:hover { color: var(--sg-accent-hover) !important; }
 
-/* ── Sidebar nav: testo link ────────────────────────────── */
-body.role-admin      .sidebar .nav-sidebar .nav-link,
-body.role-editor     .sidebar .nav-sidebar .nav-link,
-body.role-instructor .sidebar .nav-sidebar .nav-link { color: rgba(255,255,255,.82) !important; }
-body.role-viewer     .sidebar .nav-sidebar .nav-link { color: rgba(0,0,0,.72) !important; }
-
-body.role-admin      .sidebar .nav-sidebar .nav-link .nav-icon,
-body.role-editor     .sidebar .nav-sidebar .nav-link .nav-icon,
-body.role-instructor .sidebar .nav-sidebar .nav-link .nav-icon { color: rgba(255,255,255,.6) !important; }
-body.role-viewer     .sidebar .nav-sidebar .nav-link .nav-icon { color: rgba(0,0,0,.55) !important; }
+/* Sidebar nav: testo link e icone */
+.sidebar .nav-sidebar .nav-link {
+    color: var(--sg-shell-text) !important;
+}
+.sidebar .nav-sidebar .nav-link .nav-icon {
+    color: var(--sg-shell-text-muted) !important;
+}
 
 /* Hover su voci non attive */
-body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover,
-body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover,
-body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover {
-    background-color: rgba(255,255,255,.12) !important;
-    color: #fff !important;
+.sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover {
+    background-color: var(--sg-shell-bg-elevated) !important;
+    color: var(--sg-shell-text) !important;
 }
-body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon,
-body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon,
-body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon { color: #fff !important; }
-
-body.role-viewer .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover {
-    background-color: rgba(0,0,0,.08) !important;
-    color: #000 !important;
-}
-body.role-viewer .sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon { color: #000 !important; }
-
-/* ── Voce attiva: sfondo bianco + testo nel colore del ruolo ── */
-body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link.active,
-body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link.active,
-body.role-viewer     .sidebar .nav-sidebar .nav-item > .nav-link.active,
-body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link.active {
-    background-color: #fff !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,.15);
-}
-body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link.active,
-body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--rt-admin)      !important; }
-body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link.active,
-body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--rt-editor)     !important; }
-body.role-viewer     .sidebar .nav-sidebar .nav-item > .nav-link.active,
-body.role-viewer     .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--rt-viewer-dk)   !important; }
-body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link.active,
-body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--rt-instructor)  !important; }
-
-/* ── Badge sidebar: sfondo bianco + testo nel colore del ruolo ── */
-body.role-admin      .sidebar .badge { background-color: #fff !important; color: var(--rt-admin)      !important; }
-body.role-editor     .sidebar .badge { background-color: #fff !important; color: var(--rt-editor)     !important; }
-body.role-viewer     .sidebar .badge { background-color: #fff !important; color: var(--rt-viewer-dk)   !important; }
-body.role-instructor .sidebar .badge { background-color: #fff !important; color: var(--rt-instructor)  !important; }
-
-/* ── Badge nella topnav ─────────────────────────────────── */
-body.role-admin      .main-header .badge { background-color: #fff !important; color: var(--rt-admin)      !important; }
-body.role-editor     .main-header .badge { background-color: #fff !important; color: var(--rt-editor)     !important; }
-body.role-viewer     .main-header .badge { background-color: #fff !important; color: var(--rt-viewer-dk)   !important; }
-body.role-instructor .main-header .badge { background-color: #fff !important; color: var(--rt-instructor)  !important; }
-
-/* ── Badge numerini (navbar-badge) nella topnav: testo scuro su sfondo trasparente ── */
-.navbar-badge { background-color: transparent !important; border: 1px solid rgba(0,0,0,.2) !important; }
-body.role-admin      .main-header .navbar-badge { color: var(--rt-admin)      !important; border-color: var(--rt-admin)      !important; }
-body.role-editor     .main-header .navbar-badge { color: var(--rt-editor)     !important; border-color: var(--rt-editor)     !important; }
-body.role-viewer     .main-header .navbar-badge { color: var(--rt-viewer-dk)  !important; border-color: var(--rt-viewer-dk)  !important; }
-body.role-instructor .main-header .navbar-badge { color: var(--rt-instructor) !important; border-color: var(--rt-instructor) !important; }
-
-/* ── Dropdown nella topnav: testo scuro su sfondo bianco ────
-   Il colore bianco ereditato dalla navbar renderebbe il testo
-   illeggibile dentro i dropdown (sfondo #fff). Si sovrascrive
-   esplicitamente per tutti i ruoli con navbar scura.          */
-body.role-admin      .main-header .dropdown-menu,
-body.role-editor     .main-header .dropdown-menu,
-body.role-instructor .main-header .dropdown-menu { color: #212529 !important; }
-
-body.role-admin      .main-header .dropdown-menu .dropdown-item,
-body.role-admin      .main-header .dropdown-menu a:not(.btn),
-body.role-editor     .main-header .dropdown-menu .dropdown-item,
-body.role-editor     .main-header .dropdown-menu a:not(.btn),
-body.role-instructor .main-header .dropdown-menu .dropdown-item,
-body.role-instructor .main-header .dropdown-menu a:not(.btn) { color: #212529 !important; }
-
-body.role-admin      .main-header .dropdown-menu .dropdown-item:hover,
-body.role-editor     .main-header .dropdown-menu .dropdown-item:hover,
-body.role-instructor .main-header .dropdown-menu .dropdown-item:hover { color: #000 !important; }
-
-/* ── Footer del menu utente (Profilo / Logout): stesso colore
-   della navbar/sidebar per ogni ruolo.                        */
-body.role-admin      .main-header .user-footer { background-color: var(--rt-admin)      !important; }
-body.role-editor     .main-header .user-footer { background-color: var(--rt-editor)     !important; }
-body.role-viewer     .main-header .user-footer { background-color: var(--rt-viewer)     !important; }
-body.role-instructor .main-header .user-footer { background-color: var(--rt-instructor) !important; }
-
-body.role-admin      .main-header .user-footer .btn,
-body.role-editor     .main-header .user-footer .btn,
-body.role-instructor .main-header .user-footer .btn {
-    color: #fff !important;
-    border-color: rgba(255,255,255,.35) !important;
-    background-color: rgba(255,255,255,.1) !important;
-}
-body.role-admin      .main-header .user-footer .btn:hover,
-body.role-editor     .main-header .user-footer .btn:hover,
-body.role-instructor .main-header .user-footer .btn:hover {
-    background-color: rgba(255,255,255,.22) !important;
-}
-body.role-viewer .main-header .user-footer .btn {
-    color: #212529 !important;
-    border-color: rgba(0,0,0,.2) !important;
-    background-color: rgba(0,0,0,.06) !important;
-}
-body.role-viewer .main-header .user-footer .btn:hover {
-    background-color: rgba(0,0,0,.14) !important;
+.sidebar .nav-sidebar .nav-item > .nav-link:not(.active):hover .nav-icon {
+    color: var(--sg-shell-text) !important;
 }
 
-/* ── Scrollbar sidebar (os-theme-light su sfondo colorato) ── */
-body[class*="role-"] .sidebar .os-scrollbar-track { background: rgba(255,255,255,.08) !important; }
-body[class*="role-"] .sidebar .os-scrollbar-handle { background: rgba(255,255,255,.25) !important; }
-body.role-viewer     .sidebar .os-scrollbar-track  { background: rgba(0,0,0,.06) !important; }
-body.role-viewer     .sidebar .os-scrollbar-handle { background: rgba(0,0,0,.18) !important; }
+/* Voce attiva: bordo sinistro colore ruolo + sfondo tenue navy */
+.sidebar .nav-sidebar .nav-item > .nav-link.active {
+    background-color: rgba(255,255,255,.07) !important;
+    box-shadow: none !important;
+    color: var(--sg-shell-text) !important;
+    border-left: 3px solid transparent;
+    border-radius: 0;
+}
+body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link.active { border-left-color: var(--sg-role-admin)      !important; }
+body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link.active { border-left-color: var(--sg-role-editor)     !important; }
+body.role-viewer     .sidebar .nav-sidebar .nav-item > .nav-link.active { border-left-color: var(--sg-role-viewer)     !important; }
+body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link.active { border-left-color: var(--sg-role-instructor) !important; }
+
+/* Icona voce attiva: colore ruolo */
+body.role-admin      .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--sg-role-admin)      !important; }
+body.role-editor     .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--sg-role-editor)     !important; }
+body.role-viewer     .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--sg-role-viewer)     !important; }
+body.role-instructor .sidebar .nav-sidebar .nav-item > .nav-link.active .nav-icon { color: var(--sg-role-instructor) !important; }
+
+/* Badge contatori nella sidebar */
+.sidebar .badge {
+    background-color: rgba(255,255,255,.15) !important;
+    color: var(--sg-shell-text) !important;
+}
+body.role-admin      .sidebar .badge { background-color: var(--sg-role-admin)      !important; color: var(--sg-role-admin-text)      !important; }
+body.role-editor     .sidebar .badge { background-color: var(--sg-role-editor)     !important; color: var(--sg-role-editor-text)     !important; }
+body.role-viewer     .sidebar .badge { background-color: var(--sg-role-viewer)     !important; color: var(--sg-role-viewer-text)     !important; }
+body.role-instructor .sidebar .badge { background-color: var(--sg-role-instructor) !important; color: var(--sg-role-instructor-text) !important; }
+
+/* Etichette sezione ("AREA PERSONALE", "ESAMI" …) nella sidebar */
+.sidebar .nav-header {
+    color: var(--sg-shell-text-muted) !important;
+    font-weight: var(--sg-fw-medium) !important;
+    letter-spacing: .06em !important;
+}
+
+/* Scrollbar sidebar */
+.sidebar .os-scrollbar-track  { background: rgba(255,255,255,.05) !important; }
+.sidebar .os-scrollbar-handle { background: rgba(255,255,255,.20) !important; }
+
+/* AdminLTE .content-header compatto */
+.content-header {
+    padding: 8px 0 !important;
+    background: transparent !important;
+}
+.content-header h1 {
+    font-size: var(--sg-fs-xl) !important;
+    font-weight: var(--sg-fw-semibold) !important;
+    color: var(--sg-text) !important;
+    margin: 0 !important;
+    line-height: 1.3 !important;
+}
+
+/* ============================================================
+   COMPONENTI REDESIGN 15.2
+   Card, stat icon, status box, badge semantici, stile tabelle.
+   Tutti i token sono da 15.0; nessuno ridefinito qui.
+   ============================================================ */
+
+/* ── Icone stat card: chip tondo tenuito (accento <12% opacità) ── */
+
+/* Override classi grad-* esistenti: da gradiente saturo a chip tenuito */
+.sg-stat-icon.grad-blue   { background: rgba(60, 141, 188, .12); color: var(--sg-accent); }
+.sg-stat-icon.grad-green  { background: rgba(47, 158, 111, .12); color: var(--sg-success); }
+.sg-stat-icon.grad-orange { background: rgba(217, 164, 32, .12); color: var(--sg-warning); }
+.sg-stat-icon.grad-red    { background: rgba(192, 57, 43, .12);  color: var(--sg-danger); }
+.sg-stat-icon.grad-dark   { background: rgba(30, 42, 56, .10);   color: var(--sg-text); }
+
+/* Varianti semantiche (preferire queste nelle nuove view) */
+.sg-stat-icon--accent  { background: rgba(60, 141, 188, .12); color: var(--sg-accent);    }
+.sg-stat-icon--success { background: rgba(47, 158, 111, .12); color: var(--sg-success);   }
+.sg-stat-icon--warning { background: rgba(217, 164, 32, .12); color: var(--sg-warning);   }
+.sg-stat-icon--danger  { background: rgba(192, 57, 43, .12);  color: var(--sg-danger);    }
+.sg-stat-icon--muted   { background: rgba(107, 119, 133, .10); color: var(--sg-text-muted); }
+
+/* ── Status box (sostituisce small-box AdminLTE nelle pagine KPI) ── */
+.sg-status-box {
+    background: var(--sg-surface);
+    border-radius: var(--sg-radius);
+    box-shadow: var(--sg-shadow-sm);
+    padding: 20px 22px;
+    border: 1px solid var(--sg-border);
+    border-left: 4px solid var(--sg-border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 100%;
+}
+.sg-status-box-value {
+    font-size: var(--sg-fs-3xl);
+    font-weight: var(--sg-fw-bold);
+    line-height: 1;
+    color: var(--sg-text);
+    font-variant-numeric: tabular-nums;
+}
+.sg-status-box-label {
+    font-size: var(--sg-fs-sm);
+    color: var(--sg-text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    font-weight: var(--sg-fw-medium);
+    margin-top: 4px;
+}
+.sg-status-box-action {
+    margin-top: 14px;
+}
+.sg-status-box--warning { border-left-color: var(--sg-warning); }
+.sg-status-box--success { border-left-color: var(--sg-success); }
+.sg-status-box--danger  { border-left-color: var(--sg-danger);  }
+.sg-status-box--muted   { border-left-color: var(--sg-text-muted); }
+
+/* ── Badge semantici stato (convenzione unica: sfondo tenuito + testo scuro) ──
+   Contrasto verificato WCAG AA (≥ 4.5:1 per testo normale):
+   #856404 su #fff3cd → 5.23:1 ✓   #155724 su #d4edda → 5.74:1 ✓
+   #495057 su #e9ecef → 7.37:1 ✓   #0c5460 su #d1ecf1 → 5.89:1 ✓  */
+.sg-badge--draft     { background: #e9ecef; color: #495057; }
+.sg-badge--published { background: #d4edda; color: #155724; }
+.sg-badge--confirmed { background: #d1ecf1; color: #0c5460; }
+.sg-badge--pending   { background: #fff3cd; color: #856404; }
+.sg-badge--accepted  { background: #d4edda; color: #155724; }
+.sg-badge--rejected  { background: #e9ecef; color: #6c757d; }
+
+/* ── Card footer (sezione in fondo alla sg-card) ── */
+.sg-card-footer {
+    padding: 12px 22px;
+    border-top: 1px solid var(--sg-border-light);
+    background: var(--sg-surface);
+}
+
+/* ── Righe tabella segnalazioni: lo stato si legge dal badge, non dal fondo riga ── */
+.content-wrapper .table tbody tr.table-warning,
+.sg-table tbody tr.table-warning {
+    background-color: transparent !important;
+}
+.content-wrapper .table tbody tr.table-warning > td,
+.sg-table tbody tr.table-warning > td {
+    background-color: transparent !important;
+}
+
+/* ── Header tabella uniforme su token ── */
+.sg-table thead th {
+    background: var(--sg-surface-muted);
+    border-bottom: 1px solid var(--sg-border);
+}
+
+/* ── Dark mode: nuove classi 15.2 ── */
+body.dark-mode .sg-status-box {
+    background: #2d3436;
+    border-color: #495057;
+}
+body.dark-mode .sg-status-box-value { color: #f8f9fa; }
+body.dark-mode .sg-status-box-label { color: #adb5bd; }
+
+body.dark-mode .sg-stat-icon.grad-blue,
+body.dark-mode .sg-stat-icon--accent  { background: rgba(60, 141, 188, .20); color: #5dd; }
+body.dark-mode .sg-stat-icon.grad-green,
+body.dark-mode .sg-stat-icon--success { background: rgba(47, 158, 111, .20); color: #5dd678; }
+body.dark-mode .sg-stat-icon.grad-orange,
+body.dark-mode .sg-stat-icon--warning { background: rgba(217, 164, 32, .20); color: #ffc107; }
+body.dark-mode .sg-stat-icon.grad-red,
+body.dark-mode .sg-stat-icon--danger  { background: rgba(192, 57, 43, .20);  color: #ff7a85; }
+body.dark-mode .sg-stat-icon.grad-dark,
+body.dark-mode .sg-stat-icon--muted   { background: rgba(255,255,255, .08);  color: #adb5bd; }
+
+body.dark-mode .sg-badge--draft     { background: #3d4349; color: #adb5bd; }
+body.dark-mode .sg-badge--published { background: #1a3d25; color: #5dd678; }
+body.dark-mode .sg-badge--confirmed { background: #002f37; color: #5dd; }
+body.dark-mode .sg-badge--pending   { background: #3d2e00; color: #ffc107; }
+body.dark-mode .sg-badge--accepted  { background: #1a3d25; color: #5dd678; }
+body.dark-mode .sg-badge--rejected  { background: #3d4349; color: #adb5bd; }
+
+body.dark-mode .sg-card-footer {
+    background: #2d3436;
+    border-color: #495057;
+}
+
+body.dark-mode .content-wrapper .table tbody tr.table-warning > td,
+body.dark-mode .sg-table tbody tr.table-warning > td {
+    color: #f8f9fa !important;
+}
+
+/* ============================================================
+   GUEST REDESIGN 15.3 — Hero, feature card, badge patente, CTA
+   Prefisso sg-, su token. Classi guest-only.
+   ============================================================ */
+
+/* ── Hero homepage ─────────────────────────────────────────── */
+.sg-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 58vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--sg-shell-bg);
+}
+.sg-hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+.sg-hero-bg .carousel,
+.sg-hero-bg .carousel-inner,
+.sg-hero-bg .carousel-item { height: 100%; }
+.sg-hero-bg img { width: 100%; height: 100%; object-fit: cover; }
+.sg-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(160deg, rgba(30,42,56,.72) 0%, rgba(30,42,56,.55) 100%);
+}
+.sg-hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 5rem 1.5rem;
+    max-width: 700px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+.sg-hero-logo {
+    max-height: 76px;
+    width: auto;
+    filter: drop-shadow(0 2px 10px rgba(0,0,0,.35));
+}
+.sg-hero-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.14);
+    border: 1.5px solid rgba(255,255,255,.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #fff;
+    backdrop-filter: blur(4px);
+}
+.sg-hero-title {
+    font-size: var(--sg-fs-3xl);
+    font-weight: var(--sg-fw-bold);
+    color: #fff;
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -.5px;
+    text-shadow: 0 2px 16px rgba(0,0,0,.28);
+}
+.sg-hero-tagline {
+    font-size: var(--sg-fs-lg);
+    color: rgba(255,255,255,.82);
+    margin: 0;
+    line-height: 1.55;
+}
+.sg-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .75rem;
+    margin-top: .25rem;
+}
+.sg-btn-hero-primary {
+    display: inline-flex;
+    align-items: center;
+    background: var(--sg-accent);
+    color: var(--sg-accent-text);
+    font-weight: var(--sg-fw-semibold);
+    font-size: var(--sg-fs-base);
+    padding: .7rem 1.75rem;
+    border-radius: var(--sg-radius);
+    border: none;
+    text-decoration: none;
+    transition: var(--sg-transition);
+    box-shadow: 0 4px 18px rgba(60,141,188,.45);
+}
+.sg-btn-hero-primary:hover {
+    background: var(--sg-accent-hover);
+    color: var(--sg-accent-text);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(60,141,188,.55);
+    text-decoration: none;
+}
+.sg-btn-hero-secondary {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    color: #fff;
+    font-weight: var(--sg-fw-medium);
+    font-size: var(--sg-fs-base);
+    padding: .7rem 1.75rem;
+    border-radius: var(--sg-radius);
+    border: 1.5px solid rgba(255,255,255,.55);
+    text-decoration: none;
+    transition: var(--sg-transition);
+    backdrop-filter: blur(4px);
+}
+.sg-btn-hero-secondary:hover {
+    background: rgba(255,255,255,.12);
+    border-color: rgba(255,255,255,.9);
+    color: #fff;
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* ── Stat card guest ───────────────────────────────────────── */
+.sg-guest-stat-card {
+    background: var(--sg-surface);
+    border: 1px solid var(--sg-border);
+    border-top: 3px solid var(--sg-accent);
+    border-radius: var(--sg-radius);
+    box-shadow: var(--sg-shadow-sm);
+    padding: 1.75rem 1.25rem;
+}
+.sg-guest-stat-value {
+    font-size: var(--sg-fs-2xl);
+    font-weight: var(--sg-fw-bold);
+    color: var(--sg-text);
+    line-height: 1.1;
+    margin-bottom: .25rem;
+}
+.sg-guest-stat-label {
+    font-size: var(--sg-fs-sm);
+    color: var(--sg-text-muted);
+}
+
+/* ── Feature card ──────────────────────────────────────────── */
+.sg-features-section { background: var(--sg-surface-muted); }
+.sg-section-heading {
+    font-size: var(--sg-fs-2xl);
+    font-weight: var(--sg-fw-semibold);
+    color: var(--sg-text);
+    letter-spacing: -.2px;
+}
+.sg-feature-card {
+    background: var(--sg-surface);
+    border: 1px solid var(--sg-border);
+    border-radius: var(--sg-radius);
+    box-shadow: var(--sg-shadow-sm);
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+    height: 100%;
+    transition: var(--sg-transition);
+}
+.sg-feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sg-shadow-card);
+}
+.sg-feature-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--sg-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.25rem;
+}
+.sg-feature-icon--blue  { background: rgba(60,141,188,.12); color: var(--sg-accent); }
+.sg-feature-icon--red   { background: rgba(192,57,43,.12);  color: var(--sg-danger); }
+.sg-feature-icon--green { background: rgba(47,158,111,.12); color: var(--sg-success); }
+.sg-feature-icon--teal  { background: rgba(60,141,188,.10); color: var(--sg-info); }
+.sg-feature-title {
+    font-size: var(--sg-fs-lg);
+    font-weight: var(--sg-fw-semibold);
+    color: var(--sg-text);
+    margin: 0 0 .5rem;
+}
+.sg-feature-text {
+    font-size: var(--sg-fs-sm);
+    color: var(--sg-text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ── Badge tipi patente ────────────────────────────────────── */
+.sg-badge-license {
+    display: inline-block;
+    background: rgba(60,141,188,.10);
+    color: var(--sg-accent);
+    border: 1px solid rgba(60,141,188,.22);
+    border-radius: var(--sg-radius-pill);
+    font-size: var(--sg-fs-base);
+    font-weight: var(--sg-fw-semibold);
+    padding: .35rem 1.1rem;
+    margin: .25rem;
+    transition: var(--sg-transition);
+    cursor: default;
+}
+.sg-badge-license:hover {
+    background: var(--sg-accent);
+    color: var(--sg-accent-text);
+    border-color: var(--sg-accent);
+}
+
+/* ── CTA finale ────────────────────────────────────────────── */
+.sg-cta-section {
+    background: var(--sg-accent);
+    padding: 4.5rem 1.5rem;
+    text-align: center;
+}
+.sg-cta-title {
+    font-size: var(--sg-fs-2xl);
+    font-weight: var(--sg-fw-bold);
+    color: var(--sg-accent-text);
+    margin: 0 0 .75rem;
+}
+.sg-cta-subtitle {
+    font-size: var(--sg-fs-lg);
+    color: rgba(255,255,255,.88);
+    margin: 0 0 2rem;
+}
+.sg-btn-cta {
+    display: inline-flex;
+    align-items: center;
+    background: #fff;
+    color: var(--sg-accent);
+    font-weight: var(--sg-fw-semibold);
+    font-size: var(--sg-fs-base);
+    padding: .75rem 2.25rem;
+    border-radius: var(--sg-radius);
+    text-decoration: none;
+    transition: var(--sg-transition);
+    box-shadow: 0 4px 16px rgba(0,0,0,.16);
+}
+.sg-btn-cta:hover {
+    background: rgba(255,255,255,.92);
+    color: var(--sg-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(0,0,0,.22);
+    text-decoration: none;
+}
+
+/* ── Dark mode guest (data-bs-theme su <html> via Alpine) ──── */
+[data-bs-theme='dark'] .sg-auth-card {
+    background: var(--sg-shell-bg-elevated);
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+[data-bs-theme='dark'] .sg-auth-card .sg-auth-title,
+[data-bs-theme='dark'] .sg-auth-card .sg-auth-subtitle,
+[data-bs-theme='dark'] .sg-auth-card .sg-auth-app-name {
+    color: var(--sg-shell-text);
+}
+[data-bs-theme='dark'] .sg-auth-footer {
+    color: var(--sg-shell-text-muted);
+    border-color: rgba(255,255,255,.1);
+}
+[data-bs-theme='dark'] .sg-guest-stat-card {
+    background: var(--sg-shell-bg-elevated);
+    border-color: rgba(255,255,255,.08);
+}
+[data-bs-theme='dark'] .sg-guest-stat-value { color: var(--sg-shell-text); }
+[data-bs-theme='dark'] .sg-guest-stat-label { color: var(--sg-shell-text-muted); }
+[data-bs-theme='dark'] .sg-features-section { background: var(--sg-shell-bg); }
+[data-bs-theme='dark'] .sg-section-heading  { color: var(--sg-shell-text); }
+[data-bs-theme='dark'] .sg-feature-card {
+    background: var(--sg-shell-bg-elevated);
+    border-color: rgba(255,255,255,.08);
+}
+[data-bs-theme='dark'] .sg-feature-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+[data-bs-theme='dark'] .sg-feature-title { color: var(--sg-shell-text); }
+[data-bs-theme='dark'] .sg-feature-text  { color: var(--sg-shell-text-muted); }
+[data-bs-theme='dark'] .sg-badge-license {
+    background: rgba(60,141,188,.18);
+    border-color: rgba(60,141,188,.32);
+}

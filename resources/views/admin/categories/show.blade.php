@@ -4,7 +4,7 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="sg-wrapper">
+<div class="sg-wrapper-fluid">
 
     <div class="sg-header sg-flex-between mb-3">
         <div>
@@ -14,6 +14,7 @@
                     <span class="badge badge-info ml-2">EU</span>
                 @endif
             </h1>
+            <p class="sg-header-subtitle sg-mt-1">Domande e materiali associati alla categoria.</p>
         </div>
         <div>
             <a href="{{ route('admin.categories.index') }}" class="sg-btn sg-btn-secondary sg-btn-sm">

@@ -50,6 +50,13 @@
 @stop
 
 @section('content_top_nav_right')
+    {{-- Badge ruolo nella navbar --}}
+    @auth
+    <li class="nav-item d-none d-md-flex align-items-center px-2">
+        @include('layouts.partials.role-badge')
+    </li>
+    @endauth
+
     {{-- Language switcher --}}
     @if(feature('exam_translations_enabled'))
     <li class="nav-item dropdown">
