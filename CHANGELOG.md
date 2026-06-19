@@ -5,6 +5,23 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [14.5] — Feature 14.5: Fix contenuto — tagline placeholder e chiavi i18n (2026-06-19)
+
+### Fixed
+
+- **Tagline placeholder inglese**: il seeder di `system_settings` aveva `school.tagline` già vuoto; aggiunta migration idempotente `2026_06_19_000000_fix_school_tagline_placeholder` che azzera il valore se contiene il testo placeholder inglese (`Edoardo is building ScuolaGUIDA…`) eventualmente persistito in DB.
+- **Chiavi i18n scoperte** — aggiunte in `lang/{it,en,es}/editor.php`:
+  - `reports_col_type` (IT: "Tipo", EN: "Type", ES: "Tipo")
+  - `reports_col_reporter` (IT: "Segnalante", EN: "Reporter", ES: "Informante")
+  - `reports_col_date` (IT: "Data", EN: "Date", ES: "Fecha")
+- **`common.all` mancante** — aggiunto in `lang/{it,en,es}/common.php` (IT: "Tutti", EN: "All", ES: "Todos"); risolveva la chiave grezza nel dropdown "Tipo di patente" in Gestione Utenti.
+
+### Added
+
+- **`I18nContentFixTest`** — 5 test: le tre chiavi `editor.reports_col_*` risolvono in locale `it`; `common.all` ritorna "Tutti"; homepage guest non contiene il placeholder inglese.
+
+---
+
 ## [14.3] — Feature 14.3: CSS sparso e token centralizzati (2026-06-19)
 
 ### Changed

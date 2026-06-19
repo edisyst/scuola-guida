@@ -31,4 +31,5 @@ return [
     'total'          => 'Total',
     'select'         => 'Select',
     'saving'         => 'Saving...',
+    'all'            => 'All',
 ];

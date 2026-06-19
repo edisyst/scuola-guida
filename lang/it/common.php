@@ -31,4 +31,5 @@ return [
     'total'          => 'Totale',
     'select'         => 'Seleziona',
     'saving'         => 'Salvataggio...',
+    'all'            => 'Tutti',
 ];
