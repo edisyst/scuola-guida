@@ -5,81 +5,54 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
-## [Unreleased] — Feature 15.3: Redesign area guest — hero, feature card, auth (2026-06-19)
+## [15.3] — Design system "sobrio contemporaneo" — palette, shell, componenti, guest (2026-06-20)
+
+Lotto di quattro feature (15.0 → 15.3) che porta l'intero sistema visivo a un design
+system coerente basato su token CSS, tipografia Inter e look "sobrio contemporaneo".
 
 ### Changed
 
-- **Hero homepage** — eliminata la struttura "a scatole dentro scatole" (tre box semitrasparenti annidati: `sg-hero-overlay-text`, `sg-hero-overlay-soft`, `sg-hero-overlay-cta`). Nuova struttura: sezione `.sg-hero` con `.sg-hero-bg` (carosello assoluto), `.sg-hero-overlay` (gradiente unico per leggibilità WCAG AA), `.sg-hero-content` (titolo, tagline e bottoni direttamente sul bg, nessun box contenitore). `min-height: 58vh`, padding generoso, contenuto centrato.
-- **Bottoni hero** — classi dedicate `sg-btn-hero-primary` (accent, ombra tenue, hover con `translateY(-2px)`) e `sg-btn-hero-secondary` (outline bianco, backdrop-blur). Nessun inline style.
-- **Feature card** — sostituite card Bootstrap generiche con `.sg-feature-card` (surface, border token, radius, ombra tenue, hover `translateY(-4px)`). Icona in chip tondo a bassa opacità con varianti semantiche `sg-feature-icon--blue/red/green/teal`. Titolo `sg-feature-title` in `--sg-fs-lg` semibold, testo `sg-feature-text` in `--sg-fs-sm` muted.
-- **Badge tipi patente** — sostituito `badge` Bootstrap con `sg-badge-license`: pill accent tenuito, hover riempie con `--sg-accent`. Titolo sezione con `sg-section-heading` su scala tipografica Inter.
-- **Stat card homepage** — sostituita card Bootstrap inline con `sg-guest-stat-card` su token (`--sg-surface`, bordo-top accent, radius, ombra `--sg-shadow-sm`). Valore in `--sg-fs-2xl` bold, label in `--sg-fs-sm` muted.
-- **CTA finale** — sezione `.sg-cta-section` su `--sg-accent` con titolo `sg-cta-title`, sottotitolo `sg-cta-subtitle`, bottone `sg-btn-cta` bianco con ombra e hover. Rimosso inline `style="background:..."`.
-- **Auth card dark mode** — aggiunto override `[data-bs-theme='dark'] .sg-auth-card` (sfondo `--sg-shell-bg-elevated`, testo shell token) per il meccanismo Bootstrap/Alpine usato nell'area guest; il precedente `body.dark-mode .sg-auth-card` copriva solo l'area admin.
-- **`sg-auth-card`** — background aggiornato da `#fff` hardcoded a `var(--sg-surface)`; border-radius su token `calc(var(--sg-radius) * 2.25)`.
-- **`scuola-guida.css`** — aggiunto token `--sg-transition: all .2s ease;` in `:root`. Nuova sezione "GUEST REDESIGN 15.3": classi hero, feature card, badge patente, CTA, stat guest, dark mode via `[data-bs-theme='dark']` per tutta l'area guest. Classi legacy `sg-hero-overlay-*` sostituite da commento stub.
+#### 15.0 — Fondamenta palette e tipografia
+- **Token CSS centralizzati** — `public/css/scuola-guida.css` sostituisce il blocco `:root` precedente con la nuova architettura di token: shell (`--sg-shell-bg`, `--sg-shell-bg-elevated`, `--sg-shell-text`, `--sg-shell-text-muted`), accent (`--sg-accent #3c8dbc`, `--sg-accent-hover`, `--sg-accent-text`), superfici (`--sg-surface`, `--sg-surface-muted`, `--sg-border`, `--sg-text`, `--sg-text-muted`), stati semantici desaturati (`--sg-success/warning/danger/info`), colori di ruolo WCAG AA (`--sg-role-admin #c0392b 5.06:1 ✓`, `--sg-role-editor #2f6f9e 4.92:1 ✓`, `--sg-role-viewer #d9a420 6.00:1 ✓`, `--sg-role-instructor #267348 5.81:1 ✓`), scala tipografica Inter (`--sg-font`, `--sg-fs-*`, `--sg-fw-*`), radius costante (`--sg-radius: .5rem`). Token legacy mantenuti per retrocompatibilità.
+- **Tipografia unificata Inter** — `body { font-family: var(--sg-font); }` applicato globalmente; Inter caricata via Google Fonts in `appearance-css.blade.php` (ridotto a solo link font, zero variabili dinamiche). Elimina il font serif di fallback nelle aree guest e auth.
+- **`RoleTheme` middleware** — skin sidebar ora costanti hardcoded (rimossa lettura da `setting('appearance.sidebar_skin_*')`).
 
-### Added
+#### 15.1 — Shell — sidebar, navbar, page-header
+- **Shell uniforme navy** — sidebar e navbar usano `--sg-shell-bg` (#1e2a38) per tutti i ruoli. Eliminata la "vernice piena" saturata per ruolo su entrambe le superfici.
+- **Identità di ruolo localizzata** — `--sg-role-{ruolo}` compare solo in: striscia 3 px bordo destro sidebar, bordo sinistro voce attiva, badge pill navbar verificati WCAG AA.
+- **Partial `layouts/partials/role-badge.blade.php`** — mappa ruolo → (icona FA, label i18n) in un punto unico. Icone: `fa-user-shield` (admin), `fa-user-pen` (editor), `fa-user-graduate` (viewer), `fa-chalkboard-user` (instructor).
+- **Page-header compatto** — `.sg-header`: sfondo `--sg-surface-muted`, border-bottom `--sg-border`, padding 14px 24px; eliminato il gradiente navy. Titolo `--sg-fs-2xl` semibold su `--sg-text`.
+- **Chiavi i18n `common.role_*`** — aggiunte in `lang/{it,en,es}/common.php`.
 
-- **`RedesignGuestTest`** — 10 test: homepage 200, hero con `sg-hero`/`sg-hero-content`/`sg-hero-title`, assenza box annidati (`sg-hero-overlay-text/soft/cta`), feature card `sg-feature-card`, CTA `sg-cta-section`/`sg-btn-cta`, login 200 con `sg-auth-card`, register 200, flusso login valido, flusso login errato.
+#### 15.2 — Componenti area admin — card, stat box, badge
+- **Stat icon chip tenuito** — `.sg-stat-icon` usa chip tondo a bassa opacità (≈12%) invece del blocco gradiente saturo. Classi semantiche `sg-stat-icon--accent/success/warning/danger/muted`; `grad-*` ridefinite a tint per retrocompatibilità.
+- **Box KPI segnalazioni** — `admin/question-reports/index` usa `.sg-status-box` (surface, bordo sinistro semantico, numero `--sg-fs-3xl`, label muted) al posto di `small-box bg-*` AdminLTE.
+- **Badge di stato unificati** — `.sg-badge--pending/accepted/rejected/draft/published/confirmed` (sfondo tenuito, testo WCAG AA ≥ 4.5:1). View `question-reports` e `quizzes/users/index` aggiornate.
+- **Righe tabella segnalazioni** — rimossa `table-warning` saturata; stato leggibile dal solo badge in colonna.
+- **`question-reports/show`** — card Bootstrap convertite a `.sg-card/sg-card-header/sg-card-body/sg-card-footer`.
 
----
-
-## [Unreleased] — Feature 15.2: Redesign componenti area admin — card, stat box, badge (2026-06-19)
-
-### Changed
-
-- **Stat icon chip tenuito** — le icone nelle stat card (`sg-stat-icon`) usano ora un chip tondo a bassa opacità (≈12%) invece del blocco gradiente saturo precedente (`grad-blue/green/orange/red`). Introdotte classi semantiche `sg-stat-icon--accent/success/warning/danger/muted`; `grad-*` ridefinite a tint per retrocompatibilità. Dashboard admin aggiornata alle nuove classi.
-- **Box KPI segnalazioni** — i tre box "In attesa / Accettate / Rifiutate" in `admin/question-reports/index` sostituiscono il componente `small-box bg-*` di AdminLTE con il nuovo `.sg-status-box` neutro (`--sg-surface`, bordo sinistro semantico, numero `--sg-fs-3xl`, label muted, link filtra discreto).
-- **Badge di stato unificati** — introdotte classi `.sg-badge--pending/accepted/rejected/draft/published/confirmed` (sfondo tenuito + testo WCAG AA ≥ 4.5:1). Le viste `question-reports/index` e `question-reports/show` sostituiscono `badge badge-*` Bootstrap con `sg-badge sg-badge--*`. Le viste `quizzes/index` e `users/index` sostituiscono `badge badge-secondary` con `sg-badge` neutro.
-- **Righe tabella segnalazioni** — rimossa la classe `table-warning` (sfondo crema saturo) dalle righe con stato "pending"; lo stato è ora leggibile esclusivamente dal badge in colonna.
-- **`question-reports/show`** — card Bootstrap (`.card`, `.card-header`, `.card-body`, `.card-footer`) convertite a `.sg-card`, `.sg-card-header`, `.sg-card-body`, `.sg-card-footer`; badge tipo e stato aggiornati al sistema `sg-badge`.
-- **`scuola-guida.css`** — nuova sezione "COMPONENTI REDESIGN 15.2": token `--sg-shadow-sm`, classi `sg-stat-icon--*`, `sg-status-box` con varianti semantiche, `sg-badge--*`, `sg-card-footer`, override tabella (rimozione `table-warning` saturo), header tabella su `--sg-surface-muted`; dark mode per tutti i nuovi componenti.
-
-### Added
-
-- **`RedesignComponentsTest`** — 6 test: dashboard 200 senza `grad-*`, segnalazioni 200 con `sg-status-box` senza `small-box`, badge `sg-badge--pending` nelle segnalazioni, assenza `table-warning`, quiz index con `sg-badge`, users index con `sg-badge`.
-
----
-
-## [Unreleased] — Feature 15.1: Redesign shell — sidebar, navbar, page-header (2026-06-19)
-
-### Changed
-
-- **Shell uniforme navy** — sidebar e navbar usano ora `--sg-shell-bg` (#1e2a38) per tutti i ruoli. Eliminata la "vernice piena" saturata che differenziava i ruoli (admin=rosso, editor=blu, viewer=giallo, instructor=verde) su entrambe le superfici.
-- **Identità di ruolo localizzata** — il colore di ruolo (`--sg-role-{ruolo}`) compare ora solo in: striscia verticale di 3 px sul bordo destro della sidebar; bordo sinistro della voce di menu attiva; badge pill con icona FontAwesome nell'header della sidebar e nella navbar, verificati WCAG AA.
-- **`RoleTheme` middleware** — semplificato: imposta `classes_sidebar = 'sidebar-dark-primary elevation-4'` e `classes_topnav = 'navbar-dark sg-navbar'` uniformi per tutti i ruoli; mantiene `classes_body = 'role-{ruolo}'` come unico selettore discriminatore per il CSS di accento.
-- **Partial centralizzato `layouts/partials/role-badge.blade.php`** — mappa ruolo → (icona FA, label i18n) in un punto unico; incluso nel sidebar override e in `admin.blade.php`. Icone: `fa-user-shield` (admin), `fa-user-pen` (editor), `fa-user-graduate` (viewer), `fa-chalkboard-user` (instructor).
-- **`left-sidebar.blade.php`** (override vendor) — rimossa la logica PHP per classe ruolo; usa `config('adminlte.classes_sidebar')` uniforme; aggiunge `.sg-sidebar-role-area` con il badge sotto il brand logo.
-- **Page-header compatto** — `.sg-header` ridisegnato: sfondo `--sg-surface-muted`, border-bottom `--sg-border`, padding ridotto (14px 24px); eliminato il gradiente navy. Titolo in `--sg-fs-2xl` semibold su `--sg-text`. Contrasto leggibile su sfondo chiaro.
-- **CSS `scuola-guida.css`** — blocco ROLE THEMING (13.1) sostituito con SHELL 15.1: regole `.sg-navbar`, `.sg-role-badge`, `.sg-sidebar-role-area`, hover/active nav, footer uniforme navy, page-header compatto.
-- **Chiavi i18n `common.role_*`** — aggiunte in `lang/{it,en,es}/common.php` per label badge ruolo.
-
-### Added
-
-- **`RedesignShellTest`** — 11 test: assenza classi saturate, presenza badge ruolo per ogni ruolo, classe `sg-navbar` uniforme, `role-{ruolo}` sul body, pagine principali 200 per tutti i ruoli.
-
----
-
-## [Unreleased] — Feature 15.0: Design system — fondamenta palette e tipografia (2026-06-19)
-
-### Changed
-
-- **Token CSS centralizzati** — `public/css/scuola-guida.css` sostituisce il blocco `:root` precedente con la nuova architettura di token del design system "sobrio contemporaneo": shell (`--sg-shell-bg`, `--sg-shell-bg-elevated`, `--sg-shell-text`, `--sg-shell-text-muted`), accent di brand (`--sg-accent #3c8dbc`, `--sg-accent-hover`, `--sg-accent-text`), superfici chiare (`--sg-surface`, `--sg-surface-muted`, `--sg-border`, `--sg-text`, `--sg-text-muted`), stati semantici desaturati (`--sg-success`, `--sg-warning`, `--sg-danger`, `--sg-info`), colori di ruolo con variante `*-text` verificati WCAG AA come sfondo badge (`--sg-role-admin #c0392b 5.06:1 ✓`, `--sg-role-editor #2f6f9e 4.92:1 ✓`, `--sg-role-viewer #d9a420 6.00:1 ✓`, `--sg-role-instructor #267348 5.81:1 ✓`), scala tipografica Inter (`--sg-font`, `--sg-fs-*`, `--sg-fw-*`), radius costante (`--sg-radius: .5rem`). Token legacy (`--sg-dark-1`, `--sg-dark-2`, `--sg-dark-3`, gradienti ecc.) mantenuti per retrocompatibilità con le classi esistenti.
-- **Tipografia unificata Inter** — `body { font-family: var(--sg-font); }` aggiunto a `scuola-guida.css`; Inter caricata via Google Fonts (`display=swap`) dal partial `layouts/partials/appearance-css.blade.php` (ora ridotto a sola inclusione font, zero variabili dinamiche). Elimina il font serif di fallback nelle aree guest e auth.
-- **`appearance-css.blade.php` ridotto** — il partial non inietta più variabili CSS lette da `system_settings`; contiene ora solo il link Google Fonts per Inter.
-- **`RoleTheme` middleware** — le skin sidebar (`sidebar-dark-*`) erano lette da `setting('appearance.sidebar_skin_*')`; ora sono costanti hardcoded (stesso valore dei default precedenti). Il redesign sidebar avverrà nel lotto 15.1.
+#### 15.3 — Area guest — hero, feature card, auth
+- **Hero homepage** — eliminata struttura "a scatole dentro scatole" (tre box semitrasparenti: `sg-hero-overlay-text/soft/cta`). Nuova struttura: `.sg-hero` con `.sg-hero-bg` (carosello assoluto), `.sg-hero-overlay` (gradiente unico WCAG AA), `.sg-hero-content` (titolo, tagline, bottoni direttamente sul bg). `min-height: 58vh`, contenuto centrato.
+- **Bottoni hero** — `sg-btn-hero-primary` (accent, ombra, hover `translateY(-2px)`) e `sg-btn-hero-secondary` (outline bianco, backdrop-blur). Nessun inline style.
+- **Feature card** — `.sg-feature-card` (surface, border token, radius, hover `translateY(-4px)`). Icona chip tondo `sg-feature-icon--blue/red/green/teal`. Titolo `--sg-fs-lg` semibold, testo `--sg-fs-sm` muted.
+- **Badge tipi patente** — `sg-badge-license`: pill accent tenuito, hover riempie con `--sg-accent`.
+- **Stat card guest** — `sg-guest-stat-card` su token (surface, bordo-top accent, radius, ombra `--sg-shadow-sm`).
+- **CTA finale** — `.sg-cta-section` + `.sg-btn-cta`; rimosso inline `style="background:..."`.
+- **Auth card** — `sg-auth-card` background da `#fff` a `var(--sg-surface)`, radius su token. Dark mode corretta via `[data-bs-theme='dark']` (Alpine/Bootstrap guest); il precedente `body.dark-mode` copriva solo l'area admin.
+- **`scuola-guida.css`** — token `--sg-transition: all .2s ease;` in `:root`. Sezione "GUEST REDESIGN 15.3" con tutte le classi guest + dark mode via `[data-bs-theme='dark']`.
 
 ### Removed
 
-- **Configurabilità cromatica dal backoffice** — la sezione "Aspetto" in `/admin/system/settings` è rimossa: i controlli colore accent, font, border-radius e skin sidebar non sono più editabili dall'admin. I campi logo (chiaro/dark) sono stati spostati nella sezione "Dati scuola".
-- **Regole di validazione appearance** — rimosse da `UpdateSystemSettingsRequest`: `accent_color`, `accent_color_dark`, `font_family`, `border_radius`, `sidebar_skin_*`. Rimosso anche il metodo `sidebarSkins()`.
-- **`$appearanceMap` in `SystemController`** — il controller non legge più il gruppo `appearance` da `SettingService` e non persiste più chiavi `appearance.*`.
+- **Configurabilità cromatica dal backoffice** (15.0) — sezione "Aspetto" in `/admin/system/settings` rimossa: accent color, font, border-radius, skin sidebar non più editabili dall'admin. Logo spostato nella sezione "Dati scuola".
+- **Regole di validazione appearance** (15.0) — rimosse da `UpdateSystemSettingsRequest`; rimosso `sidebarSkins()` e `$appearanceMap` da `SystemController`.
 
 ### Added
 
-- **Migration `2026_06_19_130000_deprecate_appearance_settings`** — rimuove le 8 chiavi `appearance.*` da `system_settings`; `down()` idempotente che le ripristina con i valori predefiniti via `upsert`.
-- **`DesignSystemFoundationsTest`** — 12 test: assenza controlli appearance nel pannello settings, presenza logo upload, homepage guest 200 con Inter, pagina settings admin con Inter, CSS con token `--sg-font` / shell / ruolo / radius, migration reversibile, partial non inietta più variabili dinamiche.
+- **Migration `2026_06_19_130000_deprecate_appearance_settings`** (15.0) — rimuove le 8 chiavi `appearance.*` da `system_settings`; `down()` reversibile.
+- **`DesignSystemFoundationsTest`** (15.0) — 12 test: assenza controlli appearance, token CSS, Inter, migration reversibile.
+- **`RedesignShellTest`** (15.1) — 11 test: shell navy uniforme, badge ruolo, classe `sg-navbar`, `role-{ruolo}` sul body.
+- **`RedesignComponentsTest`** (15.2) — 6 test: stat icon senza `grad-*`, `sg-status-box`, `sg-badge--pending`, assenza `table-warning`.
+- **`RedesignGuestTest`** (15.3) — 11 test: homepage 200, struttura `sg-hero`, assenza box annidati, feature card, CTA, login/register 200, flusso login.
 
 ---
 
