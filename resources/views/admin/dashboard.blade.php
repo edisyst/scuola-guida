@@ -17,7 +17,7 @@
 
         <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
-                <div class="sg-stat-icon grad-blue"><i class="fas fa-users"></i></div>
+                <div class="sg-stat-icon sg-stat-icon--accent"><i class="fas fa-users"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $stats['users'] }}</div>
                     <div class="sg-stat-label">Utenti</div>
@@ -27,7 +27,7 @@
 
         <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
-                <div class="sg-stat-icon grad-green"><i class="fas fa-question-circle"></i></div>
+                <div class="sg-stat-icon sg-stat-icon--success"><i class="fas fa-question-circle"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $stats['questions'] }}</div>
                     <div class="sg-stat-label">Domande</div>
@@ -37,7 +37,7 @@
 
         <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
-                <div class="sg-stat-icon grad-orange"><i class="fas fa-folder-open"></i></div>
+                <div class="sg-stat-icon sg-stat-icon--warning"><i class="fas fa-folder-open"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $stats['categories'] }}</div>
                     <div class="sg-stat-label">Categorie</div>
@@ -47,7 +47,7 @@
 
         <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
-                <div class="sg-stat-icon grad-red"><i class="fas fa-clipboard-list"></i></div>
+                <div class="sg-stat-icon sg-stat-icon--danger"><i class="fas fa-clipboard-list"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $stats['quizzes'] }}</div>
                     <div class="sg-stat-label">Quiz</div>
@@ -97,7 +97,7 @@
         @php $quizzesByState = $globalMetrics['quizzes_by_state']; @endphp
         <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
-                <div class="sg-stat-icon grad-blue"><i class="fas fa-clipboard-list"></i></div>
+                <div class="sg-stat-icon sg-stat-icon--muted"><i class="fas fa-clipboard-list"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $quizzesByState['draft'] ?? 0 }}</div>
                     <div class="sg-stat-label">{{ __('editor.quiz_draft') }}</div>
@@ -106,7 +106,7 @@
         </div>
         <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
-                <div class="sg-stat-icon grad-green"><i class="fas fa-paper-plane"></i></div>
+                <div class="sg-stat-icon sg-stat-icon--success"><i class="fas fa-paper-plane"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $quizzesByState['published'] ?? 0 }}</div>
                     <div class="sg-stat-label">{{ __('editor.quiz_published') }}</div>
@@ -115,7 +115,7 @@
         </div>
         <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
-                <div class="sg-stat-icon grad-orange"><i class="fas fa-trophy"></i></div>
+                <div class="sg-stat-icon sg-stat-icon--accent"><i class="fas fa-trophy"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $quizzesByState['confirmed'] ?? 0 }}</div>
                     <div class="sg-stat-label">{{ __('editor.quiz_confirmed') }}</div>
@@ -124,7 +124,7 @@
         </div>
         <div class="col-lg-3 col-6 sg-grid-col">
             <div class="sg-stat-card">
-                <div class="sg-stat-icon grad-red"><i class="fas fa-image"></i></div>
+                <div class="sg-stat-icon sg-stat-icon--danger"><i class="fas fa-image"></i></div>
                 <div>
                     <div class="sg-stat-value">{{ $globalMetrics['questions_without_image'] }}</div>
                     <div class="sg-stat-label">

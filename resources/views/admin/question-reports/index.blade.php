@@ -18,42 +18,39 @@
     {{-- ── KPI ──────────────────────────────────────────────── --}}
     <div class="row sg-mb-3">
         <div class="col-12 col-md-4 mb-2">
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3>{{ $stats['pending'] }}</h3>
-                    <p>In attesa</p>
+            <div class="sg-status-box sg-status-box--warning">
+                <div class="sg-status-box-value">{{ $stats['pending'] }}</div>
+                <div class="sg-status-box-label"><i class="fas fa-clock mr-1"></i> In attesa</div>
+                <div class="sg-status-box-action">
+                    <a href="{{ route('admin.question-reports.index', ['status' => 'pending']) }}"
+                       class="sg-btn sg-btn-light sg-btn-sm">
+                        <i class="fas fa-filter"></i> Filtra
+                    </a>
                 </div>
-                <div class="icon"><i class="fas fa-clock"></i></div>
-                <a href="{{ route('admin.question-reports.index', ['status' => 'pending']) }}"
-                   class="small-box-footer">
-                    Filtra <i class="fas fa-arrow-circle-right"></i>
-                </a>
             </div>
         </div>
         <div class="col-12 col-md-4 mb-2">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <h3>{{ $stats['accepted'] }}</h3>
-                    <p>Accettate</p>
+            <div class="sg-status-box sg-status-box--success">
+                <div class="sg-status-box-value">{{ $stats['accepted'] }}</div>
+                <div class="sg-status-box-label"><i class="fas fa-check mr-1"></i> Accettate</div>
+                <div class="sg-status-box-action">
+                    <a href="{{ route('admin.question-reports.index', ['status' => 'accepted']) }}"
+                       class="sg-btn sg-btn-light sg-btn-sm">
+                        <i class="fas fa-filter"></i> Filtra
+                    </a>
                 </div>
-                <div class="icon"><i class="fas fa-check"></i></div>
-                <a href="{{ route('admin.question-reports.index', ['status' => 'accepted']) }}"
-                   class="small-box-footer">
-                    Filtra <i class="fas fa-arrow-circle-right"></i>
-                </a>
             </div>
         </div>
         <div class="col-12 col-md-4 mb-2">
-            <div class="small-box bg-secondary">
-                <div class="inner">
-                    <h3>{{ $stats['rejected'] }}</h3>
-                    <p>Rifiutate</p>
+            <div class="sg-status-box sg-status-box--muted">
+                <div class="sg-status-box-value">{{ $stats['rejected'] }}</div>
+                <div class="sg-status-box-label"><i class="fas fa-times mr-1"></i> Rifiutate</div>
+                <div class="sg-status-box-action">
+                    <a href="{{ route('admin.question-reports.index', ['status' => 'rejected']) }}"
+                       class="sg-btn sg-btn-light sg-btn-sm">
+                        <i class="fas fa-filter"></i> Filtra
+                    </a>
                 </div>
-                <div class="icon"><i class="fas fa-times"></i></div>
-                <a href="{{ route('admin.question-reports.index', ['status' => 'rejected']) }}"
-                   class="small-box-footer">
-                    Filtra <i class="fas fa-arrow-circle-right"></i>
-                </a>
             </div>
         </div>
     </div>
@@ -123,7 +120,7 @@
                     </thead>
                     <tbody>
                         @foreach($reports as $r)
-                            <tr class="{{ $r->status === 'pending' ? 'table-warning' : '' }}">
+                            <tr>
                                 <td class="sg-text-muted">{{ $r->id }}</td>
                                 <td>
                                     @if($r->question)
@@ -136,7 +133,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge badge-info">
+                                    <span class="sg-badge sg-badge-info">
                                         {{ $types[$r->type] ?? $r->type }}
                                     </span>
                                 </td>
@@ -150,13 +147,13 @@
                                 <td>
                                     @switch($r->status)
                                         @case('pending')
-                                            <span class="badge badge-warning">In attesa</span>
+                                            <span class="sg-badge sg-badge--pending">In attesa</span>
                                             @break
                                         @case('accepted')
-                                            <span class="badge badge-success">Accettata</span>
+                                            <span class="sg-badge sg-badge--accepted">Accettata</span>
                                             @break
                                         @case('rejected')
-                                            <span class="badge badge-secondary">Rifiutata</span>
+                                            <span class="sg-badge sg-badge--rejected">Rifiutata</span>
                                             @break
                                     @endswitch
                                 </td>

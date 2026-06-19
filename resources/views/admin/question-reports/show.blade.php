@@ -30,16 +30,16 @@
     <div class="row">
         {{-- ── Colonna sinistra: la domanda ──────────────────── --}}
         <div class="col-12 col-md-7 mb-3">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
+            <div class="sg-card">
+                <div class="sg-card-header">
+                    <h3 class="sg-card-header-title">
                         <i class="fas fa-question-circle mr-1"></i> Domanda segnalata
                     </h3>
                 </div>
-                <div class="card-body">
+                <div class="sg-card-body">
                     @if($report->question)
                         @if($report->question->category)
-                            <span class="badge badge-info mb-2">
+                            <span class="sg-badge sg-badge-info mb-2">
                                 {{ $report->question->category->name }}
                             </span>
                         @endif
@@ -58,17 +58,17 @@
                         <p class="mb-0">
                             Risposta corretta:
                             @if($report->question->is_true)
-                                <span class="badge badge-success">VERO</span>
+                                <span class="sg-badge sg-badge-success">VERO</span>
                             @else
-                                <span class="badge badge-danger">FALSO</span>
+                                <span class="sg-badge sg-badge-danger">FALSO</span>
                             @endif
                         </p>
                     @else
-                        <em class="text-muted">La domanda associata è stata eliminata.</em>
+                        <em class="sg-text-muted">La domanda associata è stata eliminata.</em>
                     @endif
                 </div>
                 @if($report->question && auth()->user()->canEditQuestion())
-                    <div class="card-footer text-right">
+                    <div class="sg-card-footer text-right">
                         <a href="{{ route('admin.questions.edit', $report->question) }}"
                            class="sg-btn sg-btn-warning sg-btn-sm">
                             <i class="fas fa-edit"></i> Modifica domanda
@@ -80,18 +80,18 @@
 
         {{-- ── Colonna destra: il report ─────────────────────── --}}
         <div class="col-12 col-md-5 mb-3">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
+            <div class="sg-card">
+                <div class="sg-card-header">
+                    <h3 class="sg-card-header-title">
                         <i class="fas fa-info-circle mr-1"></i> Dettagli segnalazione
                     </h3>
                 </div>
-                <div class="card-body">
+                <div class="sg-card-body">
                     <dl class="row mb-0">
                         <dt class="col-sm-4">Segnalante</dt>
                         <dd class="col-sm-8">
                             {{ $report->user?->name ?? '—' }}<br>
-                            <small class="text-muted">{{ $report->user?->email }}</small>
+                            <small class="sg-text-muted">{{ $report->user?->email }}</small>
                         </dd>
 
                         <dt class="col-sm-4">Data segnalazione</dt>
@@ -101,7 +101,7 @@
 
                         <dt class="col-sm-4">Tipo</dt>
                         <dd class="col-sm-8">
-                            <span class="badge badge-info">
+                            <span class="sg-badge sg-badge-info">
                                 {{ $types[$report->type] ?? $report->type }}
                             </span>
                         </dd>
@@ -110,13 +110,13 @@
                         <dd class="col-sm-8">
                             @switch($report->status)
                                 @case('pending')
-                                    <span class="badge badge-warning">In attesa</span>
+                                    <span class="sg-badge sg-badge--pending">In attesa</span>
                                     @break
                                 @case('accepted')
-                                    <span class="badge badge-success">Accettata</span>
+                                    <span class="sg-badge sg-badge--accepted">Accettata</span>
                                     @break
                                 @case('rejected')
-                                    <span class="badge badge-secondary">Rifiutata</span>
+                                    <span class="sg-badge sg-badge--rejected">Rifiutata</span>
                                     @break
                             @endswitch
                         </dd>
@@ -124,14 +124,14 @@
 
                     <hr>
 
-                    <h6 class="text-uppercase text-muted small mb-2">Testo segnalazione</h6>
+                    <h6 class="text-uppercase sg-text-muted small mb-2">Testo segnalazione</h6>
                     <div class="alert alert-warning mb-0">
                         {{ $report->body }}
                     </div>
 
                     @if($report->status !== 'pending')
                         <hr>
-                        <h6 class="text-uppercase text-muted small mb-2">Risoluzione</h6>
+                        <h6 class="text-uppercase sg-text-muted small mb-2">Risoluzione</h6>
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Risolta da</dt>
                             <dd class="col-sm-8">{{ $report->resolvedBy?->name ?? '—' }}</dd>
@@ -151,14 +151,14 @@
             </div>
 
             @if($report->status === 'pending')
-                <div class="card mt-3"
+                <div class="sg-card mt-3"
                      x-data="{ note: '' }">
-                    <div class="card-header">
-                        <h3 class="card-title">
+                    <div class="sg-card-header">
+                        <h3 class="sg-card-header-title">
                             <i class="fas fa-gavel mr-1"></i> Gestisci segnalazione
                         </h3>
                     </div>
-                    <div class="card-body">
+                    <div class="sg-card-body">
                         <div class="mb-3">
                             <label class="form-label">Nota per il segnalante (opzionale)</label>
                             <textarea x-model="note"

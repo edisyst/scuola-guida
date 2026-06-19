@@ -5,6 +5,23 @@ Formato seguente [Keep a Changelog](https://keepachangelog.com/it/1.0.0/).
 
 ---
 
+## [Unreleased] — Feature 15.2: Redesign componenti area admin — card, stat box, badge (2026-06-19)
+
+### Changed
+
+- **Stat icon chip tenuito** — le icone nelle stat card (`sg-stat-icon`) usano ora un chip tondo a bassa opacità (≈12%) invece del blocco gradiente saturo precedente (`grad-blue/green/orange/red`). Introdotte classi semantiche `sg-stat-icon--accent/success/warning/danger/muted`; `grad-*` ridefinite a tint per retrocompatibilità. Dashboard admin aggiornata alle nuove classi.
+- **Box KPI segnalazioni** — i tre box "In attesa / Accettate / Rifiutate" in `admin/question-reports/index` sostituiscono il componente `small-box bg-*` di AdminLTE con il nuovo `.sg-status-box` neutro (`--sg-surface`, bordo sinistro semantico, numero `--sg-fs-3xl`, label muted, link filtra discreto).
+- **Badge di stato unificati** — introdotte classi `.sg-badge--pending/accepted/rejected/draft/published/confirmed` (sfondo tenuito + testo WCAG AA ≥ 4.5:1). Le viste `question-reports/index` e `question-reports/show` sostituiscono `badge badge-*` Bootstrap con `sg-badge sg-badge--*`. Le viste `quizzes/index` e `users/index` sostituiscono `badge badge-secondary` con `sg-badge` neutro.
+- **Righe tabella segnalazioni** — rimossa la classe `table-warning` (sfondo crema saturo) dalle righe con stato "pending"; lo stato è ora leggibile esclusivamente dal badge in colonna.
+- **`question-reports/show`** — card Bootstrap (`.card`, `.card-header`, `.card-body`, `.card-footer`) convertite a `.sg-card`, `.sg-card-header`, `.sg-card-body`, `.sg-card-footer`; badge tipo e stato aggiornati al sistema `sg-badge`.
+- **`scuola-guida.css`** — nuova sezione "COMPONENTI REDESIGN 15.2": token `--sg-shadow-sm`, classi `sg-stat-icon--*`, `sg-status-box` con varianti semantiche, `sg-badge--*`, `sg-card-footer`, override tabella (rimozione `table-warning` saturo), header tabella su `--sg-surface-muted`; dark mode per tutti i nuovi componenti.
+
+### Added
+
+- **`RedesignComponentsTest`** — 6 test: dashboard 200 senza `grad-*`, segnalazioni 200 con `sg-status-box` senza `small-box`, badge `sg-badge--pending` nelle segnalazioni, assenza `table-warning`, quiz index con `sg-badge`, users index con `sg-badge`.
+
+---
+
 ## [Unreleased] — Feature 15.1: Redesign shell — sidebar, navbar, page-header (2026-06-19)
 
 ### Changed

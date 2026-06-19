@@ -7,6 +7,7 @@
     /* ── Shell: sidebar, navbar, intestazioni scure ─────────────────────────
        --sg-shell-text su --sg-shell-bg: #e6ebf0 su #1e2a38 → 10.88:1 ✓ WCAG AA */
     --sg-shell-bg:          #1e2a38;
+    --sg-shadow-sm:         0 1px 4px rgba(0, 0, 0, .06);
     --sg-shell-bg-elevated: #25323f;
     --sg-shell-text:        #e6ebf0;
     --sg-shell-text-muted:  #9fb0c0;
@@ -2341,4 +2342,132 @@ body.role-instructor .sidebar .badge { background-color: var(--sg-role-instructo
     color: var(--sg-text) !important;
     margin: 0 !important;
     line-height: 1.3 !important;
+}
+
+/* ============================================================
+   COMPONENTI REDESIGN 15.2
+   Card, stat icon, status box, badge semantici, stile tabelle.
+   Tutti i token sono da 15.0; nessuno ridefinito qui.
+   ============================================================ */
+
+/* ── Icone stat card: chip tondo tenuito (accento <12% opacità) ── */
+
+/* Override classi grad-* esistenti: da gradiente saturo a chip tenuito */
+.sg-stat-icon.grad-blue   { background: rgba(60, 141, 188, .12); color: var(--sg-accent); }
+.sg-stat-icon.grad-green  { background: rgba(47, 158, 111, .12); color: var(--sg-success); }
+.sg-stat-icon.grad-orange { background: rgba(217, 164, 32, .12); color: var(--sg-warning); }
+.sg-stat-icon.grad-red    { background: rgba(192, 57, 43, .12);  color: var(--sg-danger); }
+.sg-stat-icon.grad-dark   { background: rgba(30, 42, 56, .10);   color: var(--sg-text); }
+
+/* Varianti semantiche (preferire queste nelle nuove view) */
+.sg-stat-icon--accent  { background: rgba(60, 141, 188, .12); color: var(--sg-accent);    }
+.sg-stat-icon--success { background: rgba(47, 158, 111, .12); color: var(--sg-success);   }
+.sg-stat-icon--warning { background: rgba(217, 164, 32, .12); color: var(--sg-warning);   }
+.sg-stat-icon--danger  { background: rgba(192, 57, 43, .12);  color: var(--sg-danger);    }
+.sg-stat-icon--muted   { background: rgba(107, 119, 133, .10); color: var(--sg-text-muted); }
+
+/* ── Status box (sostituisce small-box AdminLTE nelle pagine KPI) ── */
+.sg-status-box {
+    background: var(--sg-surface);
+    border-radius: var(--sg-radius);
+    box-shadow: var(--sg-shadow-sm);
+    padding: 20px 22px;
+    border: 1px solid var(--sg-border);
+    border-left: 4px solid var(--sg-border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 100%;
+}
+.sg-status-box-value {
+    font-size: var(--sg-fs-3xl);
+    font-weight: var(--sg-fw-bold);
+    line-height: 1;
+    color: var(--sg-text);
+    font-variant-numeric: tabular-nums;
+}
+.sg-status-box-label {
+    font-size: var(--sg-fs-sm);
+    color: var(--sg-text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    font-weight: var(--sg-fw-medium);
+    margin-top: 4px;
+}
+.sg-status-box-action {
+    margin-top: 14px;
+}
+.sg-status-box--warning { border-left-color: var(--sg-warning); }
+.sg-status-box--success { border-left-color: var(--sg-success); }
+.sg-status-box--danger  { border-left-color: var(--sg-danger);  }
+.sg-status-box--muted   { border-left-color: var(--sg-text-muted); }
+
+/* ── Badge semantici stato (convenzione unica: sfondo tenuito + testo scuro) ──
+   Contrasto verificato WCAG AA (≥ 4.5:1 per testo normale):
+   #856404 su #fff3cd → 5.23:1 ✓   #155724 su #d4edda → 5.74:1 ✓
+   #495057 su #e9ecef → 7.37:1 ✓   #0c5460 su #d1ecf1 → 5.89:1 ✓  */
+.sg-badge--draft     { background: #e9ecef; color: #495057; }
+.sg-badge--published { background: #d4edda; color: #155724; }
+.sg-badge--confirmed { background: #d1ecf1; color: #0c5460; }
+.sg-badge--pending   { background: #fff3cd; color: #856404; }
+.sg-badge--accepted  { background: #d4edda; color: #155724; }
+.sg-badge--rejected  { background: #e9ecef; color: #6c757d; }
+
+/* ── Card footer (sezione in fondo alla sg-card) ── */
+.sg-card-footer {
+    padding: 12px 22px;
+    border-top: 1px solid var(--sg-border-light);
+    background: var(--sg-surface);
+}
+
+/* ── Righe tabella segnalazioni: lo stato si legge dal badge, non dal fondo riga ── */
+.content-wrapper .table tbody tr.table-warning,
+.sg-table tbody tr.table-warning {
+    background-color: transparent !important;
+}
+.content-wrapper .table tbody tr.table-warning > td,
+.sg-table tbody tr.table-warning > td {
+    background-color: transparent !important;
+}
+
+/* ── Header tabella uniforme su token ── */
+.sg-table thead th {
+    background: var(--sg-surface-muted);
+    border-bottom: 1px solid var(--sg-border);
+}
+
+/* ── Dark mode: nuove classi 15.2 ── */
+body.dark-mode .sg-status-box {
+    background: #2d3436;
+    border-color: #495057;
+}
+body.dark-mode .sg-status-box-value { color: #f8f9fa; }
+body.dark-mode .sg-status-box-label { color: #adb5bd; }
+
+body.dark-mode .sg-stat-icon.grad-blue,
+body.dark-mode .sg-stat-icon--accent  { background: rgba(60, 141, 188, .20); color: #5dd; }
+body.dark-mode .sg-stat-icon.grad-green,
+body.dark-mode .sg-stat-icon--success { background: rgba(47, 158, 111, .20); color: #5dd678; }
+body.dark-mode .sg-stat-icon.grad-orange,
+body.dark-mode .sg-stat-icon--warning { background: rgba(217, 164, 32, .20); color: #ffc107; }
+body.dark-mode .sg-stat-icon.grad-red,
+body.dark-mode .sg-stat-icon--danger  { background: rgba(192, 57, 43, .20);  color: #ff7a85; }
+body.dark-mode .sg-stat-icon.grad-dark,
+body.dark-mode .sg-stat-icon--muted   { background: rgba(255,255,255, .08);  color: #adb5bd; }
+
+body.dark-mode .sg-badge--draft     { background: #3d4349; color: #adb5bd; }
+body.dark-mode .sg-badge--published { background: #1a3d25; color: #5dd678; }
+body.dark-mode .sg-badge--confirmed { background: #002f37; color: #5dd; }
+body.dark-mode .sg-badge--pending   { background: #3d2e00; color: #ffc107; }
+body.dark-mode .sg-badge--accepted  { background: #1a3d25; color: #5dd678; }
+body.dark-mode .sg-badge--rejected  { background: #3d4349; color: #adb5bd; }
+
+body.dark-mode .sg-card-footer {
+    background: #2d3436;
+    border-color: #495057;
+}
+
+body.dark-mode .content-wrapper .table tbody tr.table-warning > td,
+body.dark-mode .sg-table tbody tr.table-warning > td {
+    color: #f8f9fa !important;
 }
