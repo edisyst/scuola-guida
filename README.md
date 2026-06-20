@@ -26,6 +26,7 @@ Funzionalità principali:
 
 - **Interfaccia multilingua (IT/EN/ES)** — menu, navbar, **tutte le pagine del viewer** e **tutta l'area backend** (admin, editor, instructor) sono disponibili in italiano, inglese e spagnolo. Il cambio lingua avviene tramite un dropdown con bandierine nella navbar; la scelta è persistita in sessione. I dati applicativi (quiz, domande, categorie) restano in italiano. Aggiungere una nuova lingua richiede creare i file in `lang/{code}/` e aggiungere l'entry in `config/locales.php`. Le tabelle DataTables si localizzano automaticamente via `meta[name="datatables-i18n"]` + `public/js/datatables-i18n.js`, senza inline scripts.
 - **Accessibilità DSA — lettura audio TTS** — ogni viewer può attivare la lettura audio delle domande tramite la Web Speech API (zero costo server, funziona offline). Il toggle e l'opzione di avvio automatico sono configurabili dal profilo. Il supporto replica l'ausilio per candidati con DSA previsto dal D.Lgs. 62/2017 e dalle disposizioni MIT sull'esame teorico.
+- **Contenuti formativi — StudyContent (Feature 10.2)** — admin ed editor possono creare contenuti HTML formativi (con TinyMCE + Media Manager integrato) collegati polimorfico a una **categoria EU** (`is_eu_directive`) o a un **modulo di guida pratica**. Il viewer legge i contenuti pubblicati tramite il componente Livewire `StudyContentViewer` (con pulsante "Segna come letto" e contatore letture). Il toggle `study_content_enabled` in `/admin/system/features` abilita/disabilita l'intera funzionalità; `eu_categories_visible` controlla la visibilità delle categorie EU nella modalità studio.
 - **Guide pratiche — moduli, sessioni e sequenzialità (D.M. MIT 294/2025)** — l'admin configura i moduli di guida pratica per tipo di patente (codice, ore richieste, ordine MIT); istruttori e admin registrano le sessioni dei singoli studenti; ogni viewer consulta il proprio avanzamento. Il percorso è **obbligatoriamente sequenziale**: il modulo A è propedeutico a tutti gli altri (A → B → C → D); tentare di registrare un modulo con precedenti incompleti ritorna HTTP 422. Il controllo avviene a doppio livello (controller + service). Al completamento di tutte le ore obbligatorie si sblocca la **certificazione finale**, visibile con data su dashboard viewer, area istruttore e PDF. Il calcolo avanzamento e lo stato certificazione avvengono in due query senza N+1.
 - **Export PDF attestazione guide pratiche** — il viewer completo scarica un riepilogo PDF delle proprie sessioni quando ha terminato tutte le ore obbligatorie; l'istruttore e l'admin possono esportare il PDF per qualsiasi studente. Il documento contiene intestazione autoscuola (configurabile tramite variabili `.env` `DRIVING_SCHOOL_*`), dati studente, riepilogo avanzamento per modulo, **stato certificazione con data di completamento**, dettaglio sessioni, elenco istruttori. Il file è generato on-demand e rimosso al download. Cleanup automatico alle 03:30.
 
@@ -209,7 +210,7 @@ Per l'elenco completo di ogni variabile, chiave e pannello vedi
 
 ## Test
 
-Suite con ~764 Feature test in ~55 classi (Laravel TestCase + `RefreshDatabase`):
+Suite con ~757 Feature test in ~66 classi (Laravel TestCase + `RefreshDatabase`):
 
 ```bash
 php artisan test

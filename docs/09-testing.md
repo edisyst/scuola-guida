@@ -82,9 +82,24 @@ php artisan test --filter test_viewer_can_submit_anagrafica
 | `ProfileTest` | 5 | Profilo, aggiornamento, cancellazione account, TTS preferences, locale preferita |
 | `CategoryTest` | 4 | CRUD, permessi |
 | `QuestionTest` | 4 | CRUD domande, permessi |
+| `DrivingSequentialityTest` | 13 | 422 su registrazione modulo fuori ordine (B senza A completato), sblocco B dopo completamento A, `getCompletionStatus` (all_completed/next_required/completion_date), view viewer banner certificazione/prossimo modulo, PDF `buildData` con `completion_status` |
+| `StudyContentTest` | 9 | CRUD per ruolo (`canEditStudyContent`), `markAsRead` idempotente, `isReadBy`, cascade delete su categoria e su modulo |
+| `FeatureToggleTest` | 10 | Toggle on/off via Livewire, `guest_homepage_enabled = false` → redirect login, `gamification_enabled = false` → badge 404, tentativo toggle su flag config → 422, accesso admin/non-admin, fallback default=true, setting=0, chiavi config-managed attese |
+| `SystemSettingsTest` | 10 | Get/set service, Redis fallback, 403 editor, 6 indicatori health, salvataggio settings, upload logo, validazione hex/filesize, idempotenza seeder |
+| `GuestHomeTest` | 12 | Risposta 200, nome scuola e tagline visibili, redirect per ruolo (admin/editor/viewer), sezione statistiche nascosta se tutti 0, sezione patenti nascosta se ≤ 1, view senza logo, view senza tagline, chiavi i18n nei tre locale |
+| `AppearanceSettingsTest` | 5 | Salvataggio nuove chiavi appearance, validazione font, rendering `--sg-accent`, skin sidebar configurata, accesso non-admin negato |
+| `AuthPagesLayoutTest` | 11 | Rotte `/login`, `/register`, `/forgot-password` rispondono 200, marker `guest-page` e `sg-auth-card` presenti, logo configurato visibile, flusso login valido, password errata rigettata, utente autenticato rediretto da `/login` |
+| `ReadableTextColorTest` | 6 | `readableTextColor()`: giallo chiaro → `#212529`, blu scuro → `#ffffff`, accent default `#3c8dbc` → `#212529`, hex shorthand `#fff`, rosso puro, nero puro |
+| `AdminPagesStructureTest` | 12 | 9 rotte migrate a `sg-wrapper` rispondono 200 per admin, assenza `var(--font-family)` in settings, `quiz.attempts.show` e `simulator.result` rispondono 200 |
+| `CssCentralizationTest` | 13 | Homepage 200, assenza inline overhead (`[x-cloak]`, logo, sortable, hero overlay, navbar-height), view toccate 200, CSS con tutte le classi/variabili nuove, `welcome.blade.php` eliminata |
+| `DesignSystemFoundationsTest` | 12 | Assenza controlli appearance nel pannello settings, token CSS centralizzati presenti, Inter caricata, migration `deprecate_appearance_settings` reversibile, assenza chiavi appearance in settings |
+| `RedesignShellTest` | 11 | Shell navy uniforme (`--sg-shell-bg`), badge ruolo con `sg-role-{ruolo}`, classe `sg-navbar` presente, `role-{ruolo}` sul body, partial `role-badge` renderizzato |
+| `RedesignComponentsTest` | 6 | Stat icon senza `grad-*` saturati, `sg-status-box` nei report segnalazioni, `sg-badge--pending` presente, assenza `table-warning` nelle righe segnalazioni |
+| `RedesignGuestTest` | 11 | Homepage 200, struttura `.sg-hero` + `.sg-hero-bg` + `.sg-hero-overlay` + `.sg-hero-content`, assenza box annidati (`sg-hero-overlay-text`), feature card `.sg-feature-card`, CTA `.sg-cta-section`, login 200, register 200, flusso login |
+| `I18nContentFixTest` | 5 | Chiavi `editor.reports_col_{type,reporter,date}` risolvono in `it`, `common.all` → "Tutti", homepage guest senza placeholder inglese |
 | `Auth/*` | 16 | Login, logout, registrazione, reset password, verifica email, aggiornamento password, conferma password |
 
-**Totale**: ~611 test in ~51 classi Feature (incluse `Auth/*`).
+**Totale**: ~757 test in ~66 classi Feature (incluse `Auth/*`).
 
 ---
 
