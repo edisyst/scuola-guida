@@ -9,6 +9,7 @@
 
 return [
     'school_name'    => env('DRIVING_SCHOOL_NAME', 'Scuola Guida'),
+    'school_tagline' => env('DRIVING_SCHOOL_TAGLINE', ''),
     'school_address' => env('DRIVING_SCHOOL_ADDRESS', ''),
     'school_phone'   => env('DRIVING_SCHOOL_PHONE', ''),
     'school_email'   => env('DRIVING_SCHOOL_EMAIL', ''),

@@ -22,7 +22,7 @@ class SystemSettingSeeder extends Seeder
                 'type'  => 'string',
                 'group' => 'school',
                 'label' => 'Slogan / tagline',
-                'value' => '',
+                'value' => config('driving.school_tagline', ''),
             ],
             [
                 'key'   => 'school.address',

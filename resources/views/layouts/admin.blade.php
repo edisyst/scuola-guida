@@ -96,6 +96,22 @@
     <livewire:notification-bell />
 @stop
 
+@section('footer')
+    <strong>{{ setting('school.name', config('app.name')) }}</strong>
+    @if(setting('school.address'))
+        &nbsp;· {{ setting('school.address') }}
+    @endif
+    @if(setting('school.phone'))
+        &nbsp;· <i class="fas fa-phone fa-xs"></i> {{ setting('school.phone') }}
+    @endif
+    @if(setting('school.email'))
+        &nbsp;· <a href="mailto:{{ setting('school.email') }}">{{ setting('school.email') }}</a>
+    @endif
+    <div class="float-right d-none d-sm-inline-block">
+        <b>© {{ now()->year }}</b>
+    </div>
+@stop
+
 @section('content_header')
     <h1>{{ $header ?? 'Admin Dashboard' }}</h1>
 @stop
