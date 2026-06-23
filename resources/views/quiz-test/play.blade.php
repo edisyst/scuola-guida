@@ -5,81 +5,7 @@
 @section('content_header')@endsection
 
 @section('content')
-<div class="quiz-wrapper">
-
-    <div class="quiz-header d-flex flex-wrap justify-content-between align-items-end">
-        <div class="quiz-header-info">
-            <p class="progress-label">{{ __('viewer.question_label') }} <span id="current-num">1</span> {{ __('viewer.of') }} <span id="total-num"></span></p>
-            <h1 class="quiz-title">{{ $quiz->title ?? 'Quiz' }}</h1>
-        </div>
-        <div class="quiz-header-progress" style="min-width:140px">
-            <p class="progress-label text-end mb-1"><span id="progress-percent">0%</span></p>
-            <div class="quiz-progress">
-                <div id="progress-bar" class="bar" style="width:0%"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-
-        {{-- Colonna domanda --}}
-        <div class="col-lg-8 mb-4">
-            <div class="card question-card h-100">
-                <div class="card-body p-4">
-
-                    <span class="question-badge">{{ __('viewer.question_label') }} <span id="q-badge-num">1</span></span>
-
-                    <div id="question-text"></div>
-
-                    <div id="question-image" class="mt-3"></div>
-
-                    <div class="answer-area">
-                        <button class="btn btn-answer" data-value="1">
-                            <i class="fas fa-check"></i> {{ __('viewer.answer_true') }}
-                        </button>
-                        <button class="btn btn-answer" data-value="0">
-                            <i class="fas fa-times"></i> {{ __('viewer.answer_false') }}
-                        </button>
-                    </div>
-
-                    <div class="mt-3">
-                        <span id="feedback"></span>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        {{-- Sidebar --}}
-        <div class="col-lg-4 mb-4">
-            <div class="card sidebar-card h-100 d-flex flex-column">
-
-                <div class="sidebar-section text-center">
-                    <p class="sidebar-label mb-1">{{ __('viewer.time_remaining') }}</p>
-                    <span id="timer">00:00</span>
-                </div>
-
-                <div class="sidebar-section">
-                    <p class="sidebar-label">{{ __('viewer.errors') }} <span id="errors-count">0</span> / {{ $maxErrors }}</p>
-                    <div class="error-dots" id="error-dots"></div>
-                </div>
-
-                <div class="sidebar-section flex-grow-1">
-                    <p class="sidebar-label">{{ __('viewer.quick_nav') }}</p>
-                    <div id="navigator"></div>
-                </div>
-
-                <div class="sidebar-section">
-                    <button id="finish-quiz" class="btn btn-dark">
-                        <i class="fas fa-flag-checkered mr-1"></i> {{ __('viewer.quiz.end_quiz') }}
-                    </button>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-</div>
+@include('partials.quiz-player-shell')
 
 {{-- Modale risultati --}}
 <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
@@ -127,7 +53,6 @@
         let remainingSeconds = timeLimit;
         let quizFinished     = false;
 
-        // ── Render domanda ──────────────────────────────────
         function renderQuestion(index) {
             updateProgress();
 
@@ -147,7 +72,6 @@
             }
         }
 
-        // ── Navigatore ──────────────────────────────────────
         function renderNavigator() {
             let html = '';
             questions.forEach((q, i) => {
@@ -161,7 +85,6 @@
             $('#navigator').html(html);
         }
 
-        // ── Punti errore ─────────────────────────────────────
         function renderErrorDots() {
             let html = '';
             for (let i = 0; i < maxErrors; i++) {
@@ -171,7 +94,6 @@
             $('#errors-count').text(errors);
         }
 
-        // ── Progresso ────────────────────────────────────────
         function updateProgress() {
             const current = currentIndex + 1;
             const total   = questions.length;
@@ -184,7 +106,6 @@
             $('#progress-bar').css('width', pct + '%');
         }
 
-        // ── Click risposta ───────────────────────────────────
         $(document).on('click', '.btn-answer', function () {
             const value    = parseInt($(this).data('value'));
             const q        = questions[currentIndex];
@@ -224,19 +145,16 @@
             }, 500);
         });
 
-        // ── Navigazione rapida ───────────────────────────────
         $(document).on('click', '.nav-btn', function () {
             currentIndex = parseInt($(this).data('index'));
             renderQuestion(currentIndex);
             renderNavigator();
         });
 
-        // ── Zoom immagine ────────────────────────────────────
         $(document).on('click', '#question-image img', function () {
             window.open($(this).attr('src'), '_blank');
         });
 
-        // ── Termina ──────────────────────────────────────────
         $('#finish-quiz').click(function () {
             if (Object.keys(answers).length === 0) {
                 toastr.warning(uiStrings.answer_required);
@@ -245,7 +163,6 @@
             finishQuiz();
         });
 
-        // ── Timer ────────────────────────────────────────────
         function startTimer() {
             updateTimerUI();
             const interval = setInterval(() => {
@@ -266,7 +183,6 @@
             if (remainingSeconds < 300) $('#timer').addClass('danger');
         }
 
-        // ── Finish — mostra risultati senza salvare ──────────
         function finishQuiz(reason = '') {
             if (quizFinished) return;
             quizFinished = true;
@@ -298,12 +214,10 @@
             $('#resultModal').modal('show');
         }
 
-        // ── Riprova ──────────────────────────────────────────
         $('#retry-btn').click(function () {
             window.location.href = playUrl;
         });
 
-        // ── Init ─────────────────────────────────────────────
         $(document).ready(function () {
             renderQuestion(0);
             renderNavigator();
