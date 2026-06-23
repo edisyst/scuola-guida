@@ -8,6 +8,7 @@ return [
     'esami'                   => 'EXAMS',
     'catalogo'                => 'CATALOG',
     'quiz'                    => 'QUIZ',
+    'quiz_test'               => 'QUIZ TEST',
     'istruttore'              => 'INSTRUCTOR',
 
     // Navbar — user menu (topnav_user)
@@ -58,6 +59,7 @@ return [
     'tipi_patente'            => 'License types',
     'moduli_guida'            => 'Driving practice modules',
     'quizzes'                 => 'Quizzes',
+    'prova_quiz'              => 'Try quiz',
     'i_miei_studenti'         => 'My students',
     'gestione_istruttori'     => 'Instructor management',
     'contenuti_formativi'     => 'Educational content',

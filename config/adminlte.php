@@ -544,6 +544,15 @@ return [
             'can'  => 'exam-participant',
         ],
 
+        // ── QUIZ TEST (preview UI, accessibile a tutti gli utenti loggati) ─────
+        ['header' => 'quiz_test'],
+        [
+            'text' => 'prova_quiz',
+            'url'  => 'quiz-test',
+            'icon' => 'fas fa-flask',
+            'key'  => 'quiz-test',
+        ],
+
         // ── ESAMI UFFICIALI (viewer partecipa, admin/editor sola lettura) ───
         ['header' => 'esami', 'can' => 'viewer-quiz-area'],
         [

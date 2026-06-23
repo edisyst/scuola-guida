@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationContro
 use App\Http\Controllers\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\QuizTestController;
 use App\Http\Controllers\Admin\HealthController;
 use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\InstructorAssignmentController;
@@ -80,6 +81,12 @@ Route::middleware(['auth'])->group(function () {
     // Iscrizione anagrafica viewer (invio dati per esami ufficiali)
     Route::post('/profile/registration', [RegistrationController::class, 'submit'])
         ->name('profile.registration.submit');
+
+    // Area test quiz (preview UI, nessun tentativo salvato)
+    Route::prefix('quiz-test')->name('quiz-test.')->group(function () {
+        Route::get('/', [QuizTestController::class, 'index'])->name('index');
+        Route::get('/{quiz}/play', [QuizTestController::class, 'play'])->name('play');
+    });
 
     // Quiz: gioca (viewer / user)
     Route::get('quiz/{quiz}/play', [QuizController::class, 'play'])->name('quiz.play');

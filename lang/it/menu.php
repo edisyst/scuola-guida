@@ -8,6 +8,7 @@ return [
     'esami'                   => 'ESAMI',
     'catalogo'                => 'CATALOGO',
     'quiz'                    => 'QUIZ',
+    'quiz_test'               => 'QUIZ TEST',
     'istruttore'              => 'ISTRUTTORE',
 
     // Voci navbar — menu utente (topnav_user)
@@ -58,6 +59,7 @@ return [
     'tipi_patente'            => 'Tipi di patente',
     'moduli_guida'            => 'Moduli guida pratica',
     'quizzes'                 => 'Quizzes',
+    'prova_quiz'              => 'Prova quiz',
     'i_miei_studenti'         => 'I miei studenti',
     'gestione_istruttori'     => 'Gestione istruttori',
     'contenuti_formativi'     => 'Contenuti formativi',

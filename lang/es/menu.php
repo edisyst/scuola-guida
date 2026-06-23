@@ -8,6 +8,7 @@ return [
     'esami'                   => 'EXÁMENES',
     'catalogo'                => 'CATÁLOGO',
     'quiz'                    => 'QUIZ',
+    'quiz_test'               => 'QUIZ TEST',
     'istruttore'              => 'INSTRUCTOR',
 
     // Barra de navegación — menú de usuario (topnav_user)
@@ -58,6 +59,7 @@ return [
     'tipi_patente'            => 'Tipos de licencia',
     'moduli_guida'            => 'Módulos de prácticas',
     'quizzes'                 => 'Quizzes',
+    'prova_quiz'              => 'Probar quiz',
     'i_miei_studenti'         => 'Mis estudiantes',
     'gestione_istruttori'     => 'Gestión de instructores',
     'contenuti_formativi'     => 'Contenido formativo',
