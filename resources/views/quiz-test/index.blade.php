@@ -21,8 +21,8 @@
     <form method="GET" action="{{ route('quiz-test.index') }}" class="sg-mb-3 d-flex align-items-center" style="gap:.5rem">
         <select name="license_type_id" class="form-control" style="max-width:220px" onchange="this.form.submit()">
             <option value="">— Tutti i tipi patente —</option>
-            @foreach($licenseTypes as $id => $label)
-                <option value="{{ $id }}" {{ $licenseTypeId == $id ? 'selected' : '' }}>{{ $label }}</option>
+            @foreach($licenseTypes as $lt)
+                <option value="{{ $lt->id }}" {{ $licenseTypeId == $lt->id ? 'selected' : '' }}>{{ $lt->name }}</option>
             @endforeach
         </select>
         @if($licenseTypeId)

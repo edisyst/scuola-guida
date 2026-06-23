@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Quiz;
 use App\Models\Question;
 use App\Models\Category;
+use App\Models\LicenseType;
 use App\Models\User;
 
 class QuizSeeder extends Seeder
@@ -26,6 +27,8 @@ class QuizSeeder extends Seeder
 
         $admin = User::first();
 
+        $licenseTypes = LicenseType::whereIn('code', ['A', 'B', 'C'])->get();
+
         $quizzes = collect()
             ->merge(Quiz::factory(3)->state(['status' => Quiz::STATUS_DRAFT])->create())
             ->merge(Quiz::factory(4)->state(['status' => Quiz::STATUS_PUBLISHED])->create())
@@ -38,6 +41,11 @@ class QuizSeeder extends Seeder
             );
 
         foreach ($quizzes as $quiz) {
+            if ($quiz->status !== Quiz::STATUS_DRAFT && $licenseTypes->isNotEmpty()) {
+                $quiz->license_type_id = $licenseTypes->random()->id;
+                $quiz->save();
+            }
+
             $count    = min($quiz->max_questions, $questions->count());
             $selected = $questions->random($count);
 

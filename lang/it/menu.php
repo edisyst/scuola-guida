@@ -58,7 +58,7 @@ return [
     'segnalazioni'            => 'Segnalazioni',
     'tipi_patente'            => 'Tipi di patente',
     'moduli_guida'            => 'Moduli guida pratica',
-    'quizzes'                 => 'Quizzes',
+    'quizzes'                 => 'Gestione quiz',
     'prova_quiz'              => 'Prova quiz',
     'i_miei_studenti'         => 'I miei studenti',
     'gestione_istruttori'     => 'Gestione istruttori',

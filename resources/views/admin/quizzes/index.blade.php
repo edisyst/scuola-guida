@@ -61,6 +61,11 @@
                         <i class="fas fa-filter"></i> {{ __('common.filter') }}
                     </button>
                 </div>
+                <div class="col-12 col-md-2 sg-mb-1">
+                    <a href="{{ route('admin.quizzes.index') }}" class="sg-btn sg-btn-secondary sg-btn-sm" style="width:100%;">
+                        <i class="fas fa-times"></i> {{ __('common.reset') }}
+                    </a>
+                </div>
             </form>
         </div>
 

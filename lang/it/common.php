@@ -7,6 +7,7 @@ return [
     'back'    => 'Indietro',
     'search'  => 'Cerca',
     'filter'  => 'Filtra',
+    'reset'   => 'Azzera filtri',
     'export'  => 'Esporta',
     'yes'     => 'Sì',
     'no'      => 'No',

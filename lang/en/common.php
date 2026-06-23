@@ -7,6 +7,7 @@ return [
     'back'    => 'Back',
     'search'  => 'Search',
     'filter'  => 'Filter',
+    'reset'   => 'Reset filters',
     'export'  => 'Export',
     'yes'     => 'Yes',
     'no'      => 'No',
