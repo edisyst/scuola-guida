@@ -36,13 +36,24 @@ class AuditLogSeeder extends Seeder
             $createdIds = collect($questionIds)->shuffle()->take(fake()->numberBetween(5, 15));
             foreach ($createdIds as $qId) {
                 $createdAt = now()->subDays(fake()->numberBetween(0, 60));
+                $demoQuestions = [
+                    'Il conducente deve cedere la precedenza ai veicoli provenienti da destra.',
+                    'In autostrada è obbligatorio percorrere la corsia di destra.',
+                    'Il limite di velocità in area urbana è di 50 km/h.',
+                    'Il sorpasso è sempre vietato in prossimità di un incrocio.',
+                    'Le cinture di sicurezza sono obbligatorie per tutti gli occupanti.',
+                    'Il segnale di Stop impone la fermata obbligatoria.',
+                    'Con pioggia il limite in autostrada scende a 110 km/h.',
+                    'I pneumatici invernali vanno montati dal 15 novembre al 15 aprile.',
+                ];
+
                 AuditLog::insert([
                     'user_id'    => $editor->id,
                     'event'      => 'created',
                     'model_type' => Question::class,
                     'model_id'   => $qId,
                     'old_values' => null,
-                    'new_values' => json_encode(['question' => fake()->sentence(8), 'is_true' => fake()->boolean()]),
+                    'new_values' => json_encode(['question' => fake()->randomElement($demoQuestions), 'is_true' => fake()->boolean()]),
                     'created_at' => $createdAt,
                     'updated_at' => $createdAt,
                 ]);

@@ -39,13 +39,30 @@ class QuestionReportSeeder extends Seeder
                 $isResolved = $status !== QuestionReport::STATUS_PENDING;
                 $resolvedAt = $isResolved ? now()->subDays(fake()->numberBetween(1, 15)) : null;
 
+                $bodies = [
+                    'La risposta sembra errata: secondo il Codice della Strada la risposta corretta dovrebbe essere l\'opposta.',
+                    'Il testo della domanda è ambiguo e può essere interpretato in modi diversi.',
+                    'L\'immagine allegata non corrisponde alla domanda.',
+                    'La domanda contiene un refuso nel testo.',
+                    'Il limite indicato non è aggiornato con le modifiche recenti al Codice della Strada.',
+                    'La domanda duplica un\'altra già presente nella banca dati.',
+                    'Non capisco il criterio con cui è stato stabilito il valore Vero/Falso.',
+                    'Il segnale descritto non corrisponde alla categoria indicata.',
+                ];
+                $adminNotes = [
+                    'Verifica in corso — rimandato alla revisione mensile.',
+                    'Confermato errore: domanda aggiornata.',
+                    'Domanda corretta, nessuna modifica necessaria.',
+                    'Testo chiarito nella versione aggiornata.',
+                ];
+
                 QuestionReport::insertOrIgnore([
                     'question_id' => $question->id,
                     'user_id'     => $viewer->id,
-                    'body'        => fake()->sentence(fake()->numberBetween(5, 15)),
+                    'body'        => fake()->randomElement($bodies),
                     'type'        => fake()->randomElement(array_keys(QuestionReport::types())),
                     'status'      => $status,
-                    'admin_note'  => $isResolved ? fake()->optional(0.5)->sentence(5) : null,
+                    'admin_note'  => $isResolved ? fake()->optional(0.5)->randomElement($adminNotes) : null,
                     'resolved_by' => $isResolved ? $admin?->id : null,
                     'resolved_at' => $resolvedAt,
                     'created_at'  => now()->subDays(fake()->numberBetween(1, 30)),

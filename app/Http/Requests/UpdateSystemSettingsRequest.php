@@ -20,6 +20,7 @@ class UpdateSystemSettingsRequest extends FormRequest
             'school_phone'         => ['nullable', 'string', 'max:20'],
             'school_email'         => ['nullable', 'email', 'max:150'],
             'school_license_number'=> ['nullable', 'string', 'max:50'],
+            'accent_color'      => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'logo'              => ['nullable', 'file', 'mimes:jpg,jpeg,png,svg', 'max:2048'],
             'logo_dark'         => ['nullable', 'file', 'mimes:jpg,jpeg,png,svg', 'max:2048'],
             'carousel_images'   => ['nullable', 'array', 'max:4'],

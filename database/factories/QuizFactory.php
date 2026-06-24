@@ -27,14 +27,22 @@ class QuizFactory extends Factory
             $id = str_pad($quiz->id, 2, '0', STR_PAD_LEFT);
 
             $prefix = match ($quiz->status) {
-                Quiz::STATUS_DRAFT     => 'Bozza di quiz',
-                Quiz::STATUS_PUBLISHED => fake()->randomElement(['Esercitazione', 'Quiz di prova']),
-                Quiz::STATUS_CONFIRMED => 'Quiz di esame',
-                default                => 'Quiz',
+                Quiz::STATUS_DRAFT     => fake()->randomElement(['Bozza', 'Quiz in preparazione', 'Bozza sessione']),
+                Quiz::STATUS_PUBLISHED => fake()->randomElement([
+                    'Esercitazione segnaletica', 'Quiz di prova – Patente B',
+                    'Ripasso norme di comportamento', 'Esercitazione limiti di velocità',
+                    'Quiz misto – teoria e segnali', 'Allenamento pre-esame',
+                ]),
+                Quiz::STATUS_CONFIRMED => fake()->randomElement([
+                    'Simulazione esame B – sessione primaverile',
+                    'Simulazione esame B – sessione estiva',
+                    'Simulazione esame B – sessione autunnale',
+                ]),
+                default => 'Quiz',
             };
 
             if ($quiz->title === 'Quiz') {
-                $quiz->updateQuietly(['title' => "{$prefix} #{$id} da {$quiz->max_questions} domande"]);
+                $quiz->updateQuietly(['title' => "{$prefix} #{$id}"]);
             }
         });
     }

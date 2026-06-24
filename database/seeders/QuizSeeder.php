@@ -29,16 +29,31 @@ class QuizSeeder extends Seeder
 
         $licenseTypes = LicenseType::whereIn('code', ['A', 'B', 'C'])->get();
 
-        $quizzes = collect()
-            ->merge(Quiz::factory(3)->state(['status' => Quiz::STATUS_DRAFT])->create())
-            ->merge(Quiz::factory(4)->state(['status' => Quiz::STATUS_PUBLISHED])->create())
-            ->merge(
-                Quiz::factory(3)->state(fn () => [
-                    'status'       => Quiz::STATUS_CONFIRMED,
-                    'confirmed_at' => now()->subDays(rand(1, 15)),
-                    'confirmed_by' => $admin?->id,
-                ])->create()
-            );
+        $drafts     = Quiz::factory(3)->state(['status' => Quiz::STATUS_DRAFT])->create();
+        $published  = Quiz::factory(4)->state(['status' => Quiz::STATUS_PUBLISHED])->create();
+        $confirmed  = Quiz::factory(3)->state(fn () => [
+            'status'       => Quiz::STATUS_CONFIRMED,
+            'confirmed_at' => now()->subDays(rand(1, 15)),
+            'confirmed_by' => $admin?->id,
+        ])->create();
+
+        // Date iscrizione sui quiz confermati: upcoming / open / closed
+        if ($confirmed->count() >= 3) {
+            $confirmed->get(0)->update([
+                'enrollments_open_at'  => now()->addDays(5),
+                'enrollments_close_at' => now()->addDays(15),
+            ]);
+            $confirmed->get(1)->update([
+                'enrollments_open_at'  => now()->subDays(3),
+                'enrollments_close_at' => now()->addDays(7),
+            ]);
+            $confirmed->get(2)->update([
+                'enrollments_open_at'  => now()->subDays(20),
+                'enrollments_close_at' => now()->subDays(5),
+            ]);
+        }
+
+        $quizzes = $drafts->merge($published)->merge($confirmed);
 
         foreach ($quizzes as $quiz) {
             if ($quiz->status !== Quiz::STATUS_DRAFT && $licenseTypes->isNotEmpty()) {
@@ -56,6 +71,6 @@ class QuizSeeder extends Seeder
             $quiz->questions()->attach($pivot);
         }
 
-        $this->command->info('CREATI 10 QUIZ (3 bozze, 4 pubblicati, 3 esami) CON DOMANDE ASSOCIATE');
+        $this->command->info('CREATI 10 QUIZ (3 bozze, 4 pubblicati, 3 esami con date iscrizione) CON DOMANDE ASSOCIATE');
     }
 }

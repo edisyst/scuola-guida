@@ -49,6 +49,12 @@ class DatabaseSeeder extends Seeder
             BookmarkSeeder::class,
             // Materiali (link/note) per categorie
             CategoryMaterialSeeder::class,
+            // Test diagnostico e piano di studio (Feature viewer)
+            DiagnosticResultSeeder::class,
+            // Notifiche DB (badge, esito esame, richieste anagrafica)
+            NotificationSeeder::class,
+            // Fix ordine: patente B ai viewer senza licenza + sync categorie-patenti
+            DemoFixSeeder::class,
         ]);
     }
 }

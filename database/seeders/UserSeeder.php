@@ -6,24 +6,49 @@ use App\Models\LicenseType;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
+    // Utenti italiani per demo — password uniforme: "password"
+    private const DEMO_USERS = [
+        ['name' => 'Sofia Esposito',    'email' => 'sofia.esposito@demo.it',    'role' => 'viewer'],
+        ['name' => 'Matteo Russo',      'email' => 'matteo.russo@demo.it',      'role' => 'viewer'],
+        ['name' => 'Chiara Romano',     'email' => 'chiara.romano@demo.it',     'role' => 'viewer'],
+        ['name' => 'Lorenzo Colombo',   'email' => 'lorenzo.colombo@demo.it',   'role' => 'viewer'],
+        ['name' => 'Giorgia Ricci',     'email' => 'giorgia.ricci@demo.it',     'role' => 'viewer'],
+        ['name' => 'Andrea Marino',     'email' => 'andrea.marino@demo.it',     'role' => 'viewer'],
+        ['name' => 'Valentina Greco',   'email' => 'valentina.greco@demo.it',   'role' => 'viewer'],
+        ['name' => 'Francesco Bruno',   'email' => 'f.bruno@demo.it',           'role' => 'viewer'],
+        ['name' => 'Alessia Gallo',     'email' => 'alessia.gallo@demo.it',     'role' => 'viewer'],
+        ['name' => 'Davide Conti',      'email' => 'davide.conti@demo.it',      'role' => 'viewer'],
+        ['name' => 'Elisa Fontana',     'email' => 'elisa.fontana@demo.it',     'role' => 'viewer'],
+        ['name' => 'Simone Barbieri',   'email' => 'simone.barbieri@demo.it',   'role' => 'viewer'],
+        ['name' => 'Federica Morelli',  'email' => 'f.morelli@demo.it',         'role' => 'viewer'],
+        ['name' => 'Riccardo Vitale',   'email' => 'r.vitale@demo.it',          'role' => 'viewer'],
+        ['name' => 'Martina De Luca',   'email' => 'm.deluca@demo.it',          'role' => 'viewer'],
+        ['name' => 'Emanuele Serra',    'email' => 'e.serra@demo.it',           'role' => 'editor'],
+        ['name' => 'Roberta Pellegrini','email' => 'r.pellegrini@demo.it',      'role' => 'editor'],
+        ['name' => 'Stefano Caruso',    'email' => 's.caruso@demo.it',          'role' => 'editor'],
+        ['name' => 'Paola Montanari',   'email' => 'p.montanari@demo.it',       'role' => 'editor'],
+        ['name' => 'Giacomo Ferretti',  'email' => 'g.ferretti@demo.it',        'role' => 'editor'],
+    ];
+
     public function run(): void
     {
-        User::factory(20)->create()->each(function ($user) {
-
-            $roles = ['editor', 'viewer'];
-
-            $user->update([
-                'role' => $roles[array_rand($roles)],
-                'permissions' => ['create_question'],
-                'created_at' => now()->subDays(rand(0, 30)), // per grafico
+        foreach (self::DEMO_USERS as $data) {
+            User::create([
+                'name'               => $data['name'],
+                'email'              => $data['email'],
+                'password'           => Hash::make('password'),
+                'role'               => $data['role'],
+                'permissions'        => $data['role'] === 'editor' ? ['create_question', 'edit_question'] : [],
+                'email_verified_at'  => now(),
+                'created_at'         => now()->subDays(rand(0, 30)),
+                'updated_at'         => now(),
             ]);
-        });
+        }
 
-        $this->command->info("CREATI 20 UTENTI RANDOM");
+        $this->command->info('CREATI 20 UTENTI DEMO ITALIANI (15 viewer, 5 editor)');
 
         // 3 iscrizioni anagrafiche in attesa
         $registrations = [
